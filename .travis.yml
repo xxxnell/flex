@@ -12,3 +12,6 @@ script:
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
+
+notifications:
+  slack: fpstudymeetup:49hLJXAjJrK04GUSIC9MdKB4
