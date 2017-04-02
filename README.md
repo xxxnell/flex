@@ -7,7 +7,7 @@
 Scope Sketch is the probablistic data structure that measures the frequency - or probalility -  of the data stream composed of measurable elements. At the same time, it is generalization of the [Count-Min Sketch](https://en.wikipedia.org/wiki/Count%E2%80%93min_sketch) data structure, that is the frequency counter for finite and countable elements.
 
 
-# Getting Started 
+## Getting Started 
 
 ``` scala 
 import sketch.scope._
@@ -23,28 +23,28 @@ println(sketch.probability(0.1, 0.2))
 ```
 
 
-# Dependencies
+## Dependencies
 
-## Maven Configuration
+### Maven Configuration
 
 ``` xml
 ```
 
 
-## sbt Configuration
+### sbt Configuration
 
 ``` scala
 ```
 
-# Documentation
+## Documentation
 
 * [Scaladoc]()
 
 
-# Bugs and Feedback
+## Bugs and Feedback
 
 
 
 
-# LICENSE
+## LICENSE
 
