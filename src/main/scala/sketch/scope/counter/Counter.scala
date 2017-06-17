@@ -37,7 +37,7 @@ trait CounterSyntax {
 
 object Counter extends CounterOps[Counter] {
 
-  def empty(cdimSize: CDim): ListCounter = ListCounter.empty(cdimSize)
+  def empty(size: Int): ListCounter = ListCounter.empty(size)
 
   def update(counter: Counter, cdim: CDim, count: Double): Option[Counter] = counter match {
     case counter: ListCounter => ListCounter.update(counter, cdim, count)

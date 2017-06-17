@@ -23,6 +23,6 @@ object ListCounter extends ListCounterOp {
 
   def apply(cs: List[Double]): ListCounter = ListCounterImpl(cs)
 
-  def empty(cdimSize: CDim): ListCounter = ListCounter(List.fill[Double](cdimSize)(0))
+  def empty(size: Int): ListCounter = ListCounter(List.fill[Double](size)(0))
 
 }

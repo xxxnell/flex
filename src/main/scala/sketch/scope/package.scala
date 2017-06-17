@@ -1,5 +1,6 @@
 package sketch
 
+import cats.data.Kleisli
 import sketch.scope.sketch.SketchSyntax
 
 /**
@@ -8,5 +9,9 @@ import sketch.scope.sketch.SketchSyntax
 package object scope extends SketchSyntax {
 
   type Result[A] = Throwable Either A
+
+  type Mon[A, B] = Kleisli[Some, A, B]
+
+  type Epi[A, B] = Kleisli[Option, A, B]
 
 }
