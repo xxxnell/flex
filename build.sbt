@@ -17,6 +17,7 @@ val commonSettings = Seq(
 )
 
 lazy val scope_sketch = (project in file("."))
+  .settings(commonSettings)
   .settings(
-    libraryDependencies ++= (cats ++ monixs ++ specs)
+    libraryDependencies ++= (specs ++ tics)
   )

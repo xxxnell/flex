@@ -12,6 +12,10 @@ object Dependencies {
     "io.monix" %% "monix" % "2.2.2"
   )
 
+  val tics = Seq(
+    "org.scalactic" %% "scalactic" % "3.0.3"
+  )
+
   val specs2Version = "3.9.1"
   val specs = Seq(
     "org.specs2" %% "specs2-core" % specs2Version % "test",
