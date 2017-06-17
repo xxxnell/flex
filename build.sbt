@@ -6,7 +6,7 @@ name := "scope-sketch"
 
 version := s"1.0$snapshot"
 
-scalaVersion := "2.11.8"
+scalaVersion := "2.12.1"
 
 val commonSettings = Seq(
 
@@ -17,6 +17,7 @@ val commonSettings = Seq(
 )
 
 lazy val scope_sketch = (project in file("."))
+  .settings(commonSettings)
   .settings(
-    libraryDependencies ++= (cats ++ monixs ++ specs)
+    libraryDependencies ++= (specs ++ tics)
   )

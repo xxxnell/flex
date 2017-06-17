@@ -1,7 +1,6 @@
 package sketch.scope.hmap
 
 import cats.data.Kleisli
-import sketch.scope.Result
 import sketch.scope.counter.CDim
 
 /**
