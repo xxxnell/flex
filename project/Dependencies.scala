@@ -12,12 +12,12 @@ object Dependencies {
     "io.monix" %% "monix" % "2.2.2"
   )
 
-  val specs2Version = "3.7"
+  val specs2Version = "3.9.1"
   val specs = Seq(
-    "org.specs2" % "specs2-core_2.11" % specs2Version % "test",
-    "org.specs2" % "specs2-mock_2.11" % specs2Version % "test",
-    "org.specs2" % "specs2-junit_2.11" % specs2Version % "test",
-    "org.specs2" % "specs2-scalacheck_2.11" % specs2Version % "test"
+    "org.specs2" %% "specs2-core" % specs2Version % "test",
+    "org.specs2" %% "specs2-mock" % specs2Version % "test",
+    "org.specs2" %% "specs2-junit" % specs2Version % "test",
+    "org.specs2" %% "specs2-scalacheck" % specs2Version % "test"
   )
 
 }
