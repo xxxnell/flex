@@ -8,7 +8,9 @@ import scala.util.Try
   * Counter for memorizing counts.
   */
 trait Counter {
+
   def cs: Seq[Double]
+
 }
 
 trait CounterOps[C<:Counter] extends CounterLaws[C] {
