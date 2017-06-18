@@ -8,25 +8,25 @@ import sketch.scope.hmap.HDim
   *
   * Characteristic Map of Sketch Algorithm.
   */
-trait Cmap[A] {
+trait Cmap {
 
   /**
     * @return hdim
     * */
-  def apply(a: A): HDim
+  def apply(a: Double): HDim
 
 }
 
-trait CmapOp {
+trait CmapOps {
 
-  def kleisli[A](cmap: Cmap[A]) = Kleisli[Option, A, HDim](a => Some(cmap.apply(a)))
+  def kleisli(cmap: Cmap) = Kleisli[Option, Double, HDim](a => Some(cmap.apply(a)))
 
 }
 
-object Cmap {
+object Cmap extends CmapOps {
 
-  def apply[A]: Cmap[A] = ???
+  def uniform(n: Int): Cmap = UniformCmap(n)
 
-  def uniform[A]: Cmap[A] = ???
+  def divider(divider: List[Double]): Cmap = DividerCmap(divider)
 
 }

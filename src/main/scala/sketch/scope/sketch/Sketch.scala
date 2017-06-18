@@ -79,7 +79,7 @@ object Sketch extends SketchOps {
   /**
     * @return
     */
-  def empty[A](cmap: Cmap[A], hmap: Hmap): Sketch[A] = ???
+  def empty[A](cmap: Cmap, hmap: Hmap): Sketch[A] = ???
 
   // Ops
 
