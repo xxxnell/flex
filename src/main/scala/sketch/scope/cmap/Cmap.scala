@@ -3,6 +3,8 @@ package sketch.scope.cmap
 import cats.data.Kleisli
 import sketch.scope.hmap.HDim
 
+import scala.collection.immutable.NumericRange
+
 /**
   * Licensed by Probe Technology, Inc.
   *
@@ -17,16 +19,37 @@ trait Cmap {
 
 }
 
-trait CmapOps {
+trait CmapOps[C<:Cmap] extends CmapLaws[C] {
+
+  def bin(cmap: C): List[NumericRange[Double]]
+
+  def size(cmap: C): Int
+
+}
+
+trait CmapLaws[C<:Cmap] { self: CmapOps[C] =>
 
   def kleisli(cmap: Cmap) = Kleisli[Option, Double, HDim](a => Some(cmap.apply(a)))
 
 }
 
-object Cmap extends CmapOps {
+trait CmapSyntax {
+
+  implicit class CmapSyntaxImpl(cmap: Cmap) {
+    def bin: List[NumericRange[Double]] = Cmap.bin(cmap)
+    def size: Int = Cmap.size(cmap)
+  }
+
+}
+
+object Cmap extends CmapOps[Cmap] {
 
   def uniform(n: Int): Cmap = UniformCmap(n)
 
   def divider(divider: List[Double]): Cmap = DividerCmap(divider)
+
+  def bin(cmap: Cmap): List[NumericRange[Double]] = ???
+
+  def size(cmap: Cmap): Int = ???
 
 }
