@@ -25,6 +25,8 @@ trait CmapOps[C<:Cmap] extends CmapLaws[C] {
 
   def size(cmap: C): Int
 
+  def range(cmap: C, hdim: HDim): NumericRange[Double]
+
 }
 
 trait CmapLaws[C<:Cmap] { self: CmapOps[C] =>
@@ -38,6 +40,7 @@ trait CmapSyntax {
   implicit class CmapSyntaxImpl(cmap: Cmap) {
     def bin: List[NumericRange[Double]] = Cmap.bin(cmap)
     def size: Int = Cmap.size(cmap)
+    def range(hdim: HDim): NumericRange[Double] = Cmap.range(cmap, hdim)
   }
 
 }
@@ -51,5 +54,7 @@ object Cmap extends CmapOps[Cmap] {
   def bin(cmap: Cmap): List[NumericRange[Double]] = ???
 
   def size(cmap: Cmap): Int = ???
+
+  def range(cmap: Cmap, hdim: HDim): NumericRange[Double] = ???
 
 }

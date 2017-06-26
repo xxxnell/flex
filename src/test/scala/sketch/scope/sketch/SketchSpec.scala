@@ -15,6 +15,6 @@ class SketchSpec extends Specification with ScalaCheck {
 
 object SketchGen {
 
-  def sketchGen: Gen[Sketch[_]] = ???
+  def sketchGen: Gen[Sketch] = ???
 
 }

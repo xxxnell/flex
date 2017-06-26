@@ -34,4 +34,6 @@ object DividerCmap extends DividerCmapOps[DividerCmap] {
 
   def size(cmap: DividerCmap): Int = ???
 
+  def range(cmap: DividerCmap, hdim: HDim): NumericRange[Double] = ???
+
 }

@@ -3,6 +3,8 @@ package sketch
 import cats.data.Kleisli
 import sketch.scope.sketch.SketchSyntax
 
+import scala.collection.immutable.NumericRange
+
 /**
   * Licensed by Probe Technology, Inc.
   */

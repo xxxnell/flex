@@ -32,4 +32,6 @@ object UniformCmap extends UniformCmapOps {
 
   def size(cmap: UniformCmap): Int = ???
 
+  def range(cmap: UniformCmap, hdim: HDim): NumericRange[Double] = ???
+
 }
