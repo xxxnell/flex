@@ -93,17 +93,23 @@ trait SketchSyntax {
 
 object Sketch extends SketchOps[Sketch] {
 
-  /**
-    * @return
-    */
-  def empty(cmapSize: Int, depth: Int, cdimSize: Int): Sketch = ???
+  def empty(caDepth: Int, caSize: Int, coDepth: Int, coSize: Int): Sketch =
+    PeriodicSketch.empty(caDepth, caSize, coDepth, coSize)
 
-  def primitiveUpdate(sketch: Sketch, p: Double): Option[Sketch] = ???
+  def primitiveUpdate(sketch: Sketch, p: Double): Option[Sketch] = sketch match {
+    case sketch: PeriodicSketch => PeriodicSketch.primitiveUpdate(sketch, p)
+  }
 
-  def primitiveCount(sketch: Sketch, pFrom: Double, pTo: Double): Option[Double] = ???
+  def primitiveCount(sketch: Sketch, pFrom: Double, pTo: Double): Option[Double] = sketch match {
+    case sketch: PeriodicSketch => PeriodicSketch.primitiveCount(sketch, pFrom, pTo)
+  }
 
-  def sum(sketch: Sketch): Double = ???
+  def sum(sketch: Sketch): Double = sketch match {
+    case sketch: PeriodicSketch => PeriodicSketch.sum(sketch)
+  }
 
-  def clear(sketch: Sketch): Sketch = ???
+  def clear(sketch: Sketch): Sketch = sketch match {
+    case sketch: PeriodicSketch => PeriodicSketch.clear(sketch)
+  }
 
 }

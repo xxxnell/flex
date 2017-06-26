@@ -149,11 +149,11 @@ object PeriodicSketch extends PeriodicSketchOps[PeriodicSketch] {
   def apply(structure: List[(Cmap, HCounter)], periods: Stream[Double]): PeriodicSketch =
     bareApply(structure, periods)
 
-  def empty(caDepth: Int, cmapSize: Int, coDepth: Int, coSize: Int): PeriodicSketch =
-    cont(caDepth, cmapSize, coDepth, coSize)
+  def empty(caDepth: Int, caSize: Int, coDepth: Int, coSize: Int): PeriodicSketch =
+    cont(caDepth, caSize, coDepth, coSize)
 
-  def cont(caDepth: Int, cmapSize: Int, coDepth: Int, coSize: Int): PeriodicSketch = {
-    val structure = (1 to caDepth).toList.map(_ => (Cmap.uniform(cmapSize), HCounter.empty(coDepth, coSize)))
+  def cont(caDepth: Int, caSize: Int, coDepth: Int, coSize: Int): PeriodicSketch = {
+    val structure = (1 to caDepth).toList.map(_ => (Cmap.uniform(caSize), HCounter.empty(coDepth, coSize)))
     ContSketch(structure, 100)
   }
 
