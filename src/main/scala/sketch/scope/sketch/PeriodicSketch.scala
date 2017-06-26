@@ -75,7 +75,7 @@ trait PeriodicSketchOps[S<:PeriodicSketch] extends SketchOps[S] { self =>
     sums.sum / sums.size
   }
 
-  def clear(sketch: S): S = ???
+//  def clear(sketch: S): S = ???
 
   def dropPeriod(sketch: S): S = bareApply(sketch.structure, sketch.periods.drop(1))
 
@@ -88,10 +88,12 @@ trait PeriodicSketchOps[S<:PeriodicSketch] extends SketchOps[S] { self =>
   } yield bareApply(structure, sketch.periods)
 
   def renewCmap(sketch: S): Option[Cmap] = {
-    val sum = self.sum(sketch)
-    val densityPlot = plot(sketch).map { case (range, count) => (range, count / (sum * (range.end - range.start))) }
+    val densityPlotO = self.densityPlot(sketch)
     val sizeO = sketch.structure.headOption.map { case (cmap, _) => cmap.size }
-    val utdRangesO = sizeO.map(size => updateRanges(size, densityPlot))
+    val utdRangesO = for {
+      densityPlot <- densityPlotO
+      size <- sizeO
+    } yield updateRanges(size, densityPlot)
     val dividerO = utdRangesO.map(ranges => ranges.map(_.start).drop(1))
     dividerO.map(divider => Cmap.divider(divider))
   }
@@ -154,7 +156,7 @@ object PeriodicSketch extends PeriodicSketchOps[PeriodicSketch] {
 
   def cont(caDepth: Int, caSize: Int, coDepth: Int, coSize: Int): PeriodicSketch = {
     val structure = (1 to caDepth).toList.map(_ => (Cmap.uniform(caSize), HCounter.empty(coDepth, coSize)))
-    ContSketch(structure, 100)
+    ContSketch.empty(caDepth, caSize, coDepth, coSize)
   }
 
   def bareApply(structure: List[(Cmap, HCounter)], periods: Stream[Double]): PeriodicSketch =

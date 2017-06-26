@@ -1,13 +1,8 @@
 package sketch.scope.sketch
 
-import scala.reflect.runtime.universe._
-
 import sketch.scope.cmap.Cmap
-import sketch.scope.counter.CDim
 import sketch.scope.hcounter.HCounter
-import sketch.scope.hmap.Hmap
-
-import scala.collection.immutable.NumericRange
+import cats.implicits._
 
 /**
   * Licensed by Probe Technology, Inc.
@@ -38,7 +33,7 @@ trait SketchOps[S<:Sketch] extends SketchLaws[S] {
     * Clear all memorization.
     * @return
     * */
-  def clear(sketch: S): S
+//  def clear(sketch: S): S
 
 }
 
@@ -68,14 +63,28 @@ trait SketchLaws[S<:Sketch] { self: SketchOps[S] =>
   /**
     * @return
     * */
-  def pdf(sketch: S, a: Double): Option[Double] = ???
+//  def pdf(sketch: S, a: Double): Option[Double] = ???
 
   /**
     * @return
     * */
-  def cdf(sketch: S, a: Double): Option[Double] = ???
+//  def cdf(sketch: S, a: Double): Option[Double] = ???
 
-  def plot(sketch: S): List[(NumericRange[Double], Double)] = ???
+  def plot(sketch: S): Option[List[(Range, Double)]] = {
+    for {
+      cmapHcounter <- sketch.structure.lastOption
+      (cmap, _) = cmapHcounter
+      ranges = cmap.bin
+      counts <- ranges.traverse(range => primitiveCount(sketch, range.start, range.end))
+    } yield ranges.zip(counts)
+  }
+
+  def densityPlot(sketch: S): Option[List[(Range, Double)]] = {
+    val sum = self.sum(sketch)
+    plot(sketch).map(plot =>
+      plot.map { case (range, count) => (range, count / (sum * (range.end - range.start))) }
+    )
+  }
 
 }
 
@@ -85,7 +94,7 @@ trait SketchSyntax {
     def update(a: Double): Option[Sketch] = Sketch.primitiveUpdate(sketch, a)
     def count(from: Double, to: Double): Option[Double] = Sketch.primitiveCount(sketch, from, to)
     def sum: Double = Sketch.sum(sketch)
-    def clear: Sketch = Sketch.clear(sketch)
+//    def clear: Sketch = Sketch.clear(sketch)
     def probability(from: Double, to: Double): Option[Double] = Sketch.probability(sketch, from, to)
   }
 
@@ -108,8 +117,8 @@ object Sketch extends SketchOps[Sketch] {
     case sketch: PeriodicSketch => PeriodicSketch.sum(sketch)
   }
 
-  def clear(sketch: Sketch): Sketch = sketch match {
-    case sketch: PeriodicSketch => PeriodicSketch.clear(sketch)
-  }
+//  def clear(sketch: Sketch): Sketch = sketch match {
+//    case sketch: PeriodicSketch => PeriodicSketch.clear(sketch)
+//  }
 
 }
