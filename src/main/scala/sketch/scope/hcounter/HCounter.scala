@@ -11,6 +11,8 @@ trait HCounter {
 
   def structure: List[(Hmap, Counter)]
 
+  def sum: Double
+
 }
 
 trait HCounterOps[HC<:HCounter] {
@@ -22,7 +24,7 @@ trait HCounterOps[HC<:HCounter] {
         counter2 <- counter.update(cdim, count)
       } yield (hmap, counter2)
     }
-  } yield HCounter(updated)
+  } yield HCounter(updated, hc.sum + count)
 
   def get(hc: HCounter, hdim: HDim): Option[Double] = for {
     counts <- hc.structure.traverse { case (hmap, counter) =>
@@ -33,9 +35,13 @@ trait HCounterOps[HC<:HCounter] {
     }
   } yield counts.min
 
-  def sum(hc: HCounter): Double = ???
+  def sum(hc: HCounter): Double = hc.sum
 
-  def count(hc: HCounter, from: HDim, to: HDim): Option[Double] = ???
+  def count(hc: HCounter, from: HDim, to: HDim): Option[Double] = {
+    (from to to).toList
+      .traverse(hdim => get(hc, hdim))
+      .map(_.sum)
+  }
 
   def depth(hc: HCounter): Int = hc.structure.size
 
@@ -58,16 +64,16 @@ trait HCounterSyntax {
 
 object HCounter extends HCounterOps[HCounter] { self =>
 
-  private case class HCounterImpl(structure: List[(Hmap, Counter)]) extends HCounter
+  private case class HCounterImpl(structure: List[(Hmap, Counter)], sum: Double) extends HCounter
 
-  def apply(structure: List[(Hmap, Counter)]): HCounter = self.structure(structure)
+  def apply(structure: List[(Hmap, Counter)], sum: Double): HCounter = HCounterImpl(structure, sum)
 
-  def structure(structure: List[(Hmap, Counter)]): HCounter = HCounterImpl(structure)
+//  def structure(structure: List[(Hmap, Counter)]): HCounter = HCounterImpl(structure)
 
   /**
     * @param width Cdim size of the counter
     * */
   def empty(depth: Int, width: Int): HCounter =
-    HCounterImpl((0 until depth).toList.map(i => (Hmap(i), Counter.empty(width))))
+    HCounterImpl((0 until depth).toList.map(i => (Hmap(i), Counter.empty(width))), 0)
 
 }
