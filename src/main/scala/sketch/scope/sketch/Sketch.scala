@@ -1,102 +1,124 @@
 package sketch.scope.sketch
 
 import sketch.scope.cmap.Cmap
-import sketch.scope.hmap.Hmap
+import sketch.scope.hcounter.HCounter
+import cats.implicits._
 
 /**
   * Licensed by Probe Technology, Inc.
   *
   * Sketch Data Structure Interface.
   */
-trait Sketch[A] {
+trait Sketch {
 
-  def measure: A => Double
+//  def measure: A => Double
 
-//  def structure: List[()]
+  def structure: List[(Cmap, HCounter)]
 
 }
 
-trait SketchOps extends SketchLaws {
+trait SketchOps[S<:Sketch] extends SketchLaws[S] {
 
-  /**
-    * Update the element to be memorized.
-    * @return
-    * */
-  def update[A](sketch: Sketch[A], a: A): Sketch[A]
+  def primitiveUpdate(sketch: S, p: Double): Option[S]
 
-  /**
-    * Get the number of elements be memorized.
-    * @return
-    * */
-  def count[A](sketch: Sketch[A], from: A, to: A): Int
+  def primitiveCount(sketch: S, pFrom: Double, pTo: Double): Option[Double]
 
   /**
     * Total number of elements be memorized.
     * @return
     * */
-  def size[A](sketch: Sketch[A]): Int
+  def sum(sketch: S): Double
 
   /**
     * Clear all memorization.
     * @return
     * */
-  def clear[A](sketch: Sketch[A]): Sketch[A]
+//  def clear(sketch: S): S
 
 }
 
-trait SketchLaws { self: SketchOps =>
+trait SketchLaws[S<:Sketch] { self: SketchOps[S] =>
+
+  /**
+    * Update the element to be memorized.
+    * @return
+    * */
+//  def update[A: TypeTag](sketch: Sketch[A], a: A): Option[Sketch[A]] = ???
+//    primitiveUpdate(sketch, sketch.measure(a))
+
+  /**
+    * Get the number of elements be memorized.
+    * @return
+    * */
+//  def count[A: TypeTag](sketch: S[A], from: A, to: A): Double = ???
+//    primitiveCount(sketch, sketch.measure(from), sketch.measure(to))
 
   /**
     * @return
     * */
-  def probability[A](sketch: Sketch[A], from: A, to: A): Double =
-    (BigDecimal(count(sketch, from, to)) / BigDecimal(size(sketch))).toDouble
+  def probability(sketch: S, from: Double, to: Double): Option[Double] =
+    primitiveCount(sketch, from, to)
+      .map(count => (BigDecimal(count) / BigDecimal(sum(sketch))).toDouble)
 
   /**
     * @return
     * */
-  def pdf[A](sketch: Sketch[A], a: A): Double = ???
+//  def pdf(sketch: S, a: Double): Option[Double] = ???
 
   /**
     * @return
     * */
-  def cdf[A](sketch: Sketch[A], a: A): Double = ???
+//  def cdf(sketch: S, a: Double): Option[Double] = ???
+
+  def plot(sketch: S): Option[List[(Range, Double)]] = {
+    for {
+      cmapHcounter <- sketch.structure.lastOption
+      (cmap, _) = cmapHcounter
+      ranges = cmap.bin
+      counts <- ranges.traverse(range => primitiveCount(sketch, range.start, range.end))
+    } yield ranges.zip(counts)
+  }
+
+  def densityPlot(sketch: S): Option[List[(Range, Double)]] = {
+    val sum = self.sum(sketch)
+    plot(sketch).map(plot =>
+      plot.map { case (range, count) => (range, count / (sum * (range.end - range.start))) }
+    )
+  }
 
 }
 
 trait SketchSyntax {
 
-  implicit class SketchSyntaxImpl[A](sketch: Sketch[A]) {
-    def update(a: A): Sketch[A] = Sketch.update(sketch, a)
-    def count(from: A, to: A): Int = Sketch.count(sketch, from, to)
-    def size: Int = Sketch.size(sketch)
-    def clear: Sketch[A] = Sketch.clear(sketch)
-    def probability(from: A, to: A): Double = Sketch.probability(sketch, from, to)
+  implicit class SketchSyntaxImpl(sketch: Sketch) {
+    def update(a: Double): Option[Sketch] = Sketch.primitiveUpdate(sketch, a)
+    def count(from: Double, to: Double): Option[Double] = Sketch.primitiveCount(sketch, from, to)
+    def sum: Double = Sketch.sum(sketch)
+//    def clear: Sketch = Sketch.clear(sketch)
+    def probability(from: Double, to: Double): Option[Double] = Sketch.probability(sketch, from, to)
   }
 
 }
 
-object Sketch extends SketchOps {
+object Sketch extends SketchOps[Sketch] {
 
-  private case class SketchImpl[A](measure: A => Double) extends Sketch[A]
+  def empty(caDepth: Int, caSize: Int, coDepth: Int, coSize: Int): Sketch =
+    PeriodicSketch.empty(caDepth, caSize, coDepth, coSize)
 
-  // Construction
+  def primitiveUpdate(sketch: Sketch, p: Double): Option[Sketch] = sketch match {
+    case sketch: PeriodicSketch => PeriodicSketch.primitiveUpdate(sketch, p)
+  }
 
-  def apply[A](measure: A => Double): Sketch[A] = ???
+  def primitiveCount(sketch: Sketch, pFrom: Double, pTo: Double): Option[Double] = sketch match {
+    case sketch: PeriodicSketch => PeriodicSketch.primitiveCount(sketch, pFrom, pTo)
+  }
 
-  /**
-    * @return
-    */
-  def empty[A](cmap: Cmap, hmap: Hmap): Sketch[A] = ???
+  def sum(sketch: Sketch): Double = sketch match {
+    case sketch: PeriodicSketch => PeriodicSketch.sum(sketch)
+  }
 
-  // Ops
-
-  def update[A](sketch: Sketch[A], a: A): Sketch[A] = ???
-
-  def count[A](sketch: Sketch[A], from: A, to: A): Int = ???
-
-  def size[A](sketch: Sketch[A]): Int = ???
-
-  def clear[A](sketch: Sketch[A]): Sketch[A] = ???
+//  def clear(sketch: Sketch): Sketch = sketch match {
+//    case sketch: PeriodicSketch => PeriodicSketch.clear(sketch)
+//  }
 
 }

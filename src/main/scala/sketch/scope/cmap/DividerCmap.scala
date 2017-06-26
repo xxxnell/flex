@@ -2,7 +2,7 @@ package sketch.scope.cmap
 
 import sketch.scope.hmap.HDim
 
-import scala.collection.immutable.TreeMap
+import scala.collection.immutable.{NumericRange, TreeMap}
 
 /**
   * Licensed by Probe Technology, Inc.
@@ -17,17 +17,23 @@ trait DividerCmap extends Cmap {
 
 }
 
-trait DividerCmapOps extends CmapOps {
+trait DividerCmapOps[DC<:DividerCmap] extends CmapOps[DC] {
 
   def divider2IndexingMap(divider: List[Double]): TreeMap[Double, HDim] =
     TreeMap.apply(divider.sorted.zipWithIndex: _*)
 
 }
 
-object DividerCmap extends DividerCmapOps {
+object DividerCmap extends DividerCmapOps[DividerCmap] {
 
   private case class DividerCmapImpl(divider: List[Double]) extends DividerCmap
 
   def apply(divider: List[Double]): DividerCmap = DividerCmapImpl(divider)
+
+  def bin(cmap: DividerCmap): List[NumericRange[Double]] = ???
+
+  def size(cmap: DividerCmap): Int = ???
+
+  def range(cmap: DividerCmap, hdim: HDim): NumericRange[Double] = ???
 
 }

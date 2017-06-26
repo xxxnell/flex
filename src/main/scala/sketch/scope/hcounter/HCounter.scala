@@ -33,6 +33,27 @@ trait HCounterOps[HC<:HCounter] {
     }
   } yield counts.min
 
+  def sum(hc: HCounter): Double = ???
+
+  def count(hc: HCounter, from: HDim, to: HDim): Option[Double] = ???
+
+  def depth(hc: HCounter): Int = hc.structure.size
+
+  def width(hc: HCounter): Int = hc.structure.headOption.fold(0){ case (_, counter) => counter.size }
+
+}
+
+trait HCounterSyntax {
+
+  implicit class HCounterSyntaxImpl(hcounter: HCounter) {
+    def update(hdim: HDim, count: Double): Option[HCounter] = HCounter.update(hcounter, hdim, count)
+    def get(hdim: HDim): Option[Double] = HCounter.get(hcounter, hdim)
+    def sum: Double = HCounter.sum(hcounter)
+    def count(from: HDim, to: HDim): Option[Double] = HCounter.count(hcounter, from, to)
+    def depth: Int = HCounter.depth(hcounter)
+    def width: Int = HCounter.width(hcounter)
+  }
+
 }
 
 object HCounter extends HCounterOps[HCounter] { self =>
@@ -43,15 +64,10 @@ object HCounter extends HCounterOps[HCounter] { self =>
 
   def structure(structure: List[(Hmap, Counter)]): HCounter = HCounterImpl(structure)
 
-  def empty(cdimSize: CDim): HCounter = HCounterImpl((Hmap(0), Counter.empty(cdimSize)) :: Nil)
-
-}
-
-trait HCounterSyntax {
-
-  implicit class HCounterSyntaxImpl(hcounter: HCounter) {
-    def update(hdim: HDim, count: Double): Option[HCounter] = HCounter.update(hcounter, hdim, count)
-    def get(hdim: HDim): Option[Double] = HCounter.get(hcounter, hdim)
-  }
+  /**
+    * @param width Cdim size of the counter
+    * */
+  def empty(depth: Int, width: Int): HCounter =
+    HCounterImpl((0 until depth).toList.map(i => (Hmap(i), Counter.empty(width))))
 
 }
