@@ -39,8 +39,9 @@ class HCounterSpec extends Specification with ScalaCheck {
 object HCounterGen {
 
   def hcounterGen: Gen[HCounter] = for {
-    cdimSize <- CounterGen.sizeGen
-  } yield HCounter.empty(cdimSize)
+    depth <- Gen.choose(1, 10)
+    width <- Gen.choose(100, 10000)
+  } yield HCounter.empty(depth, width)
 
   def hcounterA: Arbitrary[HCounter] = Arbitrary(hcounterGen)
 

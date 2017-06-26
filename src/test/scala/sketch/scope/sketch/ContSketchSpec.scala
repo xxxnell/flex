@@ -19,6 +19,13 @@ class ContSketchSpec extends Specification with ScalaCheck {
 
 object ContSketchGen {
 
-  def contSketchGen: Gen[ContSketch] = ???
+  def contSketchGen: Gen[ContSketch] = for {
+    caDepth <- Gen.choose(1, 10)
+    caSize <- Gen.choose(100, 10000)
+    coDepth <- Gen.choose(1, 10)
+    coSize <- Gen.choose(100, 10000)
+  } yield ContSketch.empty(caDepth, caSize, coDepth, coSize)
+
+  def contSketchSample: Option[ContSketch] = contSketchGen.sample
 
 }
