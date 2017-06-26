@@ -40,8 +40,6 @@ trait SketchOps[S<:Sketch] extends SketchLaws[S] {
     * */
   def clear(sketch: S): S
 
-  def archiveFirst(sketch: S): S
-
 }
 
 trait SketchLaws[S<:Sketch] { self: SketchOps[S] =>
@@ -107,7 +105,5 @@ object Sketch extends SketchOps[Sketch] {
   def sum(sketch: Sketch): Double = ???
 
   def clear(sketch: Sketch): Sketch = ???
-
-  def archiveFirst(sketch: Sketch): Sketch = ???
 
 }

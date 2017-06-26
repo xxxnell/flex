@@ -140,12 +140,24 @@ trait PeriodicSketchOps[S<:PeriodicSketch] extends SketchOps[S] { self =>
 
 }
 
-object PeriodicSketch {
+object PeriodicSketch extends PeriodicSketchOps[PeriodicSketch] {
 
-  private case class SketchImpl(structure: List[(Cmap, HCounter)],
-                                periods: Stream[Double])
+  private case class PeriodicSketchImpl(structure: List[(Cmap, HCounter)],
+                                        periods: Stream[Double])
     extends PeriodicSketch
 
-  def empty[A](cmapSize: Int, depth: Int, cdimSize: Int): Sketch = ???
+  def apply(structure: List[(Cmap, HCounter)], periods: Stream[Double]): PeriodicSketch =
+    bareApply(structure, periods)
+
+  def empty(caDepth: Int, cmapSize: Int, coDepth: Int, coSize: Int): PeriodicSketch =
+    cont(caDepth, cmapSize, coDepth, coSize)
+
+  def cont(caDepth: Int, cmapSize: Int, coDepth: Int, coSize: Int): PeriodicSketch = {
+    val structure = (1 to caDepth).toList.map(_ => (Cmap.uniform(cmapSize), HCounter.empty(coDepth, coSize)))
+    ContSketch(structure, 100)
+  }
+
+  def bareApply(structure: List[(Cmap, HCounter)], periods: Stream[Double]): PeriodicSketch =
+    PeriodicSketchImpl(structure, periods)
 
 }
