@@ -1,3 +1,5 @@
+package sketch.scope
+
 import sbt._
 
 object Resolvers {

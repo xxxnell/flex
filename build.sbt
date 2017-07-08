@@ -1,23 +1,17 @@
-import Dependencies._
-import Resolvers._
 import sbt.Keys._
+import sketch.scope.Dependencies._
+import sketch.scope.SketchBuilds
 
 name := "scope-sketch"
 
-version := s"1.0$snapshot"
+lazy val root = Project(id = "scope-sketch", base = file("."))
+  .aggregate(sketchCore)
 
-scalaVersion := "2.12.1"
+lazy val sketchCore = sketchModule("scope-sketch-core")
 
-val commonSettings = Seq(
+lazy val sketchBench = sketchModule("scope-sketch-bench")
+  .dependsOn(sketchCore)
 
-  libraryDependencies ++= (cats ++ monixs),
-
-  resolvers ++= typesafeRepo
-
-)
-
-lazy val scope_sketch = (project in file("."))
-  .settings(commonSettings)
-  .settings(
-    libraryDependencies ++= (specs ++ tics)
-  )
+def sketchModule(name: String): Project =
+  Project(id = name, base = file(name))
+    .settings(SketchBuilds.buildSettings)

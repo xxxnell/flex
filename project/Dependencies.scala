@@ -1,3 +1,6 @@
+package sketch.scope
+
+import sbt.Keys.libraryDependencies
 import sbt._
 
 object Dependencies {
@@ -18,10 +21,16 @@ object Dependencies {
 
   val specs2Version = "3.9.1"
   val specs = Seq(
-    "org.specs2" %% "specs2-core" % specs2Version % "test",
-    "org.specs2" %% "specs2-mock" % specs2Version % "test",
-    "org.specs2" %% "specs2-junit" % specs2Version % "test",
-    "org.specs2" %% "specs2-scalacheck" % specs2Version % "test"
-  )
+    "org.specs2" %% "specs2-core",
+    "org.specs2" %% "specs2-mock",
+    "org.specs2" %% "specs2-junit",
+    "org.specs2" %% "specs2-scalacheck"
+  ).map(_ % specs2Version % Test)
+
+  // project dependencies
+
+  val core = libraryDependencies ++= (cats ++ monixs ++ specs ++ tics)
+
+  val bench = libraryDependencies ++= (specs ++ tics)
 
 }
