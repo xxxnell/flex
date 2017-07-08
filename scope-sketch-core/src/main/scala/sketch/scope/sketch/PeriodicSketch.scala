@@ -35,7 +35,7 @@ trait PeriodicSketchOps[S<:PeriodicSketch] extends SketchOps[S] { self =>
     for {
       sketch <- utdSketchO
       utdSketch <- sketch.periods.headOption.fold(Option(sketch))(period =>
-        if(self.sum(sketch) > period) self.renew(dropPeriod(sketch)) else Option(sketch)
+        if(self.sum(sketch) > period) self.rearrange(dropPeriod(sketch)) else Option(sketch)
       )
     } yield utdSketch
   }
@@ -79,15 +79,15 @@ trait PeriodicSketchOps[S<:PeriodicSketch] extends SketchOps[S] { self =>
 
   def dropPeriod(sketch: S): S = bareApply(sketch.structure, sketch.periods.drop(1))
 
-  def renew(sketch: S): Option[S] = for {
+  def rearrange(sketch: S): Option[S] = for {
     cmapHcounter <- sketch.structure.headOption
     (cmap, hcounter) = cmapHcounter
     cmapHcounters = Try(sketch.structure.tail).toOption.fold(List.empty[(Cmap, HCounter)])(identity)
-    utdCmap <- renewCmap(sketch)
+    utdCmap <- rearrangeCmap(sketch)
     structure = cmapHcounters :+ (utdCmap, HCounter.empty(hcounter.depth, hcounter.width))
   } yield bareApply(structure, sketch.periods)
 
-  def renewCmap(sketch: S): Option[Cmap] = {
+  def rearrangeCmap(sketch: S): Option[Cmap] = {
     val densityPlotO = self.densityPlot(sketch)
     val sizeO = sketch.structure.headOption.map { case (cmap, _) => cmap.size }
     val utdRangesO = for {

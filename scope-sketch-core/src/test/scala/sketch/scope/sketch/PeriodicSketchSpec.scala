@@ -11,12 +11,12 @@ class PeriodicSketchSpec extends Specification with ScalaCheck {
 
   "PeroidicSketch" should {
 
-    "renew" in {
+    "rearranged" in {
       (for {
         sketch <- PeriodicSketchGen.periodicSketchSample
         utdSketch <- PeriodicSketch.primitiveUpdate(sketch, 1.0)
-        renewed <- PeriodicSketch.renew(utdSketch)
-      } yield renewed)
+        rearranged <- PeriodicSketch.rearrange(utdSketch)
+      } yield rearranged)
         .fold(ko)(sketch => ok)
     }
 

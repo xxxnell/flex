@@ -35,6 +35,8 @@ trait SketchOps[S<:Sketch] extends SketchLaws[S] {
     * */
 //  def clear(sketch: S): S
 
+  def rearrange(sketch: S): Option[S]
+
 }
 
 trait SketchLaws[S<:Sketch] { self: SketchOps[S] =>
@@ -96,6 +98,7 @@ trait SketchSyntax {
     def sum: Double = Sketch.sum(sketch)
 //    def clear: Sketch = Sketch.clear(sketch)
     def probability(from: Double, to: Double): Option[Double] = Sketch.probability(sketch, from, to)
+    def rearrange: Option[Sketch] = Sketch.rearrange(sketch)
   }
 
 }
@@ -120,5 +123,9 @@ object Sketch extends SketchOps[Sketch] {
 //  def clear(sketch: Sketch): Sketch = sketch match {
 //    case sketch: PeriodicSketch => PeriodicSketch.clear(sketch)
 //  }
+
+  def rearrange(sketch: Sketch): Option[Sketch] = sketch match {
+    case sketch: PeriodicSketch => PeriodicSketch.rearrange(sketch)
+  }
 
 }
