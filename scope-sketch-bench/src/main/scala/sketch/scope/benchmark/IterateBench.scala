@@ -14,24 +14,12 @@ import BenchOps._
 @State(Scope.Thread)
 class IterateBench {
 
-  @Param(Array("50", "100", "150", "200"))
+  @Param(Array("50", "100", "150", "200", "250", "300"))
   var size: Int = _
-
-  var xs: Array[Int] = _
-
-  @Setup
-  def setup() {
-    xs = Array.ofDim[Int](size)
-    for (c <- 0 until size) {
-      xs(c) = c + 1
-    }
-  }
 
   @Benchmark
   def iterate(bh: Blackhole) {
-    for (x <- xs) {
-      bh.consume(updateBench(defaultSketch, defaultSignals, x))
-    }
+    bh.consume(updateBench(defaultSketch, defaultSignals, size))
   }
 
 }
