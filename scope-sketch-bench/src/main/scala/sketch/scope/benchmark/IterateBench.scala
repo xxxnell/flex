@@ -15,11 +15,11 @@ import BenchOps._
 class IterateBench {
 
   @Param(Array("50", "100", "150", "200", "250", "300"))
-  var size: Int = _
+  var iterateBenchSize: Int = _
 
   @Benchmark
   def iterate(bh: Blackhole) {
-    bh.consume(updateBench(defaultSketch, defaultSignals, size))
+    bh.consume(updateBench(defaultSketch, defaultSignals, iterateBenchSize))
   }
 
 }

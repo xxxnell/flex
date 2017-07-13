@@ -19,6 +19,10 @@ object Dependencies {
     "org.scalactic" %% "scalactic" % "3.0.3"
   )
 
+  val datetime = Seq(
+    "com.github.nscala-time" %% "nscala-time" % "2.16.0"
+  )
+
   val specs2Version = "3.9.1"
   val specs = Seq(
     "org.specs2" %% "specs2-core",
@@ -31,6 +35,6 @@ object Dependencies {
 
   val core = libraryDependencies ++= (cats ++ monixs ++ specs ++ tics)
 
-  val bench = libraryDependencies ++= (specs ++ tics)
+  val bench = libraryDependencies ++= (specs ++ tics ++ datetime)
 
 }
