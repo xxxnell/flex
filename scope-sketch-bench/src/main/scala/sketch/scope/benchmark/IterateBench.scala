@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit
 
 import org.openjdk.jmh.annotations._
 import org.openjdk.jmh.infra.Blackhole
-import BenchOps._
+import SketchBenchOps._
 
 /**
   * Licensed by Probe Technology, Inc.
@@ -14,7 +14,7 @@ import BenchOps._
 @State(Scope.Thread)
 class IterateBench {
 
-  @Param(Array("50", "100", "150", "200", "250", "300"))
+  @Param(Array("50", "100", "150", "200"))
   var iterateBenchSize: Int = _
 
   @Benchmark

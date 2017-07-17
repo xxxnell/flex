@@ -5,7 +5,7 @@ import sketch.scope.sketch.Sketch
 /**
   * Licensed by Probe Technology, Inc.
   */
-object BenchOps {
+object SketchBenchOps {
 
   val defaultSketch = Sketch.empty(5, 1000, 1, 2000)
 
