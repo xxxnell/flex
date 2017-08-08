@@ -26,13 +26,14 @@ class PeriodicSketchSpec extends Specification with ScalaCheck {
 
 object PeriodicSketchGen {
 
-  def periodicSketchGen: Gen[PeriodicSketch] = for {
+  def intPeriodicSketchGen: Gen[PeriodicSketch[Int]] = for {
+    measure <- MeasureGen.intMeasureGen
     caDepth <- Gen.choose(1, 10)
     caSize <- Gen.choose(100, 10000)
     coDepth <- Gen.choose(1, 10)
     coSize <- Gen.choose(100, 10000)
-  } yield PeriodicSketch.empty(caDepth, caSize, coDepth, coSize)
+  } yield PeriodicSketch.empty(measure, caDepth, caSize, coDepth, coSize)
 
-  def periodicSketchSample: Option[PeriodicSketch] = periodicSketchGen.sample
+  def periodicSketchSample: Option[PeriodicSketch[Int]] = intPeriodicSketchGen.sample
 
 }

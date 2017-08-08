@@ -16,21 +16,21 @@ import sketch.scope.hmap.HDim
   *
   *
   */
-trait PeriodicSketch extends Sketch {
+trait PeriodicSketch[A] extends Sketch[A] {
 
   def periods: Stream[Double]
 
 }
 
-trait PeriodicSketchOps[S<:PeriodicSketch] extends SketchOps[S] { self =>
+trait PeriodicSketchOps[S[_]<:PeriodicSketch[_]] extends SketchOps[S] { self =>
 
-  def bareApply(structure: List[(Cmap, HCounter)], period: Stream[Double]): S
+  def bareApply[A](measure: A => Double, structure: List[(Cmap, HCounter)], period: Stream[Double]): S[A]
 
-  def primitiveUpdate(sketch: S, p: Double): Option[S] = {
+  def primitiveUpdate[A](sketch: S[A], p: Double): Option[S[A]] = {
     val utdStrO = sketch.structure.traverse { case (cmap, hcounter) =>
       hcounter.update(cmap.apply(p), 1).map(hcounter => (cmap, hcounter))
     }
-    val utdSketchO = utdStrO.map(str => bareApply(str, sketch.periods))
+    val utdSketchO = utdStrO.map(str => bareApply(sketch.measure.asInstanceOf[A => Double], str, sketch.periods))
 
     for {
       sketch <- utdSketchO
@@ -65,29 +65,34 @@ trait PeriodicSketchOps[S<:PeriodicSketch] extends SketchOps[S] { self =>
     } yield toCount + fromCount + midCount
   }
 
-  def primitiveCount(sketch: S, pFrom: Double, pTo: Double): Option[Double] = {
+  def primitiveCount(sketch: S[_], pFrom: Double, pTo: Double): Option[Double] = {
     val countsO = sketch.structure.traverse { case (cmap, hcounter) => singleCount(cmap, hcounter, pFrom, pTo) }
     countsO.map(counts => counts.sum / counts.size)
   }
 
-  def sum(sketch: S): Double = {
+  def sum(sketch: S[_]): Double = {
     val sums = sketch.structure.map { case (_, hcounter) => hcounter.sum }
     sums.sum / sums.size
   }
 
 //  def clear(sketch: S): S = ???
 
-  def dropPeriod(sketch: S): S = bareApply(sketch.structure, sketch.periods.drop(1))
+  def dropPeriod[A](sketch: S[A]): S[A] =
+    bareApply(
+      sketch.measure.asInstanceOf[A => Double],
+      sketch.structure,
+      sketch.periods.drop(1)
+    )
 
-  def rearrange(sketch: S): Option[S] = for {
+  def rearrange[A](sketch: S[A]): Option[S[A]] = for {
     cmapHcounter <- sketch.structure.headOption
     (cmap, hcounter) = cmapHcounter
     cmapHcounters = Try(sketch.structure.tail).toOption.fold(List.empty[(Cmap, HCounter)])(identity)
     utdCmap <- rearrangeCmap(sketch)
     structure = cmapHcounters :+ (utdCmap, HCounter.empty(hcounter.depth, hcounter.width))
-  } yield bareApply(structure, sketch.periods)
+  } yield bareApply(sketch.measure.asInstanceOf[A => Double], structure, sketch.periods)
 
-  def rearrangeCmap(sketch: S): Option[Cmap] = {
+  def rearrangeCmap(sketch: S[_]): Option[Cmap] = {
     val densityPlotO = self.densityPlot(sketch)
     val sizeO = sketch.structure.headOption.map { case (cmap, _) => cmap.size }
     val utdRangesO = for {
@@ -144,22 +149,25 @@ trait PeriodicSketchOps[S<:PeriodicSketch] extends SketchOps[S] { self =>
 
 object PeriodicSketch extends PeriodicSketchOps[PeriodicSketch] {
 
-  private case class PeriodicSketchImpl(structure: List[(Cmap, HCounter)],
-                                        periods: Stream[Double])
-    extends PeriodicSketch
+  private case class PeriodicSketchImpl[A](measure: A => Double,
+                                           structure: List[(Cmap, HCounter)],
+                                           periods: Stream[Double])
+    extends PeriodicSketch[A]
 
-  def apply(structure: List[(Cmap, HCounter)], periods: Stream[Double]): PeriodicSketch =
-    bareApply(structure, periods)
+  def apply[A](measure: A => Double, structure: List[(Cmap, HCounter)], periods: Stream[Double]): PeriodicSketch[A] =
+    bareApply(measure, structure, periods)
 
-  def empty(caDepth: Int, caSize: Int, coDepth: Int, coSize: Int): PeriodicSketch =
-    cont(caDepth, caSize, coDepth, coSize)
+  def empty[A](measure: A => Double, caDepth: Int, caSize: Int, coDepth: Int, coSize: Int): PeriodicSketch[A] =
+    cont(measure, caDepth, caSize, coDepth, coSize)
 
-  def cont(caDepth: Int, caSize: Int, coDepth: Int, coSize: Int): PeriodicSketch = {
+  def cont[A](measure: A => Double, caDepth: Int, caSize: Int, coDepth: Int, coSize: Int): PeriodicSketch[A] = {
     val structure = (1 to caDepth).toList.map(_ => (Cmap.uniform(caSize), HCounter.empty(coDepth, coSize)))
-    ContSketch.empty(caDepth, caSize, coDepth, coSize)
+    ContSketch.empty(measure, caDepth, caSize, coDepth, coSize)
   }
 
-  def bareApply(structure: List[(Cmap, HCounter)], periods: Stream[Double]): PeriodicSketch =
-    PeriodicSketchImpl(structure, periods)
+  def bareApply[A](measure: A => Double,
+                   structure: List[(Cmap, HCounter)],
+                   periods: Stream[Double]): PeriodicSketch[A] =
+    PeriodicSketchImpl(measure, structure, periods)
 
 }

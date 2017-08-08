@@ -6,7 +6,8 @@ import sketch.scope.hcounter.HCounter
 /**
   * Licensed by Probe Technology, Inc.
   */
-case class ContSketch(structure: List[(Cmap, HCounter)], period: Double) extends PeriodicSketch {
+case class ContSketch[A](measure: A => Double, structure: List[(Cmap, HCounter)], period: Double)
+  extends PeriodicSketch[A] {
 
   val periods: Stream[Double] = Stream.from(1).map(i => period * i)
 
@@ -14,9 +15,9 @@ case class ContSketch(structure: List[(Cmap, HCounter)], period: Double) extends
 
 object ContSketch extends  {
 
-  def empty(caDepth: Int, caSize: Int, coDepth: Int, coSize: Int): ContSketch = {
+  def empty[A](measure: A => Double, caDepth: Int, caSize: Int, coDepth: Int, coSize: Int): ContSketch[A] = {
     val structure = (1 to caDepth).toList.map(_ => (Cmap.uniform(caSize), HCounter.empty(coDepth, coSize)))
-    ContSketch(structure, 100)
+    ContSketch(measure, structure, 100)
   }
 
 }
