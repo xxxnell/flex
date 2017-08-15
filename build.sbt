@@ -5,7 +5,7 @@ import sketch.scope.SketchBuilds
 name := "scope-sketch"
 
 lazy val root = Project(id = "scope-sketch", base = file("."))
-  .aggregate(sketchCore)
+  .aggregate(sketchCore, sketchBench)
 
 lazy val sketchCore = sketchModule("scope-sketch-core")
 
