@@ -26,11 +26,11 @@ class SketchOpsBench {
   @Param(Array("1000", "100000"))
   var coSize: Int = _
 
-  val sketch = Sketch.empty(caDepth, caSize, coDepth, coSize)
+  val sketch = Sketch.empty((d: Double) => d, caDepth, caSize, coDepth, coSize)
 
   @Benchmark
   def construct = {
-    Sketch.empty(caDepth, caSize, coDepth, coSize)
+    Sketch.empty((d: Double) => d, caDepth, caSize, coDepth, coSize)
   }
 
   @Benchmark

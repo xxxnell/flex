@@ -7,11 +7,11 @@ import sketch.scope.sketch.Sketch
   */
 object SketchBenchOps {
 
-  val defaultSketch = Sketch.empty(5, 1000, 1, 2000)
+  val defaultSketch = Sketch.empty((d: Double) => d, 5, 1000, 1, 2000)
 
   val defaultSignals: Stream[Double] = Stream.iterate(0.0)(_ + 0.1)
 
-  def updateBench(sketch: Sketch, signals: Stream[Double], n: Int): Option[Sketch] = {
+  def updateBench(sketch: Sketch[Double], signals: Stream[Double], n: Int): Option[Sketch[Double]] = {
     signals
       .take(n)
       .foldLeft(Option(sketch)){ case (sketchO, signal) =>
@@ -19,6 +19,6 @@ object SketchBenchOps {
       }
   }
 
-  def rearrangeBench(sketch: Sketch): Option[Sketch] = sketch.rearrange
+  def rearrangeBench[A](sketch: Sketch[A]): Option[Sketch[A]] = sketch.rearrange
 
 }
