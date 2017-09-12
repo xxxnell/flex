@@ -11,7 +11,51 @@ class ContSketchSpec extends Specification with ScalaCheck {
 
   "ContSketch" should {
 
-    todo
+    "empty" in {
+      val measure: Int => Double = (a: Int) => a.toDouble
+      val caDepth = 10
+      val caSize = 20
+      val coDepth = 30
+      val coSize = 40
+
+      val contSketch = ContSketch.empty(measure, caDepth, caSize, coDepth, coSize)
+
+      val testMeasure = contSketch.measure == measure
+
+      val testCaDepth = contSketch.structure.size == caDepth
+
+      val testCaSize = contSketch
+        .structure
+        .map { case (cmap, hcounter) => cmap.size -1 == caSize }
+        .forall(b => b)
+
+      val testCoDepth = contSketch
+        .structure
+        .map { case (cmap, hcounter) => hcounter.depth == coDepth }
+        .forall(identity)
+
+      val testCoSize = contSketch
+        .structure
+        .map { case (cmap, hcounter) => hcounter.width == coSize }
+        .forall(identity)
+
+      if(testMeasure &&
+        testCaDepth &&
+        testCaSize &&
+        testCoDepth &&
+        testCoSize) ok
+      else ko(
+        s"testMeasure: $testMeasure, " +
+          s"testCaDepth: $testCaDepth, " +
+          s"testCaSize: $testCaSize, " +
+          s"testCoDepth: $testCoDepth, " +
+          s"testCoSize: $testCoSize"
+      )
+    }
+
+    "periods" in {
+      todo
+    }
 
   }
 
