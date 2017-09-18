@@ -54,7 +54,10 @@ class ContSketchSpec extends Specification with ScalaCheck {
     }
 
     "periods" in {
-      todo
+      (for {
+        contSketch <- ContSketchGen.contSketchSample
+      } yield contSketch)
+        .fold(ko)(contsketch => ok)
     }
 
   }
