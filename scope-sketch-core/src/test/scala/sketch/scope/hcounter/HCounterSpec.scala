@@ -31,7 +31,11 @@ class HCounterSpec extends Specification with ScalaCheck {
         implicit val hcounterGen = HCounterGen.hcounterA
 
         prop { (hcounter: HCounter) =>
-          todo
+          val updatedHcounter = hcounter.update(10,20).get
+          val updatedGet = updatedHcounter.get(10).get
+          if( updatedGet == 20) ok else ko (
+            s"updatedGet: $updatedGet"
+          )
         }.setArbitrary(hcounterGen)
       }
 
