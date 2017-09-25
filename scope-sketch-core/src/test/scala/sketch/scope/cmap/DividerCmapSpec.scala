@@ -24,7 +24,17 @@ class DividerCmapSpec extends Specification with ScalaCheck {
     }
 
     "size" in {
-      todo
+      implicit val dividercmapGen = DividerCmapGen.dividerA
+
+      prop { (divider: (List[Double]) ) =>
+        val dividercmapSize = DividerCmap(divider).size
+        val koMsg =
+          s"Cannot get the recorded count: " +
+            s"dividerCmap size -> ${dividercmapSize}, divider size -> ${divider.size}"
+
+        if( dividercmapSize - 1 == divider.size) ok
+        else ko(koMsg)
+      }.setArbitrary(dividercmapGen)
     }
 
     "range" in {
@@ -37,8 +47,13 @@ class DividerCmapSpec extends Specification with ScalaCheck {
 
 object DividerCmapGen {
 
-  def dividerCmapGen: Gen[DividerCmap] = ???
+  def dividerGen: Gen[List[Double]] = for {
+    from <- Gen.choose(0, 50)
+    to <- Gen.choose( 51, 100)
+    listGen <- (from to to).toList.map( a => a.toDouble )
+  } yield listGen
 
-  def cmapA: Arbitrary[Cmap] = ???
+  def dividerA: Arbitrary[List[Double]] = Arbitrary(dividerGen)
+  
 
 }
