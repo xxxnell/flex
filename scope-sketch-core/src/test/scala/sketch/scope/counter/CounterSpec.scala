@@ -28,8 +28,6 @@ class CounterSpec extends Specification with ScalaCheck {
 
     "laws" in {
 
-
-
       "get" in {
 
         "empty" in {
@@ -69,7 +67,20 @@ class CounterSpec extends Specification with ScalaCheck {
 
       }
 
-      "size" in todo
+      "size" in {
+        implicit val counterCdimA = CounterGen.counterSizeA
+
+        prop { (counterSize: (Counter, Int)) =>
+          val (counter, size) = counterSize
+          //val corr = 1e-5f
+          val koMsg =
+            s"Cannot get the recorded count: " +
+              s"counter size -> ${counter.size}, cdim -> $size"
+          if( counter.size == size) ok
+          else ko(koMsg)
+
+        }.setArbitrary(counterCdimA)
+      }
 
     }
 
@@ -108,6 +119,14 @@ object CounterGen {
     cdim <- CounterGen.cdimGen(size)
   } yield (counter, cdim)
 
+  def counterSizeGen: Gen[(Counter, Int)] = for {
+    size <- CounterGen.sizeGen
+    if size > 0
+    counter <- CounterGen.counterGen(size)
+    //cdim <- CounterGen.cdimGen(size)
+  } yield (counter, size)
+
   def counterCdimA: Arbitrary[(Counter, CDim)] = Arbitrary(counterCdimGen)
+  def counterSizeA: Arbitrary[(Counter, Int)] = Arbitrary(counterSizeGen)
 
 }
