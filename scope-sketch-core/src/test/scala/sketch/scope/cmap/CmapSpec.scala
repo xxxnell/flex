@@ -26,7 +26,13 @@ class CmapSpec extends Specification with ScalaCheck {
     }
 
     "range" in {
-      todo
+      implicit val cmapGen = CmapGen.cmapA
+
+      prop { (cmapTupple: (Int, Cmap) ) =>
+        val rangeCmap = cmapTupple._2.range( cmapTupple._1 )
+        if(  rangeCmap.length == 1 ) ok
+        else ko ( s"range : $rangeCmap.length")
+      }.setArbitrary(cmapGen)
     }
 
   }
