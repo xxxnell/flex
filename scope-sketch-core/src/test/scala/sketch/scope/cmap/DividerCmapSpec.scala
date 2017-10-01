@@ -12,7 +12,22 @@ class DividerCmapSpec extends Specification with ScalaCheck {
   "DividerCmap" should {
 
     "divider2IndexingMap" in {
-      todo
+      implicit val dividerGen = DividerCmapGen.dividerA
+
+      prop { (divider: (List[Double]) ) =>
+        val divider2indexMap = DividerCmap.divider2IndexingMap(divider)
+        val indexmapHead = divider2indexMap.get(divider(0)) == Some(0)
+        val indexmapTail = divider2indexMap.get(divider(divider.size-1)) == Some(divider.size-1)
+        val koMsg =
+          s"Cannot get the recorded count: " +
+            s"divider2indexMap size -> ${divider2indexMap.size}, divider size -> ${divider.size}, " +
+            s"indexmapHead -> ${divider2indexMap.get(1)}, indexmapTail -> ${divider2indexMap.get(divider.size)}"
+
+        if( divider2indexMap.size == divider.size &&
+            indexmapHead &&
+            indexmapTail ) ok
+        else ko(koMsg)
+      }.setArbitrary(dividerGen)
     }
 
     "divider2InverseIndexingMap" in {
@@ -48,10 +63,17 @@ class DividerCmapSpec extends Specification with ScalaCheck {
 object DividerCmapGen {
 
   def dividerGen: Gen[List[Double]] = for {
-    from <- Gen.choose(0, 50)
-    to <- Gen.choose( 51, 100)
-    listGen <- (from to to).toList.map( a => a.toDouble )
-  } yield listGen
+    from <- Gen.choose(0, 100)
+    to <- Gen.choose(0, 100)
+    if from < to
+    list = (from to to).toList.map(a => a.toDouble)
+  } yield list
+
+  def dividerCmapGen: Gen[DividerCmap] = for {
+    dividerList <- DividerCmapGen.dividerGen
+    dividercmapGen = DividerCmap(dividerList)
+//    dividercmapGen <- Gen.const(DividerCmap(dividerList))
+  } yield dividercmapGen
 
   def dividerA: Arbitrary[List[Double]] = Arbitrary(dividerGen)
   
