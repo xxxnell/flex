@@ -14,14 +14,21 @@ class CounterSpec extends Specification with ScalaCheck {
     "ops" in {
 
       "update" in {
-        implicit val counterCdimA = CounterGen.counterCdimA
+        implicit val counterCdimCountA = CounterGen.counterCdimA
+        implicit val countGenA = CounterGen.countA
 
-        prop { (counterCdim: (Counter, CDim), count: Double) =>
-          val (counter, cdim) = counterCdim
-          counter.update(cdim, count) must beSome
-        }.setArbitrary1(counterCdimA)
+        prop { (counterCdimCount: (Counter, CDim), count : Double) =>
+          val (counter, cdim) = counterCdimCount
+          val countergen = counter.update(cdim, count)
+          val updatedcount = countergen.get.get(cdim).get
+          val koMsg =
+            s"count : $count " +
+            s"counterupdated : $updatedcount"
 
-        todo
+          if( updatedcount == count) ok
+          else ko(koMsg)
+        }.setArbitrary1(counterCdimCountA)
+          .setArbitrary2(countGenA)
       }
 
     }
@@ -123,10 +130,15 @@ object CounterGen {
     size <- CounterGen.sizeGen
     if size > 0
     counter <- CounterGen.counterGen(size)
-    //cdim <- CounterGen.cdimGen(size)
   } yield (counter, size)
 
+  def countGen: Gen[Double] = for {
+    count <- Gen.choose(Double.MinValue, Double.MaxValue)
+  } yield count
+
   def counterCdimA: Arbitrary[(Counter, CDim)] = Arbitrary(counterCdimGen)
+
   def counterSizeA: Arbitrary[(Counter, Int)] = Arbitrary(counterSizeGen)
 
+  def countA: Arbitrary[Double] = Arbitrary(countGen)
 }
