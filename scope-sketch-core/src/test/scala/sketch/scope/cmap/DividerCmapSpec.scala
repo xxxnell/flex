@@ -3,6 +3,7 @@ package sketch.scope.cmap
 import org.scalacheck.{Arbitrary, Gen}
 import org.specs2.ScalaCheck
 import org.specs2.mutable.Specification
+import sketch.scope.hmap.HDim
 
 /**
   * Created by shin-yoonsu on 2017. 9. 19..
@@ -16,16 +17,25 @@ class DividerCmapSpec extends Specification with ScalaCheck {
 
       prop { (divider: (List[Double]) ) =>
         val divider2indexMap = DividerCmap.divider2IndexingMap(divider)
-        val indexmapHead = divider2indexMap.get(divider(0)) == Some(0)
-        val indexmapTail = divider2indexMap.get(divider(divider.size-1)) == Some(divider.size-1)
+        val headHdimO: Option[HDim] = for {
+          firstDivider <- divider.headOption
+          idxMap <- divider2indexMap.get(firstDivider)
+        } yield idxMap
+        val tailHdimO: Option[HDim] = for {
+          lastDivider <- divider.lastOption
+          idxMap <- divider2indexMap.get(lastDivider)
+        } yield idxMap
         val koMsg =
           s"Cannot get the recorded count: " +
-            s"divider2indexMap size -> ${divider2indexMap.size}, divider size -> ${divider.size}, " +
-            s"indexmapHead -> ${divider2indexMap.get(divider(0))}, indexmapTail -> ${divider2indexMap.get(divider(divider.size-1))}"
-
+            s"divider2indexMap size -> ${divider2indexMap.size}, " +
+            s"divider size -> ${divider.size}, " +
+            s"headHdimO -> $headHdimO, " +
+            s"headHdim -> ${0}, " +
+            s"tailHdimO -> $tailHdimO, " +
+            s"tailHdim -> ${divider.size-1}"
         if( divider2indexMap.size == divider.size &&
-            indexmapHead &&
-            indexmapTail ) ok
+            headHdimO.fold(false)(head => head == 0) &&
+            tailHdimO.fold(false)(tail => tail == divider.size-1) ) ok
         else ko(koMsg)
       }.setArbitrary(dividerGen)
     }
@@ -35,16 +45,23 @@ class DividerCmapSpec extends Specification with ScalaCheck {
 
       prop { (divider: (List[Double]) ) =>
         val divider2inverseindexMap = DividerCmap.divider2InverseIndexingMap(divider)
-        val inverseindexmapHead = divider2inverseindexMap.get(0) == Some(divider(0))
-        val inverseindexmapTail = divider2inverseindexMap.get(divider.size-1) == Some(divider(divider.size-1))
+        val headDoubleO: Option[Double] = for {
+          idxMap <- divider2inverseindexMap.get(0)
+        } yield idxMap
+        val tailDoubleO: Option[Double] = for {
+          idxMap <- divider2inverseindexMap.get(divider.size-1)
+        } yield idxMap
         val koMsg =
           s"Cannot get the recorded count: " +
-            s"divider2indexMap size -> ${divider2inverseindexMap.size}, divider size -> ${divider.size}, " +
-            s"inverseindexmapHead -> ${divider2inverseindexMap.get(0)}, inverseindexmapTail -> ${divider2inverseindexMap.get(divider.size-1)}"
-
+            s"divider2inverseindexMap size -> ${divider2inverseindexMap.size}, " +
+            s"divider size -> ${divider.size}, " +
+            s"headDoubleO -> $headDoubleO, " +
+            s"dividerHead -> ${divider.headOption}, " +
+            s"tailDoubleO -> $tailDoubleO, " +
+            s"dividerTail -> ${divider.lastOption}"
         if( divider2inverseindexMap.size == divider.size &&
-          inverseindexmapHead &&
-          inverseindexmapTail ) ok
+          headDoubleO.fold(false)(head => head == divider.headOption.get) &&
+          tailDoubleO.fold(false)(tail => tail == divider.lastOption.get)) ok
         else ko(koMsg)
       }.setArbitrary(dividerGen)
     }
@@ -60,7 +77,8 @@ class DividerCmapSpec extends Specification with ScalaCheck {
         val dividercmapSize = DividerCmap(divider).size
         val koMsg =
           s"Cannot get the recorded count: " +
-            s"dividerCmap size -> ${dividercmapSize}, divider size -> ${divider.size}"
+            s"dividerCmap size -> $dividercmapSize, " +
+            s"divider size -> ${divider.size}"
 
         if( dividercmapSize - 1 == divider.size) ok
         else ko(koMsg)
@@ -87,7 +105,6 @@ object DividerCmapGen {
   def dividerCmapGen: Gen[DividerCmap] = for {
     dividerList <- DividerCmapGen.dividerGen
     dividercmapGen = DividerCmap(dividerList)
-//    dividercmapGen <- Gen.const(DividerCmap(dividerList))
   } yield dividercmapGen
 
   def dividerA: Arbitrary[List[Double]] = Arbitrary(dividerGen)
