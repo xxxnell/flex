@@ -34,15 +34,12 @@ class CmapSpec extends Specification with ScalaCheck {
         prop { (divider: List[Double]) =>
           val cmap = DividerCmap(divider)
           val dividerSize = divider.size
-          var check = false
-          for (rangeNum <- 1 to dividerSize - 1) {
-            val eachRange = cmap.range(rangeNum)
-            if (eachRange(0) == divider(rangeNum - 1) &&
-              eachRange((divider(rangeNum) - divider(rangeNum - 1)).toInt) == divider(rangeNum)) check = true
-            else check = false
-          }
-          if (check) ok
-          else ko
+          val check = (1 until dividerSize)
+            .map(idx => (idx, cmap.range(idx)))
+            .map { case (idx, range) =>
+              range(0) == divider(idx - 1) && range((divider(idx) - divider(idx - 1)).toInt) == divider(idx)
+            }.forall(identity)
+          if(check) ok else ko
         }.setArbitrary(dividerGen)
       }
 
