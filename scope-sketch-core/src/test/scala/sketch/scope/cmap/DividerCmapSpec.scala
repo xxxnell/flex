@@ -67,7 +67,13 @@ class DividerCmapSpec extends Specification with ScalaCheck {
     }
 
     "bin" in {
-      todo
+      "divider" in {
+        todo
+      }
+
+      "uniform" in {
+        todo
+      }
     }
 
     "size" in {
@@ -86,7 +92,24 @@ class DividerCmapSpec extends Specification with ScalaCheck {
     }
 
     "range" in {
-      todo
+      "divider" in {
+        implicit val dividerGen = DividerCmapGen.dividerA
+
+        prop { (divider: List[Double]) =>
+          val cmap = DividerCmap(divider)
+          val dividerSize = divider.size
+          val check = (1 until dividerSize)
+            .map(idx => (idx, cmap.range(idx)))
+            .map { case (idx, range) =>
+              range(0) == divider(idx - 1) && range((divider(idx) - divider(idx - 1)).toInt) == divider(idx)
+            }.forall(identity)
+          if(check) ok else ko
+        }.setArbitrary(dividerGen)
+      }
+
+      "uniform" in {
+        todo
+      }
     }
 
   }
