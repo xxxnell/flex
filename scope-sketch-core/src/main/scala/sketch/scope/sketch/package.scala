@@ -1,5 +1,7 @@
 package sketch.scope
 
+import _root_.sketch.scope.cmap.Cmap
+import _root_.sketch.scope.hcounter.HCounter
 import scala.collection.immutable.NumericRange
 
 /**
@@ -12,6 +14,8 @@ package object sketch {
   type Range = NumericRange[Prim]
 
   type Ranges = List[Range]
+
+  type Structure = List[(Cmap, HCounter)]
 
   implicit def autocast[A](sketch: Sketch[A]): SimpleSketch[A] = SimpleSketch.sketch2SimpleSketch(sketch)
 

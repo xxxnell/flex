@@ -1,11 +1,9 @@
 package sketch.scope.sketch
 
+import cats.implicits._
 import sketch.scope.cmap.Cmap
 import sketch.scope.hcounter.HCounter
-import cats.implicits._
 import sketch.scope.hmap.HDim
-
-import scala.reflect.runtime.universe._
 
 /**
   * Licensed by Probe Technology, Inc.
@@ -16,7 +14,7 @@ trait Sketch[A] {
 
   def measure: A => Prim
 
-  def structure: List[(Cmap, HCounter)]
+  def structure: Structure
 
 }
 
@@ -143,7 +141,7 @@ trait SketchSyntax {
 
 object Sketch extends SketchOps[Sketch] {
 
-  def apply[A](measure: A => Prim, structure: List[(Cmap, HCounter)]): Sketch[A] = SimpleSketch(measure, structure)
+  def apply[A](measure: A => Prim, structure: Structure): Sketch[A] = SimpleSketch(measure, structure)
 
   def empty[A](measure: A => Double, caDepth: Int, caSize: Int, coDepth: Int, coSize: Int): Sketch[A] =
     PeriodicSketch.empty(measure, caDepth, caSize, coDepth, coSize)

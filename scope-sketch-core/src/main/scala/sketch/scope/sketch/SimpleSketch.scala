@@ -1,12 +1,9 @@
 package sketch.scope.sketch
 
-import sketch.scope.cmap.Cmap
-import sketch.scope.hcounter.HCounter
-
 /**
   * Licensed by Probe Technology, Inc.
   */
-case class SimpleSketch[A](measure: A => Prim, structure: List[(Cmap, HCounter)]) extends Sketch[A]
+case class SimpleSketch[A](measure: A => Prim, structure: Structure) extends Sketch[A]
 
 trait SimpleSketchOps extends SketchOps[SimpleSketch] {
 

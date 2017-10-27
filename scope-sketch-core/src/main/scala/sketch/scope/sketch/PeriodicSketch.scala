@@ -24,7 +24,7 @@ trait PeriodicSketch[A] extends Sketch[A] {
 
 trait PeriodicSketchOps[S[_]<:PeriodicSketch[_]] extends SketchOps[S] { self =>
 
-  def bareApply[A](measure: A => Double, structure: List[(Cmap, HCounter)], period: Stream[Double]): S[A]
+  def bareApply[A](measure: A => Double, structure: Structure, period: Stream[Double]): S[A]
 
   def primUpdate[A](sketch: S[A], p: Double): Option[S[A]] = {
     val utdStrO = sketch.structure.traverse { case (cmap, hcounter) =>
@@ -115,17 +115,17 @@ trait PeriodicSketchOps[S[_]<:PeriodicSketch[_]] extends SketchOps[S] { self =>
 object PeriodicSketch extends PeriodicSketchOps[PeriodicSketch] {
 
   private case class PeriodicSketchImpl[A](measure: A => Double,
-                                           structure: List[(Cmap, HCounter)],
+                                           structure: Structure,
                                            periods: Stream[Double])
     extends PeriodicSketch[A]
 
   def apply[A](measure: A => Double,
-               structure: List[(Cmap, HCounter)],
+               structure: Structure,
                periods: Stream[Double]): PeriodicSketch[A] =
     bareApply(measure, structure, periods)
 
   def bareApply[A](measure: A => Double,
-                   structure: List[(Cmap, HCounter)],
+                   structure: Structure,
                    periods: Stream[Double]): PeriodicSketch[A] =
     PeriodicSketchImpl(measure, structure, periods)
 
