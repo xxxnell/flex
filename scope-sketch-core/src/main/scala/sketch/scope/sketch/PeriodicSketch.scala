@@ -40,41 +40,6 @@ trait PeriodicSketchOps[S[_]<:PeriodicSketch[_]] extends SketchOps[S] { self =>
     } yield utdSketch
   }
 
-  def singleCount(cmap: Cmap, hcounter: HCounter, pFrom: Double, pTo: Double): Option[Double] = {
-    val (fromHdim, toHdim) = (cmap.apply(pFrom), cmap.apply(pTo))
-    val (fromRng, toRng) = (cmap.range(fromHdim), cmap.range(toHdim))
-
-    // mid count
-    val midRangeO: Option[(HDim, HDim)] = if((toHdim-1) > (fromHdim+1)) {
-      Some((fromHdim + 1, toHdim - 1))
-    } else None
-    val midCountO = midRangeO.fold(Option(0.0)){ case (from, to) => hcounter.count(from, to) }
-
-    // from count
-    val fromDensityO = hcounter.count(fromHdim, fromHdim).map(c => c / (fromRng.end - fromRng.start))
-    val fromCountO = fromDensityO.map(density => (fromRng.end - pFrom) * density)
-
-    // to count
-    val toDensityO = hcounter.count(toHdim, toHdim).map(c => c / (toRng.end - toRng.start))
-    val toCountO = toDensityO.map(density => (pTo - toRng.start) * density)
-
-    for {
-      toCount <- toCountO
-      fromCount <- fromCountO
-      midCount <- midCountO
-    } yield toCount + fromCount + midCount
-  }
-
-  def primCount(sketch: S[_], pFrom: Double, pTo: Double): Option[Double] = {
-    val countsO = sketch.structure.traverse { case (cmap, hcounter) => singleCount(cmap, hcounter, pFrom, pTo) }
-    countsO.map(counts => counts.sum / counts.size)
-  }
-
-  def sum(sketch: S[_]): Double = {
-    val sums = sketch.structure.map { case (_, hcounter) => hcounter.sum }
-    sums.sum / sums.size
-  }
-
 //  def clear(sketch: S): S = ???
 
   def dropPeriod[A](sketch: S[A]): S[A] =

@@ -3,6 +3,8 @@ package sketch.scope.sketch
 import sketch.scope.cmap.Cmap
 import sketch.scope.hcounter.HCounter
 import cats.implicits._
+import sketch.scope.hmap.HDim
+
 import scala.reflect.runtime.universe._
 
 /**
@@ -34,12 +36,43 @@ trait SketchOps[S[_]<:Sketch[_]] extends SketchLaws[S] {
     * */
   def primUpdate[A](sketch: S[A], p: Prim): Option[S[A]]
 
-  def primCount(sketch: S[_], pFrom: Prim, pTo: Prim): Option[Double]
+  def singleCount(cmap: Cmap, hcounter: HCounter, pFrom: Double, pTo: Double): Option[Double] = {
+    val (fromHdim, toHdim) = (cmap.apply(pFrom), cmap.apply(pTo))
+    val (fromRng, toRng) = (cmap.range(fromHdim), cmap.range(toHdim))
+
+    // mid count
+    val midRangeO: Option[(HDim, HDim)] = if((toHdim-1) > (fromHdim+1)) {
+      Some((fromHdim + 1, toHdim - 1))
+    } else None
+    val midCountO = midRangeO.fold(Option(0.0)){ case (from, to) => hcounter.count(from, to) }
+
+    // from count
+    val fromDensityO = hcounter.count(fromHdim, fromHdim).map(c => c / (fromRng.end - fromRng.start))
+    val fromCountO = fromDensityO.map(density => (fromRng.end - pFrom) * density)
+
+    // to count
+    val toDensityO = hcounter.count(toHdim, toHdim).map(c => c / (toRng.end - toRng.start))
+    val toCountO = toDensityO.map(density => (pTo - toRng.start) * density)
+
+    for {
+      toCount <- toCountO
+      fromCount <- fromCountO
+      midCount <- midCountO
+    } yield toCount + fromCount + midCount
+  }
+
+  def primCount(sketch: S[_], pFrom: Prim, pTo: Prim): Option[Double] = {
+    val countsO = sketch.structure.traverse { case (cmap, hcounter) => singleCount(cmap, hcounter, pFrom, pTo) }
+    countsO.map(counts => counts.sum / counts.size)
+  }
 
   /**
     * Total number of elements be memorized.
     * */
-  def sum(sketch: S[_]): Double
+  def sum(sketch: S[_]): Double = {
+    val sums = sketch.structure.map { case (_, hcounter) => hcounter.sum }
+    sums.sum / sums.size
+  }
 
   /**
     * Clear all memorization.
@@ -110,27 +143,16 @@ trait SketchSyntax {
 
 object Sketch extends SketchOps[Sketch] {
 
-  private case class SketchImpl[A](measure: A => Prim,
-                                   structure: List[(Cmap, HCounter)])
-    extends Sketch[A]
-
-  def apply[A](measure: A => Prim, structure: List[(Cmap, HCounter)]): Sketch[A] = bare(measure, structure)
-
-  def bare[A](measure: A => Prim, structure: List[(Cmap, HCounter)]): Sketch[A] = SketchImpl(measure, structure)
+  def apply[A](measure: A => Prim, structure: List[(Cmap, HCounter)]): Sketch[A] = SimpleSketch(measure, structure)
 
   def empty[A](measure: A => Double, caDepth: Int, caSize: Int, coDepth: Int, coSize: Int): Sketch[A] =
     PeriodicSketch.empty(measure, caDepth, caSize, coDepth, coSize)
 
+  // mapping ops
+
   def primUpdate[A](sketch: Sketch[A], p: Double): Option[Sketch[A]] = sketch match {
-    case sketch: PeriodicSketch[_] => PeriodicSketch.primUpdate(sketch, p)
-  }
-
-  def primCount(sketch: Sketch[_], pFrom: Double, pTo: Double): Option[Double] = sketch match {
-    case sketch: PeriodicSketch[_] => PeriodicSketch.primCount(sketch, pFrom, pTo)
-  }
-
-  def sum(sketch: Sketch[_]): Double = sketch match {
-    case sketch: PeriodicSketch[_] => PeriodicSketch.sum(sketch)
+    case sketch: PeriodicSketch[A] => PeriodicSketch.primUpdate(sketch, p)
+    case _ => SimpleSketch.primUpdate(sketch, p)
   }
 
 //  def clear(sketch: Sketch): Sketch = sketch match {
@@ -139,6 +161,7 @@ object Sketch extends SketchOps[Sketch] {
 
   def rearrange[A](sketch: Sketch[A]): Option[Sketch[A]] = sketch match {
     case sketch: PeriodicSketch[_] => PeriodicSketch.rearrange(sketch)
+    case _ => SimpleSketch.rearrange(sketch)
   }
 
 }

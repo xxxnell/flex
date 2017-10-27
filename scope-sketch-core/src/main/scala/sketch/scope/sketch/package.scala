@@ -7,10 +7,12 @@ import scala.collection.immutable.NumericRange
   */
 package object sketch {
 
-  type Range = NumericRange[Double]
+  type Prim = Double
+
+  type Range = NumericRange[Prim]
 
   type Ranges = List[Range]
 
-  type Prim = Double
+  implicit def autocast[A](sketch: Sketch[A]): SimpleSketch[A] = SimpleSketch.sketch2SimpleSketch(sketch)
 
 }
