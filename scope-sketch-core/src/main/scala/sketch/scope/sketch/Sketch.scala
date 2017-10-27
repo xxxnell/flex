@@ -20,14 +20,13 @@ trait Sketch[A] {
 
 trait SketchOps[S[_]<:Sketch[_]] extends SketchLaws[S] {
 
+  def modifyStructure[A](sketch: S[A], f: Structure => Option[Structure]): Option[S[A]]
+
   /**
     * Update a primitive value <code>p</code> without rearrange process.
     * */
-  def simpleUpdate[A](sketch: S[A], p: Prim): Option[Sketch[A]] = for {
-    utdStr <- sketch.structure.traverse { case (cmap, hcounter) =>
-      hcounter.update(cmap.apply(p), 1).map(hcounter => (cmap, hcounter))
-    }
-  } yield Sketch(sketch.measure.asInstanceOf[A => Prim], utdStr)
+  def simpleUpdate[A](sketch: S[A], p: Prim): Option[S[A]] = modifyStructure(sketch, str =>
+    str.traverse { case (cmap, hcounter) => hcounter.update(cmap.apply(p), 1).map(hcounter => (cmap, hcounter)) } )
 
   /**
     * Update a primitive value <code>p</code> instead of <code>a</code> ∈ <code>A</code>
@@ -160,6 +159,11 @@ object Sketch extends SketchOps[Sketch] {
   def rearrange[A](sketch: Sketch[A]): Option[Sketch[A]] = sketch match {
     case sketch: PeriodicSketch[_] => PeriodicSketch.rearrange(sketch)
     case _ => SimpleSketch.rearrange(sketch)
+  }
+
+  def modifyStructure[A](sketch: Sketch[A], f: Structure => Option[Structure]): Option[Sketch[A]] = sketch match {
+    case sketch: PeriodicSketch[_] => PeriodicSketch.modifyStructure(sketch, f)
+    case _ => SimpleSketch.modifyStructure(sketch, f)
   }
 
 }

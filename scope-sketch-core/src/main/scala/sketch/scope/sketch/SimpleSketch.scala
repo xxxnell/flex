@@ -17,4 +17,9 @@ trait SimpleSketchOps extends SketchOps[SimpleSketch] {
 
 }
 
-object SimpleSketch extends SimpleSketchOps
+object SimpleSketch extends SimpleSketchOps {
+
+  def modifyStructure[A](sketch: SimpleSketch[A], f: Structure => Option[Structure]): Option[SimpleSketch[A]] =
+    f(sketch.structure).map(structure => SimpleSketch(sketch.measure, structure))
+
+}
