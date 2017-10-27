@@ -12,7 +12,7 @@ import scala.reflect.runtime.universe._
   */
 trait Sketch[A] {
 
-  def measure: A => Double
+  def measure: A => Prim
 
   def structure: List[(Cmap, HCounter)]
 
@@ -20,19 +20,29 @@ trait Sketch[A] {
 
 trait SketchOps[S[_]<:Sketch[_]] extends SketchLaws[S] {
 
-  def primitiveUpdate[A](sketch: S[A], p: Double): Option[S[A]]
+  /**
+    * Update a primitive value <code>p</code> without rearrange process.
+    * */
+  def simpleUpdate[A](sketch: S[A], p: Prim): Option[Sketch[A]] = for {
+    utdStr <- sketch.structure.traverse { case (cmap, hcounter) =>
+      hcounter.update(cmap.apply(p), 1).map(hcounter => (cmap, hcounter))
+    }
+  } yield Sketch(sketch.measure.asInstanceOf[A => Prim], utdStr)
 
-  def primitiveCount(sketch: S[_], pFrom: Double, pTo: Double): Option[Double]
+  /**
+    * Update a primitive value <code>p</code> instead of <code>a</code> ∈ <code>A</code>
+    * */
+  def primUpdate[A](sketch: S[A], p: Prim): Option[S[A]]
+
+  def primCount(sketch: S[_], pFrom: Prim, pTo: Prim): Option[Double]
 
   /**
     * Total number of elements be memorized.
-    * @return
     * */
   def sum(sketch: S[_]): Double
 
   /**
     * Clear all memorization.
-    * @return
     * */
 //  def clear(sketch: S): S
 
@@ -44,37 +54,27 @@ trait SketchLaws[S[_]<:Sketch[_]] { self: SketchOps[S] =>
 
   /**
     * Update the element to be memorized.
-    * @return
     * */
   def update[A](sketch: S[A], a: A): Option[S[A]] = {
-    primitiveUpdate(sketch, sketch.measure.asInstanceOf[A => Double](a))
+    primUpdate(sketch, sketch.measure.asInstanceOf[A => Double](a))
   }
 
   /**
     * Get the number of elements be memorized.
-    * @return
     * */
   def count[A](sketch: S[A], from: A, to: A): Option[Double] = {
     val measure = sketch.measure.asInstanceOf[A => Double]
-    primitiveCount(sketch, measure(from), measure(to))
+    primCount(sketch, measure(from), measure(to))
   }
 
-  /**
-    * @return
-    * */
+  /***/
   def probability[A](sketch: S[A], from: A, to: A): Option[Double] = for {
     count <- count(sketch, from, to)
     sum = self.sum(sketch)
   } yield (BigDecimal(count) / BigDecimal(sum)).toDouble
 
-  /**
-    * @return
-    * */
 //  def pdf(sketch: S, a: Double): Option[Double] = ???
 
-  /**
-    * @return
-    * */
 //  def cdf(sketch: S, a: Double): Option[Double] = ???
 
   def plot(sketch: S[_]): Option[List[(Range, Double)]] = {
@@ -82,7 +82,7 @@ trait SketchLaws[S[_]<:Sketch[_]] { self: SketchOps[S] =>
       cmapHcounter <- sketch.structure.lastOption
       (cmap, _) = cmapHcounter
       ranges = cmap.bin
-      counts <- ranges.traverse(range => primitiveCount(sketch, range.start, range.end))
+      counts <- ranges.traverse(range => primCount(sketch, range.start, range.end))
     } yield ranges.zip(counts)
   }
 
@@ -110,15 +110,23 @@ trait SketchSyntax {
 
 object Sketch extends SketchOps[Sketch] {
 
+  private case class SketchImpl[A](measure: A => Prim,
+                                   structure: List[(Cmap, HCounter)])
+    extends Sketch[A]
+
+  def apply[A](measure: A => Prim, structure: List[(Cmap, HCounter)]): Sketch[A] = bare(measure, structure)
+
+  def bare[A](measure: A => Prim, structure: List[(Cmap, HCounter)]): Sketch[A] = SketchImpl(measure, structure)
+
   def empty[A](measure: A => Double, caDepth: Int, caSize: Int, coDepth: Int, coSize: Int): Sketch[A] =
     PeriodicSketch.empty(measure, caDepth, caSize, coDepth, coSize)
 
-  def primitiveUpdate[A](sketch: Sketch[A], p: Double): Option[Sketch[A]] = sketch match {
-    case sketch: PeriodicSketch[_] => PeriodicSketch.primitiveUpdate(sketch, p)
+  def primUpdate[A](sketch: Sketch[A], p: Double): Option[Sketch[A]] = sketch match {
+    case sketch: PeriodicSketch[_] => PeriodicSketch.primUpdate(sketch, p)
   }
 
-  def primitiveCount(sketch: Sketch[_], pFrom: Double, pTo: Double): Option[Double] = sketch match {
-    case sketch: PeriodicSketch[_] => PeriodicSketch.primitiveCount(sketch, pFrom, pTo)
+  def primCount(sketch: Sketch[_], pFrom: Double, pTo: Double): Option[Double] = sketch match {
+    case sketch: PeriodicSketch[_] => PeriodicSketch.primCount(sketch, pFrom, pTo)
   }
 
   def sum(sketch: Sketch[_]): Double = sketch match {

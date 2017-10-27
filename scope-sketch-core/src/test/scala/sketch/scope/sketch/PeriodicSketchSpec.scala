@@ -14,7 +14,7 @@ class PeriodicSketchSpec extends Specification with ScalaCheck {
     "rearranged" in {
       (for {
         sketch <- PeriodicSketchGen.periodicSketchSample
-        utdSketch <- PeriodicSketch.primitiveUpdate(sketch, 1.0)
+        utdSketch <- PeriodicSketch.primUpdate(sketch, 1.0)
         rearranged <- PeriodicSketch.rearrange(utdSketch)
       } yield rearranged)
         .fold(ko)(sketch => ok)

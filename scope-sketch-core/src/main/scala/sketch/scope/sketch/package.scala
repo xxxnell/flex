@@ -11,4 +11,6 @@ package object sketch {
 
   type Ranges = List[Range]
 
+  type Prim = Double
+
 }
