@@ -10,7 +10,7 @@ import sketch.scope.hmap.HDim
   *
   * Sketch Data Structure Interface.
   */
-trait Sketch[A] {
+trait Sketch[A] extends Dist[A] {
 
   def measure: A => Prim
 
@@ -18,7 +18,7 @@ trait Sketch[A] {
 
 }
 
-trait SketchOps[S[_]<:Sketch[_]] extends SketchLaws[S] {
+trait SketchOps[S[_]<:Sketch[_]] extends SketchLaws[S] with DistOps[S] {
 
   def modifyStructure[A](sketch: S[A], f: Structure => Option[Structure]): Option[S[A]]
 
@@ -107,7 +107,7 @@ trait SketchLaws[S[_]<:Sketch[_]] { self: SketchOps[S] =>
 
 //  def cdf(sketch: S, a: Double): Option[Double] = ???
 
-  def plot(sketch: S[_]): Option[List[(Range, Double)]] = {
+  def countPlot(sketch: S[_]): Option[List[(Range, Double)]] = {
     for {
       cmapHcounter <- sketch.structure.lastOption
       (cmap, _) = cmapHcounter
@@ -118,7 +118,7 @@ trait SketchLaws[S[_]<:Sketch[_]] { self: SketchOps[S] =>
 
   def densityPlot(sketch: S[_]): Option[List[(Range, Double)]] = {
     val sum = self.sum(sketch)
-    plot(sketch).map(plot =>
+    countPlot(sketch).map(plot =>
       plot.map { case (range, count) => (range, count / (sum * (range.end - range.start))) }
     )
   }
