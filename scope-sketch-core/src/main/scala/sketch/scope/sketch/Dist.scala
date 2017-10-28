@@ -17,7 +17,22 @@ trait DistOps[D[_]<:Dist[_]] {
 
   //  def cdf(sketch: S, a: Double): Option[Double]
 
-  def densityPlot(dist: D[_]): Option[List[(Range, Double)]]
+}
+
+trait DistSyntax {
+
+  implicit class DistSyntaxImpl[A](dist: Dist[A]) {
+    def probability(from: A, to: A): Option[Double] = Dist.probability(dist, from, to)
+  }
+
+}
+
+object Dist extends DistOps[Dist] {
+
+  def probability[A](dist: Dist[A], from: A, to: A): Option[Double] = dist match {
+    case dist: DeltaDist[A] => DeltaDist.probability(dist, from, to)
+    case sketch: Sketch[A] => Sketch.probability(sketch, from, to)
+  }
 
 }
 
