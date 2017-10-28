@@ -1,5 +1,7 @@
 package sketch.scope.sketch
 
+import scala.language.higherKinds
+
 /**
   * Licensed by Probe Technology, Inc.
   */

@@ -31,9 +31,14 @@ object Dependencies {
     "org.specs2" %% "specs2-scalacheck"
   ).map(_ % specs2Version % Test)
 
+
+  val math = Seq(
+    "org.apache.commons" % "commons-math3" % "3.6.1"
+  )
+
   // project dependencies
 
-  val core = libraryDependencies ++= (cats ++ monixs ++ specs ++ tics)
+  val core = libraryDependencies ++= (cats ++ monixs ++ specs ++ tics ++ math)
 
   val bench = libraryDependencies ++= (specs ++ tics ++ datetime)
 
