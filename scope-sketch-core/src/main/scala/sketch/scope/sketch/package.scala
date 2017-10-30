@@ -2,12 +2,18 @@ package sketch.scope
 
 import _root_.sketch.scope.cmap.Cmap
 import _root_.sketch.scope.hcounter.HCounter
+import _root_.sketch.scope.sketch.syntax._
+
 import scala.collection.immutable.NumericRange
+import scala.language.implicitConversions
 
 /**
   * Licensed by Probe Technology, Inc.
   */
-package object sketch {
+package object sketch
+  extends TrivialMeasures
+    with DistSyntax
+    with SketchSyntax {
 
   type Prim = Double
 

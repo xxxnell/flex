@@ -5,20 +5,20 @@ import sketch.scope.cmap.Cmap
 import sketch.scope.hcounter.HCounter
 import sketch.scope.hmap.HDim
 
+import scala.language.higherKinds
+
 /**
   * Licensed by Probe Technology, Inc.
   *
   * Sketch Data Structure Interface.
   */
-trait Sketch[A] extends Dist[A] {
-
-  def measure: A => Prim
+trait Sketch[A] extends SampleDist[A] {
 
   def structure: Structure
 
 }
 
-trait SketchOps[S[_]<:Sketch[_]] extends SketchLaws[S] with DistOps[S] {
+trait SketchPropOps[S[_]<:Sketch[_]] extends SketchPropLaws[S] with SampleDistPropOps[S] {
 
   def modifyStructure[A](sketch: S[A], f: Structure => Option[Structure]): Option[S[A]]
 
@@ -80,7 +80,7 @@ trait SketchOps[S[_]<:Sketch[_]] extends SketchLaws[S] with DistOps[S] {
 
 }
 
-trait SketchLaws[S[_]<:Sketch[_]] { self: SketchOps[S] =>
+trait SketchPropLaws[S[_]<:Sketch[_]] { self: SketchPropOps[S] =>
 
   /**
     * Update the element to be memorized.
@@ -125,20 +125,7 @@ trait SketchLaws[S[_]<:Sketch[_]] { self: SketchOps[S] =>
 
 }
 
-trait SketchSyntax {
-
-  implicit class SketchSyntaxImpl[A](sketch: Sketch[A]) {
-    def update(a: A): Option[Sketch[A]] = Sketch.update(sketch, a)
-    def count(from: A, to: A): Option[Double] = Sketch.count(sketch, from, to)
-    def sum: Double = Sketch.sum(sketch)
-//    def clear: Sketch = Sketch.clear(sketch)
-    def probability(from: A, to: A): Option[Double] = Sketch.probability(sketch, from, to)
-    def rearrange: Option[Sketch[A]] = Sketch.rearrange(sketch)
-  }
-
-}
-
-object Sketch extends SketchOps[Sketch] {
+object Sketch extends SketchPropOps[Sketch] {
 
   def apply[A](measure: A => Prim, structure: Structure): Sketch[A] = SimpleSketch(measure, structure)
 
