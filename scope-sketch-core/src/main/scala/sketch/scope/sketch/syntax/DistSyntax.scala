@@ -46,29 +46,3 @@ trait DistMonadSyntax3 {
   implicit val bindAux3: DistBindAux[Dist, Dist] = new DistBindAux[Dist, Dist] {}
 
 }
-
-//trait DistMonadSyntax1 extends DistMonadSyntax3 {
-//
-//  implicit class DistMonadSyntaxImpl1[A](dist: Dist[A]) {
-////    def flatMap[B](f: A => Sketch[B]): Sketch[B] = ???
-//    def flatMap[B](f: Sketch[B]): Sketch[B] = ???
-//  }
-//
-//}
-//
-////trait DistMonadSyntax2 extends DistMonadSyntax3 {
-////
-////  implicit class DistMonadSyntaxImpl2[A](dist: Dist[A]) {
-//////    def flatMap[B](f: A => SampleDist[B]): SampleDist[B] = ???
-////  }
-////
-////}
-//
-//trait DistMonadSyntax3 {
-//
-//  implicit class DistMonadSyntaxImpl3[A](dist: Dist[A]) {
-////    def flatMap[B](f: A => Dist[B]): Dist[B] = ???
-//    def flatMap[B](f: Dist[B]): Dist[B] = ???
-//  }
-//
-//}
