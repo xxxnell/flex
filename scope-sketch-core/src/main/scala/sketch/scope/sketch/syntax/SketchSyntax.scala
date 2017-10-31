@@ -1,19 +1,31 @@
 package sketch.scope.sketch.syntax
 
-import sketch.scope.sketch.Sketch
+import sketch.scope.sketch.{Dist, Sketch}
+import sketch.scope.sketch.algebra.DistFunctor
 
 /**
   * Licensed by Probe Technology, Inc.
   */
-trait SketchSyntax {
+trait SketchSyntax extends SketchPropSyntax with SketchMonadSyntax
 
-  implicit class SketchSyntaxImpl[A](sketch: Sketch[A]) {
+trait SketchPropSyntax {
+
+  implicit class SketchPropSyntaxImpl[A](sketch: Sketch[A]) {
     def update(a: A): Option[Sketch[A]] = Sketch.update(sketch, a)
     def count(from: A, to: A): Option[Double] = Sketch.count(sketch, from, to)
     def sum: Double = Sketch.sum(sketch)
     //    def clear: Sketch = Sketch.clear(sketch)
     def probability(from: A, to: A): Option[Double] = Sketch.probability(sketch, from, to)
     def rearrange: Option[Sketch[A]] = Sketch.rearrange(sketch)
+  }
+
+}
+
+trait SketchMonadSyntax {
+
+  implicit class SketchMonadSyntaxImpl[A](sketch: Sketch[A]) {
+    def map[B](f: A => B): Sketch[B] = ???
+    def flatMap[B, S1<:Sketch[_], S2<:Sketch[_]](f: A => Dist[B]): Sketch[B] = ???
   }
 
 }
