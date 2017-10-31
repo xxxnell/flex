@@ -1,6 +1,6 @@
 package sketch.scope.sketch.syntax
 
-import sketch.scope.sketch.algebra.DistBind
+import sketch.scope.sketch.algebra.{DistBind, DistFunctor, DistMonad}
 import sketch.scope.sketch.{Dist, SampleDist, Sketch}
 
 import scala.language.higherKinds
@@ -23,8 +23,11 @@ trait DistBindAux[InD[_]<:Dist[_], OutD[_]<:Dist[_]] {
 trait DistMonadSyntax extends DistMonadSyntax1 {
 
   implicit class DistMonadSyntaxImpl0[A](dist: Dist[A]) {
-    def map[B](f: A => B): Dist[B] = ???
-    def flatMap[B, D1[_]<:Dist[_], D2[_]<:Dist[_]](f: A => D1[B])(implicit aux: DistBindAux[D1, D2]): aux.Out[B] = ???
+    def map[B](f: A => B)(implicit functor: DistFunctor[Dist]): Dist[B] = functor.map(dist, f)
+    def flatMap[B, D1[_]<:Dist[_], D2[_]<:Dist[_]](f: A => D1[B])
+                                                  (implicit
+                                                   aux: DistBindAux[D1, D2],
+                                                   monad: DistMonad[Dist, D1, D2]): aux.Out[B] = monad.bind(dist, f)
   }
 
 }
@@ -32,17 +35,20 @@ trait DistMonadSyntax extends DistMonadSyntax1 {
 trait DistMonadSyntax1 extends DistMonadSyntax2 {
 
   implicit val bindAux1: DistBindAux[Sketch, Sketch] = new DistBindAux[Sketch, Sketch] {}
+  implicit val distMonad1: DistMonad[Dist, Sketch, Sketch] = DistMonad.sketch
 
 }
 
 trait DistMonadSyntax2 extends DistMonadSyntax3 {
 
   implicit val bindAux2: DistBindAux[SampleDist, SampleDist] = new DistBindAux[SampleDist, SampleDist] {}
+  implicit val distMonad2: DistMonad[Dist, SampleDist, SampleDist] = DistMonad.sampleDist
 
 }
 
 trait DistMonadSyntax3 {
 
   implicit val bindAux3: DistBindAux[Dist, Dist] = new DistBindAux[Dist, Dist] {}
+  implicit val distMonad3: DistMonad[Dist, Dist, Dist] = DistMonad.dist
 
 }
