@@ -22,7 +22,7 @@ trait PeriodicSketch[A] extends Sketch[A] {
 
 }
 
-trait PeriodicSketchOps[S[_]<:PeriodicSketch[_]] extends SketchOps[S] { self =>
+trait PeriodicSketchOps[S[_]<:PeriodicSketch[_]] extends SketchPropOps[S] { self =>
 
   def modifyPeriods[A](sketch: S[A], f: Stream[Double] => Option[Stream[Double]]): Option[S[A]]
 

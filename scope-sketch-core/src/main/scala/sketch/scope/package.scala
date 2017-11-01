@@ -1,14 +1,14 @@
 package sketch
 
 import cats.data.Kleisli
-import sketch.scope.sketch.SketchSyntax
+import sketch.scope.sketch.syntax.SketchSyntax
 
 import scala.collection.immutable.NumericRange
 
 /**
   * Licensed by Probe Technology, Inc.
   */
-package object scope extends SketchSyntax {
+package object scope {
 
   type Result[A] = Throwable Either A
 
