@@ -1,7 +1,7 @@
 package sketch.scope.sketch.syntax
 
 import sketch.scope.sketch.{Dist, Sketch}
-import sketch.scope.sketch.algebra.DistFunctor
+import sketch.scope.sketch.algebra.{DistFunctor, SketchMonad}
 
 /**
   * Licensed by Probe Technology, Inc.
@@ -24,8 +24,8 @@ trait SketchPropSyntax {
 trait SketchMonadSyntax {
 
   implicit class SketchMonadSyntaxImpl[A](sketch: Sketch[A]) {
-    def map[B](f: A => B): Sketch[B] = ???
-    def flatMap[B, S1<:Sketch[_], S2<:Sketch[_]](f: A => Dist[B]): Sketch[B] = ???
+    def map[B](f: A => B): Sketch[B] = SketchMonad.pointToPoint.map(sketch, f)
+    def flatMap[B, S1<:Sketch[_], S2<:Sketch[_]](f: A => Dist[B]): Sketch[B] = SketchMonad.pointToPoint.bind(sketch, f)
   }
 
 }
