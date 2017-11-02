@@ -1,7 +1,7 @@
 package sketch
 
 import cats.data.Kleisli
-import sketch.scope.sketch.syntax.SketchSyntax
+import sketch.scope.dist.syntax.SketchSyntax
 
 import scala.collection.immutable.NumericRange
 

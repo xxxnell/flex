@@ -1,6 +1,6 @@
 package sketch.scope.benchmark
 
-import sketch.scope.sketch.Sketch
+import sketch.scope.dist.Sketch
 
 /**
   * Licensed by Probe Technology, Inc.

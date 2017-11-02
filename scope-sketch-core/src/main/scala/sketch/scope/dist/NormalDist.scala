@@ -1,0 +1,22 @@
+package sketch.scope.dist
+
+import org.apache.commons.math3.distribution.NormalDistribution
+
+/**
+  * Licensed by Probe Technology, Inc.
+  */
+case class NormalDist[A](measure: A => Prim, mean: Prim, variance: Prim) extends SmoothDist[A]
+
+trait NormalDistOps extends SmoothDistPropOps[NormalDist] {
+
+  def probability[A](dist: NormalDist[A], from: A, to: A): Option[Double] = {
+    val toPrim = dist.measure(from)
+    val fromPrim = dist.measure(from)
+    val numericDist = new NormalDistribution(dist.mean, dist.variance)
+
+    Some(numericDist.cumulativeProbability(fromPrim) - numericDist.cumulativeProbability(toPrim))
+  }
+
+}
+
+object NormalDist extends NormalDistOps

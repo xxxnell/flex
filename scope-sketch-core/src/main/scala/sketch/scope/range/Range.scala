@@ -1,6 +1,6 @@
 package sketch.scope.range
 
-import sketch.scope.sketch.Prim
+import sketch.scope.dist.Prim
 
 /**
   * Licensed by Probe Technology, Inc.

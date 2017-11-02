@@ -2,7 +2,7 @@ package sketch.scope.cmap
 
 import cats.data.Kleisli
 import sketch.scope.hmap.HDim
-import sketch.scope.sketch._
+import sketch.scope.dist._
 
 /**
   * Licensed by Probe Technology, Inc.
