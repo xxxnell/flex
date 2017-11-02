@@ -5,7 +5,7 @@ package sketch.scope.dist
   */
 case class SimpleSketch[A](measure: A => Prim, structure: Structure) extends Sketch[A]
 
-trait SimpleSketchOps extends SketchPropOps[SimpleSketch] {
+trait SimpleSketchOps extends SketchPrimPropOps[SimpleSketch] {
 
   def primUpdate[A](sketch: SimpleSketch[A], p: Prim): Option[SimpleSketch[A]] = for {
     sketch <- simpleUpdate(sketch, p)
