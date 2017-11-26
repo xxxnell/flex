@@ -1,4 +1,4 @@
-package sketch.scope.dist.algebra
+package sketch.scope.dist.monad
 
 import sketch.scope.dist.{Dist, SmoothDist}
 

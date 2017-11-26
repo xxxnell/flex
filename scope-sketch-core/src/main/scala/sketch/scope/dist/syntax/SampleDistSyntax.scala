@@ -1,6 +1,6 @@
 package sketch.scope.dist.syntax
 
-import sketch.scope.dist.algebra.SampleDistMonad
+import sketch.scope.dist.monad.SampleDistMonad
 import sketch.scope.dist.{Dist, Range, SampleDist}
 
 /**

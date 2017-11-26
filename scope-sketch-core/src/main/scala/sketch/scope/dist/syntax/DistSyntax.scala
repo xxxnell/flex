@@ -1,6 +1,6 @@
 package sketch.scope.dist.syntax
 
-import sketch.scope.dist.algebra.{DistBind, DistFunctor, DistMonad}
+import sketch.scope.dist.monad.{DistBind, DistFunctor, DistMonad}
 import sketch.scope.dist.{Dist, SampleDist, Sketch}
 
 import scala.language.higherKinds

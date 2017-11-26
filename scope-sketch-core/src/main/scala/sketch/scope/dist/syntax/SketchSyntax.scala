@@ -1,7 +1,7 @@
 package sketch.scope.dist.syntax
 
 import sketch.scope.dist.{Dist, Sketch}
-import sketch.scope.dist.algebra.{DistFunctor, SketchMonad}
+import sketch.scope.dist.monad.{DistFunctor, SketchMonad}
 
 /**
   * Licensed by Probe Technology, Inc.
@@ -11,9 +11,9 @@ trait SketchSyntax extends SketchPropSyntax with SketchMonadSyntax
 trait SketchPropSyntax {
 
   implicit class SketchPropSyntaxImpl[A](sketch: Sketch[A]) {
-    def update(a: A): Option[Sketch[A]] = Sketch.update(sketch, a)
+//    def update(a: A): Option[Sketch[A]] = Sketch.update(sketch, a)
     def count(from: A, to: A): Option[Double] = Sketch.count(sketch, from, to)
-    def sum: Double = Sketch.sum(sketch)
+//    def sum: Double = Sketch.sum(sketch)
     //    def clear: Sketch = Sketch.clear(sketch)
     def probability(from: A, to: A): Option[Double] = Sketch.probability(sketch, from, to)
     def rearrange: Option[Sketch[A]] = Sketch.rearrange(sketch)
