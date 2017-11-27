@@ -3,23 +3,17 @@ package sketch.scope.dist
 /**
   * Licensed by Probe Technology, Inc.
   */
-case class SimpleSketch[A](measure: A => Prim, structure: Structure) extends Sketch[A]
+case class SimpleSketch[A](measure: A => Prim, structures: Structures) extends Sketch[A]
 
 trait SimpleSketchOps extends SketchPrimPropOps[SimpleSketch] {
 
-  def primUpdate[A](sketch: SimpleSketch[A], p: Prim): Option[SimpleSketch[A]] = for {
-    sketch <- simpleUpdate(sketch, p)
-  } yield sketch2SimpleSketch(sketch)
-
-  def rearrange[A](sketch: SimpleSketch[A]): Option[SimpleSketch[A]] = Some(sketch)
-
-  def sketch2SimpleSketch[A](sketch: Sketch[A]): SimpleSketch[A] = SimpleSketch(sketch.measure, sketch.structure)
+  def sketch2SimpleSketch[A](sketch: Sketch[A]): SimpleSketch[A] = SimpleSketch(sketch.measure, sketch.structures)
 
 }
 
 object SimpleSketch extends SimpleSketchOps {
 
-  def modifyStructure[A](sketch: SimpleSketch[A], f: Structure => Option[Structure]): Option[SimpleSketch[A]] =
-    f(sketch.structure).map(structure => SimpleSketch(sketch.measure, structure))
+  def modifyStructure[A](sketch: SimpleSketch[A], f: Structures => Option[Structures]): Option[SimpleSketch[A]] =
+    f(sketch.structures).map(structure => SimpleSketch(sketch.measure, structure))
 
 }

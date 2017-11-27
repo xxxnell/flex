@@ -6,7 +6,7 @@ import sketch.scope.hcounter.HCounter
 /**
   * Licensed by Probe Technology, Inc.
   */
-case class ContSketch[A](measure: A => Double, structure: List[(Cmap, HCounter)], period: Double)
+case class ContSketch[A](measure: A => Double, structures: List[(Cmap, HCounter)], period: Double)
   extends PeriodicSketch[A] {
 
   val periods: Stream[Double] = Stream.from(1).map(i => period * i)

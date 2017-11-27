@@ -14,46 +14,63 @@ import scala.language.higherKinds
   */
 trait Sketch[A] extends SampleDist[A] {
 
-  def structure: Structure
+  def structures: Structures
 
 }
 
-trait SketchPropOps[S[_]<:Sketch[_]] extends SampleDistPropOps[S] {
+trait SketchPropOps[S[_]<:Sketch[_]] extends SketchPropLaws[S] with SampleDistPropOps[S] {
 
-  def modifyStructure[A](sketch: S[A], f: Structure => Option[Structure]): Option[S[A]]
+  // Read ops
 
-  def update[A](sketch: S[A], a: A): Option[S[A]]
+  def count[A](sketch: S[A], from: A, to: A): Option[Double]
 
-  def rearrange[A](sketch: S[A]): Option[S[A]]
+  // Update ops
+
+  def modifyStructure[A](sketch: S[A], f: Structures => Option[Structures]): Option[S[A]]
+
+  def narrowUpdate[A](sketch: S[A], as: List[A]): Option[S[A]]
+
+  def deepUpdate[A](sketch: S[A], as: List[A]): Option[(S[A], Structure)]
+
+  //  def clear(sketch: S): S
 
 }
 
-object Sketch extends SketchPrimPropOps[Sketch] {
+trait SketchPropLaws[S[_]<:Sketch[_]] { self: SketchPropOps[S] =>
 
-  def apply[A](measure: A => Prim, structure: Structure): Sketch[A] = SimpleSketch(measure, structure)
+  def rearrange[A](sketch: S[A]): Option[S[A]] = deepUpdate(sketch, Nil).map(_._1)
+
+}
+
+object Sketch extends SketchPropOps[Sketch] {
+
+  def apply[A](measure: A => Prim, structure: Structures): Sketch[A] = SimpleSketch(measure, structure)
 
   def empty[A](measure: A => Double, caDepth: Int, caSize: Int, coDepth: Int, coSize: Int): Sketch[A] =
     PeriodicSketch.empty(measure, caDepth, caSize, coDepth, coSize)
 
   // mapping ops
 
-  def primUpdate[A](sketch: Sketch[A], p: Double): Option[Sketch[A]] = sketch match {
-    case sketch: PeriodicSketch[A] => PeriodicSketch.primUpdate(sketch, p)
-    case _ => SimpleSketch.primUpdate(sketch, p)
-  }
+  def probability[A](dist: Sketch[A], from: A, to: A): Option[Prim] = ???
 
-//  def clear(sketch: Sketch): Sketch = sketch match {
-//    case sketch: PeriodicSketch => PeriodicSketch.clear(sketch)
-//  }
+  def densityPlot(dist: Sketch[_]): Option[List[(Range, Prim)]] = ???
 
-  def rearrange[A](sketch: Sketch[A]): Option[Sketch[A]] = sketch match {
-    case sketch: PeriodicSketch[_] => PeriodicSketch.rearrange(sketch)
-    case _ => SimpleSketch.rearrange(sketch)
-  }
+  def count[A](sketch: Sketch[A], from: A, to: A): Option[Prim] = ???
 
-  def modifyStructure[A](sketch: Sketch[A], f: Structure => Option[Structure]): Option[Sketch[A]] = sketch match {
+  def narrowUpdate[A](sketch: Sketch[A], as: List[A]): Option[Sketch[A]] = ???
+
+  def deepUpdate[A](sketch: Sketch[A], as: List[A]): Option[(Sketch[A], Structure)] = ???
+
+  def modifyStructure[A](sketch: Sketch[A], f: Structures => Option[Structures]): Option[Sketch[A]] = sketch match {
     case sketch: PeriodicSketch[_] => PeriodicSketch.modifyStructure(sketch, f)
     case _ => SimpleSketch.modifyStructure(sketch, f)
+  }
+
+  // syntatic sugars
+
+  def update[A](sketch: Sketch[A], as: List[A]): Option[Sketch[A]] = sketch match {
+    case sketch: PeriodicSketch[A] => ???
+    case _ => narrowUpdate(sketch, as)
   }
 
 }

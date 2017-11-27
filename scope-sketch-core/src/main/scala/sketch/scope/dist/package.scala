@@ -21,7 +21,9 @@ package object dist
 
   type Ranges = List[Range]
 
-  type Structure = List[(Cmap, HCounter)]
+  type Structure = (Cmap, HCounter)
+
+  type Structures = List[Structure]
 
   implicit def autocast[A](sketch: Sketch[A]): SimpleSketch[A] = SimpleSketch.sketch2SimpleSketch(sketch)
 

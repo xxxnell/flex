@@ -11,7 +11,7 @@ trait SketchSyntax extends SketchPropSyntax with SketchMonadSyntax
 trait SketchPropSyntax {
 
   implicit class SketchPropSyntaxImpl[A](sketch: Sketch[A]) {
-//    def update(a: A): Option[Sketch[A]] = Sketch.update(sketch, a)
+    def update(a: A): Option[Sketch[A]] = ??? // Sketch.update(sketch, a)
     def count(from: A, to: A): Option[Double] = Sketch.count(sketch, from, to)
 //    def sum: Double = Sketch.sum(sketch)
     //    def clear: Sketch = Sketch.clear(sketch)
