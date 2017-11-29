@@ -1,25 +1,34 @@
 package sketch.scope.pdf.update
 
 import sketch.scope.cmap.Cmap
-import sketch.scope.pdf.{Prim, Range, Ranges, Sketch}
 import sketch.scope.hcounter.HCounter
-
-import scala.util.Try
+import sketch.scope.pdf.{Prim, Sketch}
+import sketch.scope.plot._
 
 /**
   * Licensed by Probe Technology, Inc.
   */
 trait UniformCdfUpdate {
 
-  def updateCmap(sketch: Sketch[_], ps: List[Prim], mixingRate: Double): Option[Cmap] = for {
-    plot <- sketch.densityPlot
-  } yield ???
+  def updateCmap(sketch: Sketch[_], ps: List[Prim], mixingRate: Double, window: Double): Option[Cmap] = for {
+    sketchPlot <- sketch.densityPlot
+    mtpSketchPlot = sketchPlot * (1 / (mixingRate + 1))
+    mtpPsPlot = Plot.squareKernel(ps, window) * (mixingRate / (mixingRate + 1))
+    mergedPlot = mtpSketchPlot + mtpPsPlot
+    caSize <- sketch.structures.headOption.map { case (cmap, _) => cmap.size }
+    cmap = cmapForUniformSplitCumulative(mergedPlot, caSize)
+  } yield cmap
 
+  def cmapForUniformSplitCumulative(plot: Plot, caSize: Int): Cmap = {
+    val cdf = plot.cumulative
+    val invCdf = cdf.inverse
+    val unit = cdf.value(Double.MaxValue) / caSize.toDouble
 
+    val divider = (1 until caSize).toList.map(i => i * unit).map(a => invCdf.value(a))
+    Cmap.divider(divider)
+  }
 
-
-
-//  def rearrangeCmap(sketch: Sketch[_]): Option[Cmap] = for {
+  //  def rearrangeCmap(sketch: Sketch[_]): Option[Cmap] = for {
 //    densityPlot <- densityPlot(sketch)
 //    size <- sketch.structure.headOption.map { case (cmap, _) => cmap.size }
 //    utdRanges = updateRanges(size, densityPlot)

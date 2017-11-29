@@ -4,6 +4,7 @@ import cats.implicits._
 import sketch.scope.cmap.Cmap
 import sketch.scope.hcounter.HCounter
 import sketch.scope.hmap.HDim
+import sketch.scope.plot.Plot
 
 import scala.language.higherKinds
 
@@ -46,6 +47,13 @@ object Sketch extends SketchPropOps[Sketch] {
 
   def apply[A](measure: A => Prim, structure: Structures): Sketch[A] = SimpleSketch(measure, structure)
 
+  /**
+    * @param measure  measure, i.e. map from input to double, of Sketch
+    * @param caDepth  size of Sketch structure
+    * @param caSize   Cmap size.
+    * @param coDepth  HCounter depth
+    * @param coSize   HCounter size
+    * */
   def empty[A](measure: A => Double, caDepth: Int, caSize: Int, coDepth: Int, coSize: Int): Sketch[A] =
     PeriodicSketch.empty(measure, caDepth, caSize, coDepth, coSize)
 
@@ -53,7 +61,7 @@ object Sketch extends SketchPropOps[Sketch] {
 
   def probability[A](dist: Sketch[A], from: A, to: A): Option[Prim] = ???
 
-  def densityPlot(dist: Sketch[_]): Option[List[(Range, Prim)]] = ???
+  def densityPlot(dist: Sketch[_]): Option[Plot] = ???
 
   def count[A](sketch: Sketch[A], from: A, to: A): Option[Prim] = ???
 

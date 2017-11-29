@@ -2,6 +2,8 @@ package sketch.scope.range
 
 import sketch.scope.pdf.Prim
 
+import scala.collection.immutable.NumericRange
+
 /**
   * Licensed by Probe Technology, Inc.
   */
@@ -32,5 +34,7 @@ object Range extends RangeOps {
   private case class RangeImpl(start: Prim, end: Prim) extends Range
 
   def apply(start: Prim, end: Prim): Range = RangeImpl(start, end)
+
+  def forNumericRange(numRange: NumericRange[Prim]): Range = apply(numRange.start, numRange.end)
 
 }

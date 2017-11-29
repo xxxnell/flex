@@ -5,6 +5,8 @@ import sketch.scope.hcounter.HCounter
 import sketch.scope.hmap.HDim
 import cats.implicits._
 import sketch.scope.pdf.update.UniformCdfUpdate
+import sketch.scope.plot._
+import sketch.scope.range._
 
 /**
   * Licensed by Probe Technology, Inc.
@@ -12,6 +14,10 @@ import sketch.scope.pdf.update.UniformCdfUpdate
   * This Ops introduces the update function with primitive type as a parameter.
   */
 trait SketchPrimPropOps[S[_]<:Sketch[_]] extends SketchPrimPropLaws[S] with SketchPropOps[S]{
+
+  val mixingRate: Double = 1
+
+  val window: Double = math.pow(10, -10)
 
   // Update ops
 
@@ -30,23 +36,29 @@ trait SketchPrimPropOps[S[_]<:Sketch[_]] extends SketchPrimPropLaws[S] with Sket
     * Deep update a primitive value <code>p</code> instead of <code>a</code> ∈ <code>A</code>
     * */
   def primDeepUpdate[A](sketch: S[A], ps: List[Prim]): Option[(S[A], Structure)] = for {
-    utdCmap <- UniformCdfUpdate.updateCmap(sketch, ps)
+    utdCmap <- UniformCdfUpdate.updateCmap(sketch, ps, mixingRate, window)
     headTailStr <- sketch.structures match {
       case head :: tail => Some((head, tail))
       case _ => None
     }
     (oldStr, strs) = headTailStr
-    utdHCounter <- migrate(sketch, utdCmap, oldStr._2.depth, oldStr._2.width)
-    utdStrs = strs :+ (utdCmap, utdHCounter)
+    utdHCounter1 <- migrateForSketch(HCounter.empty(oldStr._2.depth, oldStr._2.width), utdCmap, sketch)
+    utdHCounter2 <- migrateForPs(utdHCounter1, utdCmap, ps)
+    utdStrs = strs :+ (utdCmap, utdHCounter2)
     utdSketch <- modifyStructure(sketch, _ => Some(utdStrs))
   } yield (utdSketch, oldStr)
 
-  def migrate[A](sketch: S[A], cmap: Cmap, depth: Int, width: Int): Option[HCounter] = {
+  def migrateForSketch[A](hcounter: HCounter, cmap: Cmap, sketch: S[A]): Option[HCounter] = {
     cmap.ranges
       .flatMap { case (hdim, range) => primCount(sketch, range.start, range.end).map(count => (hdim, count)) }
-      .foldLeft(Option(HCounter.empty(depth, width))){ case (hcounterO, (hdim, count)) =>
+      .foldLeft(Option(hcounter)){ case (hcounterO, (hdim, count)) =>
         hcounterO.flatMap(hcounter => hcounter.update(hdim, count))
       }
+  }
+
+  def migrateForPs(hcounter: HCounter, cmap: Cmap, ps: List[Prim]): Option[HCounter] = {
+    ps.map(p => cmap.apply(p))
+      .foldLeft(Option(hcounter))((hcounterO, hdim) => hcounterO.flatMap(hcounter => hcounter.update(hdim, 1)))
   }
 
   // Read ops
@@ -119,20 +131,19 @@ trait SketchPrimPropLaws[S[_]<:Sketch[_]] { self: SketchPrimPropOps[S] =>
 
   //  def cdf(sketch: S, a: Double): Option[Double] = ???
 
-  def countPlot(sketch: S[_]): Option[List[(Range, Double)]] = {
-    for {
-      cmapHcounter <- sketch.structures.lastOption
-      (cmap, _) = cmapHcounter
-      ranges = cmap.bin
-      counts <- ranges.traverse(range => primCount(sketch, range.start, range.end))
-    } yield ranges.zip(counts)
-  }
+  def countPlot(sketch: S[_]): Option[Plot] = for {
+    cmapHcounter <- sketch.structures.lastOption
+    (cmap, _) = cmapHcounter
+    ranges = cmap.bin.map(numRange => Range.forNumericRange(numRange))
+    counts <- ranges.traverse(range => primCount(sketch, range.start, range.end))
+  } yield Plot.disjoint(ranges.zip(counts))
 
-  def densityPlot(sketch: S[_]): Option[List[(Range, Double)]] = {
+  def densityPlot(sketch: S[_]): Option[Plot] = {
     val sum = self.sum(sketch)
-    countPlot(sketch).map(plot =>
-      plot.map { case (range, count) => (range, count / (sum * (range.end - range.start))) }
-    )
+
+    for {
+      plot <- countPlot(sketch)
+    } yield plot.modify { case (range, value) => value / (sum * (range.end - range.start)) }
   }
 
 }
