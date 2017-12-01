@@ -131,19 +131,21 @@ trait SketchPrimPropLaws[S[_]<:Sketch[_]] { self: SketchPrimPropOps[S] =>
 
   //  def cdf(sketch: S, a: Double): Option[Double] = ???
 
-  def countPlot(sketch: S[_]): Option[Plot] = for {
+  def countPlot(sketch: S[_]): Option[CountPlot] = for {
     cmapHcounter <- sketch.structures.lastOption
     (cmap, _) = cmapHcounter
     ranges = cmap.bin.map(numRange => Range.forNumericRange(numRange))
     counts <- ranges.traverse(range => primCount(sketch, range.start, range.end))
-  } yield Plot.disjoint(ranges.zip(counts))
+  } yield CountPlot.disjoint(ranges.zip(counts))
 
-  def densityPlot(sketch: S[_]): Option[Plot] = {
+  def densityPlot(sketch: S[_]): Option[DensityPlot] = {
     val sum = self.sum(sketch)
 
     for {
       plot <- countPlot(sketch)
-    } yield plot.modify { case (range, value) => value / (sum * (range.end - range.start)) }
+    } yield DensityPlot.disjoint(
+      plot.records.map { case (range, value) => (range, value / (sum * (range.end - range.start))) }
+    )
   }
 
 }

@@ -1,6 +1,6 @@
 package sketch.scope.pdf
 
-import sketch.scope.plot.Plot
+import sketch.scope.plot.{DensityPlot, Plot}
 
 import scala.language.higherKinds
 
@@ -11,7 +11,7 @@ trait SampleDist[A] extends Dist[A]
 
 trait SampleDistPropOps[D[_]<:SampleDist[_]] extends DistPropOps[D] {
 
-  def densityPlot(dist: D[_]): Option[Plot]
+  def densityPlot(dist: D[_]): Option[DensityPlot]
 
 }
 
@@ -19,6 +19,6 @@ object SampleDist extends SampleDistPropOps[SampleDist] {
 
   def probability[A](dist: SampleDist[A], from: A, to: A): Option[Double] = ???
 
-  def densityPlot(dist: SampleDist[_]): Option[Plot] = ???
+  def densityPlot(dist: SampleDist[_]): Option[DensityPlot] = ???
 
 }

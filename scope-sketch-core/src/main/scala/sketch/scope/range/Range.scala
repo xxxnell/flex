@@ -10,6 +10,10 @@ import scala.collection.immutable.NumericRange
 trait Range {
   def start: Prim
   def end: Prim
+  override def equals(other: Any): Boolean = other.isInstanceOf[Range] &&
+    start == other.asInstanceOf[Range].start &&
+    end == other.asInstanceOf[Range].end
+  override def hashCode(): Int = start.hashCode() + end.hashCode()
 }
 
 trait RangeOps {
@@ -19,12 +23,15 @@ trait RangeOps {
       ((range.start <= a) && (range.end >= a))
   }
 
+  def middle(range: Range): Prim = (range.start - range.end) / 2
+
 }
 
 trait RangeSyntax {
 
   implicit class RangeImpl(range: Range) {
     def contains(a: Prim): Boolean = Range.contains(range, a)
+    def middle: Prim = Range.middle(range)
   }
 
 }

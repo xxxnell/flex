@@ -4,7 +4,7 @@ import cats.implicits._
 import sketch.scope.cmap.Cmap
 import sketch.scope.hcounter.HCounter
 import sketch.scope.hmap.HDim
-import sketch.scope.plot.Plot
+import sketch.scope.plot.{DensityPlot, Plot}
 
 import scala.language.higherKinds
 
@@ -61,7 +61,7 @@ object Sketch extends SketchPropOps[Sketch] {
 
   def probability[A](dist: Sketch[A], from: A, to: A): Option[Prim] = ???
 
-  def densityPlot(dist: Sketch[_]): Option[Plot] = ???
+  def densityPlot(dist: Sketch[_]): Option[DensityPlot] = ???
 
   def count[A](sketch: Sketch[A], from: A, to: A): Option[Prim] = ???
 
