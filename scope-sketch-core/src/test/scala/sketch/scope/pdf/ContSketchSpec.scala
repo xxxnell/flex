@@ -22,20 +22,20 @@ class ContSketchSpec extends Specification with ScalaCheck {
 
       val testMeasure = contSketch.measure == measure
 
-      val testCaDepth = contSketch.structure.size == caDepth
+      val testCaDepth = contSketch.structures.size == caDepth
 
       val testCaSize = contSketch
-        .structure
+        .structures
         .map { case (cmap, hcounter) => cmap.size -1 == caSize }
         .forall(b => b)
 
       val testCoDepth = contSketch
-        .structure
+        .structures
         .map { case (cmap, hcounter) => hcounter.depth == coDepth }
         .forall(identity)
 
       val testCoSize = contSketch
-        .structure
+        .structures
         .map { case (cmap, hcounter) => hcounter.width == coSize }
         .forall(identity)
 
