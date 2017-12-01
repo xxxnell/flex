@@ -1,7 +1,7 @@
 package sketch.scope.cmap
 
 import sketch.scope.hmap.HDim
-import sketch.scope.dist._
+import sketch.scope.pdf._
 
 import scala.collection.immutable.TreeMap
 

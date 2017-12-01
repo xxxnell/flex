@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit
 
 import org.openjdk.jmh.annotations._
 import SketchBenchOps._
-import sketch.scope.dist.Sketch
+import sketch.scope.pdf.Sketch
 
 /**
   * Licensed by Probe Technology, Inc.

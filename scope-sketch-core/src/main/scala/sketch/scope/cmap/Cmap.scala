@@ -2,7 +2,7 @@ package sketch.scope.cmap
 
 import cats.data.Kleisli
 import sketch.scope.hmap.HDim
-import sketch.scope.dist._
+import sketch.scope.pdf._
 
 /**
   * Licensed by Probe Technology, Inc.
@@ -30,7 +30,9 @@ trait CmapOps[C<:Cmap] extends CmapLaws[C] {
 
 trait CmapLaws[C<:Cmap] { self: CmapOps[C] =>
 
-  def kleisli(cmap: Cmap) = Kleisli[Option, Double, HDim](a => Some(cmap.apply(a)))
+  def kleisli(cmap: Cmap): Kleisli[Option, Prim, HDim] = Kleisli[Option, Double, HDim](a => Some(cmap.apply(a)))
+
+  def ranges(cmap: C): List[(HDim, Range)] = (for { i <- 0 until cmap.size } yield (i, range(cmap, i))).toList
 
 }
 
@@ -40,6 +42,7 @@ trait CmapSyntax {
     def bin: List[Range] = Cmap.bin(cmap)
     def size: Int = Cmap.size(cmap)
     def range(hdim: HDim): Range = Cmap.range(cmap, hdim)
+    def ranges: List[(HDim, Range)] = Cmap.ranges(cmap)
   }
 
 }
