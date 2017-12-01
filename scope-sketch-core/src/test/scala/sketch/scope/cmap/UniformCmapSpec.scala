@@ -14,9 +14,10 @@ class UniformCmapSpec extends Specification with ScalaCheck {
     "divider" in {
       implicit val uniformCmapA = UniformCmapGen.uniformCmapA
 
-      prop { (cmap: UniformCmap) =>
-        ok
-      }
+      prop { (cmapTupple: (Int, UniformCmap) ) =>
+        if( cmapTupple._2.divider.length == cmapTupple._1) ok
+        else ko
+      }.setArbitrary(uniformCmapA)
     }
 
   }
@@ -25,10 +26,10 @@ class UniformCmapSpec extends Specification with ScalaCheck {
 
 object UniformCmapGen {
 
-  def uniformCmapGen: Gen[UniformCmap] = for {
+  def uniformCmapGen: Gen[(Int, UniformCmap)] = for {
     n <- Gen.choose(0, Math.pow(2, 19).toInt)
-  } yield UniformCmap(n)
+  } yield (n, UniformCmap(n))
 
-  def uniformCmapA: Arbitrary[UniformCmap] = Arbitrary(uniformCmapGen)
+  def uniformCmapA: Arbitrary[(Int, UniformCmap)] = Arbitrary(uniformCmapGen)
 
 }

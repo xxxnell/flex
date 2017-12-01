@@ -15,19 +15,47 @@ class HCounterSpec extends Specification with ScalaCheck {
     "ops" in {
 
       "update" in {
-        implicit val hcounterGen = HCounterGen.hcounterA
 
-        prop { (hcounter: HCounter) =>
-          todo
-        }.setArbitrary(hcounterGen)
+        "normal" in {
+          implicit val hcounterGen = HCounterGen.hcounterA
+
+          prop { (hcounter: HCounter) =>
+            (for {
+              updatedHcounter <- hcounter.update(10, 20)
+              test = updatedHcounter.sum == (hcounter.sum + 20)
+            } yield test)
+              .fold(ko)(test => if (test) ok else ko)
+            //          hcounter.update(10, 20).map(hcounter => { test condition }).fold()()
+            //          for {
+            //            a <- A
+            //            b <- B
+            //            c <- C
+            //          } yield c
+            //          A.flatMap(a => B.flatMap(b => C.map(c )))
+          }.setArbitrary(hcounterGen)
+        }
+
+        "irregular index" in todo
+
       }
 
       "get" in {
-        implicit val hcounterGen = HCounterGen.hcounterA
 
-        prop { (hcounter: HCounter) =>
-          todo
-        }.setArbitrary(hcounterGen)
+        "normal" in {
+          implicit val hcounterGen = HCounterGen.hcounterA
+
+          prop { (hcounter: HCounter) =>
+            (for {
+              updatedHcounter <- hcounter.update(10, 20)
+              value <- updatedHcounter.get(10)
+            } yield value == 20)
+              .fold(ko)(test => if(test) ok else ko )
+
+          }.setArbitrary(hcounterGen)
+        }
+
+        "irregular index" in todo
+
       }
 
     }
