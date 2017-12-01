@@ -36,21 +36,21 @@ trait DistMonadSyntax extends DistMonadSyntax1 {
 
 trait DistMonadSyntax1 extends DistMonadSyntax2 {
 
-  implicit val bindAux1: DistBindAux[Sketch, Sketch] = new DistBindAux[Sketch, Sketch] {}
-  implicit val distMonad1: DistMonad[Dist, Sketch, Sketch] = DistMonad.sketch
+  implicit def bindAux1: DistBindAux[Sketch, Sketch] = new DistBindAux[Sketch, Sketch] {}
+  implicit def distMonad1: DistMonad[Dist, Sketch, Sketch] = DistMonad.sketch
 
 }
 
 trait DistMonadSyntax2 extends DistMonadSyntax3 {
 
-  implicit val bindAux2: DistBindAux[SampleDist, SampleDist] = new DistBindAux[SampleDist, SampleDist] {}
-  implicit val distMonad2: DistMonad[Dist, SampleDist, SampleDist] = DistMonad.sampleDist
+  implicit def bindAux2: DistBindAux[SampleDist, SampleDist] = new DistBindAux[SampleDist, SampleDist] {}
+  implicit def distMonad2: DistMonad[Dist, SampleDist, SampleDist] = DistMonad.sampleDist
 
 }
 
 trait DistMonadSyntax3 {
 
-  implicit val bindAux3: DistBindAux[Dist, Dist] = new DistBindAux[Dist, Dist] {}
-  implicit val distMonad3: DistMonad[Dist, Dist, Dist] = DistMonad.dist
+  implicit def bindAux3: DistBindAux[Dist, Dist] = new DistBindAux[Dist, Dist] {}
+  implicit def distMonad3: DistMonad[Dist, Dist, Dist] = DistMonad.dist
 
 }

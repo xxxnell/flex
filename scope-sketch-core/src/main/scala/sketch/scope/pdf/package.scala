@@ -1,8 +1,8 @@
 package sketch.scope
 
-import _root_.sketch.scope.cmap.Cmap
-import _root_.sketch.scope.hcounter.HCounter
-import _root_.sketch.scope.pdf.syntax._
+import sketch.scope.cmap.Cmap
+import sketch.scope.hcounter.HCounter
+import sketch.scope.pdf.syntax._
 
 import scala.collection.immutable.NumericRange
 import scala.language.implicitConversions
