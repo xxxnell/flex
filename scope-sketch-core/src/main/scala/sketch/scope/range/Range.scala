@@ -43,7 +43,11 @@ object Range extends RangeOps {
 
   private case class RangeImpl(start: Prim, end: Prim) extends Range
 
-  def apply(start: Prim, end: Prim): Range = RangeImpl(start, end)
+  def apply(start: Prim, end: Prim): Range = bare(start, end)
+
+  def bare(start: Prim, end: Prim): Range = RangeImpl(start, end)
+
+  def point(p: Prim): Range = bare(p, p)
 
   def forNumericRange(numRange: NumericRange[Prim]): Range = apply(numRange.start, numRange.end)
 

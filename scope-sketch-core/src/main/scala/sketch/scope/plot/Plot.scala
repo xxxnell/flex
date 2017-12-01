@@ -27,7 +27,9 @@ trait PlotOps[P<:Plot] extends PlotLaws[P] {
     * */
   def split(record: Record, p: Double): Option[(Record, Record)]
 
-  def inverse(plot: P): P = ???
+  def inverse(plot: P): P = modifyRecords(plot, records => {
+    records.map { case (range, value) => (Range.point(value), range.middle) }
+  })
 
   def cumulative(plot: P): P = {
     var accVal = 0.toDouble
