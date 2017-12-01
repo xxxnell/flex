@@ -13,7 +13,7 @@ class DividerCmapSpec extends Specification with ScalaCheck {
   "DividerCmap" should {
 
     "divider2IndexingMap" in {
-      implicit val dividerGen = DividerCmapGen.dividerA
+      implicit val dividerGen: Arbitrary[List[Double]] = DividerCmapGen.dividerA
 
       prop { (divider: (List[Double]) ) =>
         val divider2indexMap = DividerCmap.divider2IndexingMap(divider)
@@ -41,7 +41,7 @@ class DividerCmapSpec extends Specification with ScalaCheck {
     }
 
     "divider2InverseIndexingMap" in {
-      implicit val dividerGen = DividerCmapGen.dividerA
+      implicit val dividerGen: Arbitrary[List[Double]] = DividerCmapGen.dividerA
 
       prop { (divider: (List[Double]) ) =>
         val divider2inverseindexMap = DividerCmap.divider2InverseIndexingMap(divider)
@@ -67,8 +67,9 @@ class DividerCmapSpec extends Specification with ScalaCheck {
     }
 
     "bin" in {
+
       "divider" in {
-        implicit val dividerGen = DividerCmapGen.dividerA
+        implicit val dividerGen: Arbitrary[List[Double]] = DividerCmapGen.dividerA
 
         prop { (divider: List[Double]) =>
           val cmap = DividerCmap(divider)
@@ -85,10 +86,11 @@ class DividerCmapSpec extends Specification with ScalaCheck {
       "uniform" in {
         todo
       }
+
     }
 
     "size" in {
-      implicit val dividercmapGen = DividerCmapGen.dividerA
+      implicit val dividercmapGen: Arbitrary[List[Double]] = DividerCmapGen.dividerA
 
       prop { (divider: (List[Double]) ) =>
         val dividercmapSize = DividerCmap(divider).size
@@ -103,8 +105,9 @@ class DividerCmapSpec extends Specification with ScalaCheck {
     }
 
     "range" in {
+
       "divider" in {
-        implicit val dividerGen = DividerCmapGen.dividerA
+        implicit val dividerGen: Arbitrary[List[Double]] = DividerCmapGen.dividerA
 
         prop { (divider: List[Double]) =>
           val cmap = DividerCmap(divider)
@@ -121,6 +124,7 @@ class DividerCmapSpec extends Specification with ScalaCheck {
       "uniform" in {
         todo
       }
+
     }
 
   }

@@ -13,8 +13,8 @@ class HmapSpec extends Specification with ScalaCheck {
   "Hmap" should {
 
     "apply" in {
-      implicit val hmapA = HmapGen.hmapA
-      implicit val nontrivialSizeA = HmapGen.nontrivialSizeA
+      implicit val hmapA: Arbitrary[Hmap] = HmapGen.hmapA
+      implicit val nontrivialSizeA: Arbitrary[HDim] = HmapGen.nontrivialSizeA
 
       prop { (hmap: Hmap, hdim: HDim, size: Int) =>
         hmap.apply(hdim, size).fold(ko)(cdim =>

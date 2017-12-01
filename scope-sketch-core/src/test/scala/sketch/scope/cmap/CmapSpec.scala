@@ -14,8 +14,9 @@ class CmapSpec extends Specification with ScalaCheck {
   "Cmap" should {
 
     "bin" in {
+
       "divider" in {
-        implicit val dividerGen = CmapGen.dividerA
+        implicit val dividerGen: Arbitrary[List[Double]] = CmapGen.dividerA
 
         prop { (divider: List[Double]) =>
           val cmap = DividerCmap(divider)
@@ -32,10 +33,11 @@ class CmapSpec extends Specification with ScalaCheck {
       "uniform" in {
         todo
       }
+
     }
 
     "size" in {
-      implicit val cmapGen = CmapGen.cmapA
+      implicit val cmapGen: Arbitrary[(Int, Cmap)] = CmapGen.cmapA
 
       prop { (sizeCmap: (Int, Cmap) ) =>
         val (size, cmap) = sizeCmap
@@ -46,7 +48,7 @@ class CmapSpec extends Specification with ScalaCheck {
     "range" in {
 
       "divider" in {
-        implicit val dividerGen = CmapGen.dividerA
+        implicit val dividerGen: Arbitrary[List[Double]] = CmapGen.dividerA
 
         prop { (divider: List[Double]) =>
           val cmap = DividerCmap(divider)
@@ -63,6 +65,7 @@ class CmapSpec extends Specification with ScalaCheck {
       "uniform" in {
         todo
       }
+
     }
 
   }

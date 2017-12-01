@@ -12,7 +12,7 @@ class UniformCmapSpec extends Specification with ScalaCheck {
   "UniformCmap" should {
 
     "divider" in {
-      implicit val uniformCmapA = UniformCmapGen.uniformCmapA
+      implicit val uniformCmapA: Arbitrary[(Int, UniformCmap)] = UniformCmapGen.uniformCmapA
 
       prop { (cmapTupple: (Int, UniformCmap) ) =>
         if( cmapTupple._2.divider.length == cmapTupple._1) ok

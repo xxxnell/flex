@@ -17,7 +17,7 @@ class HCounterSpec extends Specification with ScalaCheck {
       "update" in {
 
         "normal" in {
-          implicit val hcounterGen = HCounterGen.hcounterA
+          implicit val hcounterGen: Arbitrary[HCounter] = HCounterGen.hcounterA
 
           prop { (hcounter: HCounter) =>
             (for {
@@ -42,7 +42,7 @@ class HCounterSpec extends Specification with ScalaCheck {
       "get" in {
 
         "normal" in {
-          implicit val hcounterGen = HCounterGen.hcounterA
+          implicit val hcounterGen: Arbitrary[HCounter] = HCounterGen.hcounterA
 
           prop { (hcounter: HCounter) =>
             (for {

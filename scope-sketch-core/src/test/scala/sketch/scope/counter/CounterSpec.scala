@@ -14,8 +14,8 @@ class CounterSpec extends Specification with ScalaCheck {
     "ops" in {
 
       "update" in {
-        implicit val counterCdimCountA = CounterGen.counterCdimA
-        implicit val countGenA = CounterGen.countA
+        implicit val counterCdimCountA: Arbitrary[(Counter, CDim)] = CounterGen.counterCdimA
+        implicit val countGenA: Arbitrary[Double] = CounterGen.countA
 
         prop { (counterCdimCount: (Counter, CDim), count : Double) =>
           val (counter, cdim) = counterCdimCount
@@ -38,7 +38,7 @@ class CounterSpec extends Specification with ScalaCheck {
       "get" in {
 
         "empty" in {
-          implicit val counterCdimA = CounterGen.counterCdimA
+          implicit val counterCdimA: Arbitrary[(Counter, CDim)] = CounterGen.counterCdimA
 
           prop { (counterCdim: (Counter, CDim)) =>
             val (counter, cdim) = counterCdim
@@ -55,7 +55,7 @@ class CounterSpec extends Specification with ScalaCheck {
         }
 
         "filled" in {
-          implicit val counterCdimA = CounterGen.counterCdimA
+          implicit val counterCdimA: Arbitrary[(Counter, CDim)] = CounterGen.counterCdimA
 
           prop { (counterCdim: (Counter, CDim), count: Double) =>
             val (counter, cdim) = counterCdim
@@ -75,7 +75,7 @@ class CounterSpec extends Specification with ScalaCheck {
       }
 
       "size" in {
-        implicit val counterCdimA = CounterGen.counterSizeA
+        implicit val counterCdimA: Arbitrary[(Counter, CDim)] = CounterGen.counterSizeA
 
         prop { (counterSize: (Counter, Int)) =>
           val (counter, size) = counterSize
@@ -85,7 +85,6 @@ class CounterSpec extends Specification with ScalaCheck {
               s"counter size -> ${counter.size}, cdim -> $size"
           if( counter.size == size) ok
           else ko(koMsg)
-
         }.setArbitrary(counterCdimA)
       }
 

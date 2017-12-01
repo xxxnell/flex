@@ -10,6 +10,7 @@ import org.specs2.ScalaCheck
 class ListCounterSpec extends Specification with ScalaCheck {
   
     "ListCounter" should {
+
       "update" in {
         (for {
             listcounter <- ListCounterGen.listCounterSample
@@ -17,6 +18,7 @@ class ListCounterSpec extends Specification with ScalaCheck {
         } yield updated)
           .fold(ko)( listcounter => ok )
       }
+
     }
 }
 
