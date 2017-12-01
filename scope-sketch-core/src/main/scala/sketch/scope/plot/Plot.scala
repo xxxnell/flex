@@ -23,9 +23,9 @@ trait PlotOps[P<:Plot] extends PlotLaws[P] {
   def modifyValue(plot: P, f: Record => Double): P
 
   /**
-    * @return (record with given range, remaining record)
+    * @return Some of tuple (record with given range, remaining record) or None if <code>p</code> is not in record
     * */
-  def split(record: Record, range: Range): (Record, Record)
+  def split(record: Record, p: Double): Option[(Record, Record)]
 
   def inverse(plot: P): P = ???
 
@@ -84,7 +84,19 @@ trait PlotOps[P<:Plot] extends PlotLaws[P] {
       .sortBy { case (range, _) => range.start }
   }
 
-  def planarizeRecord(record: Record, boundaries: Set[Double]): List[Record] = ???
+  def planarizeRecord(record: Record, boundaries: Set[Double]): List[Record] = {
+    def planarizeRecordAcc(record: Record, boundaries: Set[Double], acc: List[Record]): List[Record] = {
+      boundaries.find(b => record._1.start < b && record._1.end > b) match {
+        case Some(boundary) => split(record, boundary) match {
+          case Some((splitted, rem)) => planarizeRecordAcc(rem, boundaries, splitted :: acc)
+          case None => acc
+        }
+        case None => acc
+      }
+    }
+
+    planarizeRecordAcc(record, boundaries, Nil)
+  }
 
 }
 
@@ -135,6 +147,6 @@ object Plot extends PlotOps[Plot] {
     case plot: CountPlot => CountPlot.modifyValue(plot, f)
   }
 
-  def split(record: Record, range: Range): (Record, Record) = ???
+  def split(record: Record, p: Double): Option[(Record, Record)] = DensityPlot.split(record, p)
 
 }

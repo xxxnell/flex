@@ -10,7 +10,13 @@ trait DensityPlot extends Plot
 
 trait DensityPlotOps extends PlotOps[DensityPlot] {
 
-  def split(record: Record, range: Range): (Record, Record) = ???
+  def split(record: Record, p: Double): Option[(Record, Record)] = {
+    val (range, value) = record
+
+    if(range.start < p && range.end > p) {
+      Option(((Range(range.start, p), value), (Range(p, range.end), value)))
+    } else None
+  }
 
 }
 

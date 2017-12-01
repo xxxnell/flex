@@ -10,10 +10,16 @@ trait CountPlot extends Plot
 
 trait CountPlotOps extends PlotOps[CountPlot] {
 
-  /**
-    * @return (record with given range, remaining record)
-    * */
-  def split(record: Record, range: Range): (Record, Record) = ???
+  def split(record: Record, p: Double): Option[(Record, Record)] = {
+    val (range, value) = record
+
+    if(range.start < p && range.end > p) {
+      val value1 = ((p - range.start) / range.length) * value
+      val value2 = value - value1
+
+      Option(((Range(range.start, p), value1), (Range(p, range.end), value2)))
+    } else None
+  }
 
 }
 

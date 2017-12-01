@@ -25,6 +25,8 @@ trait RangeOps {
 
   def middle(range: Range): Prim = (range.start - range.end) / 2
 
+  def length(range: Range): Prim = range.end - range.start
+
 }
 
 trait RangeSyntax {
@@ -32,6 +34,7 @@ trait RangeSyntax {
   implicit class RangeImpl(range: Range) {
     def contains(a: Prim): Boolean = Range.contains(range, a)
     def middle: Prim = Range.middle(range)
+    def length: Prim = Range.length(range)
   }
 
 }
