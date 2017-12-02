@@ -45,7 +45,7 @@ trait SketchPropLaws[S[_]<:Sketch[_]] { self: SketchPropOps[S] =>
 
 }
 
-object Sketch extends SketchPropOps[Sketch] {
+object Sketch extends SketchPrimPropOps[Sketch] {
 
   def apply[A](measure: A => Prim, structure: Structures): Sketch[A] = SimpleSketch(measure, structure)
 
@@ -60,19 +60,7 @@ object Sketch extends SketchPropOps[Sketch] {
     PeriodicSketch.empty(measure, caDepth, caSize, coDepth, coSize)
 
   // mapping ops
-
-  def probability[A](dist: Sketch[A], from: A, to: A): Option[Prim] = ???
-
-  def sum(sketch: Sketch[_]): Double = ???
-
-  def densityPlot(dist: Sketch[_]): Option[DensityPlot] = ???
-
-  def count[A](sketch: Sketch[A], from: A, to: A): Option[Prim] = ???
-
-  def narrowUpdate[A](sketch: Sketch[A], as: List[A]): Option[Sketch[A]] = ???
-
-  def deepUpdate[A](sketch: Sketch[A], as: List[A]): Option[(Sketch[A], Structure)] = ???
-
+  
   def modifyStructure[A](sketch: Sketch[A], f: Structures => Option[Structures]): Option[Sketch[A]] = sketch match {
     case sketch: PeriodicSketch[_] => PeriodicSketch.modifyStructure(sketch, f)
     case _ => SimpleSketch.modifyStructure(sketch, f)
