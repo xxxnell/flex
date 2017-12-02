@@ -7,6 +7,6 @@ import sketch.scope.pdf.{Dist, Sketch}
   */
 object PointToPointSketchBind extends SketchBind[Sketch, Dist, Sketch] {
 
-  def flatMap[A, B](dist: Sketch[A], f: A => Dist[B]): Sketch[B] = ???
+  def bind[A, B](dist: Sketch[A], f: A => Dist[B]): Sketch[B] = ???
 
 }
