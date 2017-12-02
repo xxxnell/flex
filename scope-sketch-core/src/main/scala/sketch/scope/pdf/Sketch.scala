@@ -25,6 +25,8 @@ trait SketchPropOps[S[_]<:Sketch[_]] extends SketchPropLaws[S] with SampleDistPr
 
   def count[A](sketch: S[A], from: A, to: A): Option[Double]
 
+  def sum(sketch: S[_]): Double
+
   // Update ops
 
   def modifyStructure[A](sketch: S[A], f: Structures => Option[Structures]): Option[S[A]]
@@ -61,6 +63,8 @@ object Sketch extends SketchPropOps[Sketch] {
 
   def probability[A](dist: Sketch[A], from: A, to: A): Option[Prim] = ???
 
+  def sum(sketch: Sketch[_]): Double = ???
+
   def densityPlot(dist: Sketch[_]): Option[DensityPlot] = ???
 
   def count[A](sketch: Sketch[A], from: A, to: A): Option[Prim] = ???
@@ -77,7 +81,7 @@ object Sketch extends SketchPropOps[Sketch] {
   // syntatic sugars
 
   def update[A](sketch: Sketch[A], as: List[A]): Option[Sketch[A]] = sketch match {
-    case sketch: PeriodicSketch[A] => ???
+    case sketch: PeriodicSketch[A] => PeriodicSketch.update(sketch, as)
     case _ => narrowUpdate(sketch, as)
   }
 

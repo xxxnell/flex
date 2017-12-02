@@ -19,7 +19,7 @@ trait DistMonad[D1[_]<:Dist[_], D2[_]<:Dist[_], D3[_]<:Dist[_]]
 
 trait DistMonadLaws[D1[_]<:Dist[_], D2[_]<:Dist[_], D3[_]<:Dist[_]] { self: DistMonad[D1, D2, D3] =>
 
-  def map[A, B](dist: D1[A], f: A => B): D1[B] = bind(dist, a => pure(f(a)))
+//  def map[A, B](dist: D1[A], f: A => B): D1[B] = bind(dist, a => pure(f(a)))
 
 }
 
