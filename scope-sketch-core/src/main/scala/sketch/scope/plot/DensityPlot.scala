@@ -1,6 +1,6 @@
 package sketch.scope.plot
 
-import sketch.scope.plot.CountPlot.{empty, modifyRecords}
+import sketch.scope.pdf._
 import sketch.scope.range.Range
 
 /**
@@ -37,8 +37,13 @@ object DensityPlot extends DensityPlotOps {
 
   def empty: DensityPlot = bare(Nil)
 
-  def squareKernel(ds: List[Double], window: Double): DensityPlot =
-    modifyRecords(DensityPlot.empty, _ => ds.map(d => (Range(d - (window / 2), d + (window / 2)), 1 / window)))
+  def squareKernel(ds: List[(Prim, Count)], window: Double): DensityPlot = {
+    val sum = ds.map(d => d._2).sum
+
+    modifyRecords(DensityPlot.empty, _ => ds.map { case (value, count) =>
+      (Range(value - (window / 2), value + (window / 2)), count / (sum * window))
+    })
+  }
 
   def disjoint(records: List[Record]): DensityPlot = modifyRecords(empty, _ => records)
 

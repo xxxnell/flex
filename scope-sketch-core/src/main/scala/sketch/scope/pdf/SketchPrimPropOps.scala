@@ -24,10 +24,10 @@ trait SketchPrimPropOps[S[_]<:Sketch[_]] extends SketchPrimPropLaws[S] with Sket
   /**
     * Update a primitive value <code>p</code> without rearrange process.
     * */
-  def primNarrowUpdate[A](sketch: S[A], ps: List[Prim]): Option[S[A]] = modifyStructure(sketch, strs =>
+  def primNarrowUpdate[A](sketch: S[A], ps: List[(Prim, Count)]): Option[S[A]] = modifyStructure(sketch, strs =>
     strs.traverse { case (cmap, hcounter) =>
       ps.foldLeft(Option(hcounter))((hcounterO, p) =>
-        hcounterO.flatMap(hcounter => hcounter.update(cmap.apply(p), 1))
+        hcounterO.flatMap(hcounter => hcounter.update(cmap.apply(p._1), p._2))
       ).map(hcounter => (cmap, hcounter))
     }
   )
@@ -35,7 +35,7 @@ trait SketchPrimPropOps[S[_]<:Sketch[_]] extends SketchPrimPropLaws[S] with Sket
   /**
     * Deep update a primitive value <code>p</code> instead of <code>a</code> ∈ <code>A</code>
     * */
-  def primDeepUpdate[A](sketch: S[A], ps: List[Prim]): Option[(S[A], Structure)] = for {
+  def primDeepUpdate[A](sketch: S[A], ps: List[(Prim, Count)]): Option[(S[A], Structure)] = for {
     utdCmap <- UniformCdfUpdate.updateCmap(sketch, ps, mixingRate, window)
     headTailStr <- sketch.structures match {
       case head :: tail => Some((head, tail))
@@ -56,9 +56,11 @@ trait SketchPrimPropOps[S[_]<:Sketch[_]] extends SketchPrimPropLaws[S] with Sket
       }
   }
 
-  def migrateForPs(hcounter: HCounter, cmap: Cmap, ps: List[Prim]): Option[HCounter] = {
-    ps.map(p => cmap.apply(p))
-      .foldLeft(Option(hcounter))((hcounterO, hdim) => hcounterO.flatMap(hcounter => hcounter.update(hdim, 1)))
+  def migrateForPs(hcounter: HCounter, cmap: Cmap, ps: List[(Prim, Count)]): Option[HCounter] = {
+    ps.map(p => (cmap.apply(p._1), p._2))
+      .foldLeft(Option(hcounter)){ case (hcounterO, (hdim, count)) =>
+        hcounterO.flatMap(hcounter => hcounter.update(hdim, count))
+      }
   }
 
   // Read ops
@@ -105,12 +107,12 @@ trait SketchPrimPropOps[S[_]<:Sketch[_]] extends SketchPrimPropLaws[S] with Sket
 
 trait SketchPrimPropLaws[S[_]<:Sketch[_]] { self: SketchPrimPropOps[S] =>
 
-  def narrowUpdate[A](sketch: S[A], as: List[A]): Option[S[A]] = {
-    primNarrowUpdate(sketch, as.map(a => sketch.measure.asInstanceOf[A => Prim](a)))
+  def narrowUpdate[A](sketch: S[A], as: List[(A, Count)]): Option[S[A]] = {
+    primNarrowUpdate(sketch, as.map { case (value, count) => (sketch.measure.asInstanceOf[A => Prim](value), count) })
   }
 
-  def deepUpdate[A](sketch: S[A], as: List[A]): Option[(S[A], Structure)] = {
-    primDeepUpdate(sketch, as.map(a => sketch.measure.asInstanceOf[A => Prim](a)))
+  def deepUpdate[A](sketch: S[A], as: List[(A, Count)]): Option[(S[A], Structure)] = {
+    primDeepUpdate(sketch, as.map { case (value, count) => (sketch.measure.asInstanceOf[A => Prim](value), count) })
   }
 
   /**

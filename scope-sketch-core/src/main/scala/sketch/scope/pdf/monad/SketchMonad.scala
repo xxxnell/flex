@@ -10,6 +10,6 @@ trait SketchMonad[Sketch1[_]<:Sketch[_], D[_]<:Dist[_], Sketch2[_]<:Sketch[_]]
 
 object SketchMonad {
 
-  def pointToPoint: SketchMonad[Sketch, Dist, Sketch] = ???
+  def pointToPoint: SketchMonad[Sketch, Dist, Sketch] = PointToPointSketchMonad
 
 }

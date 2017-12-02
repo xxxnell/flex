@@ -23,17 +23,17 @@ trait SketchPropOps[S[_]<:Sketch[_]] extends SketchPropLaws[S] with SampleDistPr
 
   // Read ops
 
-  def count[A](sketch: S[A], from: A, to: A): Option[Double]
+  def count[A](sketch: S[A], from: A, to: A): Option[Count]
 
-  def sum(sketch: S[_]): Double
+  def sum(sketch: S[_]): Count
 
   // Update ops
 
   def modifyStructure[A](sketch: S[A], f: Structures => Option[Structures]): Option[S[A]]
 
-  def narrowUpdate[A](sketch: S[A], as: List[A]): Option[S[A]]
+  def narrowUpdate[A](sketch: S[A], as: List[(A, Count)]): Option[S[A]]
 
-  def deepUpdate[A](sketch: S[A], as: List[A]): Option[(S[A], Structure)]
+  def deepUpdate[A](sketch: S[A], as: List[(A, Count)]): Option[(S[A], Structure)]
 
   //  def clear(sketch: S): S
 
@@ -68,7 +68,7 @@ object Sketch extends SketchPrimPropOps[Sketch] {
 
   // syntatic sugars
 
-  def update[A](sketch: Sketch[A], as: List[A]): Option[Sketch[A]] = sketch match {
+  def update[A](sketch: Sketch[A], as: List[(A, Count)]): Option[Sketch[A]] = sketch match {
     case sketch: PeriodicSketch[A] => PeriodicSketch.update(sketch, as)
     case _ => narrowUpdate(sketch, as)
   }

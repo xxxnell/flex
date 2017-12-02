@@ -19,6 +19,8 @@ package object pdf
 
   type Prim = Double
 
+  type Count = Double
+
   type Range = NumericRange[Prim]
 
   type Ranges = List[Range]

@@ -65,7 +65,7 @@ object PeriodicSketch extends PeriodicSketchOps[PeriodicSketch] {
                        f: Stream[Double] => Option[Stream[Double]]): Option[PeriodicSketch[A]] =
     f(sketch.periods).map(period => bare(sketch.measure, sketch.structures, period))
 
-  def update[A](sketch: PeriodicSketch[A], as: List[A]): Option[PeriodicSketch[A]] = for {
+  def update[A](sketch: PeriodicSketch[A], as: List[(A, Count)]): Option[PeriodicSketch[A]] = for {
     nextPeriod <- sketch.periods.headOption
     utdSketch1 <- narrowUpdate[A](sketch, as)
     sum = utdSketch1.sum

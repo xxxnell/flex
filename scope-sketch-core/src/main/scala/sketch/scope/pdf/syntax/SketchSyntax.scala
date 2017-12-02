@@ -1,6 +1,6 @@
 package sketch.scope.pdf.syntax
 
-import sketch.scope.pdf.{Dist, Prim, Range, Sketch}
+import sketch.scope.pdf.{Count, Dist, Prim, Range, Sketch}
 import sketch.scope.pdf.monad.{DistFunctor, SketchMonad}
 
 /**
@@ -11,8 +11,8 @@ trait SketchSyntax extends SketchPropSyntax with SketchMonadSyntax
 trait SketchPropSyntax {
 
   implicit class SketchPropSyntaxImpl[A](sketch: Sketch[A]) {
-    def update(a: A): Option[Sketch[A]] = Sketch.update(sketch, a :: Nil)
-    def update(as: List[A]): Option[Sketch[A]] = Sketch.update(sketch, as)
+    def update(a: A): Option[Sketch[A]] = Sketch.update(sketch, (a, 1d) :: Nil)
+    def update(as: List[(A, Count)]): Option[Sketch[A]] = Sketch.update(sketch, as)
     def count(from: A, to: A): Option[Double] = Sketch.count(sketch, from, to)
     def sum: Double = Sketch.sum(sketch)
     //    def clear: Sketch = Sketch.clear(sketch)
@@ -24,9 +24,11 @@ trait SketchPropSyntax {
 
 trait SketchMonadSyntax {
 
+  val sketchMonad: SketchMonad[Sketch, Dist, Sketch] = SketchMonad.pointToPoint
+
   implicit class SketchMonadSyntaxImpl[A](sketch: Sketch[A]) {
-    def map[B](f: A => B): Sketch[B] = SketchMonad.pointToPoint.map(sketch, f)
-    def flatMap[B, S1<:Sketch[_], S2<:Sketch[_]](f: A => Dist[B]): Sketch[B] = SketchMonad.pointToPoint.bind(sketch, f)
+    def map[B](f: A => B): Sketch[B] = sketchMonad.map(sketch, f)
+    def flatMap[B, S1<:Sketch[_], S2<:Sketch[_]](f: A => Dist[B]): Sketch[B] = sketchMonad.bind(sketch, f)
   }
 
 }

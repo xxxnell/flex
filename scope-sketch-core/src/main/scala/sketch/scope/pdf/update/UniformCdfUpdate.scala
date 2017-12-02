@@ -2,7 +2,7 @@ package sketch.scope.pdf.update
 
 import sketch.scope.cmap.Cmap
 import sketch.scope.hcounter.HCounter
-import sketch.scope.pdf.{Prim, Sketch}
+import sketch.scope.pdf.{Count, Prim, Sketch}
 import sketch.scope.plot._
 
 /**
@@ -10,7 +10,7 @@ import sketch.scope.plot._
   */
 trait UniformCdfUpdate {
 
-  def updateCmap(sketch: Sketch[_], ps: List[Prim], mixingRate: Double, window: Double): Option[Cmap] = for {
+  def updateCmap(sketch: Sketch[_], ps: List[(Prim, Count)], mixingRate: Double, window: Double): Option[Cmap] = for {
     sketchPlot <- sketch.densityPlot
     mtpSketchPlot = sketchPlot * (1 / (mixingRate + 1))
     mtpPsPlot = DensityPlot.squareKernel(ps, window) * (mixingRate / (mixingRate + 1))
