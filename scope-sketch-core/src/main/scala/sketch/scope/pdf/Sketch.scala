@@ -60,7 +60,7 @@ object Sketch extends SketchPrimPropOps[Sketch] {
     PeriodicSketch.empty(measure, caDepth, caSize, coDepth, coSize)
 
   // mapping ops
-  
+
   def modifyStructure[A](sketch: Sketch[A], f: Structures => Option[Structures]): Option[Sketch[A]] = sketch match {
     case sketch: PeriodicSketch[_] => PeriodicSketch.modifyStructure(sketch, f)
     case _ => SimpleSketch.modifyStructure(sketch, f)

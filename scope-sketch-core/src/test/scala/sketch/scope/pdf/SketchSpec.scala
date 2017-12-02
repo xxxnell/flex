@@ -11,29 +11,53 @@ class SketchSpec extends Specification with ScalaCheck {
 
   "Sketch" should {
 
-    "update int" in {
-      (for {
-        sketch <- SketchGen.intSketchSample
-        updated <- sketch.update(1)
-      } yield updated)
-        .fold(ko)(sketch => ok)
+    "Prop ops" in {
+
+      "update int" in {
+        (for {
+          sketch <- SketchGen.intSketchSample
+          updated <- sketch.update(1)
+        } yield updated)
+          .fold(ko)(sketch => ok)
+      }
+
+      "update boolean" in {
+        (for {
+          sketch <- SketchGen.booleanSketchSample
+          updated <- sketch.update(true)
+        } yield updated)
+          .fold(ko)(sketch => ok)
+      }
+
+      "get" in {
+        (for {
+          sketch <- SketchGen.intSketchSample
+          updated <- sketch.update(1)
+          res <- sketch.count(0, 10)
+        } yield res)
+          .fold(ko)(sketch => ok)
+      }
+
     }
 
-    "update boolean" in {
-      (for {
-        sketch <- SketchGen.booleanSketchSample
-        updated <- sketch.update(true)
-      } yield updated)
-        .fold(ko)(sketch => ok)
-    }
+    "Monad Ops" in {
 
-    "get" in {
-      (for {
-        sketch <- SketchGen.intSketchSample
-        updated <- sketch.update(1)
-        res <- sketch.count(0, 10)
-      } yield res)
-        .fold(ko)(sketch => ok)
+      "map" in {
+        (for {
+          sketch <- SketchGen.intSketchSample
+          utdSketch = sketch.map(i => -1 * i)
+        } yield utdSketch)
+          .fold(ko)(sketch => ok)
+      }
+
+      "flatMap" in {
+        (for {
+          sketch <- SketchGen.intSketchSample
+          utdSketch = sketch.flatMap(i => NormalDist[Double](identity, i, 1))
+        } yield utdSketch)
+          .fold(ko)(sketch => ok)
+      }
+
     }
 
   }
