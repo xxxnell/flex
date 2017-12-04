@@ -1,7 +1,7 @@
 package sketch.scope.plot
 
 import sketch.scope.plot.DensityPlot.{bare, modifyRecords, planarize}
-import sketch.scope.range.Range
+import sketch.scope.range.RangeP
 
 /**
   * Licensed by Probe Technology, Inc.
@@ -17,7 +17,7 @@ trait CountPlotOps extends PlotOps[CountPlot] {
       val value1 = ((p - range.start) / range.length) * value
       val value2 = value - value1
 
-      Option(((Range(range.start, p), value1), (Range(p, range.end), value2)))
+      Option(((RangeP(range.start, p), value1), (RangeP(p, range.end), value2)))
     } else None
   }
 

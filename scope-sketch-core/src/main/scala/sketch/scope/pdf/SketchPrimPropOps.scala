@@ -137,7 +137,7 @@ trait SketchPrimPropLaws[S[_]<:Sketch[_]] { self: SketchPrimPropOps[S] =>
   def countPlot(sketch: S[_]): Option[CountPlot] = for {
     cmapHcounter <- sketch.structures.lastOption
     (cmap, _) = cmapHcounter
-    ranges = cmap.bin.map(numRange => Range.forNumericRange(numRange))
+    ranges = cmap.bin.map(numRange => RangeP.forNumericRange(numRange))
     counts <- ranges.traverse(range => primCount(sketch, range.start, range.end))
   } yield CountPlot.disjoint(ranges.zip(counts))
 

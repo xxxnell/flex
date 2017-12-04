@@ -9,7 +9,7 @@ import sketch.scope.hmap.{HDim, Hmap}
   */
 trait HCounter {
 
-  def structure: List[(Hmap, Counter)]
+  def structures: List[(Hmap, Counter)]
 
   def sum: Double
 
@@ -18,7 +18,7 @@ trait HCounter {
 trait HCounterOps[HC<:HCounter] {
 
   def update(hc: HCounter, hdim: HDim, count: Double): Option[HCounter] = for {
-    updated <- hc.structure.traverse { case (hmap, counter) =>
+    updated <- hc.structures.traverse { case (hmap, counter) =>
       for {
         cdim <- hmap.apply(hdim, counter.size)
         counter2 <- counter.update(cdim, count)
@@ -27,7 +27,7 @@ trait HCounterOps[HC<:HCounter] {
   } yield HCounter(updated, hc.sum + count)
 
   def get(hc: HCounter, hdim: HDim): Option[Double] = for {
-    counts <- hc.structure.traverse { case (hmap, counter) =>
+    counts <- hc.structures.traverse { case (hmap, counter) =>
       for {
         cdim <- hmap(hdim, counter.size)
         aa <- counter.get(cdim)
@@ -43,9 +43,9 @@ trait HCounterOps[HC<:HCounter] {
       .map(_.sum)
   }
 
-  def depth(hc: HCounter): Int = hc.structure.size
+  def depth(hc: HCounter): Int = hc.structures.size
 
-  def width(hc: HCounter): Int = hc.structure.headOption.fold(0){ case (_, counter) => counter.size }
+  def width(hc: HCounter): Int = hc.structures.headOption.fold(0){ case (_, counter) => counter.size }
 
 }
 
@@ -64,7 +64,7 @@ trait HCounterSyntax {
 
 object HCounter extends HCounterOps[HCounter] { self =>
 
-  private case class HCounterImpl(structure: List[(Hmap, Counter)], sum: Double) extends HCounter
+  private case class HCounterImpl(structures: List[(Hmap, Counter)], sum: Double) extends HCounter
 
   def apply(structure: List[(Hmap, Counter)], sum: Double): HCounter = HCounterImpl(structure, sum)
 

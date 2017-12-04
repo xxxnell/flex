@@ -10,6 +10,6 @@ package object plot
     with DensityPlotSyntax
     with CountPlotSyntax {
 
-  type Record = (Range, Double)
+  type Record = (RangeP, Double)
 
 }

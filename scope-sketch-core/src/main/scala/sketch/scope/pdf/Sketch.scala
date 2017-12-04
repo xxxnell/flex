@@ -1,11 +1,6 @@
 package sketch.scope.pdf
 
-import cats.implicits._
-import sketch.scope.cmap.Cmap
-import sketch.scope.hcounter.HCounter
-import sketch.scope.hmap.HDim
 import sketch.scope.measure.Measure
-import sketch.scope.plot.{DensityPlot, Plot}
 
 import scala.language.higherKinds
 
@@ -43,6 +38,23 @@ trait SketchPropOps[S[_]<:Sketch[_]] extends SketchPropLaws[S] with SampleDistPr
 trait SketchPropLaws[S[_]<:Sketch[_]] { self: SketchPropOps[S] =>
 
   def rearrange[A](sketch: S[A]): Option[S[A]] = deepUpdate(sketch, Nil).map(_._1)
+
+  def caDepth(sketch: S[_]): Int = sketch.structures.size
+
+  def caSize(sketch: S[_]): Int = (for {
+    structure <- sketch.structures.headOption
+    (cmap, _) = structure
+  } yield cmap.size).getOrElse(0)
+
+  def coDepth(sketch: S[_]): Int = (for {
+    structure <- sketch.structures.headOption
+    (_, hcounter) = structure
+  } yield hcounter.depth).getOrElse(0)
+
+  def coSize(sketch: S[_]): Int = (for {
+    structure <- sketch.structures.headOption
+    (_, hcounter) = structure
+  } yield hcounter.width).getOrElse(0) // sketch.structures.headOption.map { case (_, hcounter) => hcounter.structures.size }.getOrElse(0)
 
 }
 

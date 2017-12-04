@@ -1,7 +1,7 @@
 package sketch.scope.plot
 
 import sketch.scope.pdf._
-import sketch.scope.range.Range
+import sketch.scope.range.RangeP
 
 /**
   * Licensed by Probe Technology, Inc.
@@ -14,7 +14,7 @@ trait DensityPlotOps extends PlotOps[DensityPlot] {
     val (range, value) = record
 
     if(range.start < p && range.end > p) {
-      Option(((Range(range.start, p), value), (Range(p, range.end), value)))
+      Option(((RangeP(range.start, p), value), (RangeP(p, range.end), value)))
     } else None
   }
 
@@ -41,7 +41,7 @@ object DensityPlot extends DensityPlotOps {
     val sum = ds.map(d => d._2).sum
 
     modifyRecords(DensityPlot.empty, _ => ds.map { case (value, count) =>
-      (Range(value - (window / 2), value + (window / 2)), count / (sum * window))
+      (RangeP(value - (window / 2), value + (window / 2)), count / (sum * window))
     })
   }
 

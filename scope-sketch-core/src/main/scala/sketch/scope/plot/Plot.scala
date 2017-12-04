@@ -28,7 +28,7 @@ trait PlotOps[P<:Plot] extends PlotLaws[P] {
   def split(record: Record, p: Double): Option[(Record, Record)]
 
   def inverse(plot: P): P = modifyRecords(plot, records => {
-    records.map { case (range, value) => (Range.point(value), range.middle) }
+    records.map { case (range, value) => (RangeP.point(value), range.middle) }
   })
 
   def cumulative(plot: P): P = {
@@ -74,7 +74,7 @@ trait PlotOps[P<:Plot] extends PlotLaws[P] {
     coeff(0) * x * x + coeff(1) * x + coeff(2)
   }
 
-  def planarize(records: List[Record]): List[(Range, List[Double])] = {
+  def planarize(records: List[Record]): List[(RangeP, List[Double])] = {
     val boundaries: HashSet[Double] =
       HashSet(records.flatMap { case (range, _) => range.start :: range.end :: Nil }.sorted.toArray: _*)
 
