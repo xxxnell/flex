@@ -4,6 +4,8 @@ import org.scalacheck.Gen
 import org.specs2.ScalaCheck
 import org.specs2.mutable._
 
+import sketch.scope.measure._
+
 /**
   * Licensed by Probe Technology, Inc.
   */
@@ -53,7 +55,7 @@ class SketchSpec extends Specification with ScalaCheck {
       "flatMap" in {
         (for {
           sketch <- SketchGen.intSketchSample
-          utdSketch = sketch.flatMap(i => NormalDist[Double](identity, i, 1))
+          utdSketch = sketch.flatMap(i => NormalDist[Double](doubleMeasure, i, 1))
         } yield utdSketch)
           .fold(ko)(sketch => ok)
       }
@@ -66,11 +68,11 @@ class SketchSpec extends Specification with ScalaCheck {
 
 object SketchGen {
 
-  def intSketchGen: Gen[Sketch[Int]] = sketchGen(MeasureGen.intMeasure)
+  def intSketchGen: Gen[Sketch[Int]] = sketchGen(intMeasure)
 
-  def booleanSketchGen: Gen[Sketch[Boolean]] = sketchGen(MeasureGen.booleanMeasure)
+  def booleanSketchGen: Gen[Sketch[Boolean]] = sketchGen(booleanMeasure)
 
-  def sketchGen[A](measure: A => Double): Gen[Sketch[A]] = for {
+  def sketchGen[A](measure: Measure[A]): Gen[Sketch[A]] = for {
     caDepth <- Gen.choose(1, 10)
     caSize <- Gen.choose(100, 10000)
     coDepth <- Gen.choose(1, 10)

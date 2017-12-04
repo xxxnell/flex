@@ -3,6 +3,7 @@ package sketch.scope.pdf
 import org.scalacheck.Gen
 import org.specs2.mutable._
 import org.specs2.ScalaCheck
+import sketch.scope.measure._
 
 /**
   * Licensed by Probe Technology, Inc.
@@ -12,7 +13,7 @@ class ContSketchSpec extends Specification with ScalaCheck {
   "ContSketch" should {
 
     "empty" in {
-      val measure: Int => Double = (a: Int) => a.toDouble
+      val measure: Measure[Int] = intMeasure
       val caDepth = 10
       val caSize = 20
       val coDepth = 30

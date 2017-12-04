@@ -4,6 +4,7 @@ import cats.implicits._
 import sketch.scope.cmap.Cmap
 import sketch.scope.hcounter.HCounter
 import sketch.scope.hmap.HDim
+import sketch.scope.measure.Measure
 import sketch.scope.plot.{DensityPlot, Plot}
 
 import scala.language.higherKinds
@@ -47,16 +48,16 @@ trait SketchPropLaws[S[_]<:Sketch[_]] { self: SketchPropOps[S] =>
 
 object Sketch extends SketchPrimPropOps[Sketch] {
 
-  def apply[A](measure: A => Prim, structure: Structures): Sketch[A] = SimpleSketch(measure, structure)
+  def apply[A](measure: Measure[A], structure: Structures): Sketch[A] = SimpleSketch(measure, structure)
 
   /**
-    * @param measure  measure, i.e. map from input to double, of Sketch
+    * @param measure  measure of Sketch
     * @param caDepth  size of Sketch structure
     * @param caSize   Cmap size.
     * @param coDepth  HCounter depth
     * @param coSize   HCounter size
     * */
-  def empty[A](measure: A => Double, caDepth: Int, caSize: Int, coDepth: Int, coSize: Int): Sketch[A] =
+  def empty[A](measure: Measure[A], caDepth: Int, caSize: Int, coDepth: Int, coSize: Int): Sketch[A] =
     PeriodicSketch.empty(measure, caDepth, caSize, coDepth, coSize)
 
   // mapping ops

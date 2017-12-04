@@ -10,6 +10,7 @@ import cats._
 import cats.data._
 import cats.implicits._
 import sketch.scope.hmap.HDim
+import sketch.scope.measure.Measure
 
 /**
   * Licensed by Probe Technology, Inc.
@@ -36,25 +37,25 @@ trait PeriodicSketchLaws[S[_]<:PeriodicSketch[_]] { self: PeriodicSketchOps[S] =
 
 object PeriodicSketch extends PeriodicSketchOps[PeriodicSketch] {
 
-  private case class PeriodicSketchImpl[A](measure: A => Double,
+  private case class PeriodicSketchImpl[A](measure: Measure[A],
                                            structures: Structures,
                                            periods: Stream[Double])
     extends PeriodicSketch[A]
 
-  def apply[A](measure: A => Double,
+  def apply[A](measure: Measure[A],
                structure: Structures,
                periods: Stream[Double]): PeriodicSketch[A] =
     bare(measure, structure, periods)
 
-  def bare[A](measure: A => Double,
+  def bare[A](measure: Measure[A],
               structure: Structures,
               periods: Stream[Double]): PeriodicSketch[A] =
     PeriodicSketchImpl(measure, structure, periods)
 
-  def empty[A](measure: A => Double, caDepth: Int, caSize: Int, coDepth: Int, coSize: Int): PeriodicSketch[A] =
+  def empty[A](measure: Measure[A], caDepth: Int, caSize: Int, coDepth: Int, coSize: Int): PeriodicSketch[A] =
     cont(measure, caDepth, caSize, coDepth, coSize)
 
-  def cont[A](measure: A => Double, caDepth: Int, caSize: Int, coDepth: Int, coSize: Int): PeriodicSketch[A] =
+  def cont[A](measure: Measure[A], caDepth: Int, caSize: Int, coDepth: Int, coSize: Int): PeriodicSketch[A] =
     ContSketch.empty(measure, caDepth, caSize, coDepth, coSize)
 
   def modifyStructure[A](sketch: PeriodicSketch[A],

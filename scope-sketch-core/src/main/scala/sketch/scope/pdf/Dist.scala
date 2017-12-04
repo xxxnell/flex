@@ -1,6 +1,7 @@
 package sketch.scope.pdf
 
 import cats.Monad
+import sketch.scope.measure.Measure
 
 import scala.language.higherKinds
 
@@ -9,7 +10,7 @@ import scala.language.higherKinds
   */
 trait Dist[A] {
 
-  def measure: A => Prim
+  def measure: Measure[A]
 
 }
 
@@ -25,9 +26,9 @@ trait DistPropOps[D[_]<:Dist[_]] {
 
 object Dist extends DistPropOps[Dist] {
 
-  def delta[A](implicit measure: A => Prim): Dist[A] = DeltaDist(measure, 0)
+  def delta[A](implicit measure: Measure[A]): Dist[A] = DeltaDist(measure, 0)
 
-  def delta[A](center: A)(implicit measure: A => Prim): Dist[A] = DeltaDist(measure, measure(center))
+  def delta[A](center: A)(implicit measure: Measure[A]): Dist[A] = DeltaDist(measure, measure(center))
 
   def probability[A](dist: Dist[A], from: A, to: A): Option[Double] = dist match {
     case dist: DeltaDist[A] => DeltaDist.probability(dist, from, to)

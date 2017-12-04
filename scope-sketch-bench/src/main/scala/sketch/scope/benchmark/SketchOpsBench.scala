@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit
 import org.openjdk.jmh.annotations._
 import SketchBenchOps._
 import sketch.scope.pdf.Sketch
+import sketch.scope.measure._
 
 /**
   * Licensed by Probe Technology, Inc.
@@ -26,11 +27,11 @@ class SketchOpsBench {
   @Param(Array("1000", "100000"))
   var coSize: Int = _
 
-  val sketch = Sketch.empty((d: Double) => d, caDepth, caSize, coDepth, coSize)
+  val sketch = Sketch.empty(doubleMeasure, caDepth, caSize, coDepth, coSize)
 
   @Benchmark
   def construct = {
-    Sketch.empty((d: Double) => d, caDepth, caSize, coDepth, coSize)
+    Sketch.empty(doubleMeasure, caDepth, caSize, coDepth, coSize)
   }
 
   @Benchmark

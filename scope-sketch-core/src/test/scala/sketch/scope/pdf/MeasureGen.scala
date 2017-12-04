@@ -1,20 +1,17 @@
 package sketch.scope.pdf
 
 import org.scalacheck.Gen
+import sketch.scope.measure._
 
 /**
   * Licensed by Probe Technology, Inc.
   */
 object MeasureGen {
 
-  def intMeasure: Int => Double = i => i.toDouble
+  def intMeasureGen: Gen[Measure[Int]] = Gen.const(intMeasure)
 
-  def intMeasureGen: Gen[Int => Double] = Gen.const(intMeasure)
+  def doubleMeasureGen: Gen[Measure[Double]] = Gen.const(doubleMeasure)
 
-  def doubleMeasure: Double => Double = d => d
-
-  def doubleMeasureGen: Gen[Double => Double] = Gen.const(d => d)
-
-  def booleanMeasure: Boolean => Double = b => if(b) 1d else 0d
+  def booleanMeasureGen: Gen[Measure[Boolean]] = Gen.const(booleanMeasure)
 
 }

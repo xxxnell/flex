@@ -4,6 +4,7 @@ import sketch.scope.cmap.Cmap
 import sketch.scope.hcounter.HCounter
 import sketch.scope.hmap.HDim
 import cats.implicits._
+import sketch.scope.measure.Measure
 import sketch.scope.pdf.update.UniformCdfUpdate
 import sketch.scope.plot._
 import sketch.scope.range._
@@ -108,18 +109,18 @@ trait SketchPrimPropOps[S[_]<:Sketch[_]] extends SketchPrimPropLaws[S] with Sket
 trait SketchPrimPropLaws[S[_]<:Sketch[_]] { self: SketchPrimPropOps[S] =>
 
   def narrowUpdate[A](sketch: S[A], as: List[(A, Count)]): Option[S[A]] = {
-    primNarrowUpdate(sketch, as.map { case (value, count) => (sketch.measure.asInstanceOf[A => Prim](value), count) })
+    primNarrowUpdate(sketch, as.map { case (value, count) => (sketch.measure.asInstanceOf[Measure[A]](value), count) })
   }
 
   def deepUpdate[A](sketch: S[A], as: List[(A, Count)]): Option[(S[A], Structure)] = {
-    primDeepUpdate(sketch, as.map { case (value, count) => (sketch.measure.asInstanceOf[A => Prim](value), count) })
+    primDeepUpdate(sketch, as.map { case (value, count) => (sketch.measure.asInstanceOf[Measure[A]](value), count) })
   }
 
   /**
     * Get the number of elements be memorized.
     * */
   def count[A](sketch: S[A], from: A, to: A): Option[Double] = {
-    val measure = sketch.measure.asInstanceOf[A => Double]
+    val measure = sketch.measure.asInstanceOf[Measure[A]]
     primCount(sketch, measure(from), measure(to))
   }
 

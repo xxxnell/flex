@@ -1,9 +1,11 @@
 package sketch.scope.pdf
 
+import sketch.scope.measure.Measure
+
 /**
   * Licensed by Probe Technology, Inc.
   */
-case class SimpleSketch[A](measure: A => Prim, structures: Structures) extends Sketch[A]
+case class SimpleSketch[A](measure: Measure[A], structures: Structures) extends Sketch[A]
 
 trait SimpleSketchOps extends SketchPrimPropOps[SimpleSketch] {
 

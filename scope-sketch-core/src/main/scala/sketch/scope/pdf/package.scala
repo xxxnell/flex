@@ -2,6 +2,7 @@ package sketch.scope
 
 import sketch.scope.cmap.Cmap
 import sketch.scope.hcounter.HCounter
+import sketch.scope.measure.TrivialMeasures
 import sketch.scope.pdf.syntax._
 
 import scala.collection.immutable.NumericRange
@@ -11,8 +12,7 @@ import scala.language.implicitConversions
   * Licensed by Probe Technology, Inc.
   */
 package object pdf
-  extends TrivialMeasures
-    with DistSyntax
+  extends DistSyntax
     with SampleDistSyntax
     with SmoothDistSyntax
     with SketchSyntax {
