@@ -31,7 +31,8 @@ object Dist extends DistPropOps[Dist] {
   def delta[A](center: A)(implicit measure: Measure[A]): Dist[A] = DeltaDist(measure, measure(center))
 
   def probability[A](dist: Dist[A], from: A, to: A): Option[Double] = dist match {
-    case dist: DeltaDist[A] => DeltaDist.probability(dist, from, to)
+    case smooth: SmoothDist[A] => SmoothDist.probability(smooth, from, to)
+    case groomed: PredefinedDist[A] => PredefinedDist.probability(groomed, from, to)
     case sketch: Sketch[A] => Sketch.probability(sketch, from, to)
   }
 

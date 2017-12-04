@@ -7,4 +7,12 @@ import scala.language.higherKinds
   */
 trait SmoothDist[A] extends Dist[A]
 
-trait SmoothDistPropOps[SD[_]<:SmoothDist[_]] extends DistPropOps[SD]
+trait SmoothDistPropOps[D[_]<:SmoothDist[_]] extends DistPropOps[D]
+
+object SmoothDist extends SmoothDistPropOps[SmoothDist] {
+
+  def probability[A](dist: SmoothDist[A], from: A, to: A): Option[Prim] = dist match {
+    case dist: DeltaDist[A] => DeltaDist.probability(dist, from, to)
+  }
+
+}
