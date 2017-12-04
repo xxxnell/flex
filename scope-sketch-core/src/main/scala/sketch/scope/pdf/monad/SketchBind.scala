@@ -1,5 +1,6 @@
 package sketch.scope.pdf.monad
 
+import sketch.scope.measure.Measure
 import sketch.scope.pdf.{Dist, Sketch}
 
 /**
@@ -7,7 +8,5 @@ import sketch.scope.pdf.{Dist, Sketch}
   */
 trait SketchBind[Sketch1[_]<:Sketch[_], D[_]<:Dist[_], Sketch2[_]<:Sketch[_]]
   extends SampleDistBind[Sketch1, D, Sketch2] {
-
-  def bind[A, B](dist: Sketch1[A], f: A => D[B]): Sketch2[B]
 
 }

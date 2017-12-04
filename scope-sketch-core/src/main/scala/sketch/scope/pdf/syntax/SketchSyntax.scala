@@ -1,5 +1,6 @@
 package sketch.scope.pdf.syntax
 
+import sketch.scope.measure.Measure
 import sketch.scope.pdf.{Count, Dist, Prim, Range, Sketch}
 import sketch.scope.pdf.monad.{DistFunctor, SketchMonad}
 
@@ -28,11 +29,13 @@ trait SketchPropSyntax {
 
 trait SketchMonadSyntax {
 
-  val sketchMonad: SketchMonad[Sketch, Dist, Sketch] = SketchMonad.pointToPoint
+  lazy val sketchMonad: SketchMonad[Sketch, Dist, Sketch] = SketchMonad.pointToPoint
 
   implicit class SketchMonadSyntaxImpl[A](sketch: Sketch[A]) {
-    def map[B](f: A => B): Sketch[B] = sketchMonad.map(sketch, f)
-    def flatMap[B, S1<:Sketch[_], S2<:Sketch[_]](f: A => Dist[B]): Sketch[B] = sketchMonad.bind(sketch, f)
+    def map[B](f: A => B)(implicit measureB: Measure[B]): Sketch[B] =
+      sketchMonad.map(sketch, f, measureB)
+    def flatMap[B, S1<:Sketch[_], S2<:Sketch[_]](f: A => Dist[B])(implicit measureB: Measure[B]): Sketch[B] =
+      sketchMonad.bind(sketch, f, measureB)
   }
 
 }

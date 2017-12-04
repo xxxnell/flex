@@ -1,5 +1,6 @@
 package sketch.scope.pdf.syntax
 
+import sketch.scope.measure.Measure
 import sketch.scope.pdf.monad.{DistBind, DistFunctor, DistMonad}
 import sketch.scope.pdf.{Dist, SampleDist, Sketch}
 
@@ -25,11 +26,17 @@ trait DistBindAux[InD[_]<:Dist[_], OutD[_]<:Dist[_]] {
 trait DistMonadSyntax extends DistMonadSyntax1 {
 
   implicit class DistMonadSyntaxImpl0[A](dist: Dist[A]) {
-    def map[B](f: A => B)(implicit functor: DistFunctor[Dist]): Dist[B] = functor.map(dist, f)
+    def map[B](f: A => B)
+              (implicit
+               functor: DistFunctor[Dist],
+               measureB: Measure[B]): Dist[B] =
+      functor.map(dist, f, measureB)
     def flatMap[B, D1[_]<:Dist[_], D2[_]<:Dist[_]](f: A => D1[B])
                                                   (implicit
                                                    aux: DistBindAux[D1, D2],
-                                                   monad: DistMonad[Dist, D1, D2]): aux.Out[B] = monad.bind(dist, f)
+                                                   monad: DistMonad[Dist, D1, D2],
+                                                   measureB: Measure[B]): aux.Out[B] =
+      monad.bind(dist, f, measureB)
   }
 
 }

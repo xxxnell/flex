@@ -1,5 +1,6 @@
 package sketch.scope.pdf.monad
 
+import sketch.scope.measure.Measure
 import sketch.scope.pdf.{Dist, Sketch}
 
 /**
@@ -7,8 +8,9 @@ import sketch.scope.pdf.{Dist, Sketch}
   */
 object PointToPointSketchMonad extends SketchMonad[Sketch, Dist, Sketch] {
 
-  override def map[A, B](dist: Sketch[A], f: A => B): Sketch[B] = ???
+  def map[A, B](dist: Sketch[A], f: A => B, measureB: Measure[B]): Sketch[B] = ???
 
-  override def bind[A, B](dist: Sketch[A], f: A => Dist[B]): Sketch[B] = PointToPointSketchBind.bind(dist, f)
+  def bind[A, B](dist: Sketch[A], f: A => Dist[B], measureB: Measure[B]): Sketch[B] =
+    PointToPointSketchBind.bind(dist, f, measureB)
 
 }
