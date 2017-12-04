@@ -17,8 +17,14 @@ trait SampleDistPropOps[D[_]<:SampleDist[_]] extends DistPropOps[D] {
 
 object SampleDist extends SampleDistPropOps[SampleDist] {
 
-  def probability[A](dist: SampleDist[A], from: A, to: A): Option[Double] = ???
+  def probability[A](dist: SampleDist[A], from: A, to: A): Option[Double] = dist match {
+    case sketch: Sketch[A] => Sketch.probability(sketch, from, to)
+    case _ => ???
+  }
 
-  def densityPlot(dist: SampleDist[_]): Option[DensityPlot] = ???
+  def densityPlot(dist: SampleDist[_]): Option[DensityPlot] = dist match {
+    case sketch: Sketch[_] => Sketch.densityPlot(sketch)
+    case _ => ???
+  }
 
 }
