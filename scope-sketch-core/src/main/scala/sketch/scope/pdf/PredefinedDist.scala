@@ -5,20 +5,20 @@ import sketch.scope.measure.Measure
 /**
   * Licensed by Probe Technology, Inc.
   */
-trait PredefinedDist[A] extends Dist[A] {
+trait PredefinedDist[A] extends SmoothDist[A] {
 
   def probability(from: A, to: A): Option[Double]
 
 }
 
-trait GroomedDistOps[D[_]<:PredefinedDist[_]] extends DistPropOps[D] {
+trait PredefinedDistOps[D[_]<:PredefinedDist[_]] extends SmoothDistPropOps[D] {
 
   def probability[A](dist: D[A], from: A, to: A): Option[Double] =
     dist.asInstanceOf[PredefinedDist[A]].probability(from, to)
 
 }
 
-object PredefinedDist extends GroomedDistOps[PredefinedDist] {
+object PredefinedDist extends PredefinedDistOps[PredefinedDist] {
 
   case class PredefinedDistImpl[A](measure: Measure[A],
                                    probabilityF: (A, A) => Option[Double]) extends PredefinedDist[A] {
