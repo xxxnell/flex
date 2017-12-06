@@ -86,6 +86,6 @@ object Sketch extends SketchPrimPropOps[Sketch] {
     case _ => narrowUpdate(sketch, as)
   }
 
-  def sample[A](sketch: Sketch[A]): (A, Sketch[A]) = ???
+  def sample[A](sketch: Sketch[A]): (Sketch[A], A) = ???
 
 }

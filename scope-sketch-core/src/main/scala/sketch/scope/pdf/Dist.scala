@@ -22,7 +22,7 @@ trait DistPropOps[D[_]<:Dist[_]] {
 
   //  def cdf(sketch: S, a: Double): Option[Double]
 
-  def sample[A](dist: D[A]): (A, D[A])
+  def sample[A](dist: D[A]): (D[A], A)
 
 }
 
@@ -37,7 +37,7 @@ object Dist extends DistPropOps[Dist] {
     case sampled: SampledDist[A] => SampledDist.probability(sampled, from, to)
   }
 
-  def sample[A](dist: Dist[A]): (A, Dist[A]) = dist match {
+  def sample[A](dist: Dist[A]): (Dist[A], A) = dist match {
     case smooth: SmoothDist[A] => SmoothDist.sample(smooth)
     case sampled: SampledDist[A] => SampledDist.sample(sampled)
   }

@@ -77,6 +77,6 @@ object PeriodicSketch extends PeriodicSketchOps[PeriodicSketch] {
                        f: Stream[Double] => Option[Stream[Double]]): Option[PeriodicSketch[A]] =
     f(sketch.periods).map(period => bare(sketch.measure, sketch.structures, period))
 
-  def sample[A](sketch: PeriodicSketch[A]): (A, PeriodicSketch[A]) = ???
+  def sample[A](sketch: PeriodicSketch[A]): (PeriodicSketch[A], A) = ???
 
 }

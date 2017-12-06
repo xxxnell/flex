@@ -16,7 +16,7 @@ trait DeltaDistOps extends SmoothDistPropOps[DeltaDist] {
     if(RangeP(dist.measure.to(from), dist.measure.to(to)).contains(dist.center)) Some(1) else Some(0)
   }
 
-  def sample[A](dist: DeltaDist[A]): (A, DeltaDist[A]) = (dist.measure.from(dist.center), dist)
+  def sample[A](dist: DeltaDist[A]): (DeltaDist[A], A) = ???
 
 }
 

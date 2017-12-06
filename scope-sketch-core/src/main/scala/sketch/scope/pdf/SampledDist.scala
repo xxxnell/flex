@@ -32,7 +32,7 @@ object SampledDist extends SampleDistPropOps[SampledDist] {
     case _ => ???
   }
 
-  def sample[A](dist: SampledDist[A]): (A, SampledDist[A]) = dist match {
+  def sample[A](dist: SampledDist[A]): (SampledDist[A], A) = dist match {
     case sketch: Sketch[_] => Sketch.sample(sketch)
     case plotted: PlottedDist[_] => PlottedDist.sample(plotted)
   }

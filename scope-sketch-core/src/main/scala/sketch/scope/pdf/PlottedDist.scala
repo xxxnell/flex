@@ -26,6 +26,6 @@ object PlottedDist extends PlottedDistPropOps[PlottedDist] {
 
   def probability[A](dist: PlottedDist[A], start: A, end: A): Option[Double] = ???
 
-  def sample[A](dist: PlottedDist[A]): (A, PlottedDist[A]) = ???
+  def sample[A](dist: PlottedDist[A]): (PlottedDist[A], A) = ???
 
 }

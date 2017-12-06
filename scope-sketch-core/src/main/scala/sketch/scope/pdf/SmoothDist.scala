@@ -32,7 +32,7 @@ object SmoothDist extends SmoothDistPropOps[SmoothDist] {
     case normal: NormalDist[A] => NormalDist.probability(normal, start, end)
   }
 
-  def sample[A](dist: SmoothDist[A]): (A, SmoothDist[A]) = dist match {
+  def sample[A](dist: SmoothDist[A]): (SmoothDist[A], A) = dist match {
     case predefined: PredefinedDist[A] => PredefinedDist.sample(predefined)
     case delta: DeltaDist[A] => DeltaDist.sample(delta)
     case normal: NormalDist[A] => NormalDist.sample(normal)
