@@ -11,6 +11,7 @@ trait GenericIRng[S<:Random, A<:Double] extends Rng[S, A]
 
 trait IRngOps extends RngOps[Random, Double, GenericIRng] {
 
+  // todo note that it is not functional now
   def nextS: State[IRng, Double] = State { rng =>
     val random = rng.seed
     (IRng.bare(random), random.nextDouble)

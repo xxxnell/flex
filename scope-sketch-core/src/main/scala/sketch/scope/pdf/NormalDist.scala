@@ -18,7 +18,14 @@ trait NormalDistOps extends SmoothDistPropOps[NormalDist] {
     Some(numericDist.cumulativeProbability(toPrim) - numericDist.cumulativeProbability(fromPrim))
   }
 
-  def sample[A](dist: NormalDist[A]): (NormalDist[A], A) = ???
+  def modifyRng[A](dist: NormalDist[A], f: IRng => IRng): NormalDist[A]
+
+  def sample[A](dist: NormalDist[A]): (NormalDist[A], A) = {
+    val (rng, rand) = dist.rng.next
+    val numericDist = new NormalDistribution(dist.mean, dist.variance)
+
+    (modifyRng(dist, _ => rng), dist.measure.from(numericDist.inverseCumulativeProbability(rand)))
+  }
 
 }
 
@@ -26,5 +33,8 @@ object NormalDist extends NormalDistOps {
 
   def apply[A](measure: Measure[A], mean: Prim, variance: Prim): NormalDist[A] =
     NormalDist(measure, mean, variance, IRng(mean.toInt + variance.toInt))
+
+  def modifyRng[A](dist: NormalDist[A], f: IRng => IRng): NormalDist[A] =
+    NormalDist(dist.measure, dist.mean, dist.variance, f(dist.rng))
 
 }
