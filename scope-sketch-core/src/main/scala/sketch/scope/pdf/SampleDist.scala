@@ -1,6 +1,7 @@
 package sketch.scope.pdf
 
 import sketch.scope.plot.{DensityPlot, Plot}
+import sketch.scope.range.RangeP
 
 import scala.language.higherKinds
 
@@ -17,7 +18,7 @@ trait SampleDistPropOps[D[_]<:SampleDist[_]] extends DistPropOps[D] {
 
 object SampleDist extends SampleDistPropOps[SampleDist] {
 
-//  def forSmoothDist[A](dist: SmoothDist[A], )
+  def forSmoothDist[A](dist: SmoothDist[A], domains: List[RangeP]): SampleDist[A] = dist.toSampleDist(domains)
 
   def probability[A](dist: SampleDist[A], start: A, end: A): Option[Double] = dist match {
     case sketch: Sketch[A] => Sketch.probability(sketch, start, end)
