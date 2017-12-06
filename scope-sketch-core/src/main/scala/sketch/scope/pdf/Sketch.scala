@@ -9,7 +9,7 @@ import scala.language.higherKinds
   *
   * Sketch Data Structure Interface.
   */
-trait Sketch[A] extends SampleDist[A] {
+trait Sketch[A] extends SampledDist[A] {
 
   def structures: Structures
 
@@ -85,5 +85,7 @@ object Sketch extends SketchPrimPropOps[Sketch] {
     case sketch: PeriodicSketch[A] => PeriodicSketch.update(sketch, as)
     case _ => narrowUpdate(sketch, as)
   }
+
+  def sample[A](sketch: Sketch[A]): (Sketch[A], A) = ???
 
 }

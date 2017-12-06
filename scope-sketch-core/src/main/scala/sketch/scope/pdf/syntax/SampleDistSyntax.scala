@@ -2,7 +2,7 @@ package sketch.scope.pdf.syntax
 
 import sketch.scope.measure.Measure
 import sketch.scope.pdf.monad.SampleDistMonad
-import sketch.scope.pdf.{Dist, Range, SampleDist}
+import sketch.scope.pdf.{Dist, Range, SampledDist, Sketch}
 import sketch.scope.plot.{DensityPlot, Plot}
 
 /**
@@ -12,19 +12,21 @@ trait SampleDistSyntax extends SampleDistPropSyntax with SampleDistMonadSyntax
 
 trait SampleDistPropSyntax {
 
-  implicit class SampleDistPropSyntaxImpl[A](dist: SampleDist[A]) {
-    def densityPlot: Option[DensityPlot] = SampleDist.densityPlot(dist)
+  implicit class SampleDistPropSyntaxImpl[A](dist: SampledDist[A]) {
+    def sample: (SampledDist[A], A) = SampledDist.sample(dist)
+    def samples(n: Int): (SampledDist[A], List[A]) = SampledDist.samples(dist, n)
+    def densityPlot: Option[DensityPlot] = SampledDist.densityPlot(dist)
   }
 
 }
 
 trait SampleDistMonadSyntax {
 
-  lazy val distMonad: SampleDistMonad[SampleDist, Dist, SampleDist] = SampleDistMonad()
+  lazy val distMonad: SampleDistMonad[SampledDist, Dist, SampledDist] = SampleDistMonad()
 
-  implicit class SampleDistMonadSyntaxImpl[A](dist: SampleDist[A]) {
-    def map[B](f: A => B)(implicit measureB: Measure[B]): SampleDist[B] = distMonad.map(dist, f, measureB)
-    def flatMap[B](f: A => Dist[B])(implicit measureB: Measure[B]): SampleDist[B] = distMonad.bind(dist, f, measureB)
+  implicit class SampleDistMonadSyntaxImpl[A](dist: SampledDist[A]) {
+    def map[B](f: A => B)(implicit measureB: Measure[B]): SampledDist[B] = distMonad.map(dist, f, measureB)
+    def flatMap[B](f: A => Dist[B])(implicit measureB: Measure[B]): SampledDist[B] = distMonad.bind(dist, f, measureB)
   }
 
 }

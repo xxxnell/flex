@@ -28,6 +28,8 @@ object PredefinedDist extends PredefinedDistOps[PredefinedDist] {
   def apply[A](measure: Measure[A], probability: (A, A) => Option[Double]): PredefinedDist[A] =
     PredefinedDistImpl(measure, probability)
 
+  def sample[A](dist: PredefinedDist[A]): (PredefinedDist[A], A) = ???
+
 }
 
 

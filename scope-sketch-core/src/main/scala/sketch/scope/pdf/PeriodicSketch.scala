@@ -11,6 +11,7 @@ import cats.data._
 import cats.implicits._
 import sketch.scope.hmap.HDim
 import sketch.scope.measure.Measure
+import sketch.scope.pdf.PeriodicSketch.{dropPeriod, narrowUpdate, rearrange}
 
 /**
   * Licensed by Probe Technology, Inc.
@@ -32,6 +33,16 @@ trait PeriodicSketchOps[S[_]<:PeriodicSketch[_]] extends SketchPrimPropOps[S] wi
 trait PeriodicSketchLaws[S[_]<:PeriodicSketch[_]] { self: PeriodicSketchOps[S] =>
 
   def dropPeriod[A](sketch: S[A]): Option[S[A]] = modifyPeriods(sketch, periods => Some(periods.drop(1)))
+
+  def update[A](sketch: S[A], as: List[(A, Count)]): Option[S[A]] = for {
+    nextPeriod <- sketch.periods.headOption
+    utdSketch1 <- narrowUpdate[A](sketch, as)
+    sum = self.sum(utdSketch1)
+    utdSketch2 <- if(nextPeriod < sum) for {
+      rearrangedSketch <- rearrange(utdSketch1)
+      droppedSketch <- dropPeriod(rearrangedSketch)
+    } yield droppedSketch else Some(utdSketch1)
+  } yield utdSketch2
 
 }
 
@@ -66,14 +77,6 @@ object PeriodicSketch extends PeriodicSketchOps[PeriodicSketch] {
                        f: Stream[Double] => Option[Stream[Double]]): Option[PeriodicSketch[A]] =
     f(sketch.periods).map(period => bare(sketch.measure, sketch.structures, period))
 
-  def update[A](sketch: PeriodicSketch[A], as: List[(A, Count)]): Option[PeriodicSketch[A]] = for {
-    nextPeriod <- sketch.periods.headOption
-    utdSketch1 <- narrowUpdate[A](sketch, as)
-    sum = utdSketch1.sum
-    utdSketch2 <- if(nextPeriod < sum) for {
-      rearrangedSketch <- rearrange(utdSketch1)
-      droppedSketch <- dropPeriod(rearrangedSketch)
-    } yield droppedSketch else Some(utdSketch1)
-  } yield utdSketch2
+  def sample[A](sketch: PeriodicSketch[A]): (PeriodicSketch[A], A) = ???
 
 }
