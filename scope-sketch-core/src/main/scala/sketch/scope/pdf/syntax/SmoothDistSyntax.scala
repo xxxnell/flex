@@ -1,6 +1,6 @@
 package sketch.scope.pdf.syntax
 
-import sketch.scope.pdf.{SampledDist, SmoothDist}
+import sketch.scope.pdf.{Dist, SampledDist, SmoothDist}
 import sketch.scope.range.RangeP
 
 /**
@@ -12,6 +12,7 @@ trait SmoothDistPropSyntax {
 
   implicit class SmoothDistPropSyntaxImpl[A](dist: SmoothDist[A]) {
     def toSampleDist(domains: List[RangeP]): SampledDist[A] = SmoothDist.toSampleDist(dist, domains)
+    def sample: (SmoothDist[A], A) = SmoothDist.sample(dist)
   }
 
 }

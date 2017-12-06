@@ -2,7 +2,7 @@ package sketch.scope.pdf.syntax
 
 import sketch.scope.measure.Measure
 import sketch.scope.pdf.monad.SampleDistMonad
-import sketch.scope.pdf.{Dist, Range, SampledDist}
+import sketch.scope.pdf.{Dist, Range, SampledDist, Sketch}
 import sketch.scope.plot.{DensityPlot, Plot}
 
 /**
@@ -13,6 +13,7 @@ trait SampleDistSyntax extends SampleDistPropSyntax with SampleDistMonadSyntax
 trait SampleDistPropSyntax {
 
   implicit class SampleDistPropSyntaxImpl[A](dist: SampledDist[A]) {
+    def sample: (SampledDist[A], A) = SampledDist.sample(dist)
     def densityPlot: Option[DensityPlot] = SampledDist.densityPlot(dist)
   }
 
