@@ -6,7 +6,7 @@ import sketch.scope.plot.DensityPlot
 /**
   * Licensed by Probe Technology, Inc.
   */
-trait PlottedDist[A] extends SampleDist[A] {
+trait PlottedDist[A] extends SampledDist[A] {
 
   def densityPlot: DensityPlot
 
@@ -25,5 +25,7 @@ object PlottedDist extends PlottedDistPropOps[PlottedDist] {
   def apply[A](measure: Measure[A], densityPlot: DensityPlot): PlottedDist[A] = PlottedDistImpl(measure, densityPlot)
 
   def probability[A](dist: PlottedDist[A], start: A, end: A): Option[Double] = ???
+
+  def sample[A](dist: PlottedDist[A]): (A, PlottedDist[A]) = ???
 
 }

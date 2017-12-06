@@ -1,7 +1,7 @@
 package sketch.scope.pdf.monad
 
 import sketch.scope.measure.Measure
-import sketch.scope.pdf.{DeltaDist, Dist, Prim, SampleDist, Sketch}
+import sketch.scope.pdf.{DeltaDist, Dist, Prim, SampledDist, Sketch}
 
 import scala.language.higherKinds
 
@@ -31,7 +31,7 @@ object DistMonad {
 
   def dist: DistMonad[Dist, Dist, Dist] = ???
 
-  def sampleDist: DistMonad[Dist, SampleDist, SampleDist] = ???
+  def sampleDist: DistMonad[Dist, SampledDist, SampledDist] = ???
 
   def sketch: DistMonad[Dist, Sketch, Sketch] = ???
 

@@ -2,7 +2,7 @@ package sketch.scope.pdf.syntax
 
 import sketch.scope.measure.Measure
 import sketch.scope.pdf.monad.{DistBind, DistFunctor, DistMonad}
-import sketch.scope.pdf.{Dist, SampleDist, Sketch}
+import sketch.scope.pdf.{Dist, SampledDist, Sketch}
 
 import scala.language.higherKinds
 
@@ -50,8 +50,8 @@ trait DistMonadSyntax1 extends DistMonadSyntax2 {
 
 trait DistMonadSyntax2 extends DistMonadSyntax3 {
 
-  implicit def bindAux2: DistBindAux[SampleDist, SampleDist] = new DistBindAux[SampleDist, SampleDist] {}
-  implicit def distMonad2: DistMonad[Dist, SampleDist, SampleDist] = DistMonad.sampleDist
+  implicit def bindAux2: DistBindAux[SampledDist, SampledDist] = new DistBindAux[SampledDist, SampledDist] {}
+  implicit def distMonad2: DistMonad[Dist, SampledDist, SampledDist] = DistMonad.sampleDist
 
 }
 

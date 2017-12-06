@@ -18,4 +18,6 @@ object SimpleSketch extends SimpleSketchOps {
   def modifyStructure[A](sketch: SimpleSketch[A], f: Structures => Option[Structures]): Option[SimpleSketch[A]] =
     f(sketch.structures).map(structure => SimpleSketch(sketch.measure, structure))
 
+  def sample[A](dist: SimpleSketch[A]): (A, SimpleSketch[A]) = ???
+
 }
