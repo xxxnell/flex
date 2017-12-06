@@ -7,36 +7,39 @@ import scala.util.Random
 /**
   * Licensed by Probe Technology, Inc.
   */
-trait GenericIRng[S<:Random, A<:Double] extends Rng[S, A]
+trait GenericIRng[S<:Seed, A<:Out] extends Rng[S, A]
 
-trait IRngOps extends RngOps[Random, Double, GenericIRng] {
+trait IRngOps extends RngOps[Seed, Out, GenericIRng] {
 
-  // todo note that it is not functional now
-  def nextS: State[IRng, Double] = State { rng =>
-    val random = rng.seed
-    (IRng.bare(random), random.nextDouble)
+  def nextS: State[IRng, Out] = State { rng =>
+    val seed = new Random(rng.seed).nextLong()
+    val rand = new Random(rng.seed).nextDouble()
+
+    (IRng.bare(seed), rand)
   }
 
 }
 
 trait IRngSyntax {
 
-  type IRng = GenericIRng[Random, Double]
+  type Seed = Long
+
+  type Out = Double
+
+  type IRng = GenericIRng[Seed, Out]
 
   implicit class IRngSyntaxImpl(rng: IRng) {
-    def next: (IRng, Double) = IRng.nextS.run(rng).value
+    def next: (IRng, Out) = IRng.nextS.run(rng).value
   }
 
 }
 
 object IRng extends IRngOps {
 
-  case class IRngImpl(seed: Random) extends IRng
+  case class IRngImpl(seed: Seed) extends IRng
 
-  def apply(seed: Int): IRng = bare(new Random(seed))
+  def apply(seed: Int): IRng = bare(seed.toLong)
 
-  def apply(seed: Long): IRng = bare(new Random(seed))
-
-  def bare(seed: Random): IRng = IRngImpl(seed)
+  def bare(seed: Seed): IRng = IRngImpl(seed)
 
 }
