@@ -19,13 +19,15 @@ object SampleDist extends SampleDistPropOps[SampleDist] {
 
 //  def forSmoothDist[A](dist: SmoothDist[A], )
 
-  def probability[A](dist: SampleDist[A], from: A, to: A): Option[Double] = dist match {
-    case sketch: Sketch[A] => Sketch.probability(sketch, from, to)
+  def probability[A](dist: SampleDist[A], start: A, end: A): Option[Double] = dist match {
+    case sketch: Sketch[A] => Sketch.probability(sketch, start, end)
+    case plotted: PlottedDist[A] => PlottedDist.probability(plotted, start, end)
     case _ => ???
   }
 
   def densityPlot(dist: SampleDist[_]): Option[DensityPlot] = dist match {
     case sketch: Sketch[_] => Sketch.densityPlot(sketch)
+    case plotted: PlottedDist[_] => PlottedDist.densityPlot(plotted)
     case _ => ???
   }
 
