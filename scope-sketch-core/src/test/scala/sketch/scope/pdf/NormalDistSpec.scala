@@ -57,7 +57,6 @@ class NormalDistSpec extends Specification with ScalaCheck {
           NormalDistGen.doubleNormalDistGen.sample.fold(ko)(dist => {
             val (_, samples) = dist.samples(100)
 //            samples.foreach(sample => println(sample))
-
             ok
           })
         }
@@ -73,8 +72,8 @@ class NormalDistSpec extends Specification with ScalaCheck {
 object NormalDistGen {
 
   def normalDistGen[A](measure: Measure[A]): Gen[NormalDist[A]] = for {
-    mean <- Arbitrary.arbitrary[Double]
-    variance <- Gen.choose(0.1d, 10000d)
+    mean <- Gen.choose(-1000d, 1000d)
+    variance <- Gen.choose(0.1d, 100d)
   } yield NormalDist(measure, mean, variance)
 
   def doubleNormalDistGen: Gen[NormalDist[Double]] = normalDistGen(doubleMeasure)
