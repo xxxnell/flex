@@ -1,9 +1,8 @@
 package sketch.scope.rand
 
 import org.scalacheck.{Arbitrary, Gen}
-import org.specs2.mutable._
 import org.specs2.ScalaCheck
-import sketch.scope.hmap.{HDim, Hmap, HmapGen}
+import org.specs2.mutable._
 
 /**
   * Licensed by Probe Technology, Inc.

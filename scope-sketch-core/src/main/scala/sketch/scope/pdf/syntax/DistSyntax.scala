@@ -16,6 +16,7 @@ trait DistPropSyntax {
   implicit class DistPropSyntaxImpl[A](dist: Dist[A]) {
     def probability(from: A, to: A): Option[Double] = Dist.probability(dist, from, to)
     def sample: (Dist[A], A) = Dist.sample(dist)
+    def samples(n: Int): (Dist[A], List[A]) = Dist.samples(dist, n)
   }
 
 }

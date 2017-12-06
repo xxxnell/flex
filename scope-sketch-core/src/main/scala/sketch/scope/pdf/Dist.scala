@@ -14,7 +14,7 @@ trait Dist[A] {
 
 }
 
-trait DistPropOps[D[_]<:Dist[_]] {
+trait DistPropOps[D[_]<:Dist[_]] extends DistPropLaws[D] {
 
   def probability[A](dist: D[A], from: A, to: A): Option[Double]
 
@@ -23,6 +23,17 @@ trait DistPropOps[D[_]<:Dist[_]] {
   //  def cdf(sketch: S, a: Double): Option[Double]
 
   def sample[A](dist: D[A]): (D[A], A)
+
+}
+
+trait DistPropLaws[D[_]<:Dist[_]] { self: DistPropOps[D] =>
+
+  def samples[A](dist: D[A], n: Int): (D[A], List[A]) = {
+    (0 until n).foldLeft[(D[A], List[A])]((dist, Nil)){ case ((utdDist1, acc), _) =>
+      val (utdDist2, s) = sample(utdDist1)
+      (utdDist2, s :: acc)
+    }
+  }
 
 }
 

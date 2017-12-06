@@ -14,6 +14,7 @@ trait SampleDistPropSyntax {
 
   implicit class SampleDistPropSyntaxImpl[A](dist: SampledDist[A]) {
     def sample: (SampledDist[A], A) = SampledDist.sample(dist)
+    def samples(n: Int): (SampledDist[A], List[A]) = SampledDist.samples(dist, n)
     def densityPlot: Option[DensityPlot] = SampledDist.densityPlot(dist)
   }
 

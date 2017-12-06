@@ -13,6 +13,7 @@ trait SketchPropSyntax {
 
   implicit class SketchPropSyntaxImpl[A](sketch: Sketch[A]) {
     def sample: (Sketch[A], A) = Sketch.sample(sketch)
+    def samples(n: Int): (Sketch[A], List[A]) = Sketch.samples(sketch, n)
     def update(a: A): Option[Sketch[A]] = Sketch.update(sketch, (a, 1d) :: Nil)
     def update(as: List[(A, Count)]): Option[Sketch[A]] = Sketch.update(sketch, as)
     def count(from: A, to: A): Option[Double] = Sketch.count(sketch, from, to)
