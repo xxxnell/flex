@@ -1,5 +1,6 @@
 package sketch.scope.range
 
+import sketch.scope.measure._
 import sketch.scope.pdf.Prim
 
 import scala.collection.immutable.NumericRange
@@ -9,23 +10,13 @@ import scala.collection.immutable.NumericRange
   *
   * Range with primitive type of Sketch.
   */
-trait RangeP {
+trait GenericRangeP[G] extends RangeM[Prim] {
+  def measure: Measure[Prim] = doubleMeasure
   def start: Prim
   def end: Prim
-  override def equals(other: Any): Boolean = other.isInstanceOf[RangeP] &&
-    start == other.asInstanceOf[RangeP].start &&
-    end == other.asInstanceOf[RangeP].end
-  override def hashCode(): Int = start.hashCode() + end.hashCode()
 }
 
-trait RangePOps {
-
-  def contains(range: RangeP, a: Prim): Boolean = {
-    ((range.start >= a) && range.end <= a) ||
-      ((range.start <= a) && (range.end >= a))
-  }
-
-  def middle(range: RangeP): Prim = (range.start - range.end) / 2
+trait RangePOps extends RangeMOps[GenericRangeP] {
 
   def length(range: RangeP): Prim = range.end - range.start
 
@@ -33,9 +24,9 @@ trait RangePOps {
 
 trait RangePSyntax {
 
+  type RangeP = GenericRangeP[Nothing]
+
   implicit class RangeImpl(range: RangeP) {
-    def contains(a: Prim): Boolean = RangeP.contains(range, a)
-    def middle: Prim = RangeP.middle(range)
     def length: Prim = RangeP.length(range)
   }
 

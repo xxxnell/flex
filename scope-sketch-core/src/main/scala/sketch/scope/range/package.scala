@@ -4,6 +4,7 @@ package sketch.scope
   * Licensed by Probe Technology, Inc.
   */
 package object range
-  extends RangePSyntax {
+  extends RangePSyntax
+    with RangeMSyntax {
 
 }
