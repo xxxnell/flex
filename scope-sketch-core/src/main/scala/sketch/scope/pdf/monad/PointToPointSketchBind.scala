@@ -22,7 +22,7 @@ object PointToPointSketchBind extends SketchBind[Sketch, Dist, Sketch] {
     utdSketchBStructure <- Sketch.deepUpdate(emptySketchB, discretizeRecords(records))
     (utdSketchB, structure) = utdSketchBStructure
   } yield utdSketchB)
-    .get
+    .getOrElse(Sketch.empty(measureB, dist.caDepth, dist.caSize, dist.coDepth, dist.coSize))
 
   def probabilityForWeightDists[A](from: A, to: A, weightDists: List[(Double, Dist[A])]): Option[Double] =
     weightDists.foldLeft(Option(0d)){ case (accProbO, (weight, distB)) => for {
