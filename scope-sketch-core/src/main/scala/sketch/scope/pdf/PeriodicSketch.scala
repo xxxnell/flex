@@ -1,17 +1,6 @@
 package sketch.scope.pdf
 
-import scala.reflect.runtime.universe._
-import sketch.scope.cmap.Cmap
-import sketch.scope.hcounter.HCounter
-
-import scala.collection.immutable.NumericRange
-import scala.util.Try
-import cats._
-import cats.data._
-import cats.implicits._
-import sketch.scope.hmap.HDim
 import sketch.scope.measure.Measure
-import sketch.scope.pdf.PeriodicSketch.{dropPeriod, narrowUpdate, rearrange}
 
 /**
   * Licensed by Probe Technology, Inc.
