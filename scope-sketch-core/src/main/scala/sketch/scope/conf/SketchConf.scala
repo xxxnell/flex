@@ -4,32 +4,19 @@ package sketch.scope.conf
   * Licensed by Probe Technology, Inc.
   */
 trait SketchConf {
-  // cmap
-  val cmapSize: Int
-  val cmapNo: Int
-  val cmapMin: Double
-  val cmapMax: Double
-  // hcounter
-  val counterSize: Int
-  val counterNo: Int
+  val cmap: CmapConf
+  val counter: CounterConf
 }
 
 object SketchConf {
 
-  case class SketchConfImpl(cmapSize: Int,
-                            cmapNo: Int,
-                            cmapMin: Double,
-                            cmapMax: Double,
-                            counterSize: Int,
-                            counterNo: Int) extends SketchConf
+  case class SketchConfImpl(cmap: CmapConf,
+                            counter: CounterConf) extends SketchConf
 
   def default: SketchConf = DefaultSketchConf
 
-  def apply(cmapSize: Int, cmapNo: Int, cmapMin: Double, cmapMax: Double,
-            counterSize: Int, counterNo: Int): SketchConf =
-    SketchConfImpl(
-      cmapSize, cmapNo, cmapMin, cmapMax,
-      counterSize, counterNo
-    )
+  def apply(cmapConf: CmapConf,
+            counterConf: CounterConf): SketchConf =
+    SketchConfImpl(cmapConf, counterConf)
 
 }
