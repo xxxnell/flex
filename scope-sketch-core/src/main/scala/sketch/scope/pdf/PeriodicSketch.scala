@@ -1,5 +1,6 @@
 package sketch.scope.pdf
 
+import sketch.scope.conf.SketchConf
 import sketch.scope.measure.Measure
 
 /**
@@ -39,32 +40,33 @@ object PeriodicSketch extends PeriodicSketchOps[PeriodicSketch] {
 
   private case class PeriodicSketchImpl[A](measure: Measure[A],
                                            structures: Structures,
+                                           conf: SketchConf,
                                            periods: Stream[Double])
     extends PeriodicSketch[A]
 
   def apply[A](measure: Measure[A],
                structure: Structures,
+               conf: SketchConf,
                periods: Stream[Double]): PeriodicSketch[A] =
-    bare(measure, structure, periods)
+    bare(measure, structure, conf, periods)
 
   def bare[A](measure: Measure[A],
               structure: Structures,
+              conf: SketchConf,
               periods: Stream[Double]): PeriodicSketch[A] =
-    PeriodicSketchImpl(measure, structure, periods)
+    PeriodicSketchImpl(measure, structure, conf, periods)
 
-  def empty[A](measure: Measure[A], caDepth: Int, caSize: Int, coDepth: Int, coSize: Int): PeriodicSketch[A] =
-    cont(measure, caDepth, caSize, coDepth, coSize)
+  def empty[A](implicit measure: Measure[A], conf: SketchConf): PeriodicSketch[A] = cont(measure, conf)
 
-  def cont[A](measure: Measure[A], caDepth: Int, caSize: Int, coDepth: Int, coSize: Int): PeriodicSketch[A] =
-    ContSketch.empty(measure, caDepth, caSize, coDepth, coSize)
+  def cont[A](measure: Measure[A], conf: SketchConf): PeriodicSketch[A] = ContSketch.empty(measure, conf)
 
   def modifyStructure[A](sketch: PeriodicSketch[A],
                          f: Structures => Option[Structures]): Option[PeriodicSketch[A]] =
-    f(sketch.structures).map(structure => bare(sketch.measure, structure, sketch.periods))
+    f(sketch.structures).map(structure => bare(sketch.measure, structure, sketch.conf, sketch.periods))
 
   def modifyPeriods[A](sketch: PeriodicSketch[A],
                        f: Stream[Double] => Option[Stream[Double]]): Option[PeriodicSketch[A]] =
-    f(sketch.periods).map(period => bare(sketch.measure, sketch.structures, period))
+    f(sketch.periods).map(period => bare(sketch.measure, sketch.structures, sketch.conf, period))
 
   def sample[A](sketch: PeriodicSketch[A]): (PeriodicSketch[A], A) = ???
 

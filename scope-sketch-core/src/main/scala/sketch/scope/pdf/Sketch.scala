@@ -1,5 +1,6 @@
 package sketch.scope.pdf
 
+import sketch.scope.conf.SketchConf
 import sketch.scope.measure.Measure
 
 import scala.language.higherKinds
@@ -12,6 +13,8 @@ import scala.language.higherKinds
 trait Sketch[A] extends SampledDist[A] {
 
   def structures: Structures
+
+  def conf: SketchConf
 
 }
 
@@ -60,17 +63,13 @@ trait SketchPropLaws[S[_]<:Sketch[_]] { self: SketchPropOps[S] =>
 
 object Sketch extends SketchPrimPropOps[Sketch] {
 
-  def apply[A](measure: Measure[A], structure: Structures): Sketch[A] = SimpleSketch(measure, structure)
+  def apply[A](measure: Measure[A], structure: Structures, conf: SketchConf): Sketch[A] =
+    SimpleSketch(measure, structure, conf)
 
   /**
     * @param measure  measure of Sketch
-    * @param caDepth  size of Sketch structure
-    * @param caSize   Cmap size.
-    * @param coDepth  HCounter depth
-    * @param coSize   HCounter size
     * */
-  def empty[A](measure: Measure[A], caDepth: Int, caSize: Int, coDepth: Int, coSize: Int): Sketch[A] =
-    PeriodicSketch.empty(measure, caDepth, caSize, coDepth, coSize)
+  def empty[A](implicit measure: Measure[A], conf: SketchConf): Sketch[A] = PeriodicSketch.empty(measure, conf)
 
   // mapping ops
 

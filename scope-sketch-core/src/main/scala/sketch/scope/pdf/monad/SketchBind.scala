@@ -1,6 +1,5 @@
 package sketch.scope.pdf.monad
 
-import sketch.scope.measure.Measure
 import sketch.scope.pdf.{Dist, Sketch}
 
 /**
