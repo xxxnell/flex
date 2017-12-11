@@ -1,6 +1,7 @@
 package sketch.scope.cmap
 
 import cats.data.Kleisli
+import sketch.scope.conf.{CmapConf, UniformCmapConf}
 import sketch.scope.hmap.HDim
 import sketch.scope.pdf._
 
@@ -12,9 +13,9 @@ import sketch.scope.pdf._
 trait Cmap {
 
   /**
-    * @return hdim
+    * @return option of hdim. It returns None if the given prim is out of scope.
     * */
-  def apply(a: Double): HDim
+  def apply(a: Prim): HDim
 
 }
 
@@ -49,9 +50,14 @@ trait CmapSyntax {
 
 object Cmap extends CmapOps[Cmap] {
 
-  def uniform(n: Int): Cmap = UniformCmap(n)
+  def apply(conf: CmapConf): Cmap = conf match {
+    case conf: UniformCmapConf => Cmap.uniform(conf.no, conf.start, conf.end)
+    case _ => ???
+  }
 
-  def divider(divider: List[Double]): Cmap = DividerCmap(divider)
+  def uniform(n: Int, start: Option[Prim] = None, end: Option[Prim] = None): Cmap = UniformCmap(n, start, end)
+
+  def divider(divider: List[Prim]): Cmap = DividerCmap(divider)
 
   def bin(cmap: Cmap): List[Range] = cmap match {
     case cmap: DividerCmap => DividerCmap.bin(cmap)

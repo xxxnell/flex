@@ -3,6 +3,7 @@ package sketch.scope.pdf
 import org.specs2.mutable._
 import org.specs2.ScalaCheck
 import sketch.scope.measure._
+import sketch.scope.conf._
 
 /**
   * Licensed by Probe Technology, Inc.
@@ -25,7 +26,7 @@ class DistSpec extends Specification with ScalaCheck {
         }
 
         "with sketch" in {
-          val res: Sketch[Double] = Dist.delta[Double].flatMap(_ => Sketch.empty[Double](doubleMeasure, 1, 1, 1, 1))
+          val res: Sketch[Double] = Dist.delta[Double].flatMap(_ => Sketch.empty[Double])
           res must beAnInstanceOf[Sketch[Double]]
         }
 
@@ -44,7 +45,7 @@ class DistSpec extends Specification with ScalaCheck {
         "with sketch" in {
           val res = for {
             x <- Dist.delta[Double]
-            y <- Sketch.empty[Double](doubleMeasure, 1, 1, 1, 1)
+            y <- Sketch.empty[Double]
           } yield x + y
           res must beAnInstanceOf[Sketch[Double]]
         }

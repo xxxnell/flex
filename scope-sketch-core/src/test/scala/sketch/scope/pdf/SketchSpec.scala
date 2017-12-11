@@ -3,7 +3,7 @@ package sketch.scope.pdf
 import org.scalacheck.Gen
 import org.specs2.ScalaCheck
 import org.specs2.mutable._
-
+import sketch.scope.conf._
 import sketch.scope.measure._
 
 /**
@@ -68,16 +68,13 @@ class SketchSpec extends Specification with ScalaCheck {
 
 object SketchGen {
 
-  def intSketchGen: Gen[Sketch[Int]] = sketchGen(intMeasure)
+  def intSketchGen: Gen[Sketch[Int]] = sketchGen[Int]
 
-  def booleanSketchGen: Gen[Sketch[Boolean]] = sketchGen(booleanMeasure)
+  def booleanSketchGen: Gen[Sketch[Boolean]] = sketchGen[Boolean]
 
-  def sketchGen[A](measure: Measure[A]): Gen[Sketch[A]] = for {
-    caDepth <- Gen.choose(1, 10)
-    caSize <- Gen.choose(100, 10000)
-    coDepth <- Gen.choose(1, 10)
-    coSize <- Gen.choose(100, 10000)
-  } yield Sketch.empty(measure, caDepth, caSize, coDepth, coSize)
+  def sketchGen[A](implicit measure: Measure[A]): Gen[Sketch[A]] = for {
+    conf <- SketchConfGen.sketchConfGen
+  } yield Sketch.empty[A](measure, conf)
 
   def intSketchSample: Option[Sketch[Int]] = intSketchGen.sample
 

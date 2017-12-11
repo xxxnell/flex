@@ -10,11 +10,11 @@ import scala.collection.immutable.TreeMap
   */
 trait DividerCmap extends Cmap {
 
-  val divider: List[Double]
+  val divider: List[Prim]
 
-  lazy val index: TreeMap[Double, HDim] = DividerCmap.divider2IndexingMap(divider)
+  lazy val index: TreeMap[Prim, HDim] = DividerCmap.divider2IndexingMap(divider)
 
-  lazy val inverseIndex: TreeMap[HDim, Double] = DividerCmap.divider2InverseIndexingMap(divider)
+  lazy val inverseIndex: TreeMap[HDim, Prim] = DividerCmap.divider2InverseIndexingMap(divider)
 
   def apply(a: Double): HDim = index.from(a).headOption.fold(0){ case (_, idx) => idx + 1 }
 
@@ -28,9 +28,9 @@ trait DividerCmapOps[DC<:DividerCmap] extends CmapOps[DC] {
   def divider2InverseIndexingMap(divider: List[Double]): TreeMap[HDim, Double] =
     TreeMap.apply(divider.sorted.zipWithIndex.map { case (div, idx) => (idx, div) }: _*)
 
-  val min = Double.MinValue
+  val min: Prim = Double.MinValue
 
-  val max = Double.MaxValue
+  val max: Prim = Double.MaxValue
 
   def bin(cmap: DC): List[Range] = {
     val divider = cmap.divider

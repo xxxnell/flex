@@ -2,13 +2,14 @@ package sketch.scope.benchmark
 
 import sketch.scope.pdf.Sketch
 import sketch.scope.measure._
+import sketch.scope.conf._
 
 /**
   * Licensed by Probe Technology, Inc.
   */
 object SketchBenchOps {
 
-  val defaultSketch: Sketch[Double] = Sketch.empty(doubleMeasure, 5, 1000, 1, 2000)
+  val defaultSketch: Sketch[Double] = Sketch.empty[Double]
 
   val defaultSignals: Stream[Double] = Stream.iterate(0.0)(_ + 0.1)
 
