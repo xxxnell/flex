@@ -5,7 +5,7 @@ package sketch.scope.conf
   */
 object DefaultSketchConf extends SketchConf {
 
-  val cmap: CmapConf = CmapConf.uniform(1000, 10, Double.MinValue, Double.MaxValue)
+  val cmap: CmapConf = CmapConf.uniform(1000, 10, None, None)
 
   val counter: CounterConf = CounterConf.apply(200, 2)
 

@@ -1,6 +1,7 @@
 package sketch.scope.cmap
 
 import cats.data.Kleisli
+import sketch.scope.conf.{CmapConf, UniformCmapConf}
 import sketch.scope.hmap.HDim
 import sketch.scope.pdf._
 
@@ -49,7 +50,12 @@ trait CmapSyntax {
 
 object Cmap extends CmapOps[Cmap] {
 
-  def uniform(n: Int): Cmap = UniformCmap(n)
+  def apply(conf: CmapConf): Cmap = conf match {
+    case conf: UniformCmapConf => Cmap.uniform(conf.no, conf.start, conf.end)
+    case _ => ???
+  }
+
+  def uniform(n: Int, start: Option[Prim] = None, end: Option[Prim] = None): Cmap = UniformCmap(n, start, end)
 
   def divider(divider: List[Prim]): Cmap = DividerCmap(divider)
 

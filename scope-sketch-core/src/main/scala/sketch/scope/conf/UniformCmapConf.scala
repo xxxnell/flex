@@ -6,15 +6,15 @@ import sketch.scope.pdf.Prim
   * Licensed by Probe Technology, Inc.
   */
 trait UniformCmapConf extends CmapConf {
-  val start: Prim
-  val end: Prim
+  val start: Option[Prim]
+  val end: Option[Prim]
 }
 
 object UniformCmapConf {
 
-  case class UniformCmapConfImpl(size: Int, no: Int, start: Prim, end: Prim) extends UniformCmapConf
+  case class UniformCmapConfImpl(size: Int, no: Int, start: Option[Prim], end: Option[Prim]) extends UniformCmapConf
 
-  def apply(size: Int, no: Int, start: Prim, end: Prim): UniformCmapConf =
+  def apply(size: Int, no: Int, start: Option[Prim], end: Option[Prim]): UniformCmapConf =
     UniformCmapConfImpl(size, no, start, end)
 
 }

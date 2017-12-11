@@ -3,7 +3,7 @@ package sketch.scope.cmap
 /**
   * Licensed by Probe Technology, Inc.
   */
-class UniformCmap(n: Int, start: Option[Double] = None, end: Option[Double] = None) extends DividerCmap {
+class UniformCmap(n: Int, start: Option[Double], end: Option[Double]) extends DividerCmap {
 
   val divider: List[Double] = {
     val min = BigDecimal(start.getOrElse(DividerCmap.min))
@@ -29,6 +29,7 @@ object UniformCmap extends UniformCmapOps {
   /**
     * @param n number of pieces
     * */
-  def apply(n: Int): UniformCmap = new UniformCmap(n)
+  def apply(n: Int, start: Option[Double] = None, end: Option[Double] = None): UniformCmap =
+    new UniformCmap(n, start, end)
 
 }

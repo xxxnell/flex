@@ -1,6 +1,7 @@
 package sketch.scope.hcounter
 
 import cats.implicits._
+import sketch.scope.conf.CounterConf
 import sketch.scope.counter.{CDim, Counter}
 import sketch.scope.hmap.{HDim, Hmap}
 
@@ -67,6 +68,8 @@ object HCounter extends HCounterOps[HCounter] { self =>
   private case class HCounterImpl(structures: List[(Hmap, Counter)], sum: Double) extends HCounter
 
   def apply(structure: List[(Hmap, Counter)], sum: Double): HCounter = HCounterImpl(structure, sum)
+
+  def apply(conf: CounterConf): HCounter = empty(conf.no, conf.size)
 
 //  def structure(structure: List[(Hmap, Counter)]): HCounter = HCounterImpl(structure)
 

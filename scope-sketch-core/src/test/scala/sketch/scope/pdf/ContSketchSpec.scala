@@ -3,7 +3,7 @@ package sketch.scope.pdf
 import org.scalacheck.Gen
 import org.specs2.mutable._
 import org.specs2.ScalaCheck
-import sketch.scope.conf.{SketchConf, SketchConfGen}
+import sketch.scope.conf.{CmapConf, CounterConf, SketchConf, SketchConfGen}
 import sketch.scope.measure._
 
 /**
@@ -14,9 +14,12 @@ class ContSketchSpec extends Specification with ScalaCheck {
   "ContSketch" should {
 
     "empty" in {
-      val (cmapSize, cmapNo, cmapMin, cmapMax, counterSize, counterNo) =
-        (5, 100, Double.MinValue, Double.MaxValue, 10, 2)
-      implicit val conf: SketchConf = SketchConf(cmapSize, cmapNo, cmapMin, cmapMax, counterSize, counterNo)
+      val (cmapSize, cmapNo, cmapMin, cmapMax) = (5, 100, -100, 100)
+      val (counterSize, counterNo) = (10, 2)
+      implicit val conf: SketchConf = SketchConf(
+        CmapConf.uniform(cmapSize, cmapNo, Some(cmapMin), Some(cmapMax)),
+        CounterConf(counterSize, counterNo)
+      )
       val contSketch = ContSketch.empty[Int]
 
       val testCaDepth = contSketch.structures.lengthCompare(cmapNo) == 0

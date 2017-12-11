@@ -19,7 +19,7 @@ object ContSketch extends  {
 
   def empty[A](implicit measure: Measure[A], conf: SketchConf): ContSketch[A] = {
     val structure = (1 to conf.cmap.no).toList
-      .map(_ => (Cmap.uniform(conf.cmap.size), HCounter.empty(conf.counter.no, conf.counter.size)))
+      .map(_ => (Cmap(conf.cmap), HCounter(conf.counter)))
     ContSketch(measure, structure, conf, 100)
   }
 

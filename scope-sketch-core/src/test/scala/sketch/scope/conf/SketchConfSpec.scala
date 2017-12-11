@@ -16,10 +16,20 @@ class SketchConfSpec extends Specification with ScalaCheck {
 object SketchConfGen {
 
   def sketchConfGen: Gen[SketchConf] = for {
+    cmapConf <- cmapConfGen
+    counterConf <- counterConfGen
+  } yield SketchConf(cmapConf, counterConf)
+
+  def cmapConfGen: Gen[CmapConf] = uniformCmapConfGen
+
+  def uniformCmapConfGen: Gen[UniformCmapConf] = for {
     cmapNo <- Gen.choose(1, 10)
     cmapSize <- Gen.choose(100, 10000)
+  } yield UniformCmapConf(cmapSize, cmapNo, None, None)
+
+  def counterConfGen: Gen[CounterConf] = for {
     counterNo <- Gen.choose(1, 10)
     counterSize <- Gen.choose(100, 10000)
-  } yield SketchConf(cmapSize, cmapNo, Double.MinValue, Double.MaxValue, counterSize, counterNo)
+  } yield CounterConf(counterSize, counterNo)
 
 }

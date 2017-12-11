@@ -12,7 +12,7 @@ trait CmapConf {
 
 object CmapConf {
 
-  def uniform(size: Int, no: Int, start: Prim, end: Prim): UniformCmapConf =
+  def uniform(size: Int, no: Int, start: Option[Prim], end: Option[Prim]): UniformCmapConf =
     UniformCmapConf(size, no, start, end)
 
 }
