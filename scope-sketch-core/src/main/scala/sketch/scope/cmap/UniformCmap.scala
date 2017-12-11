@@ -1,20 +1,23 @@
 package sketch.scope.cmap
 
-import sketch.scope.hmap.HDim
-
-import scala.collection.immutable.NumericRange
-
 /**
   * Licensed by Probe Technology, Inc.
   */
-class UniformCmap(n: Int) extends DividerCmap {
+class UniformCmap(n: Int, start: Option[Double] = None, end: Option[Double] = None) extends DividerCmap {
 
   val divider: List[Double] = {
-    val max = BigDecimal(DividerCmap.max)
-    val min = BigDecimal(DividerCmap.min)
+    val min = BigDecimal(start.getOrElse(DividerCmap.min))
+    val max = BigDecimal(end.getOrElse(DividerCmap.max))
     val unit = if(n > 0) (max - min) / n else max - min
 
-    (1 to n).toList.map(idx => (min + idx * unit).toDouble)
+    val idx = (start, end) match {
+      case (Some(_), Some(_)) => 0 until (n - 1)
+      case (Some(_), None) => 0 until (n - 1)
+      case (None, Some(_)) => 1 until n
+      case (None, None) => 1 until n
+    }
+
+    idx.toList.map(idx => (min + idx * unit).toDouble)
   }
 
 }
