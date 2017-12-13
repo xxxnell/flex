@@ -41,7 +41,7 @@ class CmapSpec extends Specification with ScalaCheck {
 
       prop { (sizeCmap: (Int, Cmap) ) =>
         val (size, cmap) = sizeCmap
-        if(size + 1 == cmap.size) ok else ko
+        if(size == cmap.size) ok else ko
       }.setArbitrary(cmapGen)
     }
 
