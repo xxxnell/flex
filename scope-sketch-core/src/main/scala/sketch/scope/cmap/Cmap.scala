@@ -55,9 +55,9 @@ object Cmap extends CmapOps[Cmap] {
     case _ => ???
   }
 
-  def uniform(n: Int, start: Option[Prim] = None, end: Option[Prim] = None): Cmap = UniformCmap(n, start, end)
+  def uniform(n: Int, start: Option[Prim] = None, end: Option[Prim] = None): UniformCmap = UniformCmap(n, start, end)
 
-  def divider(divider: List[Prim]): Cmap = DividerCmap(divider)
+  def divider(divider: List[Prim]): DividerCmap = DividerCmap(divider)
 
   def bin(cmap: Cmap): List[Range] = cmap match {
     case cmap: DividerCmap => DividerCmap.bin(cmap)

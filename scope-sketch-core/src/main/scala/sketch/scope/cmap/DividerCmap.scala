@@ -16,7 +16,7 @@ trait DividerCmap extends Cmap {
 
   lazy val inverseIndex: TreeMap[HDim, Prim] = DividerCmap.divider2InverseIndexingMap(divider)
 
-  def apply(a: Double): HDim = index.from(a).headOption.fold(0){ case (_, idx) => idx + 1 }
+  def apply(a: Double): HDim = index.to(a).lastOption.fold(0){ case (_, idx) => idx + 1 }
 
 }
 
