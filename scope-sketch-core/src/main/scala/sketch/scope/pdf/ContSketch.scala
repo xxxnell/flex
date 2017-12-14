@@ -17,10 +17,12 @@ case class ContSketch[A](measure: Measure[A], structures: List[(Cmap, HCounter)]
 
 object ContSketch extends  {
 
+  val defaultPeriod = 100
+
   def empty[A](implicit measure: Measure[A], conf: SketchConf): ContSketch[A] = {
     val structure = (1 to conf.cmap.no).toList
       .map(_ => (Cmap(conf.cmap), HCounter(conf.counter)))
-    ContSketch(measure, structure, conf, 100)
+    ContSketch(measure, structure, conf, defaultPeriod)
   }
 
 }

@@ -21,10 +21,10 @@ trait SketchPropSyntax {
     //    def clear: Sketch = Sketch.clear(sketch)
     def probability(from: A, to: A): Option[Double] = Sketch.probability(sketch, from, to)
     def rearrange: Option[Sketch[A]] = Sketch.rearrange(sketch)
-    def caDepth: Int = Sketch.caDepth(sketch)
-    def caSize: Int = Sketch.caSize(sketch)
-    def coDepth: Int = Sketch.coDepth(sketch)
-    def coSize: Int = Sketch.coSize(sketch)
+    def caDepth: Int = Sketch.cmapNo(sketch)
+    def caSize: Int = Sketch.cmapSize(sketch)
+    def coDepth: Int = Sketch.counterNo(sketch)
+    def coSize: Int = Sketch.counterSize(sketch)
   }
 
 }

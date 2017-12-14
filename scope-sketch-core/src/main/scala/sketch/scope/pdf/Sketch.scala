@@ -42,19 +42,19 @@ trait SketchPropLaws[S[_]<:Sketch[_]] { self: SketchPropOps[S] =>
 
   def rearrange[A](sketch: S[A]): Option[S[A]] = deepUpdate(sketch, Nil).map(_._1)
 
-  def caDepth(sketch: S[_]): Int = sketch.structures.size
+  def cmapNo(sketch: S[_]): Int = sketch.structures.size
 
-  def caSize(sketch: S[_]): Int = (for {
+  def cmapSize(sketch: S[_]): Int = (for {
     structure <- sketch.structures.headOption
     (cmap, _) = structure
   } yield cmap.size).getOrElse(0)
 
-  def coDepth(sketch: S[_]): Int = (for {
+  def counterNo(sketch: S[_]): Int = (for {
     structure <- sketch.structures.headOption
     (_, hcounter) = structure
   } yield hcounter.depth).getOrElse(0)
 
-  def coSize(sketch: S[_]): Int = (for {
+  def counterSize(sketch: S[_]): Int = (for {
     structure <- sketch.structures.headOption
     (_, hcounter) = structure
   } yield hcounter.width).getOrElse(0) // sketch.structures.headOption.map { case (_, hcounter) => hcounter.structures.size }.getOrElse(0)

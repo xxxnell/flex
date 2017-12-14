@@ -51,7 +51,7 @@ trait CmapSyntax {
 object Cmap extends CmapOps[Cmap] {
 
   def apply(conf: CmapConf): Cmap = conf match {
-    case conf: UniformCmapConf => Cmap.uniform(conf.no, conf.start, conf.end)
+    case conf: UniformCmapConf => Cmap.uniform(conf.size, conf.start, conf.end)
     case _ => ???
   }
 
