@@ -74,9 +74,7 @@ class CmapSpec extends Specification with ScalaCheck {
 
 object CmapGen {
   
-  def cmapGen: Gen[(Int, Cmap)] = for {
-    n <- Gen.choose(1, 10)
-  } yield (n, Cmap.uniform(n))
+  def cmapGen: Gen[(Int, Cmap)] = UniformCmapGen.uniformCmapGen
 
   def dividerGen: Gen[List[Double]] = for {
     from <- Gen.choose(0, 100)
