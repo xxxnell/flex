@@ -2,6 +2,8 @@ package sketch.scope.pdf.monad
 
 import sketch.scope.pdf.{Dist, SmoothDist}
 
+import scala.language.higherKinds
+
 /**
   * Licensed by Probe Technology, Inc.
   */
