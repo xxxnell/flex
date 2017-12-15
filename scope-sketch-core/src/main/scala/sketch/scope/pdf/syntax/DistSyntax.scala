@@ -3,6 +3,8 @@ package sketch.scope.pdf.syntax
 import sketch.scope.measure.Measure
 import sketch.scope.pdf.monad.{DistBind, DistFunctor, DistMonad}
 import sketch.scope.pdf.{Dist, SampledDist, Sketch}
+import sketch.scope.plot.AsciiArtPlot
+import sketch.scope.range.RangeM
 
 import scala.language.higherKinds
 
@@ -17,6 +19,7 @@ trait DistPropSyntax {
     def probability(from: A, to: A): Option[Double] = Dist.probability(dist, from, to)
     def sample: (Dist[A], A) = Dist.sample(dist)
     def samples(n: Int): (Dist[A], List[A]) = Dist.samples(dist, n)
+    def histogram(ranges: List[RangeM[A]]): String = AsciiArtPlot.histogram(dist, ranges)
   }
 
 }

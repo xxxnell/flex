@@ -3,6 +3,9 @@ package sketch.scope.range
 import sketch.scope.measure.Measure
 import sketch.scope.pdf.Prim
 
+import scala.collection.immutable.NumericRange
+import scala.language.{higherKinds, implicitConversions}
+
 /**
   * Licensed by Probe Technology, Inc.
   */
@@ -43,6 +46,18 @@ trait RangeMOps[R[_]<:RangeM[_]] {
 
 trait RangeMSyntax {
 
+  implicit def scalaRange2RangeMs(range: Range): List[RangeM[Int]] =
+    scalaNumericRange2RangeMs(NumericRange(range.start, range.end, range.step))
+
+  implicit def scalaNumericRange2RangeMs[A](range: NumericRange[A])
+                                           (implicit measure: Measure[A]): List[RangeM[A]] =
+    range.toList
+      .grouped(2).toList
+      .flatMap {
+        case a1 :: a2 :: Nil => Some((a1, a2))
+        case _ => None
+      }.map { case (start, end) => RangeM(start, end) }
+
   implicit class RangeMSyntaxImpl[A](range: RangeM[A]) {
     def contains(a: A): Boolean = RangeM.contains(range, a)
     def middle: A = RangeM.middle(range)
@@ -50,4 +65,12 @@ trait RangeMSyntax {
 
 }
 
-object RangeM extends RangeMOps[RangeM]
+object RangeM extends RangeMOps[RangeM] {
+
+  case class RangeMImpl[A](start: A, end: A, measure: Measure[A]) extends RangeM[A]
+
+  def apply[A](start: A, end: A)(implicit measure: Measure[A]): RangeM[A] = bare(start, end, measure)
+
+  def bare[A](start: A, end: A, measure: Measure[A]): RangeM[A] = RangeMImpl(start, end, measure)
+
+}
