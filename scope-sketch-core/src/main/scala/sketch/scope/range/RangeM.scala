@@ -52,7 +52,7 @@ trait RangeMSyntax {
   implicit def scalaNumericRange2RangeMs[A](range: NumericRange[A])
                                            (implicit measure: Measure[A]): List[RangeM[A]] =
     range.toList
-      .grouped(2).toList
+      .sliding(2).toList
       .flatMap {
         case a1 :: a2 :: Nil => Some((a1, a2))
         case _ => None
