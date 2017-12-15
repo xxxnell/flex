@@ -51,13 +51,13 @@ trait CmapSyntax {
 object Cmap extends CmapOps[Cmap] {
 
   def apply(conf: CmapConf): Cmap = conf match {
-    case conf: UniformCmapConf => Cmap.uniform(conf.no, conf.start, conf.end)
+    case conf: UniformCmapConf => Cmap.uniform(conf.size, conf.start, conf.end)
     case _ => ???
   }
 
-  def uniform(n: Int, start: Option[Prim] = None, end: Option[Prim] = None): Cmap = UniformCmap(n, start, end)
+  def uniform(n: Int, start: Option[Prim] = None, end: Option[Prim] = None): UniformCmap = UniformCmap(n, start, end)
 
-  def divider(divider: List[Prim]): Cmap = DividerCmap(divider)
+  def divider(divider: List[Prim]): DividerCmap = DividerCmap(divider)
 
   def bin(cmap: Cmap): List[Range] = cmap match {
     case cmap: DividerCmap => DividerCmap.bin(cmap)

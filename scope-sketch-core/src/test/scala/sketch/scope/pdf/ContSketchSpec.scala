@@ -14,6 +14,7 @@ class ContSketchSpec extends Specification with ScalaCheck {
   "ContSketch" should {
 
     "empty" in {
+      // construct
       val (cmapSize, cmapNo, cmapMin, cmapMax) = (5, 100, -100, 100)
       val (counterSize, counterNo) = (10, 2)
       implicit val conf: SketchConf = SketchConf(
@@ -22,32 +23,27 @@ class ContSketchSpec extends Specification with ScalaCheck {
       )
       val contSketch = ContSketch.empty[Int]
 
-      val testCaDepth = contSketch.structures.lengthCompare(cmapNo) == 0
-
-      val testCaSize = contSketch
+      // test
+      val strSize = contSketch.structures.size
+      val cmapSizes = contSketch
         .structures
-        .map { case (cmap, hcounter) => cmap.size - 1 }
-        .forall(_ == cmapSize)
-
-      val testCoDepth = contSketch
+        .map { case (cmap, hcounter) => cmap.size }
+      val counterNos = contSketch
         .structures
         .map { case (cmap, hcounter) => hcounter.depth }
-        .forall(_ == counterNo)
-
-      val testCoSize = contSketch
+      val counterSizes = contSketch
         .structures
         .map { case (cmap, hcounter) => hcounter.width }
-        .forall(_ == counterSize)
 
-      if(testCaDepth &&
-        testCaSize &&
-        testCoDepth &&
-        testCoSize) ok
+      if(strSize == cmapNo &&
+        cmapSizes.forall(_ == cmapSize) &&
+        counterNos.forall(_ == counterNo) &&
+        counterSizes.forall(_ == counterSize)) ok
       else ko(
-        s"testCaDepth: $testCaDepth, " +
-          s"testCaSize: $testCaSize, " +
-          s"testCoDepth: $testCoDepth, " +
-          s"testCoSize: $testCoSize"
+        s"strSize: $strSize (expected: $cmapNo), " +
+          s"cmapSizes: $cmapSizes (expected: $cmapSize), " +
+          s"counterNos: $counterNos (expected: $counterNo), " +
+          s"counterSizes: $counterSizes (expected: $counterSize)"
       )
     }
 
