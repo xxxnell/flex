@@ -15,3 +15,4 @@ after_success:
 
 notifications:
   slack: fpstudymeetup:49hLJXAjJrK04GUSIC9MdKB4
+  email: false
