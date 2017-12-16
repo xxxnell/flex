@@ -1,73 +1,50 @@
 package sketch.scope.pdf
 
+import sketch.scope.cmap.Cmap
 import sketch.scope.conf.SketchConf
+import sketch.scope.hcounter.HCounter
 import sketch.scope.measure.Measure
 
 /**
   * Licensed by Probe Technology, Inc.
-  *
-  *
   */
-trait PeriodicSketch[A] extends Sketch[A] {
+trait PeriodicSketch[A] extends RecurSketch[A] {
 
-  def periods: Stream[Double]
+  val period: Double
 
-}
-
-trait PeriodicSketchOps[S[_]<:PeriodicSketch[_]] extends SketchPrimPropOps[S] with PeriodicSketchLaws[S] { self =>
-
-  def modifyPeriods[A](sketch: S[A], f: Stream[Double] => Option[Stream[Double]]): Option[S[A]]
+  val thresholds: Stream[Double] = Stream.from(1).map(i => period * i)
 
 }
 
-trait PeriodicSketchLaws[S[_]<:PeriodicSketch[_]] { self: PeriodicSketchOps[S] =>
+object PeriodicSketch extends RecurSketchOps[PeriodicSketch] {
 
-  def dropPeriod[A](sketch: S[A]): Option[S[A]] = modifyPeriods(sketch, periods => Some(periods.drop(1)))
-
-  def update[A](sketch: S[A], as: List[(A, Count)]): Option[S[A]] = for {
-    nextPeriod <- sketch.periods.headOption
-    utdSketch1 <- narrowUpdate[A](sketch, as)
-    sum = self.sum(utdSketch1)
-    utdSketch2 <- if(nextPeriod < sum) for {
-      rearrangedSketch <- rearrange(utdSketch1)
-      droppedSketch <- dropPeriod(rearrangedSketch)
-    } yield droppedSketch else Some(utdSketch1)
-  } yield utdSketch2
-
-}
-
-object PeriodicSketch extends PeriodicSketchOps[PeriodicSketch] {
-
-  private case class PeriodicSketchImpl[A](measure: Measure[A],
-                                           structures: Structures,
-                                           conf: SketchConf,
-                                           periods: Stream[Double])
+  case class PeriodicSketchImpl[A](measure: Measure[A],
+                                   structures: List[(Cmap, HCounter)],
+                                   conf: SketchConf,
+                                   period: Double)
     extends PeriodicSketch[A]
 
-  def apply[A](measure: Measure[A],
-               structure: Structures,
-               conf: SketchConf,
-               periods: Stream[Double]): PeriodicSketch[A] =
-    bare(measure, structure, conf, periods)
+  val defaultPeriod = 100
 
   def bare[A](measure: Measure[A],
-              structure: Structures,
-              conf: SketchConf,
-              periods: Stream[Double]): PeriodicSketch[A] =
-    PeriodicSketchImpl(measure, structure, conf, periods)
+             structures: List[(Cmap, HCounter)],
+             conf: SketchConf,
+             period: Double): PeriodicSketch[A] = PeriodicSketchImpl(measure, structures, conf, period)
 
-  def empty[A](implicit measure: Measure[A], conf: SketchConf): PeriodicSketch[A] = cont(measure, conf)
+  def empty[A](implicit measure: Measure[A], conf: SketchConf): PeriodicSketch[A] = emptyForPeriod(defaultPeriod)
 
-  def cont[A](measure: Measure[A], conf: SketchConf): PeriodicSketch[A] = ContSketch.empty(measure, conf)
+  def emptyForPeriod[A](period: Double)(implicit measure: Measure[A], conf: SketchConf): PeriodicSketch[A] = {
+    val structure = (1 to conf.cmap.no).toList
+      .map(_ => (Cmap(conf.cmap), HCounter(conf.counter)))
+    bare(measure, structure, conf, period)
+  }
+
+  def modifyThresholds[A](sketch: PeriodicSketch[A],
+                          f: Stream[Double] => Option[Stream[Double]]): Option[PeriodicSketch[A]] = ???
 
   def modifyStructure[A](sketch: PeriodicSketch[A],
-                         f: Structures => Option[Structures]): Option[PeriodicSketch[A]] =
-    f(sketch.structures).map(structure => bare(sketch.measure, structure, sketch.conf, sketch.periods))
+                         f: Structures => Option[Structures]): Option[PeriodicSketch[A]] = ???
 
-  def modifyPeriods[A](sketch: PeriodicSketch[A],
-                       f: Stream[Double] => Option[Stream[Double]]): Option[PeriodicSketch[A]] =
-    f(sketch.periods).map(period => bare(sketch.measure, sketch.structures, sketch.conf, period))
-
-  def sample[A](sketch: PeriodicSketch[A]): (PeriodicSketch[A], A) = ???
+  def sample[A](dist: PeriodicSketch[A]): (PeriodicSketch[A], A) = ???
 
 }

@@ -69,19 +69,19 @@ object Sketch extends SketchPrimPropOps[Sketch] {
   /**
     * @param measure  measure of Sketch
     * */
-  def empty[A](implicit measure: Measure[A], conf: SketchConf): Sketch[A] = PeriodicSketch.empty(measure, conf)
+  def empty[A](implicit measure: Measure[A], conf: SketchConf): Sketch[A] = RecurSketch.empty(measure, conf)
 
   // mapping ops
 
   def modifyStructure[A](sketch: Sketch[A], f: Structures => Option[Structures]): Option[Sketch[A]] = sketch match {
-    case sketch: PeriodicSketch[_] => PeriodicSketch.modifyStructure(sketch, f)
+    case sketch: RecurSketch[_] => RecurSketch.modifyStructure(sketch, f)
     case _ => SimpleSketch.modifyStructure(sketch, f)
   }
 
   // syntatic sugars
 
   def update[A](sketch: Sketch[A], as: List[(A, Count)]): Option[Sketch[A]] = sketch match {
-    case sketch: PeriodicSketch[A] => PeriodicSketch.update(sketch, as)
+    case sketch: RecurSketch[A] => RecurSketch.update(sketch, as)
     case _ => narrowUpdate(sketch, as)
   }
 

@@ -1,7 +1,6 @@
-package sketch.scope.pdf
+package sketch.scope.measure
 
 import org.scalacheck.Gen
-import sketch.scope.measure._
 
 /**
   * Licensed by Probe Technology, Inc.
