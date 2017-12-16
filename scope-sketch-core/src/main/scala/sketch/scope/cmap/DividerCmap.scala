@@ -18,6 +18,9 @@ trait DividerCmap extends Cmap {
 
   def apply(a: Double): HDim = index.to(a).lastOption.fold(0){ case (_, idx) => idx + 1 }
 
+  override def equals(other: Any): Boolean = other.isInstanceOf[DividerCmap] &&
+    (divider == other.asInstanceOf[DividerCmap].divider)
+
 }
 
 trait DividerCmapOps[DC<:DividerCmap] extends CmapOps[DC] {
