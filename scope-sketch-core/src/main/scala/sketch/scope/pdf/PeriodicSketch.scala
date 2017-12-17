@@ -10,41 +10,39 @@ import sketch.scope.measure.Measure
   */
 trait PeriodicSketch[A] extends RecurSketch[A] {
 
+  val start: Double
+
   val period: Double
 
-  val thresholds: Stream[Double] = Stream.from(1).map(i => period * i)
+  val thresholds: Stream[Double] = Stream.from(0).map(i => start + period * i)
 
 }
 
-object PeriodicSketch extends RecurSketchOps[PeriodicSketch] {
+object PeriodicSketch {
 
   case class PeriodicSketchImpl[A](measure: Measure[A],
                                    structures: List[(Cmap, HCounter)],
                                    conf: SketchConf,
+                                   start: Double,
                                    period: Double)
     extends PeriodicSketch[A]
 
   val defaultPeriod = 100
 
   def bare[A](measure: Measure[A],
-             structures: List[(Cmap, HCounter)],
-             conf: SketchConf,
-             period: Double): PeriodicSketch[A] = PeriodicSketchImpl(measure, structures, conf, period)
+              structures: List[(Cmap, HCounter)],
+              conf: SketchConf,
+              start: Double,
+              period: Double): PeriodicSketch[A] = PeriodicSketchImpl(measure, structures, conf, start, period)
 
-  def empty[A](implicit measure: Measure[A], conf: SketchConf): PeriodicSketch[A] = emptyForPeriod(defaultPeriod)
+  def empty[A](implicit measure: Measure[A], conf: SketchConf): PeriodicSketch[A] =
+    emptyForPeriod(defaultPeriod, defaultPeriod)
 
-  def emptyForPeriod[A](period: Double)(implicit measure: Measure[A], conf: SketchConf): PeriodicSketch[A] = {
+  def emptyForPeriod[A](start: Double, period: Double)
+                       (implicit measure: Measure[A], conf: SketchConf): PeriodicSketch[A] = {
     val structure = (1 to conf.cmap.no).toList
       .map(_ => (Cmap(conf.cmap), HCounter(conf.counter)))
-    bare(measure, structure, conf, period)
+    bare(measure, structure, conf, start, period)
   }
-
-  def modifyThresholds[A](sketch: PeriodicSketch[A],
-                          f: Stream[Double] => Option[Stream[Double]]): Option[PeriodicSketch[A]] = ???
-
-  def modifyStructure[A](sketch: PeriodicSketch[A],
-                         f: Structures => Option[Structures]): Option[PeriodicSketch[A]] = ???
-
-  def sample[A](dist: PeriodicSketch[A]): (PeriodicSketch[A], A) = ???
 
 }

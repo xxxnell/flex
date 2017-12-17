@@ -64,18 +64,18 @@ object RecurSketch extends RecurSketchOps[RecurSketch] {
 
   def modifyStructure[A](sketch: RecurSketch[A],
                          f: Structures => Option[Structures]): Option[RecurSketch[A]] = sketch match {
-    case periodic: PeriodicSketch[A] => PeriodicSketch.modifyStructure(periodic, f)
+//    case periodic: PeriodicSketch[A] => PeriodicSketch.modifyStructure(periodic, f)
     case _ => f(sketch.structures).map(structure => bare(sketch.measure, structure, sketch.conf, sketch.thresholds))
   }
 
   def modifyThresholds[A](sketch: RecurSketch[A],
                           f: Stream[Double] => Option[Stream[Double]]): Option[RecurSketch[A]] = sketch match {
-    case periodic: PeriodicSketch[A] => PeriodicSketch.modifyThresholds(periodic, f)
+//    case periodic: PeriodicSketch[A] => PeriodicSketch.modifyThresholds(periodic, f)
     case _ => f(sketch.thresholds).map(threshold => bare(sketch.measure, sketch.structures, sketch.conf, threshold))
   }
 
   def sample[A](sketch: RecurSketch[A]): (RecurSketch[A], A) = sketch match {
-    case periodic: PeriodicSketch[A] => PeriodicSketch.sample(periodic)
+//    case periodic: PeriodicSketch[A] => PeriodicSketch.sample(periodic)
     case _ => ???
   }
 
