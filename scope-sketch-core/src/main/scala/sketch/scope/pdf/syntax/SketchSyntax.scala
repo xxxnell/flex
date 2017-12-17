@@ -1,5 +1,6 @@
 package sketch.scope.pdf.syntax
 
+import sketch.scope.cmap.Cmap
 import sketch.scope.measure.Measure
 import sketch.scope.pdf.{Count, Dist, Prim, Range, Sketch}
 import sketch.scope.pdf.monad.{DistFunctor, SketchMonad}
@@ -25,6 +26,7 @@ trait SketchPropSyntax {
     def caSize: Int = Sketch.cmapSize(sketch)
     def coDepth: Int = Sketch.counterNo(sketch)
     def coSize: Int = Sketch.counterSize(sketch)
+    def lastCmap: Option[Cmap] = Sketch.lastCmap(sketch)
   }
 
 }

@@ -23,17 +23,17 @@ class PeriodicSketchSpec extends Specification with ScalaCheck {
         CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
         CounterConf(counterSize, counterNo)
       )
-      val contSketch = PeriodicSketch.empty[Int]
-
+      val periodicSketch = PeriodicSketch.empty[Int]
+      
       // test
-      val strSize = contSketch.structures.size
-      val cmapSizes = contSketch
+      val strSize = periodicSketch.structures.size
+      val cmapSizes = periodicSketch
         .structures
         .map { case (cmap, hcounter) => cmap.size }
-      val counterNos = contSketch
+      val counterNos = periodicSketch
         .structures
         .map { case (cmap, hcounter) => hcounter.depth }
-      val counterSizes = contSketch
+      val counterSizes = periodicSketch
         .structures
         .map { case (cmap, hcounter) => hcounter.width }
 
@@ -51,9 +51,9 @@ class PeriodicSketchSpec extends Specification with ScalaCheck {
 
     "periods" in {
       (for {
-        contSketch <- PeriodicSketchGen.periodicSketchSample
-      } yield contSketch)
-        .fold(ko)(contsketch => ok)
+        periodicSketch <- PeriodicSketchGen.periodicSketchSample
+      } yield periodicSketch)
+        .fold(ko)(periodicSketch => ok)
     }
 
     "update" in {

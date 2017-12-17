@@ -1,5 +1,6 @@
 package sketch.scope.pdf
 
+import sketch.scope.cmap.Cmap
 import sketch.scope.conf.SketchConf
 import sketch.scope.measure.Measure
 
@@ -58,6 +59,11 @@ trait SketchPropLaws[S[_]<:Sketch[_]] { self: SketchPropOps[S] =>
     structure <- sketch.structures.headOption
     (_, hcounter) = structure
   } yield hcounter.width).getOrElse(0) // sketch.structures.headOption.map { case (_, hcounter) => hcounter.structures.size }.getOrElse(0)
+
+  def lastCmap(sketch: S[_]): Option[Cmap] = for {
+    structure <- sketch.structures.lastOption
+    cmap = structure._1
+  } yield cmap
 
 }
 

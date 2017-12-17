@@ -24,6 +24,8 @@ trait DividerCmap extends Cmap {
   override def equals(other: Any): Boolean = other.isInstanceOf[DividerCmap] &&
     (divider == other.asInstanceOf[DividerCmap].divider)
 
+  override def toString: String = s"DividerCmap($divider)"
+
 }
 
 trait DividerCmapOps[DC<:DividerCmap] extends CmapOps[DC] {
