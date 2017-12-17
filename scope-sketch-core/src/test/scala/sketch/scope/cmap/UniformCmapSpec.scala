@@ -30,46 +30,71 @@ class UniformCmapSpec extends Specification with ScalaCheck {
           val cond2 = cmap(Double.MaxValue) == size - 1
           if (cond1 && cond2) ok
           else ko(
-            s"cmap(Double.MinValue): ${cmap(Double.MinValue)}, " +
+            s"size: $size, " +
+              s"cmap(Double.MinValue): ${cmap(Double.MinValue)}, " +
               s"cmap(Double.MaxValue): ${cmap(Double.MaxValue)}"
           )
         }.setArbitrary(cmapGen)
       }
 
       "UniformCmap: lower bound" in {
-        implicit val cmapGen: Arbitrary[(Int, Prim, UniformCmap)] = Arbitrary(UniformCmapGen.uniformCmapGen2)
 
-        prop { (cmapGenProps: (Int, Prim, UniformCmap) ) =>
-          val (size, start, cmap) = cmapGenProps
+        "boundaries" in {
+          implicit val cmapGen: Arbitrary[(Int, Prim, UniformCmap)] = Arbitrary(UniformCmapGen.uniformCmapGen2)
 
-          val cond1 = cmap(Double.MinValue) == 0
-          val cond2 = cmap(Double.MaxValue) == size - 1
-          val cond3 = cmap(start) == 1
-          if(cond1 && cond2 && cond3) ok
-          else ko(
-            s"cmap(Double.MinValue): ${cmap(Double.MinValue)}, " +
-              s"cmap(Double.MaxValue): ${cmap(Double.MaxValue)}, " +
-              s"cmap(start): ${cmap(start)}"
-          )
-        }.setArbitrary(cmapGen)
+          prop { (cmapGenProps: (Int, Prim, UniformCmap) ) =>
+            val (size, start, cmap) = cmapGenProps
+            val delta = ((BigDecimal(Double.MaxValue) - BigDecimal(start)) / size * 0.1).toDouble
+
+            val cond1 = cmap(Double.MinValue) == 0
+            val cond2 = cmap(Double.MaxValue) == size - 1
+            val cond3 = cmap(start + delta) == 1
+            if(cond1 && cond2 && cond3) ok
+            else ko(
+              s"size: $size, " +
+                s"start: $start, " +
+                s"start + delta: ${start + delta}, " +
+                s"cmap(Double.MinValue): ${cmap(Double.MinValue)}, " +
+                s"cmap(Double.MaxValue): ${cmap(Double.MaxValue)}, " +
+                s"cmap(start + delta): ${cmap(start + delta)}"
+            )
+          }.setArbitrary(cmapGen)
+        }
+
       }
 
       "UniformCmap: upper bound" in {
-        implicit val cmapGen: Arbitrary[(Int, Prim, UniformCmap)] = Arbitrary(UniformCmapGen.uniformCmapGen3)
 
-        prop { (cmapGenProps: (Int, Prim, UniformCmap) ) =>
-          val (size, end, cmap) = cmapGenProps
+        "boundaries" in {
+          implicit val cmapGen: Arbitrary[(Int, Prim, UniformCmap)] = Arbitrary(UniformCmapGen.uniformCmapGen3)
 
-          val cond1 = cmap(Double.MinValue) == 0
-          val cond2 = cmap(Double.MaxValue) == size - 1
-          val cond3 = cmap(end) == size - 1
-          if(cond1 && cond2 && cond3) ok
-          else ko(
-            s"cmap(Double.MinValue): ${cmap(Double.MinValue)}, " +
-              s"cmap(Double.MaxValue): ${cmap(Double.MaxValue)}, " +
-              s"cmap(end): ${cmap(end)}"
-          )
-        }.setArbitrary(cmapGen)
+          prop { (cmapGenProps: (Int, Prim, UniformCmap) ) =>
+            val (size, end, cmap) = cmapGenProps
+            val delta = ((BigDecimal(end) - BigDecimal(Double.MaxValue)) / size * 0.1).toDouble
+
+            val cond1 = cmap(Double.MinValue) == 0
+            val cond2 = cmap(Double.MaxValue) == size - 1
+            val cond3 = cmap(end + delta) == size - 1
+            if(cond1 && cond2 && cond3) ok
+            else ko(
+              s"size: $size, " +
+                s"end: $end, " +
+                s"cmap(Double.MinValue): ${cmap(Double.MinValue)}, " +
+                s"cmap(Double.MaxValue): ${cmap(Double.MaxValue)}, " +
+                s"cmap(end + delta): ${cmap(end + delta)}"
+            )
+          }.setArbitrary(cmapGen)
+        }
+
+        "sample" in {
+          val (n, end) = (3, 0)
+          val cmap = UniformCmap(n, None, Some(end))
+          val cond1 = cmap(Double.MinValue / 2) == 1
+          val cond2 = cmap(0) == 2
+
+          if(cond1 && cond2) ok else ko(s"n: $n, end: $end, divider: ${cmap.divider}")
+        }
+
       }
 
       "UniformCmap: lower and upper bound" in {
@@ -77,17 +102,21 @@ class UniformCmapSpec extends Specification with ScalaCheck {
 
         prop { (cmapGenProps: (Int, Prim, Prim, UniformCmap) ) =>
           val (size, start, end, cmap) = cmapGenProps
+          val delta = ((BigDecimal(end) - BigDecimal(start)) / size * 0.1).toDouble
 
           val cond1 = cmap(Double.MinValue) == 0
           val cond2 = cmap(Double.MaxValue) == size - 1
-          val cond3 = cmap(start) == 1
-          val cond4 = cmap(end) == size - 1
+          val cond3 = cmap(start + delta) == 1
+          val cond4 = cmap(end + delta) == size - 1
           if(cond1 && cond2 && cond3 && cond4) ok
           else ko(
-            s"cmap(Double.MinValue): ${cmap(Double.MinValue)}, " +
+            s"size: $size, " +
+              s"start: $start, " +
+              s"end: $end, " +
+              s"cmap(Double.MinValue): ${cmap(Double.MinValue)}, " +
               s"cmap(Double.MaxValue): ${cmap(Double.MaxValue)}, " +
-              s"cmap(start): ${cmap(start)}, " +
-              s"cmap(end): ${cmap(end)}"
+              s"cmap(start + delta): ${cmap(start + delta)}, " +
+              s"cmap(end + delta): ${cmap(end + delta)}"
           )
         }.setArbitrary(cmapGen)
       }
