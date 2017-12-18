@@ -8,7 +8,7 @@ import sketch.scope.plot._
 /**
   * Licensed by Probe Technology, Inc.
   */
-trait UniformCdfUpdate {
+trait EqualSpaceCdfUpdate {
 
   def updateCmap(sketch: Sketch[_], ps: List[(Prim, Count)], mixingRate: Double, window: Double): Option[Cmap] = for {
     sketchPlot <- sketch.densityPlot
@@ -30,4 +30,4 @@ trait UniformCdfUpdate {
 
 }
 
-object UniformCdfUpdate extends UniformCdfUpdate
+object EqualSpaceCdfUpdate extends EqualSpaceCdfUpdate

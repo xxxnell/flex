@@ -46,7 +46,7 @@ class SketchSpec extends Specification with ScalaCheck {
           )
           val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
           val sketch1O = sketch0.deepUpdate(1).map(_._1)
-          
+
           if(sketch0.lastCmap != sketch1O.flatMap(_.lastCmap)) ok
           else ko(s"cmap1: ${sketch0.lastCmap}, cmap2: ${sketch1O.flatMap(_.lastCmap)}")
         }
@@ -72,33 +72,57 @@ class SketchSpec extends Specification with ScalaCheck {
 
       }
 
-      "get" in {
-        (for {
-          sketch <- SketchGen.intSketchSample
-          updated <- sketch.update(1)
-          res <- sketch.count(0, 10)
-        } yield res)
-          .fold(ko)(sketch => ok)
+      "count" in {
+
+        "basic" in {
+          val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 1, 0, 10)
+          val (counterSize, counterNo) = (2, 1)
+          implicit val conf: SketchConf = SketchConf(
+            CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
+            CounterConf(counterSize, counterNo)
+          )
+          val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
+
+          (for {
+            sketch1 <- sketch0.update(1)
+            count <- sketch1.count(0, 10)
+            _ = println(sketch1)
+            _ = println(count)
+          } yield count)
+            .fold(ko)(count => if(count > 0 && count < 1) ok else ko(s"count: $count"))
+        }
+
+        "empty" in {
+          val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 1, 0, 10)
+          val (counterSize, counterNo) = (2, 1)
+          implicit val conf: SketchConf = SketchConf(
+            CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
+            CounterConf(counterSize, counterNo)
+          )
+          val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
+
+          (for {
+            count <- sketch0.count(0, 10)
+          } yield count)
+            .fold(ko)(count => if(count == 0) ok else ko(s"count: $count"))
+        }
+
       }
 
-    }
+      "sum" in {
+        val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 1, 0, 10)
+        val (counterSize, counterNo) = (2, 1)
+        implicit val conf: SketchConf = SketchConf(
+          CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
+          CounterConf(counterSize, counterNo)
+        )
+        val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
 
-    "Monad Ops" in {
-
-      "map" in {
         (for {
-          sketch <- SketchGen.intSketchSample
-          utdSketch = sketch.map(i => -1 * i)
-        } yield utdSketch)
-          .fold(ko)(sketch => ok)
-      }
-
-      "flatMap" in {
-        (for {
-          sketch <- SketchGen.intSketchSample
-          utdSketch = sketch.flatMap(i => NormalDist[Double](doubleMeasure, i, 1))
-        } yield utdSketch)
-          .fold(ko)(sketch => ok)
+          sketch1 <- sketch0.update(1)
+          sum = sketch1.sum
+        } yield sum)
+          .fold(ko)(sum => if(sum > 0 && sum <= 1) ok else ko(s"sum: $sum"))
       }
 
     }
