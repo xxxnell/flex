@@ -14,6 +14,11 @@ trait HCounter {
 
   def sum: Double
 
+  override def toString: String = {
+    val structuresStr = structures.map { case (hmap, counter) => s"($hmap, $counter)" }.mkString(", ")
+    s"HCounter($structuresStr)"
+  }
+
 }
 
 trait HCounterOps[HC<:HCounter] {

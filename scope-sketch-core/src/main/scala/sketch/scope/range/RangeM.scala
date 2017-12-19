@@ -42,6 +42,8 @@ trait RangeMOps[R[_]<:RangeM[_]] {
   def middle[A](range: R[A]): A =
     range.measure.asInstanceOf[Measure[A]].from(middleP(primStart(range), primEnd(range)))
 
+  def forward(range: R[_]): Boolean = if(primStart(range) - primEnd(range) >= 0) true else false
+
 }
 
 trait RangeMSyntax {
@@ -71,6 +73,8 @@ object RangeM extends RangeMOps[RangeM] {
 
   def apply[A](start: A, end: A)(implicit measure: Measure[A]): RangeM[A] = bare(start, end, measure)
 
-  def bare[A](start: A, end: A, measure: Measure[A]): RangeM[A] = RangeMImpl(start, end, measure)
+  def bare[A](start: A, end: A, measure: Measure[A]): RangeM[A] = {
+    if(measure(start) < measure(end)) RangeMImpl(start, end, measure) else RangeMImpl(end, start, measure)
+  }
 
 }

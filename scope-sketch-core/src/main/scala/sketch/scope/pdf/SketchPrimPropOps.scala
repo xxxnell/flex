@@ -68,33 +68,36 @@ trait SketchPrimPropOps[S[_]<:Sketch[_]] extends SketchPrimPropLaws[S] with Sket
 
   // Read ops
 
-  def singleCount(cmap: Cmap, hcounter: HCounter, pFrom: Double, pTo: Double): Option[Double] = {
-    val (fromHdim, toHdim) = (cmap.apply(pFrom), cmap.apply(pTo))
-    val (fromRng, toRng) = (cmap.range(fromHdim), cmap.range(toHdim))
+  def singleCount(cmap: Cmap, hcounter: HCounter, pStart: Double, pEnd: Double): Option[Double] = {
+    val (startHdim, endHdim) = (cmap.apply(pStart), cmap.apply(pEnd))
+    val (startRng, endRng) = (cmap.range(startHdim), cmap.range(endHdim))
 
     // mid count
-    val midRangeO: Option[(HDim, HDim)] = if((toHdim-1) > (fromHdim+1)) {
-      Some((fromHdim + 1, toHdim - 1))
+    val midRangeO: Option[(HDim, HDim)] = if((endHdim - 1) > (startHdim + 1)) {
+      Some((startHdim + 1, endHdim - 1))
     } else None
-    val midCountO = midRangeO.fold(Option(0.0)){ case (from, to) => hcounter.count(from, to) }
+    val midCountO: Option[Double] = midRangeO.map { case (midStart, midEnd) => hcounter.count(midStart, midEnd) }
+      .getOrElse(Option(0d))
 
-    // from count
-    val fromDensityO = hcounter.count(fromHdim, fromHdim).map(c => c / (fromRng.end - fromRng.start))
-    val fromCountO = fromDensityO.map(density => (fromRng.end - pFrom) * density)
-
-    // to count
-    val toDensityO = hcounter.count(toHdim, toHdim).map(c => c / (toRng.end - toRng.start))
-    val toCountO = toDensityO.map(density => (pTo - toRng.start) * density)
+    val boundaryCountO = if(startHdim == endHdim) for {
+      count <- hcounter.get(startHdim)
+      percent = startRng.overlapPercent(RangeP(pStart, pEnd))
+    } yield count * percent else for {
+      startCount <- hcounter.get(startHdim)
+      startPercent = startRng.overlapPercent(RangeP(pStart, startRng.end))
+      endCount <- hcounter.get(endHdim)
+      endPercent = endRng.overlapPercent(RangeP(endRng.start, pEnd))
+    } yield startCount * startPercent + endCount * endPercent
 
     for {
-      toCount <- toCountO
-      fromCount <- fromCountO
+      boundartCount <- boundaryCountO
       midCount <- midCountO
-    } yield toCount + fromCount + midCount
+    } yield midCount + boundartCount
   }
 
   def primCount(sketch: S[_], pFrom: Prim, pTo: Prim): Option[Double] = {
     val countsO = sketch.structures.traverse { case (cmap, hcounter) => singleCount(cmap, hcounter, pFrom, pTo) }
+
     countsO.map(counts => counts.sum / counts.size)
   }
 
@@ -139,7 +142,7 @@ trait SketchPrimPropLaws[S[_]<:Sketch[_]] { self: SketchPrimPropOps[S] =>
   def countPlot(sketch: S[_]): Option[CountPlot] = for {
     cmapHcounter <- sketch.structures.lastOption
     (cmap, _) = cmapHcounter
-    ranges = cmap.bin.map(numRange => RangeP.forNumericRange(numRange))
+    ranges = cmap.bin
     counts <- ranges.traverse(range => primCount(sketch, range.start, range.end))
   } yield CountPlot.disjoint(ranges.zip(counts))
 

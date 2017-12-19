@@ -2,6 +2,7 @@ package sketch.scope.cmap
 
 import sketch.scope.hmap.HDim
 import sketch.scope.pdf._
+import sketch.scope.range.RangeP
 
 import scala.collection.immutable.TreeMap
 
@@ -40,19 +41,23 @@ trait DividerCmapOps[DC<:DividerCmap] extends CmapOps[DC] {
 
   val max: Prim = Double.MaxValue
 
-  def bin(cmap: DC): List[Range] = {
+  def bin(cmap: DC): List[RangeP] = {
     val divider = cmap.divider
-    (min :: divider).zip(divider :+ max).map { case (from, to) => (from to to).by(1) }
+
+    (min :: divider)
+      .zip(divider :+ max)
+      .map { case (start, end) => RangeP(start, end) }
   }
 
   def size(cmap: DC): Int = {
     cmap.divider.size + 1
   }
 
-  def range(cmap: DC, hdim: HDim): Range = {
-    val from = cmap.inverseIndex.get(hdim - 1).fold(min)(identity)
-    val to = cmap.inverseIndex.get(hdim).fold(max)(identity)
-    (from to to).by(1)
+  def range(cmap: DC, hdim: HDim): RangeP = {
+    val start = cmap.inverseIndex.getOrElse(hdim - 1, min)
+    val end = cmap.inverseIndex.getOrElse(hdim, max)
+
+    RangeP(start, end)
   }
 
 }

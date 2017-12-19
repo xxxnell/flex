@@ -4,6 +4,7 @@ import cats.data.Kleisli
 import sketch.scope.conf.{CmapConf, UniformCmapConf}
 import sketch.scope.hmap.HDim
 import sketch.scope.pdf._
+import sketch.scope.range.RangeP
 
 /**
   * Licensed by Probe Technology, Inc.
@@ -21,11 +22,11 @@ trait Cmap {
 
 trait CmapOps[C<:Cmap] extends CmapLaws[C] {
 
-  def bin(cmap: C): List[Range]
+  def bin(cmap: C): List[RangeP]
 
   def size(cmap: C): Int
 
-  def range(cmap: C, hdim: HDim): Range
+  def range(cmap: C, hdim: HDim): RangeP
 
 }
 
@@ -33,17 +34,17 @@ trait CmapLaws[C<:Cmap] { self: CmapOps[C] =>
 
   def kleisli(cmap: Cmap): Kleisli[Option, Prim, HDim] = Kleisli[Option, Double, HDim](a => Some(cmap.apply(a)))
 
-  def ranges(cmap: C): List[(HDim, Range)] = (for { i <- 0 until cmap.size } yield (i, range(cmap, i))).toList
+  def ranges(cmap: C): List[(HDim, RangeP)] = (for { i <- 0 until cmap.size } yield (i, range(cmap, i))).toList
 
 }
 
 trait CmapSyntax {
 
   implicit class CmapSyntaxImpl(cmap: Cmap) {
-    def bin: List[Range] = Cmap.bin(cmap)
+    def bin: List[RangeP] = Cmap.bin(cmap)
     def size: Int = Cmap.size(cmap)
-    def range(hdim: HDim): Range = Cmap.range(cmap, hdim)
-    def ranges: List[(HDim, Range)] = Cmap.ranges(cmap)
+    def range(hdim: HDim): RangeP = Cmap.range(cmap, hdim)
+    def ranges: List[(HDim, RangeP)] = Cmap.ranges(cmap)
   }
 
 }
@@ -59,7 +60,7 @@ object Cmap extends CmapOps[Cmap] {
 
   def divider(divider: List[Prim]): DividerCmap = DividerCmap(divider)
 
-  def bin(cmap: Cmap): List[Range] = cmap match {
+  def bin(cmap: Cmap): List[RangeP] = cmap match {
     case cmap: DividerCmap => DividerCmap.bin(cmap)
   }
 
@@ -67,7 +68,7 @@ object Cmap extends CmapOps[Cmap] {
     case cmap: DividerCmap => DividerCmap.size(cmap)
   }
 
-  def range(cmap: Cmap, hdim: HDim): Range = cmap match {
+  def range(cmap: Cmap, hdim: HDim): RangeP = cmap match {
     case cmap: DividerCmap => DividerCmap.range(cmap, hdim)
   }
 
