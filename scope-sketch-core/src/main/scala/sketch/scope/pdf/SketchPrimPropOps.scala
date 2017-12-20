@@ -152,7 +152,9 @@ trait SketchPrimPropLaws[S[_]<:Sketch[_]] { self: SketchPrimPropOps[S] =>
     for {
       plot <- countPlot(sketch)
     } yield DensityPlot.disjoint(
-      plot.records.map { case (range, value) => (range, value / (sum * (range.end - range.start))) }
+      plot.records
+        .map { case (range, value) => (range, if(sum != 0) value / (sum * range.length) else 0) }
+        .filter { case (_, value) => !value.isNaN }
     )
   }
 

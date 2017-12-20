@@ -102,7 +102,7 @@ trait PlotOps[P<:Plot] extends PlotLaws[P] {
         split(rem, b).fold((rem, acc)){ case (rec1, rec2) => (rec1, rec2 :: acc) }
       }
 
-    planarized
+    planarized.filter { case (range, _) => !range.isPoint }
   }
 
   def remove[A](xs: Vector[A], a: A): Vector[A] = {
