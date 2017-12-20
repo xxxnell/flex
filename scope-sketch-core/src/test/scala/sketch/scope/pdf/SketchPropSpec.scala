@@ -33,11 +33,49 @@ class SketchPropSpec extends Specification with ScalaCheck {
 
     }
 
+    "countPloy" in {
+      val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, 0, 10)
+      val (counterSize, counterNo) = (8, 2)
+      implicit val conf: SketchConf = SketchConf(
+        CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
+        CounterConf(counterSize, counterNo)
+      )
+      val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
+
+      sketch0.countPlot.fold(ko("Fail to call the countPlot."))(plot => {
+        val cond1 = plot.records.nonEmpty
+        val cond2 = plot.records.forall { case (_, value) => !value.isNaN }
+        if(cond1 && cond2) ok
+        else if(!cond1) ko("Plot record is empty.")
+        else if(!cond2) ko("Some value is NaN")
+        else ko
+      })
+    }
+
+    "densityPlot" in {
+      val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, 0, 10)
+      val (counterSize, counterNo) = (8, 2)
+      implicit val conf: SketchConf = SketchConf(
+        CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
+        CounterConf(counterSize, counterNo)
+      )
+      val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
+
+      sketch0.densityPlot.fold(ko("Fail to call the densityPlot."))(plot => {
+        val cond1 = plot.records.nonEmpty
+        val cond2 = plot.records.forall { case (_, value) => !value.isNaN }
+        if(cond1 && cond2) ok
+        else if(!cond1) ko("Plot record is empty.")
+        else if(!cond2) ko("Some value is NaN")
+        else ko
+      })
+    }
+
     "deepUpdate" in {
 
       "basic" in {
         val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, 0, 10)
-        val (counterSize, counterNo) = (2, 1)
+        val (counterSize, counterNo) = (8, 2)
         implicit val conf: SketchConf = SketchConf(
           CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
           CounterConf(counterSize, counterNo)
@@ -51,7 +89,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
 
       "2 times" in {
         val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, 0, 10)
-        val (counterSize, counterNo) = (2, 1)
+        val (counterSize, counterNo) = (8, 2)
         implicit val conf: SketchConf = SketchConf(
           CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
           CounterConf(counterSize, counterNo)
@@ -74,7 +112,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
 
       "basic" in {
         val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, 0, 10)
-        val (counterSize, counterNo) = (2, 1)
+        val (counterSize, counterNo) = (8, 2)
         implicit val conf: SketchConf = SketchConf(
           CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
           CounterConf(counterSize, counterNo)
@@ -90,7 +128,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
 
       "empty" in {
         val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, 0, 10)
-        val (counterSize, counterNo) = (2, 1)
+        val (counterSize, counterNo) = (8, 2)
         implicit val conf: SketchConf = SketchConf(
           CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
           CounterConf(counterSize, counterNo)
@@ -107,7 +145,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
 
     "sum" in {
       val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, 0, 10)
-      val (counterSize, counterNo) = (2, 1)
+      val (counterSize, counterNo) = (8, 2)
       implicit val conf: SketchConf = SketchConf(
         CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
         CounterConf(counterSize, counterNo)

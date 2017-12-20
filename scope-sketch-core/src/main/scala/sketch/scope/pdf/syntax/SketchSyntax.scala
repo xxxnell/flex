@@ -4,6 +4,7 @@ import sketch.scope.cmap.Cmap
 import sketch.scope.measure.Measure
 import sketch.scope.pdf.{Count, Dist, Prim, Range, Sketch, Structure}
 import sketch.scope.pdf.monad.{DistFunctor, SketchMonad}
+import sketch.scope.plot.CountPlot
 
 /**
   * Licensed by Probe Technology, Inc.
@@ -20,6 +21,7 @@ trait SketchPropSyntax {
     def narrowUpdate(as: A*): Option[Sketch[A]] = Sketch.narrowUpdate(sketch, as.toList.map(a => (a, 1d)))
     def deepUpdate(as: A*): Option[(Sketch[A], Structure)] = Sketch.deepUpdate(sketch, as.toList.map(a => (a, 1d)))
     def count(from: A, to: A): Option[Double] = Sketch.count(sketch, from, to)
+    def countPlot: Option[CountPlot] = Sketch.countPlot(sketch)
     def sum: Double = Sketch.sum(sketch)
     //    def clear: Sketch = Sketch.clear(sketch)
     def probability(from: A, to: A): Option[Double] = Sketch.probability(sketch, from, to)

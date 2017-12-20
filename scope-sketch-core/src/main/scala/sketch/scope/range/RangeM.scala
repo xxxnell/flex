@@ -22,6 +22,7 @@ trait RangeM[A] {
     measure.to(end) == otherR.measure.to(otherR.end)
   }
   override def hashCode(): Int = start.hashCode() + end.hashCode()
+  override def toString: String = s"[$start..$end]"
 }
 
 trait RangeMOps[R[_]<:RangeM[_]] {
@@ -42,7 +43,9 @@ trait RangeMOps[R[_]<:RangeM[_]] {
   def middle[A](range: R[A]): A =
     range.measure.asInstanceOf[Measure[A]].from(middleP(primStart(range), primEnd(range)))
 
-  def forward(range: R[_]): Boolean = if(primStart(range) - primEnd(range) >= 0) true else false
+  def isForward(range: R[_]): Boolean = if(primStart(range) - primEnd(range) >= 0) true else false
+
+  def isPoint(range: R[_]): Boolean = if(range.start == range.end) true else false
 
 }
 
@@ -63,6 +66,7 @@ trait RangeMSyntax {
   implicit class RangeMSyntaxImpl[A](range: RangeM[A]) {
     def contains(a: A): Boolean = RangeM.contains(range, a)
     def middle: A = RangeM.middle(range)
+    def isPoint: Boolean = RangeM.isPoint(range)
   }
 
 }

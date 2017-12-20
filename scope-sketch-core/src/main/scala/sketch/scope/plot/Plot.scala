@@ -14,6 +14,11 @@ trait Plot {
 
   def records: List[Record]
 
+  override def toString: String = {
+    val recordsStr = records.map { case (range, value) => s"$range -> $value" }.mkString(", ")
+    s"Plot($recordsStr)"
+  }
+
 }
 
 trait PlotOps[P<:Plot] extends PlotLaws[P] {
@@ -74,9 +79,13 @@ trait PlotOps[P<:Plot] extends PlotLaws[P] {
     coeff(0) * x * x + coeff(1) * x + coeff(2)
   }
 
-  def planarize(records: List[Record]): List[(RangeP, List[Double])] = {
-    val boundaries: HashSet[Double] =
-      HashSet(records.flatMap { case (range, _) => range.start :: range.end :: Nil }.sorted.toArray: _*)
+  /**
+    * Plalarize records that is transforming overlapped records to disjointed records.
+    * e.g. {[0..2] -> 1, [1..3] -> 2} => {[0..1] -> {split(1)}, [1..2] -> {split(1), split(2)}, [2..3] -> split(2)}
+    * */
+  def planarizeRecords(records: List[Record]): List[(RangeP, List[Double])] = {
+    val boundaries: Vector[Double] =
+      records.flatMap { case (range, _) => range.start :: range.end :: Nil }.sorted.toVector
 
     records
       .flatMap { record => planarizeRecord(record, boundaries) }
@@ -86,18 +95,19 @@ trait PlotOps[P<:Plot] extends PlotLaws[P] {
       .sortBy { case (range, _) => range.start }
   }
 
-  def planarizeRecord(record: Record, boundaries: Set[Double]): List[Record] = {
-    def planarizeRecordAcc(record: Record, boundaries: Set[Double], acc: List[Record]): List[Record] = {
-      boundaries.find(b => record._1.start < b && record._1.end > b) match {
-        case Some(boundary) => split(record, boundary) match {
-          case Some((splitted, rem)) => planarizeRecordAcc(rem, boundaries, splitted :: acc)
-          case None => acc
-        }
-        case None => acc
+  def planarizeRecord(record: Record, boundaries: Vector[Double]): List[Record] = {
+    val (_, planarized) = boundaries
+      .filter(b => record._1.start <= b && record._1.end >= b)
+      .foldRight((record, List.empty[Record])){ case (b, (rem, acc)) =>
+        split(rem, b).fold((rem, acc)){ case (rec1, rec2) => (rec1, rec2 :: acc) }
       }
-    }
 
-    planarizeRecordAcc(record, boundaries, Nil)
+    planarized
+  }
+
+  def remove[A](xs: Vector[A], a: A): Vector[A] = {
+    val idx = xs.indexOf(a)
+    (xs take idx) ++ (xs drop (idx + 1))
   }
 
 }
@@ -106,7 +116,7 @@ trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
 
   def add(plot1: P, plot2: P): P =
     modifyRecords(plot1, records =>
-      planarize(records ++ plot2.records).map { case (range, values) => (range, values.sum) }
+      planarizeRecords(records ++ plot2.records).map { case (range, values) => (range, values.sum) }
     )
 
   def multiply(plot: P, mag: Double): P = modifyValue(plot, record => record._2 * mag)

@@ -13,7 +13,7 @@ trait DensityPlotOps extends PlotOps[DensityPlot] {
   def split(record: Record, p: Double): Option[(Record, Record)] = {
     val (range, value) = record
 
-    if(range.start < p && range.end > p) {
+    if(range.contains(p)) {
       Option(((RangeP(range.start, p), value), (RangeP(p, range.end), value)))
     } else None
   }
@@ -48,7 +48,7 @@ object DensityPlot extends DensityPlotOps {
   def disjoint(records: List[Record]): DensityPlot = modifyRecords(empty, _ => records)
 
   def modifyRecords(plot: DensityPlot, f: List[Record] => List[Record]): DensityPlot =
-    bare(planarize(f(plot.records)).map { case (range, values) => (range, values.sum / values.size) })
+    bare(planarizeRecords(f(plot.records)).map { case (range, values) => (range, values.sum / values.size) })
 
   def modifyValue(plot: DensityPlot, f: Record => Double): DensityPlot =
     bare(plot.records.map(record => (record._1, f(record))))

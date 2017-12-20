@@ -1,6 +1,6 @@
 package sketch.scope.plot
 
-import sketch.scope.plot.DensityPlot.{bare, modifyRecords, planarize}
+import sketch.scope.plot.DensityPlot.{bare, modifyRecords, planarizeRecords}
 import sketch.scope.range.RangeP
 
 /**
@@ -13,7 +13,7 @@ trait CountPlotOps extends PlotOps[CountPlot] {
   def split(record: Record, p: Double): Option[(Record, Record)] = {
     val (range, value) = record
 
-    if(range.start < p && range.end > p) {
+    if(range.contains(p)) {
       val value1 = ((p - range.start) / range.length) * value
       val value2 = value - value1
 
@@ -42,8 +42,9 @@ object CountPlot extends CountPlotOps {
 
   def disjoint(records: List[Record]): CountPlot = modifyRecords(empty, _ => records)
 
-  def modifyRecords(plot: CountPlot, f: List[Record] => List[Record]): CountPlot =
-    bare(planarize(f(plot.records)).map { case (range, values) => (range, values.sum / values.size) })
+  def modifyRecords(plot: CountPlot, f: List[Record] => List[Record]): CountPlot = {
+    bare(planarizeRecords(f(plot.records)).map { case (range, values) => (range, values.sum / values.size) })
+  }
 
   def modifyValue(plot: CountPlot, f: Record => Double): CountPlot =
     bare(plot.records.map(record => (record._1, f(record))))

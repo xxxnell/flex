@@ -3,7 +3,7 @@ package sketch.scope.pdf.syntax
 import sketch.scope.measure.Measure
 import sketch.scope.pdf.monad.SampleDistMonad
 import sketch.scope.pdf.{Dist, Range, SampledDist, Sketch}
-import sketch.scope.plot.{DensityPlot, Plot}
+import sketch.scope.plot.{CountPlot, DensityPlot, Plot}
 
 /**
   * Licensed by Probe Technology, Inc.
