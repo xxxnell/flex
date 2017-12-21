@@ -16,8 +16,6 @@ trait EqualSpaceCdfUpdate {
     mtpPsPlot = DensityPlot.squareKernel(ps, window) * (mixingRate / (mixingRate + 1))
     mergedPlot = mtpSketchPlot + mtpPsPlot
     cmapSize = sketch.conf.cmap.size
-//    _ = println(s"mixingRate: $mixingRate, window: $window")
-//    _ = println(s"mergedPlot: $mergedPlot")
     cmap = cmapForEqualSpaceCumulative(mergedPlot, cmapSize)
   } yield cmap
 
@@ -26,14 +24,7 @@ trait EqualSpaceCdfUpdate {
     val invCdf = cdf.inverse
     val unit = cdf.interpolation(Double.MaxValue) / cmapSize.toDouble
 
-//    println(s"cdf: $cdf")
-//    println(s"invCdf: $invCdf")
-//    println(s"cdf.interpolation(Double.MaxValue): ${cdf.interpolation(Double.MaxValue)} unit: " + unit)
-
-    val divider = (1 until cmapSize).toList.map(i => i * unit).map(a => {
-//      println("interpolation: " + invCdf.interpolation(a) + s" for a: $a")
-      invCdf.interpolation(a)
-    })
+    val divider = (1 until cmapSize).toList.map(i => i * unit).map(a => invCdf.interpolation(a))
     Cmap.divider(divider)
   }
 

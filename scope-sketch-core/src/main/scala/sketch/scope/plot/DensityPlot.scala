@@ -29,7 +29,7 @@ trait DensityPlotOps extends PlotOps[DensityPlot] {
         accVal = endVal
         (RangeP.point(range.start), startVal) :: (RangeP.point(range.end), endVal) :: Nil
       }
-      println("cumulative: " + utdRecord.headOption.fold(utdRecord)(utdHead => if(utdHead._1 != cumHead._1) cumHead :: utdRecord else utdRecord))
+
       utdRecord.headOption.fold(utdRecord)(utdHead => if(utdHead._1 != cumHead._1) cumHead :: utdRecord else utdRecord)
     })
   }

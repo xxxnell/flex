@@ -64,8 +64,6 @@ trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
     val tailExt = plot.records.lastOption.filter { case (range, _) => range.end <= argument }
       .map { case (_, value) => value }
 
-//    println(s"argument: $argument, result: ${(midInterp orElse headExt orElse tailExt).getOrElse(0)}")
-
     (midInterp orElse headExt orElse tailExt).getOrElse(0)
   }
 
@@ -106,13 +104,9 @@ trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
   def polynomialFitting(as: List[(Double, Double)], x: Double): Option[Double] = Try {
     val xB = BigDecimal(x)
 
-//    println(s"as: $as, x: $x")
-
     val obs = as.foldLeft(new WeightedObservedPoints){ case (_obs, (_x, _y)) => _obs.add(_x, _y); _obs }
     val fitter = PolynomialCurveFitter.create(2)
     val coeff = fitter.fit(obs.toList)
-
-    println(s"as: $as, x: $x, coeff: ${coeff.toList}, result: ${(coeff(0) * xB * xB + coeff(1) * xB + coeff(2)).toDouble}")
 
     (coeff(0) * xB * xB + coeff(1) * xB + coeff(2)).toDouble
   }.toOption
@@ -124,9 +118,6 @@ trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
   def planarizeRecords(records: List[Record]): List[(RangeP, List[Double])] = {
     val boundaries: Vector[Double] =
       records.flatMap { case (range, _) => range.start :: range.end :: Nil }.sorted.toVector
-
-//    println("records: " + records)
-//    println("planarizeRecord: " + records.flatMap { record => planarizeRecord(record, boundaries) })
 
     records
       .flatMap { record => planarizeRecord(record, boundaries) }

@@ -83,8 +83,6 @@ class SketchPropSpec extends Specification with ScalaCheck {
         val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
         val sketch1O = sketch0.deepUpdate(1).map(_._1)
 
-        println(s"cmap1: ${sketch0.lastCmap}, cmap2: ${sketch1O.flatMap(_.lastCmap)}")
-
         val cond1 = sketch0.lastCmap != sketch1O.flatMap(_.lastCmap)
         val cond2 = sketch0.lastCmap.map(_.size) == sketch1O.flatMap(_.lastCmap).map(_.size)
 
@@ -109,8 +107,6 @@ class SketchPropSpec extends Specification with ScalaCheck {
         val cmap0O = sketch0.lastCmap
         val cmap1O = sketch1O.flatMap(_.lastCmap)
         val cmap2O = sketch2O.flatMap(_.lastCmap)
-
-        println("2times: \n " + s"cmap0: $cmap0O, cmap1: $cmap1O, cmap2: $cmap2O")
 
         if(cmap0O != cmap1O && cmap1O != cmap2O) ok
         else ko(s"cmap0: $cmap0O, cmap1: $cmap1O, cmap2: $cmap2O")
