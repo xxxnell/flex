@@ -4,6 +4,8 @@ import sketch.scope.range._
 import org.apache.commons.math3.fitting.{PolynomialCurveFitter, WeightedObservedPoints}
 
 import scala.collection.immutable.{HashSet, Set}
+import scala.language.postfixOps
+import scala.util.Try
 
 /**
   * Licensed by Probe Technology, Inc.
@@ -32,18 +34,13 @@ trait PlotOps[P<:Plot] extends PlotLaws[P] {
     * */
   def split(record: Record, p: Double): Option[(Record, Record)]
 
+}
+
+trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
+
   def inverse(plot: P): P = modifyRecords(plot, records => {
     records.map { case (range, value) => (RangeP.point(value), range.middle) }
   })
-
-  def cumulative(plot: P): P = {
-    var accVal = 0.toDouble
-
-    modifyRecords(plot, (records: List[Record]) => records.map { case (range, value) =>
-      accVal = accVal + value
-      (range, accVal)
-    })
-  }
 
   def image(plot: P, argument: Double): Option[Double] = {
     plot.records.find { case (range, value) => range.contains(argument) }
@@ -51,17 +48,23 @@ trait PlotOps[P<:Plot] extends PlotLaws[P] {
   }
 
   def interpolation(plot: P, argument: Double): Double = {
-    val midInterp = plot.records.sliding(3).flatMap(recordGroup => list2Triplet(recordGroup))
-      .find { case ((range1, _), _, (range2, _)) => range1.start < argument && range2.end > argument }
-      .map { case ((range1, value1), (range2, value2), (range3, value3)) =>
-        ((range1.middle, value1), (range2.middle, value2), (range3.middle, value3))
-      }.map { case (a1, a2, a3) => polynomialFitting(a1 :: a2 :: a3 :: Nil, argument) }
+    val dataRefSize = 2
 
-    val headExt = plot.records.headOption.filter { case (range, _) => range.start > argument }
+    val midInterp = plot.records.sliding(dataRefSize)
+      .find { records =>
+        records.headOption.flatMap { case (headRange, _) => records.lastOption.map { case (lastRange, _) =>
+          RangeP(headRange.start, lastRange.end).contains(argument)
+        }}.getOrElse(false)
+      }.map(records => records.map { case (range, value) => (range.middle, value) })
+      .flatMap { datas => dataFitting(datas, argument) }
+
+    val headExt = plot.records.headOption.filter { case (range, _) => range.start >= argument }
       .map { case (_, value) => value }
 
-    val tailExt = plot.records.lastOption.filter { case (range, _) => range.end < argument }
+    val tailExt = plot.records.lastOption.filter { case (range, _) => range.end <= argument }
       .map { case (_, value) => value }
+
+//    println(s"argument: $argument, result: ${(midInterp orElse headExt orElse tailExt).getOrElse(0)}")
 
     (midInterp orElse headExt orElse tailExt).getOrElse(0)
   }
@@ -71,13 +74,48 @@ trait PlotOps[P<:Plot] extends PlotLaws[P] {
     case _ => None
   }
 
-  def polynomialFitting(as: List[(Double, Double)], x: Double): Double = {
+  def dataFitting(as: List[(Double, Double)], x: Double): Option[Double] = {
+    val largeCutoff = 1e300
+    val smallCutoff = -1e300
+
+    val polyValid = as.forall { case (_x, _y) =>
+      _x < largeCutoff && _y < largeCutoff && _x > smallCutoff && _y > smallCutoff
+    }
+
+    (as.size, polyValid) match {
+      case (size, true) if size > 2 => polynomialFitting(as, x)
+      case _ => for {
+        start <- as.find(_._1 <= x)
+        end <- as.find(_._1 >= x)
+      } yield linearFitting(start, end, x)
+    }
+  }
+
+  def linearFitting(a1: (Double, Double), a2: (Double, Double), x: Double): Double = {
+    val (x1, y1) = a1
+    val (x2, y2) = a2
+    val (x1B, y1B) = (BigDecimal(x1), BigDecimal(y1))
+    val (x2B, y2B) = (BigDecimal(x2), BigDecimal(y2))
+
+    val slope = (y2B - y1B) / (x2B - x1B)
+    val c = y1B - slope * x1B
+
+    (slope * x + c).toDouble
+  }
+
+  def polynomialFitting(as: List[(Double, Double)], x: Double): Option[Double] = Try {
+    val xB = BigDecimal(x)
+
+//    println(s"as: $as, x: $x")
+
     val obs = as.foldLeft(new WeightedObservedPoints){ case (_obs, (_x, _y)) => _obs.add(_x, _y); _obs }
     val fitter = PolynomialCurveFitter.create(2)
     val coeff = fitter.fit(obs.toList)
 
-    coeff(0) * x * x + coeff(1) * x + coeff(2)
-  }
+    println(s"as: $as, x: $x, coeff: ${coeff.toList}, result: ${(coeff(0) * xB * xB + coeff(1) * xB + coeff(2)).toDouble}")
+
+    (coeff(0) * xB * xB + coeff(1) * xB + coeff(2)).toDouble
+  }.toOption
 
   /**
     * Plalarize records that is transforming overlapped records to disjointed records.
@@ -86,6 +124,9 @@ trait PlotOps[P<:Plot] extends PlotLaws[P] {
   def planarizeRecords(records: List[Record]): List[(RangeP, List[Double])] = {
     val boundaries: Vector[Double] =
       records.flatMap { case (range, _) => range.start :: range.end :: Nil }.sorted.toVector
+
+//    println("records: " + records)
+//    println("planarizeRecord: " + records.flatMap { record => planarizeRecord(record, boundaries) })
 
     records
       .flatMap { record => planarizeRecord(record, boundaries) }
@@ -97,12 +138,12 @@ trait PlotOps[P<:Plot] extends PlotLaws[P] {
 
   def planarizeRecord(record: Record, boundaries: Vector[Double]): List[Record] = {
     val (_, planarized) = boundaries
-      .filter(b => record._1.start <= b && record._1.end >= b)
+      .filter(b => record._1.start < b && record._1.end > b)
       .foldRight((record, List.empty[Record])){ case (b, (rem, acc)) =>
         split(rem, b).fold((rem, acc)){ case (rec1, rec2) => (rec1, rec2 :: acc) }
       }
 
-    planarized.filter { case (range, _) => !range.isPoint }
+    if(planarized.nonEmpty) planarized else List(record)
   }
 
   def remove[A](xs: Vector[A], a: A): Vector[A] = {
@@ -110,9 +151,15 @@ trait PlotOps[P<:Plot] extends PlotLaws[P] {
     (xs take idx) ++ (xs drop (idx + 1))
   }
 
-}
+  def domain(plot: P): Option[RangeP] = {
+    val startO = Try(plot.records.map { case (range, _) => range.start }.min).toOption
+    val endO = Try(plot.records.map { case (range, _) => range.end }.max).toOption
 
-trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
+    for {
+      start <- startO
+      end <- endO
+    } yield RangeP(start, end)
+  }
 
   def add(plot1: P, plot2: P): P =
     modifyRecords(plot1, records =>
@@ -136,13 +183,14 @@ trait PlotSyntax {
 trait PolyPlotSyntax[P<:Plot] {
   def plot: P
   def ops: PlotOps[P]
+
   def modify(f: Record => Double): P = ops.modifyValue(plot, f)
   def add(plot2: P): P = ops.add(plot, plot2)
   def +(plot2: P): P = ops.add(plot, plot2)
   def multiply(mag: Double): P = ops.multiply(plot, mag)
   def *(mag: Double): P = ops.multiply(plot, mag)
   def inverse: P = ops.inverse(plot)
-  def cumulative: P = ops.cumulative(plot)
+  def domain: Option[RangeP] = ops.domain(plot)
 }
 
 object Plot extends PlotOps[Plot] {

@@ -38,7 +38,7 @@ trait RangeMOps[R[_]<:RangeM[_]] {
   def contains[A](range: R[A], a: A): Boolean =
     containsP(primStart(range), primEnd(range), range.measure.asInstanceOf[Measure[A]].to(a))
 
-  def middleP[A](start: Prim, end: Prim): Prim = (start + end) / 2
+  def middleP[A](start: Prim, end: Prim): Prim = ((BigDecimal(start) + BigDecimal(end)) / 2).toDouble
 
   def middle[A](range: R[A]): A =
     range.measure.asInstanceOf[Measure[A]].from(middleP(primStart(range), primEnd(range)))

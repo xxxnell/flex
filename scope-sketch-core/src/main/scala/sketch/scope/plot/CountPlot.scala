@@ -14,7 +14,7 @@ trait CountPlotOps extends PlotOps[CountPlot] {
     val (range, value) = record
 
     if(range.contains(p)) {
-      val value1 = ((p - range.start) / range.length) * value
+      val value1 = if(range.length != 0) (((p - range.start) / range.length) * value).toDouble else 0
       val value2 = value - value1
 
       Option(((RangeP(range.start, p), value1), (RangeP(p, range.end), value2)))

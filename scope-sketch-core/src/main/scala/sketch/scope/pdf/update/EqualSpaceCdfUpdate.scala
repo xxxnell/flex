@@ -15,16 +15,25 @@ trait EqualSpaceCdfUpdate {
     mtpSketchPlot = sketchPlot * (1 / (mixingRate + 1))
     mtpPsPlot = DensityPlot.squareKernel(ps, window) * (mixingRate / (mixingRate + 1))
     mergedPlot = mtpSketchPlot + mtpPsPlot
-    caSize <- sketch.structures.headOption.map { case (cmap, _) => cmap.size }
-    cmap = cmapForUniformSplitCumulative(mergedPlot, caSize)
+    cmapSize = sketch.conf.cmap.size
+//    _ = println(s"mixingRate: $mixingRate, window: $window")
+//    _ = println(s"mergedPlot: $mergedPlot")
+    cmap = cmapForEqualSpaceCumulative(mergedPlot, cmapSize)
   } yield cmap
 
-  def cmapForUniformSplitCumulative(plot: DensityPlot, caSize: Int): Cmap = {
+  def cmapForEqualSpaceCumulative(plot: DensityPlot, cmapSize: Int): Cmap = {
     val cdf = plot.cumulative
     val invCdf = cdf.inverse
-    val unit = cdf.interpolation(Double.MaxValue) / caSize.toDouble
+    val unit = cdf.interpolation(Double.MaxValue) / cmapSize.toDouble
 
-    val divider = (1 until caSize).toList.map(i => i * unit).map(a => invCdf.interpolation(a))
+//    println(s"cdf: $cdf")
+//    println(s"invCdf: $invCdf")
+//    println(s"cdf.interpolation(Double.MaxValue): ${cdf.interpolation(Double.MaxValue)} unit: " + unit)
+
+    val divider = (1 until cmapSize).toList.map(i => i * unit).map(a => {
+//      println("interpolation: " + invCdf.interpolation(a) + s" for a: $a")
+      invCdf.interpolation(a)
+    })
     Cmap.divider(divider)
   }
 

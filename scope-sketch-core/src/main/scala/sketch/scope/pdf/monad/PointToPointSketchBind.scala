@@ -12,7 +12,9 @@ object PointToPointSketchBind extends SketchBind[Sketch, Dist, Sketch] {
 
   def bind[A, B](sketch: Sketch[A], f: A => Dist[B], measureB: Measure[B]): Sketch[B] = (for {
     plot <- sketch.densityPlot
-    weightDists = plot.records.map { case (range, value) => (range.length * value, f(sketch.measure.from(range.middle))) }
+    weightDists = plot.records.map { case (range, value) =>
+      ((range.length * value).toDouble, f(sketch.measure.from(range.middle)))
+    }
     bindedDist = PredefinedDist[B](measureB, (from: B, to: B) => probabilityForWeightDists(from, to, weightDists))
     emptySketchB = Sketch.empty(measureB, sketch.conf)
     domainsB = plot.records.map { case (range, _) => (measureB.from(range.start), measureB.from(range.end)) }

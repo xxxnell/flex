@@ -74,7 +74,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
     "deepUpdate" in {
 
       "basic" in {
-        val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, 0, 10)
+        val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 3, -1, 10)
         val (counterSize, counterNo) = (8, 2)
         implicit val conf: SketchConf = SketchConf(
           CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
@@ -83,12 +83,20 @@ class SketchPropSpec extends Specification with ScalaCheck {
         val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
         val sketch1O = sketch0.deepUpdate(1).map(_._1)
 
-        if(sketch0.lastCmap != sketch1O.flatMap(_.lastCmap)) ok
-        else ko(s"cmap1: ${sketch0.lastCmap}, cmap2: ${sketch1O.flatMap(_.lastCmap)}")
+        println(s"cmap1: ${sketch0.lastCmap}, cmap2: ${sketch1O.flatMap(_.lastCmap)}")
+
+        val cond1 = sketch0.lastCmap != sketch1O.flatMap(_.lastCmap)
+        val cond2 = sketch0.lastCmap.map(_.size) == sketch1O.flatMap(_.lastCmap).map(_.size)
+
+        if(cond1 && cond2) ok
+        else ko(
+          s"cmap1(${sketch0.lastCmap.map(_.size).getOrElse(0)}): ${sketch0.lastCmap}, " +
+            s"cmap2(${sketch1O.flatMap(_.lastCmap).map(_.size).getOrElse(0)}): ${sketch1O.flatMap(_.lastCmap)}"
+        )
       }
 
       "2 times" in {
-        val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, 0, 10)
+        val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, -1, 10)
         val (counterSize, counterNo) = (8, 2)
         implicit val conf: SketchConf = SketchConf(
           CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
@@ -101,6 +109,8 @@ class SketchPropSpec extends Specification with ScalaCheck {
         val cmap0O = sketch0.lastCmap
         val cmap1O = sketch1O.flatMap(_.lastCmap)
         val cmap2O = sketch2O.flatMap(_.lastCmap)
+
+        println("2times: \n " + s"cmap0: $cmap0O, cmap1: $cmap1O, cmap2: $cmap2O")
 
         if(cmap0O != cmap1O && cmap1O != cmap2O) ok
         else ko(s"cmap0: $cmap0O, cmap1: $cmap1O, cmap2: $cmap2O")

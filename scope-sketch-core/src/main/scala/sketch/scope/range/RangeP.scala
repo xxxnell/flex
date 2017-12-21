@@ -18,7 +18,7 @@ trait GenericRangeP[G] extends RangeM[Prim] {
 
 trait RangePOps extends RangeMOps[GenericRangeP] {
 
-  def length(range: RangeP): Prim = range.end - range.start
+  def length(range: RangeP): BigDecimal = BigDecimal(range.end) - BigDecimal(range.start)
 
   def product[A](range1: RangeP, range2: RangeP): RangeP = {
     val (start1, end1) = (range1.start, range1.end)
@@ -31,7 +31,7 @@ trait RangePOps extends RangeMOps[GenericRangeP] {
   }
 
   def overlapPercent[A](range1: RangeP, range2: RangeP): Double = {
-    length(product(range1, range2)) / length(range1)
+    (length(product(range1, range2)) / length(range1)).toDouble
   }
 
 }
@@ -41,7 +41,7 @@ trait RangePSyntax {
   type RangeP = GenericRangeP[Nothing]
 
   implicit class RangeImpl(range: RangeP) {
-    def length: Prim = RangeP.length(range)
+    def length: BigDecimal = RangeP.length(range)
     def overlapPercent(range2: RangeP): Double = RangeP.overlapPercent(range, range2)
   }
 

@@ -18,6 +18,22 @@ trait DensityPlotOps extends PlotOps[DensityPlot] {
     } else None
   }
 
+  def cumulative(plot: DensityPlot): DensityPlot = {
+    var accVal = 0d
+    val cumHead = (RangeP.point(Double.MinValue), 0d)
+
+    modifyRecords(plot, (records: List[Record]) => {
+      val utdRecord = records.flatMap { case (range, value) =>
+        val startVal = accVal
+        val endVal = (accVal + value * range.length).toDouble
+        accVal = endVal
+        (RangeP.point(range.start), startVal) :: (RangeP.point(range.end), endVal) :: Nil
+      }
+      println("cumulative: " + utdRecord.headOption.fold(utdRecord)(utdHead => if(utdHead._1 != cumHead._1) cumHead :: utdRecord else utdRecord))
+      utdRecord.headOption.fold(utdRecord)(utdHead => if(utdHead._1 != cumHead._1) cumHead :: utdRecord else utdRecord)
+    })
+  }
+
 }
 
 trait DensityPlotSyntax {
@@ -25,6 +41,8 @@ trait DensityPlotSyntax {
   implicit class DensityPlotSyntaxImpl(dPlot: DensityPlot) extends PolyPlotSyntax[DensityPlot] {
     def plot: DensityPlot = dPlot
     def ops: PlotOps[DensityPlot] = DensityPlot
+
+    def cumulative: DensityPlot = DensityPlot.cumulative(plot)
   }
 
 }
@@ -48,7 +66,8 @@ object DensityPlot extends DensityPlotOps {
   def disjoint(records: List[Record]): DensityPlot = modifyRecords(empty, _ => records)
 
   def modifyRecords(plot: DensityPlot, f: List[Record] => List[Record]): DensityPlot =
-    bare(planarizeRecords(f(plot.records)).map { case (range, values) => (range, values.sum / values.size) })
+    bare(planarizeRecords(f(plot.records)).flatMap { case (range, values) => values.map(value => (range, value)) })
+//    bare(planarizeRecords(f(plot.records)).map { case (range, values) => (range, values.sum / values.size) })
 
   def modifyValue(plot: DensityPlot, f: Record => Double): DensityPlot =
     bare(plot.records.map(record => (record._1, f(record))))
