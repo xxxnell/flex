@@ -13,6 +13,58 @@ class SketchPropSpec extends Specification with ScalaCheck {
 
   "Sketch" should {
 
+    "count" in {
+
+      "basic 1" in {
+        val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, 0, 10)
+        val (counterSize, counterNo) = (8, 2)
+        implicit val conf: SketchConf = SketchConf(
+          CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
+          CounterConf(counterSize, counterNo)
+        )
+        val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
+
+        (for {
+          sketch1 <- sketch0.update(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+          count <- sketch1.count(1, 5)
+        } yield count)
+          .fold(ko)(count => if(count < 10) ok else ko(s"count: $count, expected: 5"))
+      }
+
+      "basic 2" in {
+        val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, 0, 10)
+        val (counterSize, counterNo) = (8, 2)
+        implicit val conf: SketchConf = SketchConf(
+          CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
+          CounterConf(counterSize, counterNo)
+        )
+        val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
+
+        (for {
+          sketch1 <- sketch0.update(1, 2, 3, 4, 5, 6, 7, 8, 9)
+          count <- sketch1.count(0, 10)
+        } yield count)
+          .fold(ko)(count => if(count == 9) ok else ko(s"count: $count, expected: 10"))
+      }
+
+      "count smaller space then cmap bound" in {
+        val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, 0, 10)
+        val (counterSize, counterNo) = (8, 2)
+        implicit val conf: SketchConf = SketchConf(
+          CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
+          CounterConf(counterSize, counterNo)
+        )
+        val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
+
+        (for {
+          sketch1 <- sketch0.update(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+          count <- sketch1.count(1.1, 1.2)
+        } yield count)
+          .fold(ko)(count => if(count < 1) ok else ko(s"count: $count, expected: <1"))
+      }
+
+    }
+
     "update" in {
 
       "update int" in {

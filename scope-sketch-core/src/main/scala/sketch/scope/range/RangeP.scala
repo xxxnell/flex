@@ -20,18 +20,18 @@ trait RangePOps extends RangeMOps[GenericRangeP] {
 
   def length(range: RangeP): BigDecimal = BigDecimal(range.end) - BigDecimal(range.start)
 
-  def product[A](range1: RangeP, range2: RangeP): RangeP = {
+  def intersection[A](range1: RangeP, range2: RangeP): RangeP = {
     val (start1, end1) = (range1.start, range1.end)
     val (start2, end2) = (range2.start, range2.end)
 
-    val start = if(start1 > start2) start2 else start1
-    val end = if(end1 > end2) end1 else end2
+    val start = if(start1 > start2) start1 else start2
+    val end = if(end1 > end2) end2 else end1
 
     RangeP(start, end)
   }
 
   def overlapPercent[A](range1: RangeP, range2: RangeP): Double = {
-    (length(product(range1, range2)) / length(range1)).toDouble
+    (length(intersection(range1, range2)) / length(range1)).toDouble
   }
 
 }

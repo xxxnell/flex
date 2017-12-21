@@ -79,15 +79,19 @@ trait SketchPrimPropOps[S[_]<:Sketch[_]] extends SketchPrimPropLaws[S] with Sket
     val midCountO: Option[Double] = midRangeO.map { case (midStart, midEnd) => hcounter.count(midStart, midEnd) }
       .getOrElse(Option(0d))
 
-    val boundaryCountO = if(startHdim == endHdim) for {
-      count <- hcounter.get(startHdim)
-      percent = startRng.overlapPercent(RangeP(pStart, pEnd))
-    } yield count * percent else for {
-      startCount <- hcounter.get(startHdim)
-      startPercent = startRng.overlapPercent(RangeP(pStart, startRng.end))
-      endCount <- hcounter.get(endHdim)
-      endPercent = endRng.overlapPercent(RangeP(endRng.start, pEnd))
-    } yield startCount * startPercent + endCount * endPercent
+    val boundaryCountO = if(startHdim == endHdim) {
+      for {
+        count <- hcounter.get(startHdim)
+        percent = startRng.overlapPercent(RangeP(pStart, pEnd))
+      } yield count * percent
+    } else {
+      for {
+        startCount <- hcounter.get(startHdim)
+        startPercent = startRng.overlapPercent(RangeP(pStart, startRng.end))
+        endCount <- hcounter.get(endHdim)
+        endPercent = endRng.overlapPercent(RangeP(endRng.start, pEnd))
+      } yield startCount * startPercent + endCount * endPercent
+    }
 
     for {
       boundartCount <- boundaryCountO
