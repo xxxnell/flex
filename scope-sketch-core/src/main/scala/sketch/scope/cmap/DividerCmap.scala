@@ -25,7 +25,21 @@ trait DividerCmap extends Cmap {
   override def equals(other: Any): Boolean = other.isInstanceOf[DividerCmap] &&
     (divider == other.asInstanceOf[DividerCmap].divider)
 
-  override def toString: String = s"DividerCmap($divider)"
+  override def toString: String = {
+    def divider2Str(divider: List[Prim]): String =
+      ((DividerCmap.min :: divider.flatMap(a => List(a, a))) :+ DividerCmap.max)
+        .grouped(2)
+        .flatMap {
+          case a1 :: a2 :: _ => Some(RangeP(a1, a2))
+          case _ => None
+        }.mkString(", ")
+
+    val sizeLimit = 100
+    val dividerStr = if(divider.size <= sizeLimit) divider2Str(divider) else
+      s"${divider2Str(divider.take(sizeLimit / 2))}, ......, ${divider2Str(divider.takeRight(sizeLimit / 2))}"
+
+    s"DividerCmap($dividerStr)"
+  }
 
 }
 

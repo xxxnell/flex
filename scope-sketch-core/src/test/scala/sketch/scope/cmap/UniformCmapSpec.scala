@@ -10,12 +10,6 @@ import sketch.scope.pdf.Prim
   */
 class UniformCmapSpec extends Specification with ScalaCheck {
 
-//  implicit val cmapGen: Arbitrary[(Int, UniformCmap)] = Arbitrary(UniformCmapGen.uniformCmapGen)
-//
-//  prop { (sizeCmap: (Int, UniformCmap) ) =>
-//    todo
-//  }.setArbitrary(cmapGen)
-
   "UniformCmap" should {
 
     "apply" in {
@@ -44,7 +38,7 @@ class UniformCmapSpec extends Specification with ScalaCheck {
 
           prop { (cmapGenProps: (Int, Prim, UniformCmap) ) =>
             val (size, start, cmap) = cmapGenProps
-            val delta = ((BigDecimal(Double.MaxValue) - BigDecimal(start)) / size * 0.1).toDouble
+            val delta = ((BigDecimal(Double.MaxValue) - BigDecimal(start)) / size * 0.001).toDouble
 
             val cond1 = cmap(Double.MinValue) == 0
             val cond2 = cmap(Double.MaxValue) == size - 1
@@ -70,7 +64,7 @@ class UniformCmapSpec extends Specification with ScalaCheck {
 
           prop { (cmapGenProps: (Int, Prim, UniformCmap) ) =>
             val (size, end, cmap) = cmapGenProps
-            val delta = ((BigDecimal(end) - BigDecimal(Double.MaxValue)) / size * 0.1).toDouble
+            val delta = ((BigDecimal(end) - BigDecimal(Double.MinValue)) / size * 0.001).toDouble
 
             val cond1 = cmap(Double.MinValue) == 0
             val cond2 = cmap(Double.MaxValue) == size - 1
@@ -102,7 +96,7 @@ class UniformCmapSpec extends Specification with ScalaCheck {
 
         prop { (cmapGenProps: (Int, Prim, Prim, UniformCmap) ) =>
           val (size, start, end, cmap) = cmapGenProps
-          val delta = ((BigDecimal(end) - BigDecimal(start)) / size * 0.1).toDouble
+          val delta = ((BigDecimal(end) - BigDecimal(start)) / size * 0.001).toDouble
 
           val cond1 = cmap(Double.MinValue) == 0
           val cond2 = cmap(Double.MaxValue) == size - 1
