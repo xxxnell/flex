@@ -68,31 +68,32 @@ class PeriodicSketchSpec extends Specification with ScalaCheck {
         val sketch0: Sketch[Double] = PeriodicSketch.emptyForPeriod[Double](0, 1)
         val datas = Stream.from(1, 1).take(3)
 
-        val sequencialSketchsO: Option[List[Option[Sketch[Double]]]] = datas
-          .foldLeft(Option(List(Option(sketch0)))){ case (accO, data) => for {
+        val sequencialSketchsO: Option[List[Sketch[Double]]] = datas
+          .foldLeft(Option(List(sketch0))){ case (accO, data) => for {
             acc <- accO
-            sketchO <- acc.lastOption
-            utdSketchO <- sketchO.traverse(sketch => sketch.update(data))
-          } yield acc :+ utdSketchO }
+            sketch <- acc.lastOption
+            utdSketch <- sketch.update(data)
+          } yield acc :+ utdSketch }
 
-        val sequencialCmapsO: Option[List[Option[Cmap]]] = sequencialSketchsO.map(seqSketches =>
-          seqSketches.map(sketchO => for {
-            sketch <- sketchO
-            recentStr <- sketch.structures.lastOption
-          } yield recentStr._1)
+        val sequencialCmapsO: Option[List[Cmap]] = sequencialSketchsO.flatMap(sketches =>
+          sketches.traverse(sketch => sketch.lastCmap)
         )
 
-        val cond = sequencialCmapsO.exists(sequencialCmaps => sequencialCmaps.sliding(2)
+        val cond = sequencialCmapsO.exists(cmaps => cmaps.sliding(2)
           .map {
-            case Some(cmap1) :: Some(cmap2) :: Nil => Some((cmap1, cmap2))
+            case cmap1 :: cmap2 :: Nil => Some((cmap1, cmap2))
             case _ => None
           }.forall {
-            case Some((cmap1: DividerCmap, cmap2: DividerCmap)) => cmap1 == cmap2
+            case Some((cmap1: DividerCmap, cmap2: DividerCmap)) => cmap1 != cmap2
             case _ => false
           }
         )
 
-        if(cond) ok else ko(s"cmaps: $sequencialCmapsO")
+        if(cond) ok else ko(
+          sequencialCmapsO.map(cmaps =>
+            cmaps.zipWithIndex.map { case (cmap, idx) => s"cmap ${idx+1}: $cmap"}.mkString("\n")
+          ).getOrElse("empty cmap")
+        )
       }
 
     }
