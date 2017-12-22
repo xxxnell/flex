@@ -2,6 +2,8 @@ package sketch.scope.pdf
 
 import sketch.scope.measure.Measure
 
+import scala.language.higherKinds
+
 /**
   * Licensed by Probe Technology, Inc.
   */

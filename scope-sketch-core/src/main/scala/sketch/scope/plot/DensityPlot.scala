@@ -57,9 +57,11 @@ object DensityPlot extends DensityPlotOps {
 
   def squareKernel(ds: List[(Prim, Count)], window: Double): DensityPlot = {
     val sum = ds.map(d => d._2).sum
+    val utdWindow = if(window <= 0) 1e-100 else window
 
     modifyRecords(DensityPlot.empty, _ => ds.map { case (value, count) =>
-      (RangeP(value - (window / 2), value + (window / 2)), count / (sum * window))
+      (RangeP(value - (utdWindow / 2), value + (utdWindow / 2)),
+        if(sum * utdWindow > 0) count / (sum * utdWindow) else 0)
     })
   }
 
@@ -67,7 +69,6 @@ object DensityPlot extends DensityPlotOps {
 
   def modifyRecords(plot: DensityPlot, f: List[Record] => List[Record]): DensityPlot =
     bare(planarizeRecords(f(plot.records)).flatMap { case (range, values) => values.map(value => (range, value)) })
-//    bare(planarizeRecords(f(plot.records)).map { case (range, values) => (range, values.sum / values.size) })
 
   def modifyValue(plot: DensityPlot, f: Record => Double): DensityPlot =
     bare(plot.records.map(record => (record._1, f(record))))
