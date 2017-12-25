@@ -85,7 +85,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
 
     }
 
-    "countPloy" in {
+    "countPlot" in {
       val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, 0, 10)
       val (counterSize, counterNo) = (8, 2)
       implicit val conf: SketchConf = SketchConf(
@@ -202,19 +202,39 @@ class SketchPropSpec extends Specification with ScalaCheck {
     }
 
     "sum" in {
-      val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, 0, 10)
-      val (counterSize, counterNo) = (8, 2)
-      implicit val conf: SketchConf = SketchConf(
-        CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
-        CounterConf(counterSize, counterNo)
-      )
-      val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
 
-      (for {
-        sketch1 <- sketch0.update(1)
-        sum = sketch1.sum
-      } yield sum)
-        .fold(ko)(sum => if(sum > 0 && sum <= 1) ok else ko(s"sum: $sum"))
+      "basic" in {
+        val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, 0, 10)
+        val (counterSize, counterNo) = (8, 2)
+        implicit val conf: SketchConf = SketchConf(
+          CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
+          CounterConf(counterSize, counterNo)
+        )
+        val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
+
+        (for {
+          sketch1 <- sketch0.update(1)
+          sum = sketch1.sum
+        } yield sum)
+          .fold(ko)(sum => if(sum > 0 && sum <= 1) ok else ko(s"sum: $sum"))
+      }
+
+      "after updated" in {
+        val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, 0, 10)
+        val (counterSize, counterNo) = (8, 2)
+        implicit val conf: SketchConf = SketchConf(
+          CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
+          CounterConf(counterSize, counterNo)
+        )
+        val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
+
+        (for {
+          sketch1 <- sketch0.update(1, 2, 3, 4, 5)
+          sum = sketch1.sum
+        } yield sum)
+          .fold(ko)(sum => if(sum ~= 5) ok else ko(s"sum: $sum, expected: 5"))
+      }
+
     }
 
   }
