@@ -32,7 +32,13 @@ trait NormalDistOps extends SmoothDistPropOps[NormalDist] {
 object NormalDist extends NormalDistOps {
 
   def apply[A](measure: Measure[A], mean: Prim, variance: Prim): NormalDist[A] =
-    NormalDist(measure, mean, variance, IRng(mean.toInt + variance.toInt))
+    bare(measure, mean, variance, IRng(mean.toInt + variance.toInt))
+
+  def bare[A](measure: Measure[A], mean: Prim, variance: Prim, rng: IRng): NormalDist[A] =
+    NormalDist(measure, mean, variance, rng)
+
+  def apply[A](mean: A, variance: Prim)(implicit measure: Measure[A]): NormalDist[A] =
+    apply(measure, measure.to(mean), variance)
 
   def modifyRng[A](dist: NormalDist[A], f: IRng => IRng): NormalDist[A] =
     NormalDist(dist.measure, dist.mean, dist.variance, f(dist.rng))

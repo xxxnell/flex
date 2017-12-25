@@ -50,7 +50,7 @@ class SketchMonadSpec extends Specification with ScalaCheck {
           )
           val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
 
-          sketch0.flatMap(i => NormalDist[Double](doubleMeasure, i, 1))
+          sketch0.flatMap(i => NormalDist[Double](i, 1))
           ok
         }
 

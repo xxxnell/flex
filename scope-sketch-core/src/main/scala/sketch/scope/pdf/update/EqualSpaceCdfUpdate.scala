@@ -10,10 +10,10 @@ import sketch.scope.plot._
   */
 trait EqualSpaceCdfUpdate {
 
-  def updateCmap(sketch: Sketch[_], ps: List[(Prim, Count)], mixingRate: Double, window: Double): Option[Cmap] = for {
+  def updateCmap(sketch: Sketch[_], ps: List[(Prim, Count)], mixingRatio: Double, window: Double): Option[Cmap] = for {
     sketchPlot <- sketch.densityPlot
-    mtpSketchPlot = sketchPlot * (1 / (mixingRate + 1))
-    mtpPsPlot = DensityPlot.squareKernel(ps, window) * (mixingRate / (mixingRate + 1))
+    mtpSketchPlot = sketchPlot * (1 / (mixingRatio + 1))
+    mtpPsPlot = DensityPlot.squareKernel(ps, window) * (mixingRatio / (mixingRatio + 1))
     mergedPlot = mtpSketchPlot + mtpPsPlot
     cmapSize = sketch.conf.cmap.size
     cmap = cmapForEqualSpaceCumulative(mergedPlot, cmapSize)

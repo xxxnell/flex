@@ -18,9 +18,9 @@ import scala.language.higherKinds
   */
 trait SketchPrimPropOps[S[_]<:Sketch[_]] extends SketchPrimPropLaws[S] with SketchPropOps[S]{
 
-  val mixingRate: Double = 1
+  val mixingRatio: Double = 1
 
-  val window: Double = math.pow(10, -10)
+  val window: Double = 1e-10
 
   // Update ops
 
@@ -39,7 +39,7 @@ trait SketchPrimPropOps[S[_]<:Sketch[_]] extends SketchPrimPropLaws[S] with Sket
     * Deep update a primitive value <code>p</code> instead of <code>a</code> ∈ <code>A</code>
     * */
   def primDeepUpdate[A](sketch: S[A], ps: List[(Prim, Count)]): Option[(S[A], Structure)] = for {
-    utdCmap <- EqualSpaceCdfUpdate.updateCmap(sketch, ps, mixingRate, window)
+    utdCmap <- EqualSpaceCdfUpdate.updateCmap(sketch, ps, mixingRatio, window)
     headTailStr <- sketch.structures match {
       case head :: tail => Some((head, tail))
       case _ => None
