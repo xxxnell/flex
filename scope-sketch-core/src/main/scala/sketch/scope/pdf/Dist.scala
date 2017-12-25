@@ -43,6 +43,9 @@ object Dist extends DistPropOps[Dist] {
 
   def delta[A](center: A)(implicit measure: Measure[A]): Dist[A] = DeltaDist(measure, measure(center))
 
+  def normal[A](mean: A, variance: Double)(implicit measure: Measure[A]): NormalDist[A] =
+    NormalDist(mean, variance)
+
   def probability[A](dist: Dist[A], from: A, to: A): Option[Double] = dist match {
     case smooth: SmoothDist[A] => SmoothDist.probability(smooth, from, to)
     case sampled: SampledDist[A] => SampledDist.probability(sampled, from, to)
