@@ -13,7 +13,7 @@ import scala.util.Try
   */
 object ExpOutOps {
 
-  val defaultPath = "experiments"
+  val defaultPath = "scope-sketch-bench/experiments"
 
   def clear(name: String): Unit = clear(defaultPath, name)
 
