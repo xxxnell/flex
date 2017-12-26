@@ -85,6 +85,65 @@ class SketchPropSpec extends Specification with ScalaCheck {
 
     }
 
+    "narrowUpdate" in {
+      val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, -10, 10)
+      val (counterSize, counterNo) = (8, 2)
+      implicit val conf: SketchConf = SketchConf(
+        CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
+        CounterConf(counterSize, counterNo)
+      )
+      val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
+
+      (for {
+        sketch <- sketch0.narrowUpdate(0)
+        count <- sketch.count(-1, 1)
+        _ = println(s"count: $count")
+      } yield count)
+        .fold(ko("Exception occurs."))(count => if(count > 0) ok else ko(s"count: $count, expected: 0<x<1"))
+    }
+
+    "probability" in {
+
+      "empty" in {
+        val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, -10, 10)
+        val (counterSize, counterNo) = (8, 2)
+        implicit val conf: SketchConf = SketchConf(
+          CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
+          CounterConf(counterSize, counterNo)
+        )
+        val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
+
+        sketch0.probability(0, 1)
+          .fold(ko)(prob => if(prob > 0) ok else ko(s"probability: $prob"))
+      }
+
+      "from min to 0 after updated" in {
+        val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, 0, 10)
+        val (counterSize, counterNo) = (8, 2)
+        implicit val conf: SketchConf = SketchConf(
+          CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
+          CounterConf(counterSize, counterNo)
+        )
+        val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
+
+        (for {
+          sketch1 <- sketch0.update(-1)
+          prob1 <- sketch1.probability(Double.MinValue, 0)
+          prob2 <- sketch1.probability(0, Double.MaxValue)
+          _ = println(prob1)
+          _ = println(prob2)
+        } yield (prob1, prob2))
+          .fold(ko){ case (prob1, prob2) =>
+            val cond1 = prob1 ~= 1d
+            val cond2 = prob2 ~= 0d
+
+            if(cond1 && cond2) ok
+            else ko(s"probability for [-∞, 0]: $prob1, probability for [0, +∞]: $prob2")
+          }
+      }
+
+    }
+
     "countPlot" in {
       val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, -10, 10)
       val (counterSize, counterNo) = (8, 2)
@@ -244,6 +303,8 @@ class SketchPropSpec extends Specification with ScalaCheck {
       }
 
     }
+
+    /** End **/
 
   }
 

@@ -10,13 +10,14 @@ import sketch.scope.plot._
 import sketch.scope.range._
 
 import scala.language.higherKinds
+import scala.util.Try
 
 /**
   * Licensed by Probe Technology, Inc.
   *
   * This Ops introduces the update function with primitive type as a parameter.
   */
-trait SketchPrimPropOps[S[_]<:Sketch[_]] extends SketchPrimPropLaws[S] with SketchPropOps[S]{
+trait SketchPrimPropOps[S[_]<:Sketch[_]] extends SketchPrimPropLaws[S] with SketchPropOps[S] { self =>
 
   val mixingRatio: Double = 1
 
@@ -105,6 +106,12 @@ trait SketchPrimPropOps[S[_]<:Sketch[_]] extends SketchPrimPropLaws[S] with Sket
     countsO.map(counts => counts.sum / counts.size)
   }
 
+  def primProbability(sketch: S[_], pFrom: Prim, pTo: Prim): Option[Double] = for {
+    count <- primCount(sketch, pFrom, pTo)
+    sum = self.sum(sketch)
+    flatDensity = BigDecimal(1) / RangeP(Cmap.max, Cmap.min).length
+  } yield if(sum != 0) (BigDecimal(count) / BigDecimal(sum)).toDouble else flatDensity.toDouble
+
   /**
     * Total number of elements be memorized.
     * */
@@ -134,10 +141,10 @@ trait SketchPrimPropLaws[S[_]<:Sketch[_]] { self: SketchPrimPropOps[S] =>
   }
 
   /***/
-  def probability[A](sketch: S[A], from: A, to: A): Option[Double] = for {
-    count <- count(sketch, from, to)
-    sum = self.sum(sketch)
-  } yield (BigDecimal(count) / BigDecimal(sum)).toDouble
+  def probability[A](sketch: S[A], from: A, to: A): Option[Double] = {
+    val measure = sketch.measure.asInstanceOf[Measure[A]]
+    primProbability(sketch, measure(from), measure(to))
+  }
 
   //  def pdf(sketch: S, a: Double): Option[Double] = ???
 
@@ -154,12 +161,10 @@ trait SketchPrimPropLaws[S[_]<:Sketch[_]] { self: SketchPrimPropOps[S] =>
     cmapHcounter <- sketch.structures.lastOption
     (cmap, _) = cmapHcounter
     ranges = cmap.bin
-    rangeCounts <- ranges.traverse(range => primCount(sketch, range.start, range.end).map(count => (range, count)))
-    sum = self.sum(sketch)
-    flatDensity = (1d / RangeP(Cmap.max, Cmap.min).length).toDouble
-    densityRanges = rangeCounts.map { case (range, count) =>
-      (range, if(sum != 0) count / (sum * range.length).toDouble else flatDensity)
-    }.filter { case (_, value) => !value.isNaN }
-  } yield DensityPlot.disjoint(densityRanges)
+    rangeProbs <- ranges.traverse(range => primProbability(sketch, range.start, range.end).map(prob => (range, prob)))
+    rangeDensities = rangeProbs
+      .map { case (range, prob) => (range, Try(prob / range.length).toOption) }
+      .flatMap { case (range, densityO) => densityO.map(density => (range, density.toDouble)) }
+  } yield DensityPlot.disjoint(rangeDensities)
   
 }
