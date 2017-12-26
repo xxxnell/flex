@@ -9,7 +9,7 @@ import sketch.scope.pdf.update.EqualSpaceCdfUpdate
 import sketch.scope.plot._
 import sketch.scope.range._
 
-import scala.language.higherKinds
+import scala.language.{higherKinds, postfixOps}
 import scala.util.Try
 
 /**
@@ -110,7 +110,8 @@ trait SketchPrimPropOps[S[_]<:Sketch[_]] extends SketchPrimPropLaws[S] with Sket
     count <- primCount(sketch, pFrom, pTo)
     sum = self.sum(sketch)
     flatDensity = BigDecimal(1) / RangeP(Cmap.max, Cmap.min).length
-  } yield if(sum != 0) (BigDecimal(count) / BigDecimal(sum)).toDouble else flatDensity.toDouble
+    flatProb = (flatDensity * RangeP(pFrom, pTo).length).toDouble
+  } yield if(sum != 0) (BigDecimal(count) / BigDecimal(sum)).toDouble else flatProb
 
   /**
     * Total number of elements be memorized.

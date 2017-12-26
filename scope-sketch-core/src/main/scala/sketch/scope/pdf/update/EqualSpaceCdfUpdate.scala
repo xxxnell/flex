@@ -14,7 +14,7 @@ trait EqualSpaceCdfUpdate {
     sketchPlot <- sketch.densityPlot
     mtpSketchPlot = sketchPlot * (1 / (mixingRatio + 1))
     mtpPsPlot = DensityPlot.squareKernel(ps, window) * (mixingRatio / (mixingRatio + 1))
-    mergedPlot = mtpSketchPlot + mtpPsPlot
+    mergedPlot = if(ps.nonEmpty) mtpSketchPlot + mtpPsPlot else sketchPlot
     cmapSize = sketch.conf.cmap.size
     cmap = cmapForEqualSpaceCumulative(mergedPlot, cmapSize)
   } yield cmap
