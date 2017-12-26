@@ -86,7 +86,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
     }
 
     "countPlot" in {
-      val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, 0, 10)
+      val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, -10, 10)
       val (counterSize, counterNo) = (8, 2)
       implicit val conf: SketchConf = SketchConf(
         CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
@@ -97,15 +97,19 @@ class SketchPropSpec extends Specification with ScalaCheck {
       sketch0.countPlot.fold(ko("Fail to call the countPlot."))(plot => {
         val cond1 = plot.records.nonEmpty
         val cond2 = plot.records.forall { case (_, value) => !value.isNaN }
-        if(cond1 && cond2) ok
-        else if(!cond1) ko("Plot record is empty.")
+        val cond3 = plot.records.headOption.forall { case (range, _) => range.end ~= cmapMin }
+        val cond4 = plot.records.lastOption.forall { case (range, _) => range.start ~= cmapMax }
+
+        if(!cond1) ko("Plot record is empty.")
         else if(!cond2) ko("Some value is NaN")
-        else ko
+        else if(!cond3) ko(s"${plot.records.headOption} is first range. cmapMin: $cmapMin")
+        else if(!cond4) ko(s"${plot.records.lastOption} is last range. cmapMax: $cmapMax")
+        else ok
       })
     }
 
     "densityPlot" in {
-      val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, 0, 10)
+      val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, -10, 10)
       val (counterSize, counterNo) = (8, 2)
       implicit val conf: SketchConf = SketchConf(
         CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
@@ -116,10 +120,14 @@ class SketchPropSpec extends Specification with ScalaCheck {
       sketch0.densityPlot.fold(ko("Fail to call the densityPlot."))(plot => {
         val cond1 = plot.records.nonEmpty
         val cond2 = plot.records.forall { case (_, value) => !value.isNaN }
-        if(cond1 && cond2) ok
-        else if(!cond1) ko("Plot record is empty.")
+        val cond3 = plot.records.headOption.forall { case (range, _) => range.end ~= cmapMin }
+        val cond4 = plot.records.lastOption.forall { case (range, _) => range.start ~= cmapMax }
+
+        if(!cond1) ko("Plot record is empty.")
         else if(!cond2) ko("Some value is NaN")
-        else ko
+        else if(!cond3) ko(s"${plot.records.headOption} is first range. cmapMin: $cmapMin")
+        else if(!cond4) ko(s"${plot.records.lastOption} is last range. cmapMax: $cmapMax")
+        else ok
       })
     }
 

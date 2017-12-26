@@ -150,18 +150,16 @@ trait SketchPrimPropLaws[S[_]<:Sketch[_]] { self: SketchPrimPropOps[S] =>
     counts <- ranges.traverse(range => primCount(sketch, range.start, range.end))
   } yield CountPlot.disjoint(ranges.zip(counts))
 
-  def densityPlot(sketch: S[_]): Option[DensityPlot] = {
-    val sum = self.sum(sketch)
-
-    for {
-      plot <- countPlot(sketch)
-      domain <- plot.domain
-      flatDensity = (1d / domain.length).toDouble
-    } yield DensityPlot.disjoint(
-      plot.records
-        .map { case (range, value) => (range, if(sum != 0) value / (sum * range.length).toDouble else flatDensity) }
-        .filter { case (_, value) => !value.isNaN }
-    )
-  }
-
+  def densityPlot(sketch: S[_]): Option[DensityPlot] = for {
+    cmapHcounter <- sketch.structures.lastOption
+    (cmap, _) = cmapHcounter
+    ranges = cmap.bin
+    rangeCounts <- ranges.traverse(range => primCount(sketch, range.start, range.end).map(count => (range, count)))
+    sum = self.sum(sketch)
+    flatDensity = (1d / RangeP(Cmap.max, Cmap.min).length).toDouble
+    densityRanges = rangeCounts.map { case (range, count) =>
+      (range, if(sum != 0) count / (sum * range.length).toDouble else flatDensity)
+    }.filter { case (_, value) => !value.isNaN }
+  } yield DensityPlot.disjoint(densityRanges)
+  
 }

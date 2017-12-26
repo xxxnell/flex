@@ -22,6 +22,10 @@ trait Cmap {
 
 trait CmapOps[C<:Cmap] extends CmapLaws[C] {
 
+  val min: Prim = Double.MinValue
+
+  val max: Prim = Double.MaxValue
+
   def bin(cmap: C): List[RangeP]
 
   def size(cmap: C): Int

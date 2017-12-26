@@ -51,10 +51,6 @@ trait DividerCmapOps[DC<:DividerCmap] extends CmapOps[DC] {
   def divider2InverseIndexingMap(divider: List[Double]): TreeMap[HDim, Double] =
     TreeMap.apply(divider.sorted.zipWithIndex.map { case (div, idx) => (idx, div) }: _*)
 
-  val min: Prim = Double.MinValue
-
-  val max: Prim = Double.MaxValue
-
   def bin(cmap: DC): List[RangeP] = {
     val divider = cmap.divider
 
