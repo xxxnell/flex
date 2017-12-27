@@ -31,7 +31,11 @@ trait RangePOps extends RangeMOps[GenericRangeP] {
   }
 
   def overlapPercent[A](range1: RangeP, range2: RangeP): Double = {
-    (length(intersection(range1, range2)) / length(range1)).toDouble
+    val range1Len = length(range1)
+
+    if (range1Len != 0) (length(intersection(range1, range2)) / length(range1)).toDouble
+    else if(range1 == range2) 1
+    else 0
   }
 
 }
