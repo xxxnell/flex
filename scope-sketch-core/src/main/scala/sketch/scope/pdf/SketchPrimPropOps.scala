@@ -46,7 +46,7 @@ trait SketchPrimPropOps[S[_]<:Sketch[_]] extends SketchPrimPropLaws[S] with Sket
       case _ => None
     }
     (oldStr, strs) = headTailStr
-    utdHCounter1 <- migrateForSketch(HCounter.empty(oldStr._2.depth, oldStr._2.width), utdCmap, sketch)
+    utdHCounter1 <- migrateForSketch(HCounter.empty(oldStr._2.depth, oldStr._2.width, sum(sketch).toInt), utdCmap, sketch)
     utdHCounter2 <- migrateForPs(utdHCounter1, utdCmap, ps)
     utdStrs = strs :+ (utdCmap, utdHCounter2)
     utdSketch <- modifyStructure(sketch, _ => Some(utdStrs))

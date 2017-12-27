@@ -69,7 +69,8 @@ object HCounterGen {
   def hcounterGen: Gen[HCounter] = for {
     depth <- Gen.choose(1, 10)
     width <- Gen.choose(100, 10000)
-  } yield HCounter.empty(depth, width)
+    seed = 0
+  } yield HCounter.empty(depth, width, seed)
 
   def hcounterA: Arbitrary[HCounter] = Arbitrary(hcounterGen)
 

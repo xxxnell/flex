@@ -10,7 +10,7 @@ import scala.util.hashing.byteswap32
   */
 class Byteswap32Hmap(seed: Int) extends Hmap {
 
-  val hseed = byteswap32(seed)
+  val hseed: Int = byteswap32(seed)
 
   def apply(hdim: HDim, size: Int): Option[CDim] = if(size > 0) {
     Try(Math.abs(byteswap32(hseed + hdim)) % size).toOption

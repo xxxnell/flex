@@ -41,7 +41,7 @@ object PeriodicSketch {
   def emptyForPeriod[A](start: Double, period: Double)
                        (implicit measure: Measure[A], conf: SketchConf): PeriodicSketch[A] = {
     val structure = (1 to conf.cmap.no).toList
-      .map(_ => (Cmap(conf.cmap), HCounter(conf.counter)))
+      .map(i => (Cmap(conf.cmap), HCounter(conf.counter, ~i)))
     bare(measure, structure, conf, start, period)
   }
 
