@@ -9,21 +9,21 @@ import sketch.scope.plot.{DensityPlot, Plot}
 /**
   * Licensed by Probe Technology, Inc.
   */
-object BasicExp {
-
-  val expName = "basic"
+object BasicDeltaDistExp {
 
   def main(args: Array[String]): Unit = {
-    val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, -10, 10)
-    val (counterSize, counterNo) = (8, 2)
+    val expName = "basic-delta"
+
+    val (cmapSize, cmapNo, cmapMin, cmapMax) = (100, 2, -10, 10)
+    val (counterSize, counterNo) = (1000, 2)
     val sampleNo = 10
 
     val conf: SketchConf = SketchConf(
       CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
       CounterConf(counterSize, counterNo)
     )
-    val sketch = PeriodicSketch.emptyForPeriod(0, 1)(doubleMeasure, conf)
-    val (_, datas) = Dist.delta(0).samples(sampleNo)
+    val sketch = PeriodicSketch.emptyForPeriod(2, 1)(doubleMeasure, conf)
+    val (_, datas) = Dist.delta(0.1).samples(sampleNo)
 
     var tempSketchO: Option[Sketch[Double]] = Option(sketch)
     val utdSketches: List[Option[Sketch[Double]]] = Option(sketch) :: datas.map { data =>
@@ -31,7 +31,7 @@ object BasicExp {
       tempSketchO
     }
     val plots = utdSketches.map { sketchO => sketchO.flatMap(_.densityPlot) }.map(_.getOrElse(DensityPlot.empty))
-    
+
     ExpOutOps.clear(expName)
     ExpOutOps.writePlots(expName, plots)
   }

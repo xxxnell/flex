@@ -2,8 +2,6 @@ package sketch.scope
 
 import java.io.{File, FileOutputStream}
 
-import com.github.nscala_time.time.Imports.DateTime
-import sketch.scope.experiment.BasicExp.expName
 import sketch.scope.plot.Plot
 
 import scala.util.Try
@@ -45,7 +43,7 @@ object ExpOutOps {
   def writePlots(path: String, name: String, plots: List[Plot]): Unit = {
     for (plotIdx <- plots.zipWithIndex) {
       val (plot, idx) = plotIdx
-      writePlot(expName, idx.toString, plot)
+      writePlot(name, idx.toString, plot)
     }
   }
 
