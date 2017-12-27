@@ -192,45 +192,92 @@ class SketchPropSpec extends Specification with ScalaCheck {
 
     "deepUpdate" in {
 
-      "basic" in {
-        val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 3, -1, 10)
-        val (counterSize, counterNo) = (8, 2)
-        implicit val conf: SketchConf = SketchConf(
-          CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
-          CounterConf(counterSize, counterNo)
-        )
-        val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
-        val sketch1O = sketch0.deepUpdate(1).map(_._1)
+      "changing cmap" in {
 
-        val cond1 = sketch0.lastCmap != sketch1O.flatMap(_.lastCmap)
-        val cond2 = sketch0.lastCmap.map(_.size) == sketch1O.flatMap(_.lastCmap).map(_.size)
+        "basic" in {
+          val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 3, -1, 10)
+          val (counterSize, counterNo) = (8, 2)
+          implicit val conf: SketchConf = SketchConf(
+            CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
+            CounterConf(counterSize, counterNo)
+          )
+          val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
+          val sketch1O = sketch0.deepUpdate(1).map(_._1)
 
-        if(cond1 && cond2) ok
-        else ko(
-          s"cmap1(${sketch0.lastCmap.map(_.size).getOrElse(0)}): ${sketch0.lastCmap}, " +
-            s"cmap2(${sketch1O.flatMap(_.lastCmap).map(_.size).getOrElse(0)}): ${sketch1O.flatMap(_.lastCmap)}"
-        )
+          val cond1 = sketch0.lastCmap != sketch1O.flatMap(_.lastCmap)
+          val cond2 = sketch0.lastCmap.map(_.size) == sketch1O.flatMap(_.lastCmap).map(_.size)
+
+          if(cond1 && cond2) ok
+          else ko(
+            s"cmap1(${sketch0.lastCmap.map(_.size).getOrElse(0)}): ${sketch0.lastCmap}, " +
+              s"cmap2(${sketch1O.flatMap(_.lastCmap).map(_.size).getOrElse(0)}): ${sketch1O.flatMap(_.lastCmap)}"
+          )
+        }
+
+        "2 times" in {
+          val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, -1, 10)
+          val (counterSize, counterNo) = (8, 2)
+          implicit val conf: SketchConf = SketchConf(
+            CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
+            CounterConf(counterSize, counterNo)
+          )
+          val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
+          val sketch1O = sketch0.deepUpdate(1).map(_._1)
+          val sketch2O = sketch1O.flatMap(sketch1 => sketch1.deepUpdate(1).map(_._1))
+
+          val cmap0O = sketch0.lastCmap
+          val cmap1O = sketch1O.flatMap(_.lastCmap)
+          val cmap2O = sketch2O.flatMap(_.lastCmap)
+
+          if(cmap0O != cmap1O && cmap1O != cmap2O) ok
+          else ko(s"cmap0: $cmap0O, cmap1: $cmap1O, cmap2: $cmap2O")
+        }
+
       }
 
-      "2 times" in {
-        val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, -1, 10)
-        val (counterSize, counterNo) = (8, 2)
-        implicit val conf: SketchConf = SketchConf(
-          CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
-          CounterConf(counterSize, counterNo)
-        )
-        val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
-        val sketch1O = sketch0.deepUpdate(1).map(_._1)
-        val sketch2O = sketch1O.flatMap(sketch1 => sketch1.deepUpdate(1).map(_._1))
+      "migrate countings" in {
+//        val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 3, 0, 10)
+//        val (counterSize, counterNo) = (8, 2)
+//        implicit val conf: SketchConf = SketchConf(
+//          CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
+//          CounterConf(counterSize, counterNo)
+//        )
+//        val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
+//        val sketch1O = sketch0.narrowU(5.5).map(_._1)
 
-        val cmap0O = sketch0.lastCmap
-        val cmap1O = sketch1O.flatMap(_.lastCmap)
-        val cmap2O = sketch2O.flatMap(_.lastCmap)
-
-        if(cmap0O != cmap1O && cmap1O != cmap2O) ok
-        else ko(s"cmap0: $cmap0O, cmap1: $cmap1O, cmap2: $cmap2O")
+        todo
       }
 
+    }
+
+    "rearrange" in {
+//      val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 3, 0, 10)
+//      val (counterSize, counterNo) = (8, 2)
+//      val conf: SketchConf = SketchConf(
+//        CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
+//        CounterConf(counterSize, counterNo)
+//      )
+//      val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
+//
+//      (for {
+//        sketch1 <- sketch0.narrowUpdate(5.5)
+//        sketch2 <- sketch1.rearrange
+//        count1 <- sketch2.count(5, 6)
+//        count2 <- sketch2.count(0, 1)
+//      } yield (count1, count2))
+//        .fold(ko){ case (count1, count2) =>
+//          val count1Exp = 1d - 1d / (cmapSize.toDouble - 2)
+//          val cond1 = count1 ~= count1Exp
+//          val cond2 = count2 ~= 0
+//
+//          if(cond1 && cond2) ok
+//          else ko(
+//            s"count 5<x<6: $count1 (expected: $count1Exp), " +
+//              s"count 0<x<1: $count2 (expected: 0)"
+//          )
+//        }
+
+      todo
     }
 
     "count" in {
