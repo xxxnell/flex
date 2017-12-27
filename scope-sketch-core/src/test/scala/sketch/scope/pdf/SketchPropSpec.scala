@@ -97,7 +97,6 @@ class SketchPropSpec extends Specification with ScalaCheck {
       (for {
         sketch <- sketch0.narrowUpdate(0)
         count <- sketch.count(-1, 1)
-        _ = println(s"count: $count")
       } yield count)
         .fold(ko("Exception occurs."))(count => if(count > 0) ok else ko(s"count: $count, expected: 0<x<1"))
     }
@@ -130,8 +129,6 @@ class SketchPropSpec extends Specification with ScalaCheck {
           sketch1 <- sketch0.update(-1)
           prob1 <- sketch1.probability(Double.MinValue, 0)
           prob2 <- sketch1.probability(0, Double.MaxValue)
-          _ = println(prob1)
-          _ = println(prob2)
         } yield (prob1, prob2))
           .fold(ko){ case (prob1, prob2) =>
             val cond1 = prob1 ~= 1d
