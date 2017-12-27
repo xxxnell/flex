@@ -33,7 +33,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
 
       "basic 2" in {
         val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, 0, 10)
-        val (counterSize, counterNo) = (8, 2)
+        val (counterSize, counterNo) = (100, 2)
         implicit val conf: SketchConf = SketchConf(
           CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
           CounterConf(counterSize, counterNo)
@@ -44,7 +44,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
           sketch1 <- sketch0.update(1, 2, 3, 4, 5, 6, 7, 8, 9)
           count <- sketch1.count(0, 10)
         } yield count)
-          .fold(ko)(count => if(count == 9) ok else ko(s"count: $count, expected: 10"))
+          .fold(ko)(count => if(count ~= 9) ok else ko(s"count: $count, expected: 9"))
       }
 
       "count smaller space then cmap bound" in {
@@ -118,7 +118,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
 
       "from min to 0 after updated" in {
         val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, 0, 10)
-        val (counterSize, counterNo) = (8, 2)
+        val (counterSize, counterNo) = (100, 2)
         implicit val conf: SketchConf = SketchConf(
           CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
           CounterConf(counterSize, counterNo)
