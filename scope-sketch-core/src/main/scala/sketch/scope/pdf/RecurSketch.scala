@@ -30,7 +30,7 @@ trait RecurSketchLaws[S[_]<:RecurSketch[_]] { self: RecurSketchOps[S] =>
     nextThreshold <- sketch.thresholds.headOption
     utdSketch1 <- narrowUpdate[A](sketch, as)
     sum = self.sum(utdSketch1)
-    utdSketch2 <- if(nextThreshold < sum) for {
+    utdSketch2 <- if(nextThreshold <= sum) for {
       rearrangedSketch <- rearrange(utdSketch1)
       droppedSketch <- dropThreshold(rearrangedSketch)
     } yield droppedSketch else Some(utdSketch1)
