@@ -14,7 +14,7 @@ object BasicExp {
   val expName = "basic"
 
   def main(args: Array[String]): Unit = {
-    val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, 0, 10)
+    val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, -10, 10)
     val (counterSize, counterNo) = (8, 2)
     val sampleNo = 10
 
@@ -23,15 +23,15 @@ object BasicExp {
       CounterConf(counterSize, counterNo)
     )
     val sketch = PeriodicSketch.emptyForPeriod(0, 1)(doubleMeasure, conf)
-    val (_, datas) = Dist.normal(0d, 1).samples(sampleNo)
+    val (_, datas) = Dist.delta(0).samples(sampleNo)
 
     var tempSketchO: Option[Sketch[Double]] = Option(sketch)
-    val utdSketches = datas.map { data =>
+    val utdSketches: List[Option[Sketch[Double]]] = Option(sketch) :: datas.map { data =>
       tempSketchO = tempSketchO.flatMap(_.update(data))
       tempSketchO
     }
     val plots = utdSketches.map { sketchO => sketchO.flatMap(_.densityPlot) }.map(_.getOrElse(DensityPlot.empty))
-
+    
     ExpOutOps.clear(expName)
     ExpOutOps.writePlots(expName, plots)
   }
