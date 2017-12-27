@@ -21,11 +21,12 @@ class HCounterOpsBench {
   @Param(Array("1000", "100000"))
   var coSize: Int = _
 
-  val hcounter = HCounter.empty(coDepth, coSize)
+  val seed = 0
+  val hcounter = HCounter.empty(coDepth, coSize, seed)
 
   @Benchmark
   def construct = {
-    HCounter.empty(coDepth, coSize)
+    HCounter.empty(coDepth, coSize, seed)
   }
 
   @Benchmark

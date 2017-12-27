@@ -3,7 +3,10 @@ package sketch.scope.hcounter
 import cats.implicits._
 import sketch.scope.conf.CounterConf
 import sketch.scope.counter.{CDim, Counter}
+import sketch.scope.hcounter.HCounter.width
 import sketch.scope.hmap.{HDim, Hmap}
+
+import scala.util.hashing.byteswap32
 
 /**
   * Licensed by Probe Technology, Inc.
@@ -72,16 +75,19 @@ object HCounter extends HCounterOps[HCounter] { self =>
 
   private case class HCounterImpl(structures: List[(Hmap, Counter)], sum: Double) extends HCounter
 
-  def apply(structure: List[(Hmap, Counter)], sum: Double): HCounter = HCounterImpl(structure, sum)
+  def apply(structure: List[(Hmap, Counter)], sum: Double): HCounter = bare(structure, sum)
 
-  def apply(conf: CounterConf): HCounter = empty(conf.no, conf.size)
+  def apply(conf: CounterConf, seed: Int): HCounter = empty(conf.no, conf.size, seed)
 
-//  def structure(structure: List[(Hmap, Counter)]): HCounter = HCounterImpl(structure)
+  def bare(structures: List[(Hmap, Counter)], sum: Double): HCounter = HCounterImpl(structures, sum)
 
   /**
     * @param width Cdim size of the counter
     * */
-  def empty(depth: Int, width: Int): HCounter =
-    HCounterImpl((0 until depth).toList.map(i => (Hmap(i), Counter.empty(width))), 0)
+  def empty(depth: Int, width: Int, seed: Int): HCounter = {
+    val hmapSeed: Int => Int = (i: Int) => byteswap32(seed ^ Int.MaxValue) << i
+    val strs = (0 until depth).toList.map(i => (Hmap(hmapSeed(i)), Counter.empty(width)))
+    bare(strs, 0)
+  }
 
 }

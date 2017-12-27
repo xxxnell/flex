@@ -33,6 +33,7 @@ trait SketchPropOps[S[_]<:Sketch[_]] extends SketchPropLaws[S] with SampleDistPr
 
   def narrowUpdate[A](sketch: S[A], as: List[(A, Count)]): Option[S[A]]
 
+  // todo deepUpdate have to take a conf parameter to construct returned Sketch
   def deepUpdate[A](sketch: S[A], as: List[(A, Count)]): Option[(S[A], Structure)]
 
   //  def clear(sketch: S): S
