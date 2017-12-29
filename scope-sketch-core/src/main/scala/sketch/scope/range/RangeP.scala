@@ -18,8 +18,6 @@ trait GenericRangeP[G] extends RangeM[Prim] {
 
 trait RangePOps extends RangeMOps[GenericRangeP] {
 
-  def length(range: RangeP): BigDecimal = BigDecimal(range.end) - BigDecimal(range.start)
-
   def intersection[A](range1: RangeP, range2: RangeP): RangeP = {
     val (start1, end1) = (range1.start, range1.end)
     val (start2, end2) = (range2.start, range2.end)
@@ -64,5 +62,9 @@ object RangeP extends RangePOps {
   def point(p: Prim): RangeP = bare(p, p)
 
   def forNumericRange(numRange: NumericRange[Prim]): RangeP = apply(numRange.start, numRange.end)
+
+  def forRangeM[A](rangeM: RangeM[A]): RangeP = {
+    bare(rangeM.measure.to(rangeM.start), rangeM.measure.to(rangeM.end))
+  }
 
 }

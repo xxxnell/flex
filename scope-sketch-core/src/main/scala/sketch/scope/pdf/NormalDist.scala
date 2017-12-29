@@ -11,11 +11,18 @@ case class NormalDist[A](measure: Measure[A], mean: Prim, variance: Prim, rng: I
 trait NormalDistOps extends SmoothDistPropOps[NormalDist] {
 
   def probability[A](dist: NormalDist[A], start: A, end: A): Option[Double] = {
-    val toPrim = dist.measure(end)
-    val fromPrim = dist.measure(start)
+    val startPrim = dist.measure.to(end)
+    val endPrim = dist.measure.to(start)
     val numericDist = new NormalDistribution(dist.mean, dist.variance)
 
-    Some(numericDist.cumulativeProbability(toPrim) - numericDist.cumulativeProbability(fromPrim))
+    Some(numericDist.cumulativeProbability(startPrim) - numericDist.cumulativeProbability(endPrim))
+  }
+
+  def pdf[A](dist: NormalDist[A], a: A): Option[Prim] = {
+    val numericDist = new NormalDistribution(dist.mean, dist.variance)
+    val prim = dist.measure.to(a)
+
+    Some(numericDist.density(prim))
   }
 
   def modifyRng[A](dist: NormalDist[A], f: IRng => IRng): NormalDist[A]
