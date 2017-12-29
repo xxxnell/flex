@@ -1,10 +1,10 @@
 package sketch.scope.plot
 
-import sketch.scope.range._
 import org.apache.commons.math3.fitting.{PolynomialCurveFitter, WeightedObservedPoints}
+import sketch.scope.range._
 
-import scala.collection.immutable.{HashSet, Set}
 import scala.language.postfixOps
+import scala.math._
 import scala.util.Try
 
 /**
@@ -65,11 +65,6 @@ trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
       .map { case (_, value) => value }
 
     (midInterp orElse headExt orElse tailExt).getOrElse(0)
-  }
-
-  def list2Triplet[A](list: List[A]): Option[(A, A, A)] = list match {
-    case List(a, b, c) => Some((a, b, c))
-    case _ => None
   }
 
   def dataFitting(as: List[(Double, Double)], x: Double): Option[Double] = {
@@ -139,11 +134,6 @@ trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
     if(planarized.nonEmpty) planarized else List(record)
   }
 
-  def remove[A](xs: Vector[A], a: A): Vector[A] = {
-    val idx = xs.indexOf(a)
-    (xs take idx) ++ (xs drop (idx + 1))
-  }
-
   def domain(plot: P): Option[RangeP] = {
     val startO = Try(plot.records.map { case (range, _) => range.start }.min).toOption
     val endO = Try(plot.records.map { case (range, _) => range.end }.max).toOption
@@ -159,7 +149,7 @@ trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
       planarizeRecords(records ++ plot2.records).map { case (range, values) => (range, values.sum) }
     )
 
-  def multiply(plot: P, mag: Double): P = modifyValue(plot, record => record._2 * mag)
+  def multiplyConstant(plot: P, mag: Double): P = modifyValue(plot, { case (_, value) => value * mag })
 
 }
 
@@ -174,14 +164,15 @@ trait PlotSyntax {
 }
 
 trait PolyPlotSyntax[P<:Plot] {
+  // context
   def plot: P
   def ops: PlotOps[P]
-
+  // syntax
   def modify(f: Record => Double): P = ops.modifyValue(plot, f)
   def add(plot2: P): P = ops.add(plot, plot2)
   def +(plot2: P): P = ops.add(plot, plot2)
-  def multiply(mag: Double): P = ops.multiply(plot, mag)
-  def *(mag: Double): P = ops.multiply(plot, mag)
+  def multiply(mag: Double): P = ops.multiplyConstant(plot, mag)
+  def *(mag: Double): P = ops.multiplyConstant(plot, mag)
   def inverse: P = ops.inverse(plot)
   def domain: Option[RangeP] = ops.domain(plot)
 }
