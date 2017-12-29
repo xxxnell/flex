@@ -38,6 +38,10 @@ trait RangeMOps[R[_]<:RangeM[_]] {
   def contains[A](range: R[A], a: A): Boolean =
     containsP(primStart(range), primEnd(range), range.measure.asInstanceOf[Measure[A]].to(a))
 
+  def greater[A](range: R[A], a: A): Boolean = primStart(range) > range.measure.asInstanceOf[Measure[A]].to(a)
+
+  def less[A](range: R[A], a: A): Boolean = primEnd(range) < range.measure.asInstanceOf[Measure[A]].to(a)
+
   def middleP[A](start: Prim, end: Prim): Prim = ((BigDecimal(start) + BigDecimal(end)) / 2).toDouble
 
   def middle[A](range: R[A]): A =
@@ -65,6 +69,12 @@ trait RangeMSyntax {
 
   implicit class RangeMSyntaxImpl[A](range: RangeM[A]) {
     def contains(a: A): Boolean = RangeM.contains(range, a)
+    def greater(a: A): Boolean = RangeM.greater(range, a)
+    def >(a: A): Boolean = RangeM.greater(range, a)
+    def >=(a: A): Boolean = RangeM.greater(range, a) || RangeM.contains(range, a)
+    def less(a: A): Boolean = RangeM.less(range, a)
+    def <(a: A): Boolean = RangeM.less(range, a)
+    def <=(a: A): Boolean = RangeM.less(range, a) || RangeM.contains(range, a)
     def middle: A = RangeM.middle(range)
     def isPoint: Boolean = RangeM.isPoint(range)
   }

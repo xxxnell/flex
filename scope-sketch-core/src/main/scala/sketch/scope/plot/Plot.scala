@@ -1,5 +1,7 @@
 package sketch.scope.plot
 
+import org.apache.commons.math3.analysis.UnivariateFunction
+import org.apache.commons.math3.analysis.integration.SimpsonIntegrator
 import org.apache.commons.math3.fitting.{PolynomialCurveFitter, WeightedObservedPoints}
 import sketch.scope.range._
 
@@ -151,6 +153,38 @@ trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
 
   def multiplyConstant(plot: P, mag: Double): P = modifyValue(plot, { case (_, value) => value * mag })
 
+  def integral(plot: P, start: Double, end: Double): Double = {
+    val maxEval = 3
+    val minimalIterationCount = 2
+    val maximalIterationCount = 3
+    val integrator = new SimpsonIntegrator(minimalIterationCount, maximalIterationCount)
+    val f = new UnivariateFunction {
+      override def value(x: Double): Double = plot.interpolation(x)
+    }
+    val samples: List[RangeP] = plot.records
+      .map { case (range, _) => range.middle }
+      .sliding(2)
+      .flatMap {
+        case s1 :: s2 :: Nil => Some(RangeP(s1, s2))
+        case _ => None
+      }.toList
+
+    val mid: Double = samples
+      .filter { sample => sample > start && sample < end }
+      .map(range => integrator.integrate(maxEval, f, range.start, range.end))
+      .sum
+
+    val startBoundary: Double = samples.find(sample => sample.contains(start))
+      .map(range => integrator.integrate(maxEval, f, start, range.end))
+      .getOrElse(0)
+
+    val endBoundary: Double = samples.find(sample => sample.contains(end))
+      .map(range => integrator.integrate(maxEval, f, range.start, end))
+      .getOrElse(0)
+
+    mid + startBoundary + endBoundary
+  }
+
 }
 
 trait PlotSyntax {
@@ -159,6 +193,7 @@ trait PlotSyntax {
     def image(argument: Double): Option[Double] = Plot.image(plot, argument)
     def value(argument: Double): Option[Double] = Plot.image(plot, argument)
     def interpolation(argument: Double): Double = Plot.interpolation(plot, argument)
+    def integral(start: Double, end: Double): Double = Plot.integral(plot, start, end)
   }
 
 }
