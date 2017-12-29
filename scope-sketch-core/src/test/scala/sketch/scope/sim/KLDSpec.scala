@@ -13,16 +13,21 @@ class KLDSpec extends Specification with ScalaCheck {
   "KLD" should {
 
     "basic" in {
-      val normal = Dist.normal(0d, 1)
-      val samples = (-2.5 to 2.5 by 0.01).toList.sliding(2).map { case s1 :: s2 :: Nil => RangeP(s1, s2) }.toList
+      val normal1 = Dist.normal(0.0, 1)
+      val normal2 = Dist.normal(0.5d, 1)
+      val samples = (-2.5 to 2.5 by 0.1).toList.sliding(2).flatMap {
+        case s1 :: s2 :: Nil => Some(RangeP(s1, s2))
+        case _ => None
+      }.toList
 
       (for {
-        sampling <- normal.toSampleDist(samples)
-        kld <- KLD(sampling, normal)
+        sampling <- normal1.toSampleDist(samples)
+        kld <- KLD(sampling, normal2)
         _ = println(kld)
       } yield kld)
         .fold(ko("Error occurs.")){ kld =>
-          if(kld > 0) ok else ko(s"kld: $kld") }
+          if(kld > 0) ok else ko(s"kld: $kld")
+        }
     }
 
   }

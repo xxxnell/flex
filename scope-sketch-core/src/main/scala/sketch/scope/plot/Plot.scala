@@ -3,6 +3,7 @@ package sketch.scope.plot
 import org.apache.commons.math3.analysis.UnivariateFunction
 import org.apache.commons.math3.analysis.integration.SimpsonIntegrator
 import org.apache.commons.math3.fitting.{PolynomialCurveFitter, WeightedObservedPoints}
+import sketch.scope.pdf.Prim
 import sketch.scope.range._
 
 import scala.language.postfixOps
@@ -154,36 +155,36 @@ trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
   def multiplyConstant(plot: P, mag: Double): P = modifyValue(plot, { case (_, value) => value * mag })
 
   def integral(plot: P, start: Double, end: Double): Double = {
-    val maxEval = 10000
-    val minimalIterationCount = 2
-    val maximalIterationCount = 30
-    val integrator = new SimpsonIntegrator()
-    val f = new UnivariateFunction {
-      override def value(x: Double): Double = plot.interpolation(x)
-    }
-    val samples: List[RangeP] = plot.records
-      .map { case (range, _) => range.middle }
-      .sliding(2)
-      .flatMap {
-        case s1 :: s2 :: Nil => Some(RangeP(s1, s2))
-        case _ => None
-      }.toList
+    val samples: List[(Prim, Double)] = plot.records
+      .flatMap { case (range, value) => (range.start, value) :: (range.end, value) :: Nil }
 
-    val mid: Double = samples
-      .filter { sample => sample > start && sample < end }
-      .map(range => integrator.integrate(maxEval, f, range.start, range.end))
+    val slidings = samples.sliding(2).flatMap {
+      case s1 :: s2 :: Nil => Some((s1, s2))
+      case _ => None
+    }
+
+    val mid: Double = slidings
+      .filter { case ((x1, _), (x2, _)) => x1 > start && x2 < end }
+      .map { case ((x1, y1), (x2, y2)) =>
+        println(s"delta, y1, y2: ${(x2 - x1, y1, y2)}, area: ${area(x1, y1, x2, y2)}")
+        area(x1, y1, x2, y2) }
       .sum
 
-    val startBoundary: Double = samples.find(sample => sample.contains(start))
-      .map(range => integrator.integrate(maxEval, f, start, range.end))
+    val startBoundary: Double = slidings
+      .find { case ((x1, _), (x2, _)) => RangeP(x1, x2).contains(start) }
+      .map { case ((x1, y1), (x2, y2)) => area(x1, y1, x2, y2) }
       .getOrElse(0)
 
-    val endBoundary: Double = samples.find(sample => sample.contains(end))
-      .map(range => integrator.integrate(maxEval, f, range.start, end))
+    val endBoundary: Double = slidings
+      .find { case ((x1, _), (x2, _)) => RangeP(x1, x2).contains(end) }
+      .map { case ((x1, y1), (x2, y2)) => area(x1, y1, x2, y2) }
       .getOrElse(0)
 
     mid + startBoundary + endBoundary
   }
+
+  def area(x1: Double, y1: Double, x2: Double, y2: Double): Double = (x2 - x1) * (y2 + y1) / 2
+
 
 }
 
