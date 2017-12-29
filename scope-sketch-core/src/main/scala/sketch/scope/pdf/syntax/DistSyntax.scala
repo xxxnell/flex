@@ -2,7 +2,7 @@ package sketch.scope.pdf.syntax
 
 import sketch.scope.measure.Measure
 import sketch.scope.pdf.monad.{DistBind, DistFunctor, DistMonad}
-import sketch.scope.pdf.{Dist, Prim, SampledDist, Sketch}
+import sketch.scope.pdf.{Dist, Prim, SamplingDist, Sketch}
 import sketch.scope.plot.AsciiArtPlot
 import sketch.scope.range.RangeM
 
@@ -56,8 +56,8 @@ trait DistMonadSyntax1 extends DistMonadSyntax2 {
 
 trait DistMonadSyntax2 extends DistMonadSyntax3 {
 
-  implicit def bindAux2: DistBindAux[SampledDist, SampledDist] = new DistBindAux[SampledDist, SampledDist] {}
-  implicit def distMonad2: DistMonad[Dist, SampledDist, SampledDist] = DistMonad.sampleDist
+  implicit def bindAux2: DistBindAux[SamplingDist, SamplingDist] = new DistBindAux[SamplingDist, SamplingDist] {}
+  implicit def distMonad2: DistMonad[Dist, SamplingDist, SamplingDist] = DistMonad.samplingDist
 
 }
 

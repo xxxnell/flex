@@ -8,13 +8,13 @@ import scala.language.higherKinds
 /**
   * Licensed by Probe Technology, Inc.
   */
-trait PlottedDist[A] extends SampledDist[A] {
+trait PlottedDist[A] extends SamplingDist[A] {
 
   def densityPlot: DensityPlot
 
 }
 
-trait PlottedDistPropOps[D[_]<:PlottedDist[_]] extends SampleDistPropOps[D] {
+trait PlottedDistPropOps[D[_]<:PlottedDist[_]] extends SamplingDistPropOps[D] {
 
   def densityPlot(dist: D[_]): Option[DensityPlot] = Some(dist.densityPlot)
 

@@ -11,7 +11,7 @@ import scala.language.higherKinds
   *
   * Sketch Data Structure Interface.
   */
-trait Sketch[A] extends SampledDist[A] {
+trait Sketch[A] extends SamplingDist[A] {
 
   def structures: Structures
 
@@ -19,7 +19,7 @@ trait Sketch[A] extends SampledDist[A] {
 
 }
 
-trait SketchPropOps[S[_]<:Sketch[_]] extends SketchPropLaws[S] with SampleDistPropOps[S] {
+trait SketchPropOps[S[_]<:Sketch[_]] extends SketchPropLaws[S] with SamplingDistPropOps[S] {
 
   // Read ops
 

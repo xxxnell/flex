@@ -53,17 +53,17 @@ object Dist extends DistPropOps[Dist] { self =>
 
   def probability[A](dist: Dist[A], from: A, to: A): Option[Double] = dist match {
     case smooth: SmoothDist[A] => SmoothDist.probability(smooth, from, to)
-    case sampled: SampledDist[A] => SampledDist.probability(sampled, from, to)
+    case sampled: SamplingDist[A] => SamplingDist.probability(sampled, from, to)
   }
 
   def sample[A](dist: Dist[A]): (Dist[A], A) = dist match {
     case smooth: SmoothDist[A] => SmoothDist.sample(smooth)
-    case sampled: SampledDist[A] => SampledDist.sample(sampled)
+    case sampled: SamplingDist[A] => SamplingDist.sample(sampled)
   }
 
   def pdf[A](dist: Dist[A], a: A): Option[Double] = dist match {
     case smooth: SmoothDist[A] => SmoothDist.pdf(smooth, a)
-    case sampled: SampledDist[A] => SampledDist.pdf(sampled, a)
+    case sampled: SamplingDist[A] => SamplingDist.pdf(sampled, a)
   }
 
 }

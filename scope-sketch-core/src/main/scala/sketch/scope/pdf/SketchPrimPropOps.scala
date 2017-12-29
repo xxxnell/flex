@@ -106,20 +106,21 @@ trait SketchPrimPropOps[S[_]<:Sketch[_]] extends SketchPrimPropLaws[S] with Sket
     countsO.map(counts => counts.sum / counts.size)
   }
 
+  /**
+    * Total number of elements be memorized.
+    * */
+  def sum(sketch: S[_]): Double = {
+    val sums = sketch.structures.map { case (_, hcounter) => hcounter.sum }
+
+    sums.sum / sums.size
+  }
+
   def primProbability(sketch: S[_], pFrom: Prim, pTo: Prim): Option[Double] = for {
     count <- primCount(sketch, pFrom, pTo)
     sum = self.sum(sketch)
     flatDensity = BigDecimal(1) / RangeP(Cmap.max, Cmap.min).length
     flatProb = (flatDensity * RangeP(pFrom, pTo).length).toDouble
   } yield if(sum != 0) (BigDecimal(count) / BigDecimal(sum)).toDouble else flatProb
-
-  /**
-    * Total number of elements be memorized.
-    * */
-  def sum(sketch: S[_]): Double = {
-    val sums = sketch.structures.map { case (_, hcounter) => hcounter.sum }
-    sums.sum / sums.size
-  }
 
 }
 
@@ -146,10 +147,6 @@ trait SketchPrimPropLaws[S[_]<:Sketch[_]] { self: SketchPrimPropOps[S] =>
     val measure = sketch.measure.asInstanceOf[Measure[A]]
     primProbability(sketch, measure(from), measure(to))
   }
-
-  //  def pdf(sketch: S, a: Double): Option[Double] = ???
-
-  //  def cdf(sketch: S, a: Double): Option[Double] = ???
 
   def countPlot(sketch: S[_]): Option[CountPlot] = for {
     cmapHcounter <- sketch.structures.lastOption

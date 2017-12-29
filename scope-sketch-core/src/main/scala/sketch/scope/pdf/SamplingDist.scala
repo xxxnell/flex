@@ -9,15 +9,15 @@ import scala.language.higherKinds
 /**
   * Licensed by Probe Technology, Inc.
   */
-trait SampledDist[A] extends Dist[A]
+trait SamplingDist[A] extends Dist[A]
 
-trait SampleDistPropOps[D[_]<:SampledDist[_]] extends DistPropOps[D] with SampleDistPropLaws[D] {
+trait SamplingDistPropOps[D[_]<:SamplingDist[_]] extends DistPropOps[D] with SamplingDistPropLaws[D] {
 
   def densityPlot(dist: D[_]): Option[DensityPlot]
 
 }
 
-trait SampleDistPropLaws[D[_]<:SampledDist[_]] { self: SampleDistPropOps[D] =>
+trait SamplingDistPropLaws[D[_]<:SamplingDist[_]] { self: SamplingDistPropOps[D] =>
 
   def pdf[A](dist: D[A], a: A): Option[Double] = for {
     plot <- densityPlot(dist)
@@ -26,24 +26,24 @@ trait SampleDistPropLaws[D[_]<:SampledDist[_]] { self: SampleDistPropOps[D] =>
 
 }
 
-object SampledDist extends SampleDistPropOps[SampledDist] {
+object SamplingDist extends SamplingDistPropOps[SamplingDist] {
 
-  def forSmoothDist[A](dist: SmoothDist[A], domains: List[RangeM[A]]): Option[SampledDist[A]] =
-    dist.toSampleDist(domains)
+  def forSmoothDist[A](dist: SmoothDist[A], domains: List[RangeM[A]]): Option[SamplingDist[A]] =
+    dist.toSamplingDist(domains)
 
-  def probability[A](dist: SampledDist[A], start: A, end: A): Option[Double] = dist match {
+  def probability[A](dist: SamplingDist[A], start: A, end: A): Option[Double] = dist match {
     case sketch: Sketch[A] => Sketch.probability(sketch, start, end)
     case plotted: PlottedDist[A] => PlottedDist.probability(plotted, start, end)
     case _ => ???
   }
 
-  def densityPlot(dist: SampledDist[_]): Option[DensityPlot] = dist match {
+  def densityPlot(dist: SamplingDist[_]): Option[DensityPlot] = dist match {
     case sketch: Sketch[_] => Sketch.densityPlot(sketch)
     case plotted: PlottedDist[_] => PlottedDist.densityPlot(plotted)
     case _ => ???
   }
 
-  def sample[A](dist: SampledDist[A]): (SampledDist[A], A) = dist match {
+  def sample[A](dist: SamplingDist[A]): (SamplingDist[A], A) = dist match {
     case sketch: Sketch[_] => Sketch.sample(sketch)
     case plotted: PlottedDist[_] => PlottedDist.sample(plotted)
   }

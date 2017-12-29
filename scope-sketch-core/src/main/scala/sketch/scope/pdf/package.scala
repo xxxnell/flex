@@ -13,7 +13,7 @@ import scala.language.implicitConversions
   */
 package object pdf
   extends DistSyntax
-    with SampleDistSyntax
+    with SamplingDistSyntax
     with SmoothDistSyntax
     with SketchSyntax {
 
