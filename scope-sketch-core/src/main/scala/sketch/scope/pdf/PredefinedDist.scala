@@ -32,6 +32,8 @@ object PredefinedDist extends PredefinedDistOps[PredefinedDist] {
 
   def sample[A](dist: PredefinedDist[A]): (PredefinedDist[A], A) = ???
 
+  def pdf[A](dist: PredefinedDist[A], a: A): Option[Prim] = ???
+
 }
 
 

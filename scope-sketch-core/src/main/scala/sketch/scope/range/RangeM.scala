@@ -47,9 +47,11 @@ trait RangeMOps[R[_]<:RangeM[_]] {
   def middle[A](range: R[A]): A =
     range.measure.asInstanceOf[Measure[A]].from(middleP(primStart(range), primEnd(range)))
 
-  def isForward(range: R[_]): Boolean = if(primStart(range) - primEnd(range) >= 0) true else false
+  def isForward(range: R[_]): Boolean = if(primEnd(range) - primStart(range) >= 0) true else false
 
   def isPoint(range: R[_]): Boolean = if(range.start == range.end) true else false
+
+  def length[A](range: R[A]): BigDecimal = BigDecimal(primEnd(range)) - BigDecimal(primStart(range))
 
 }
 
@@ -77,6 +79,7 @@ trait RangeMSyntax {
     def <=(a: A): Boolean = RangeM.less(range, a) || RangeM.contains(range, a)
     def middle: A = RangeM.middle(range)
     def isPoint: Boolean = RangeM.isPoint(range)
+    def length: BigDecimal = RangeM.length(range)
   }
 
 }

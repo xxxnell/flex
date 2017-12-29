@@ -18,15 +18,20 @@ trait DistPropOps[D[_]<:Dist[_]] extends DistPropLaws[D] {
 
   def probability[A](dist: D[A], from: A, to: A): Option[Double]
 
-  //  def pdf(sketch: S, a: Double): Option[Double]
-
-  //  def cdf(sketch: S, a: Double): Option[Double]
-
   def sample[A](dist: D[A]): (D[A], A)
 
 }
 
 trait DistPropLaws[D[_]<:Dist[_]] { self: DistPropOps[D] =>
+
+  def numericPdf[A](dist: D[A], a: A, delta: Prim): Option[Double] = {
+    val measure = dist.measure.asInstanceOf[Measure[A]]
+    val ap = measure.from(measure.to(a) + delta)
+
+    probability(dist, a, ap).map(prob => prob / delta)
+  }
+
+  def cdf[A](sketch: D[A], a: A): Option[Double] = ???
 
   def samples[A](dist: D[A], n: Int): (D[A], List[A]) = {
     (0 until n).foldLeft[(D[A], List[A])]((dist, Nil)){ case ((utdDist1, acc), _) =>
@@ -37,7 +42,7 @@ trait DistPropLaws[D[_]<:Dist[_]] { self: DistPropOps[D] =>
 
 }
 
-object Dist extends DistPropOps[Dist] {
+object Dist extends DistPropOps[Dist] { self =>
 
   def delta[A](implicit measure: Measure[A]): Dist[A] = DeltaDist(measure, 0)
 
@@ -54,6 +59,11 @@ object Dist extends DistPropOps[Dist] {
   def sample[A](dist: Dist[A]): (Dist[A], A) = dist match {
     case smooth: SmoothDist[A] => SmoothDist.sample(smooth)
     case sampled: SampledDist[A] => SampledDist.sample(sampled)
+  }
+
+  def pdf[A](dist: Dist[A], a: A): Option[Double] = dist match {
+    case smooth: SmoothDist[A] => SmoothDist.pdf(smooth, a)
+    case sampled: SampledDist[A] => SampledDist.pdf(sampled, a)
   }
 
 }

@@ -16,6 +16,8 @@ trait DeltaDistOps extends SmoothDistPropOps[DeltaDist] {
     if(RangeP(dist.measure.to(from), dist.measure.to(to)).contains(dist.pole)) Some(1) else Some(0)
   }
 
+  def pdf[A](dist: DeltaDist[A], a: A): Option[Double] = if(a != 0) Some(0) else None
+
   def sample[A](dist: DeltaDist[A]): (DeltaDist[A], A) = (dist, dist.measure.from(dist.pole))
 
 }

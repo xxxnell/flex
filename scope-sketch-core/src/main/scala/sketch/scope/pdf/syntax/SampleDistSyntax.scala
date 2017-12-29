@@ -2,8 +2,8 @@ package sketch.scope.pdf.syntax
 
 import sketch.scope.measure.Measure
 import sketch.scope.pdf.monad.SampleDistMonad
-import sketch.scope.pdf.{Dist, Range, SampledDist, Sketch}
-import sketch.scope.plot.{CountPlot, DensityPlot, Plot}
+import sketch.scope.pdf.{Dist, SampledDist}
+import sketch.scope.plot.DensityPlot
 
 /**
   * Licensed by Probe Technology, Inc.
@@ -14,6 +14,7 @@ trait SampleDistPropSyntax {
 
   implicit class SampleDistPropSyntaxImpl[A](dist: SampledDist[A]) {
     def sample: (SampledDist[A], A) = SampledDist.sample(dist)
+    def pdf(a: A): Option[Double] = SampledDist.pdf(dist, a)
     def samples(n: Int): (SampledDist[A], List[A]) = SampledDist.samples(dist, n)
     def densityPlot: Option[DensityPlot] = SampledDist.densityPlot(dist)
   }

@@ -154,10 +154,10 @@ trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
   def multiplyConstant(plot: P, mag: Double): P = modifyValue(plot, { case (_, value) => value * mag })
 
   def integral(plot: P, start: Double, end: Double): Double = {
-    val maxEval = 3
+    val maxEval = 10000
     val minimalIterationCount = 2
-    val maximalIterationCount = 3
-    val integrator = new SimpsonIntegrator(minimalIterationCount, maximalIterationCount)
+    val maximalIterationCount = 30
+    val integrator = new SimpsonIntegrator()
     val f = new UnivariateFunction {
       override def value(x: Double): Double = plot.interpolation(x)
     }
