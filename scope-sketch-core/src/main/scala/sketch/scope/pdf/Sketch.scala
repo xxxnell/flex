@@ -11,7 +11,7 @@ import scala.language.higherKinds
   *
   * Sketch Data Structure Interface.
   */
-trait Sketch[A] extends SamplingDist[A] {
+trait Sketch[A] extends DataBinningDist[A] {
 
   def structures: Structures
 
@@ -19,7 +19,7 @@ trait Sketch[A] extends SamplingDist[A] {
 
 }
 
-trait SketchPropOps[S[_]<:Sketch[_]] extends SketchPropLaws[S] with SamplingDistPropOps[S] {
+trait SketchPropOps[S[_]<:Sketch[_]] extends DataBinningDistOps[S] with SketchPropLaws[S] {
 
   // Read ops
 
@@ -89,6 +89,7 @@ object Sketch extends SketchPrimPropOps[Sketch] {
 
   def update[A](sketch: Sketch[A], as: List[(A, Count)]): Option[Sketch[A]] = sketch match {
     case sketch: RecurSketch[A] => RecurSketch.update(sketch, as)
+    case sketch: SimpleSketch[A] => SimpleSketch.update(sketch, as)
     case _ => narrowUpdate(sketch, as)
   }
 

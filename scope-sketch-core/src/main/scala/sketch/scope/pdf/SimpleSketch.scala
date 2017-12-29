@@ -22,4 +22,6 @@ object SimpleSketch extends SimpleSketchOps {
 
   def sample[A](dist: SimpleSketch[A]): (SimpleSketch[A], A) = ???
 
+  def update[A](sketch: SimpleSketch[A], as: List[(A, Count)]): Option[SimpleSketch[A]] = narrowUpdate(sketch, as)
+
 }
