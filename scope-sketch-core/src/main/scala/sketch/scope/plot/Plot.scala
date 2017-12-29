@@ -165,9 +165,7 @@ trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
 
     val mid: Double = slidings
       .filter { case ((x1, _), (x2, _)) => x1 > start && x2 < end }
-      .map { case ((x1, y1), (x2, y2)) =>
-        println(s"delta, y1, y2: ${(x2 - x1, y1, y2)}, area: ${area(x1, y1, x2, y2)}")
-        area(x1, y1, x2, y2) }
+      .map { case ((x1, y1), (x2, y2)) => area(x1, y1, x2, y2) }
       .sum
 
     val startBoundary: Double = slidings

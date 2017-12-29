@@ -23,7 +23,6 @@ class KLDSpec extends Specification with ScalaCheck {
       (for {
         sampling <- normal1.toSampleDist(samples)
         kld <- KLD(sampling, normal2)
-        _ = println(kld)
       } yield kld)
         .fold(ko("Error occurs.")){ kld =>
           if(kld > 0) ok else ko(s"kld: $kld")
