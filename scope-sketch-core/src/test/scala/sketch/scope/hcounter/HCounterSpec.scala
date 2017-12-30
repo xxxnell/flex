@@ -17,22 +17,7 @@ class HCounterSpec extends Specification with ScalaCheck {
       "update" in {
 
         "basic" in {
-          implicit val hcounterGen: Arbitrary[HCounter] = HCounterGen.hcounterA
-
-          prop { (hcounter: HCounter) =>
-            (for {
-              updatedHcounter <- hcounter.update(10, 20)
-              test = updatedHcounter.sum == (hcounter.sum + 20)
-            } yield test)
-              .fold(ko)(test => if (test) ok else ko)
-            //          hcounter.update(10, 20).map(hcounter => { test condition }).fold()()
-            //          for {
-            //            a <- A
-            //            b <- B
-            //            c <- C
-            //          } yield c
-            //          A.flatMap(a => B.flatMap(b => C.map(c )))
-          }.setArbitrary(hcounterGen)
+          todo
         }
 
         "irregular index" in todo
@@ -41,18 +26,7 @@ class HCounterSpec extends Specification with ScalaCheck {
 
       "get" in {
 
-        "normal" in {
-          implicit val hcounterGen: Arbitrary[HCounter] = HCounterGen.hcounterA
-
-          prop { (hcounter: HCounter) =>
-            (for {
-              updatedHcounter <- hcounter.update(10, 20)
-              value <- updatedHcounter.get(10)
-            } yield value == 20)
-              .fold(ko)(test => if(test) ok else ko )
-
-          }.setArbitrary(hcounterGen)
-        }
+        "basic" in todo
 
         "irregular index" in todo
 
