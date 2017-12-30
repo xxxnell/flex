@@ -22,10 +22,6 @@ trait SketchPrimPropOps[S[_]<:Sketch[_], C<:SketchConf]
   extends SketchPrimPropLaws[S, C]
     with SketchPropOps[S, C] { self =>
 
-  val mixingRatio: Double = 1
-
-  val window: Double = 1e-10
-
   // Update ops
 
   /**
@@ -42,8 +38,8 @@ trait SketchPrimPropOps[S[_]<:Sketch[_], C<:SketchConf]
   /**
     * Deep update a primitive value <code>p</code> instead of <code>a</code> ∈ <code>A</code>
     * */
-  def primDeepUpdate[A](sketch: S[A], ps: List[(Prim, Count)]): Option[(S[A], Structure)] = for {
-    utdCmap <- EqualSpaceCdfUpdate.updateCmap(sketch, ps, mixingRatio, window)
+  def primDeepUpdate[A](sketch: S[A], ps: List[(Prim, Count)], conf: C): Option[(S[A], Structure)] = for {
+    utdCmap <- EqualSpaceCdfUpdate.updateCmap(sketch, ps, conf.cmap.size, conf.mixingRatio, conf.dataKernelWindow)
     headTailStr <- sketch.structures match {
       case head :: tail => Some((head, tail))
       case _ => None
@@ -133,9 +129,11 @@ trait SketchPrimPropLaws[S[_]<:Sketch[_], C<:SketchConf] { self: SketchPrimPropO
     primNarrowUpdate(sketch, as.map { case (value, count) => (sketch.measure.asInstanceOf[Measure[A]](value), count) })
   }
 
-  def deepUpdate[A](sketch: S[A], as: List[(A, Count)]): Option[(S[A], Structure)] = {
-    primDeepUpdate(sketch, as.map { case (value, count) => (sketch.measure.asInstanceOf[Measure[A]](value), count) })
-  }
+  def deepUpdate[A](sketch: S[A], as: List[(A, Count)], conf: C): Option[(S[A], Structure)] = primDeepUpdate(
+    sketch,
+    as.map { case (value, count) => (sketch.measure.asInstanceOf[Measure[A]](value), count) },
+    conf
+  )
 
   /**
     * Get the number of elements be memorized.

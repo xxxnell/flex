@@ -1,7 +1,9 @@
 package sketch.scope.range
 
 import sketch.scope.measure._
+import sketch.scope.measure.syntax._
 import sketch.scope.pdf.Prim
+import sketch.scope.range.syntax._
 
 import scala.collection.immutable.NumericRange
 

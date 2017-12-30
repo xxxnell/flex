@@ -4,29 +4,37 @@ trait CustomSketchConf extends SketchConf
 
 object CustomSketchConf {
 
-  case class CustomSketchConfImpl(cmap: CmapConf,
-                                  counter: CounterConf) extends CustomSketchConf
+  case class CustomSketchConfImpl(mixingRatio: Double,
+                                  dataKernelWindow: Double,
+                                  cmap: CmapConf,
+                                  counter: CounterConf)
+    extends CustomSketchConf
 
-  def apply(cmapConf: CmapConf,
-            counterConf: CounterConf): CustomSketchConf =
-    custom(cmapConf, counterConf)
-
-  def apply(cmapSize: Int, cmapNo: Int,
-            counterSize: Int, counterNo: Int): CustomSketchConf =
-    custom(
-      CmapConf.uniform(cmapSize, cmapNo, None, None),
+  def apply(// sketch
+            mixingRatio: Double = DefaultSketchConf.mixingRatio,
+            dataKernelWindow: Double = DefaultSketchConf.dataKernelWindow,
+            // periodic
+            startThreshold: Double = DefaultSketchConf.startThreshold,
+            thresholdPeriod: Double = DefaultSketchConf.thresholdPeriod,
+            // cmap
+            cmapSize: Int = DefaultSketchConf.cmap.size,
+            cmapNo: Int = DefaultSketchConf.cmap.no,
+            cmapStart: Option[Double] = DefaultSketchConf.cmap.start,
+            cmapEnd: Option[Double] = DefaultSketchConf.cmap.end,
+            // counter
+            counterSize: Int = DefaultSketchConf.counter.size,
+            counterNo: Int = DefaultSketchConf.counter.no): CustomPeriodicSketchConf =
+    PeriodicSketchConf.custom(
+      mixingRatio, dataKernelWindow,
+      startThreshold, thresholdPeriod,
+      CmapConf.uniform(cmapSize, cmapNo, cmapStart, cmapEnd),
       CounterConf(counterSize, counterNo)
     )
 
-  def apply(cmapSize: Int, cmapNo: Int, cmapMin: Double, cmapMax: Double,
-            counterSize: Int, counterNo: Int): CustomSketchConf =
-    custom(
-      CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
-      CounterConf(counterSize, counterNo)
-    )
-
-  def custom(cmapConf: CmapConf,
+  def simple(mixingRatio: Double,
+             dataKernelWindow: Double,
+             cmapConf: CmapConf,
              counterConf: CounterConf): CustomSketchConf =
-    CustomSketchConfImpl(cmapConf, counterConf)
+    CustomSketchConfImpl(mixingRatio, dataKernelWindow, cmapConf, counterConf)
 
 }

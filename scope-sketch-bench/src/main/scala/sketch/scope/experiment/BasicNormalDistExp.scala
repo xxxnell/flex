@@ -12,18 +12,15 @@ object BasicNormalDistExp {
 
   def main(args: Array[String]): Unit = {
     val expName1 = "basic-normal"
-
-    val (cmapSize, cmapNo, cmapMin, cmapMax) = (150, 2, -10, 10)
-    val (counterSize, counterNo) = (1000, 2)
     val sampleNo = 1000
-    val start = 50
     val period = 100
 
-    val conf: SketchConf = SketchConf(
-      cmapSize, cmapNo, cmapMin, cmapMax,
-      counterSize, counterNo
+    implicit val conf: SketchConf = SketchConf(
+      startThreshold = 50, thresholdPeriod = period,
+      cmapSize = 150, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10),
+      counterSize = 1000, counterNo = 2
     )
-    val sketch = PeriodicSketch.emptyForPeriod(start, period)(doubleMeasure, conf)
+    val sketch = Sketch.empty[Double]
     val (_, datas) = Dist.normal(0.1, 1).samples(sampleNo)
     val dataIdxs = datas.zipWithIndex
 

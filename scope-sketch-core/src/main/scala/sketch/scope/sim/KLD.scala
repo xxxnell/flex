@@ -1,8 +1,9 @@
 package sketch.scope.sim
 
 import sketch.scope.conf.DistConf
-import sketch.scope.pdf.{Dist, SamplingDist, SmoothDist}
+import sketch.scope.pdf.{Dist, SamplingDist}
 import sketch.scope.plot._
+import sketch.scope.pdf.syntax._
 
 import scala.math._
 
@@ -34,6 +35,5 @@ object KLD {
       point(value, d2.pdf(d2.measure.from(range.middle))(conf2).getOrElse(0))
     }
   } yield kldDensityPlot
-
 
 }

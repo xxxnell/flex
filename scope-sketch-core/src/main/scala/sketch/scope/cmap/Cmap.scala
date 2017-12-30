@@ -4,7 +4,7 @@ import cats.data.Kleisli
 import sketch.scope.conf.{CmapConf, UniformCmapConf}
 import sketch.scope.hmap.HDim
 import sketch.scope.pdf._
-import sketch.scope.range.RangeP
+import sketch.scope.range.syntax._
 
 /**
   * Licensed by Probe Technology, Inc.

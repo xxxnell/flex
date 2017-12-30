@@ -1,10 +1,9 @@
 package sketch.scope.plot
 
-import org.apache.commons.math3.analysis.UnivariateFunction
-import org.apache.commons.math3.analysis.integration.SimpsonIntegrator
 import org.apache.commons.math3.fitting.{PolynomialCurveFitter, WeightedObservedPoints}
 import sketch.scope.pdf.Prim
 import sketch.scope.range._
+import sketch.scope.range.syntax._
 
 import scala.language.postfixOps
 import scala.math._

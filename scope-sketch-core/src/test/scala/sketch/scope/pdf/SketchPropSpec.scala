@@ -4,7 +4,8 @@ import org.scalacheck.Gen
 import org.specs2.ScalaCheck
 import org.specs2.mutable._
 import sketch.scope.conf._
-import sketch.scope.measure._
+import sketch.scope.measure.Measure
+import sketch.scope.measure.syntax._
 
 /**
   * Licensed by Probe Technology, Inc.
@@ -16,11 +17,11 @@ class SketchPropSpec extends Specification with ScalaCheck {
     "count" in {
 
       "basic 1" in {
-        val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, 0, 10)
+        val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 2, Some(0d), Some(10d))
         val (counterSize, counterNo) = (8, 2)
         implicit val conf: CustomSketchConf = CustomSketchConf(
-          CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
-          CounterConf(counterSize, counterNo)
+          cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
+          counterSize = counterSize, counterNo = counterNo
         )
         val sketch0 = Sketch.empty[Double]
 
@@ -32,11 +33,11 @@ class SketchPropSpec extends Specification with ScalaCheck {
       }
 
       "basic 2" in {
-        val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, 0, 10)
+        val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 2, Some(0d), Some(10d))
         val (counterSize, counterNo) = (100, 2)
         implicit val conf: CustomSketchConf = CustomSketchConf(
-          CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
-          CounterConf(counterSize, counterNo)
+          cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
+          counterSize = counterSize, counterNo = counterNo
         )
         val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
 
@@ -48,11 +49,11 @@ class SketchPropSpec extends Specification with ScalaCheck {
       }
 
       "count smaller space then cmap bound" in {
-        val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, 0, 10)
+        val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 2, Some(0d), Some(10d))
         val (counterSize, counterNo) = (8, 2)
         implicit val conf: CustomSketchConf = CustomSketchConf(
-          CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
-          CounterConf(counterSize, counterNo)
+          cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
+          counterSize = counterSize, counterNo = counterNo
         )
         val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
 
@@ -86,11 +87,11 @@ class SketchPropSpec extends Specification with ScalaCheck {
     }
 
     "narrowUpdate" in {
-      val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, -10, 10)
+      val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 2, Some(-10d), Some(10d))
       val (counterSize, counterNo) = (8, 2)
       implicit val conf: CustomSketchConf = CustomSketchConf(
-        CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
-        CounterConf(counterSize, counterNo)
+        cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
+        counterSize = counterSize, counterNo = counterNo
       )
       val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
 
@@ -104,11 +105,11 @@ class SketchPropSpec extends Specification with ScalaCheck {
     "probability" in {
 
       "empty" in {
-        val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, -10, 10)
+        val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 2, Some(-10d), Some(10d))
         val (counterSize, counterNo) = (8, 2)
         implicit val conf: CustomSketchConf = CustomSketchConf(
-          CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
-          CounterConf(counterSize, counterNo)
+          cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
+          counterSize = counterSize, counterNo = counterNo
         )
         val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
 
@@ -117,11 +118,11 @@ class SketchPropSpec extends Specification with ScalaCheck {
       }
 
       "from min to 0 after updated" in {
-        val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, 0, 10)
+        val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 2, Some(0d), Some(10d))
         val (counterSize, counterNo) = (100, 2)
         implicit val conf: CustomSketchConf = CustomSketchConf(
-          CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
-          CounterConf(counterSize, counterNo)
+          cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
+          counterSize = counterSize, counterNo = counterNo
         )
         val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
 
@@ -142,47 +143,47 @@ class SketchPropSpec extends Specification with ScalaCheck {
     }
 
     "countPlot" in {
-      val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, -10, 10)
+      val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 2, Some(-10d), Some(10d))
       val (counterSize, counterNo) = (8, 2)
       implicit val conf: CustomSketchConf = CustomSketchConf(
-        CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
-        CounterConf(counterSize, counterNo)
+        cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
+        counterSize = counterSize, counterNo = counterNo
       )
       val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
 
       sketch0.countPlot.fold(ko("Fail to call the countPlot."))(plot => {
         val cond1 = plot.records.nonEmpty
         val cond2 = plot.records.forall { case (_, value) => !value.isNaN }
-        val cond3 = plot.records.headOption.forall { case (range, _) => range.end ~= cmapMin }
-        val cond4 = plot.records.lastOption.forall { case (range, _) => range.start ~= cmapMax }
+        val cond3 = plot.records.headOption.forall { case (range, _) => range.end ~= cmapStart.value }
+        val cond4 = plot.records.lastOption.forall { case (range, _) => range.start ~= cmapEnd.value }
 
         if(!cond1) ko("Plot record is empty.")
         else if(!cond2) ko("Some value is NaN")
-        else if(!cond3) ko(s"${plot.records.headOption} is first range. cmapMin: $cmapMin")
-        else if(!cond4) ko(s"${plot.records.lastOption} is last range. cmapMax: $cmapMax")
+        else if(!cond3) ko(s"${plot.records.headOption} is first range. cmapStart: $cmapStart")
+        else if(!cond4) ko(s"${plot.records.lastOption} is last range. cmapEnd: $cmapEnd")
         else ok
       })
     }
 
     "densityPlot" in {
-      val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, -10, 10)
+      val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 2, Some(-10d), Some(10d))
       val (counterSize, counterNo) = (8, 2)
       implicit val conf: CustomSketchConf = CustomSketchConf(
-        CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
-        CounterConf(counterSize, counterNo)
+        cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
+        counterSize = counterSize, counterNo = counterNo
       )
       val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
 
       sketch0.densityPlot.fold(ko("Fail to call the densityPlot."))(plot => {
         val cond1 = plot.records.nonEmpty
         val cond2 = plot.records.forall { case (_, value) => !value.isNaN }
-        val cond3 = plot.records.headOption.forall { case (range, _) => range.end ~= cmapMin }
-        val cond4 = plot.records.lastOption.forall { case (range, _) => range.start ~= cmapMax }
+        val cond3 = plot.records.headOption.forall { case (range, _) => range.end ~= cmapStart.value }
+        val cond4 = plot.records.lastOption.forall { case (range, _) => range.start ~= cmapEnd.value }
 
         if(!cond1) ko("Plot record is empty.")
         else if(!cond2) ko("Some value is NaN")
-        else if(!cond3) ko(s"${plot.records.headOption} is first range. cmapMin: $cmapMin")
-        else if(!cond4) ko(s"${plot.records.lastOption} is last range. cmapMax: $cmapMax")
+        else if(!cond3) ko(s"${plot.records.headOption} is first range. cmapStart: $cmapStart")
+        else if(!cond4) ko(s"${plot.records.lastOption} is last range. cmapEnd: $cmapEnd")
         else ok
       })
     }
@@ -192,11 +193,11 @@ class SketchPropSpec extends Specification with ScalaCheck {
       "changing cmap" in {
 
         "basic" in {
-          val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 3, -1, 10)
+          val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 3, Some(-1d), Some(10d))
           val (counterSize, counterNo) = (8, 2)
           implicit val conf: CustomSketchConf = CustomSketchConf(
-            CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
-            CounterConf(counterSize, counterNo)
+            cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
+            counterSize = counterSize, counterNo = counterNo
           )
           val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
           val sketch1O = sketch0.deepUpdate(1).map(_._1)
@@ -212,11 +213,11 @@ class SketchPropSpec extends Specification with ScalaCheck {
         }
 
         "2 times" in {
-          val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, -1, 10)
+          val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 2, Some(-1d), Some(10d))
           val (counterSize, counterNo) = (8, 2)
           implicit val conf: CustomSketchConf = CustomSketchConf(
-            CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
-            CounterConf(counterSize, counterNo)
+            cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
+            counterSize = counterSize, counterNo = counterNo
           )
           val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
           val sketch1O = sketch0.deepUpdate(1).map(_._1)
@@ -233,10 +234,10 @@ class SketchPropSpec extends Specification with ScalaCheck {
       }
 
       "migrate countings" in {
-//        val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 3, 0, 10)
+//        val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 3, 0, 10)
 //        val (counterSize, counterNo) = (8, 2)
 //        implicit val conf: SketchConf = SketchConf(
-//          CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
+//          CmapConf.uniform(cmapSize, cmapNo, cmapStart, cmapEnd),
 //          CounterConf(counterSize, counterNo)
 //        )
 //        val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
@@ -248,10 +249,10 @@ class SketchPropSpec extends Specification with ScalaCheck {
     }
 
     "rearrange" in {
-//      val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 3, 0, 10)
+//      val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 3, 0, 10)
 //      val (counterSize, counterNo) = (8, 2)
 //      val conf: SketchConf = SketchConf(
-//        CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
+//        CmapConf.uniform(cmapSize, cmapNo, cmapStart, cmapEnd),
 //        CounterConf(counterSize, counterNo)
 //      )
 //      val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
@@ -280,11 +281,11 @@ class SketchPropSpec extends Specification with ScalaCheck {
     "count" in {
 
       "basic" in {
-        val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, 0, 10)
+        val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 2, Some(0d), Some(10d))
         val (counterSize, counterNo) = (8, 2)
         implicit val conf: CustomSketchConf = CustomSketchConf(
-          CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
-          CounterConf(counterSize, counterNo)
+          cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
+          counterSize = counterSize, counterNo = counterNo
         )
         val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
 
@@ -296,11 +297,11 @@ class SketchPropSpec extends Specification with ScalaCheck {
       }
 
       "empty" in {
-        val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, 0, 10)
+        val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 2, Some(0d), Some(10d))
         val (counterSize, counterNo) = (8, 2)
         implicit val conf: CustomSketchConf = CustomSketchConf(
-          CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
-          CounterConf(counterSize, counterNo)
+          cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
+          counterSize = counterSize, counterNo = counterNo
         )
         val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
 
@@ -315,11 +316,11 @@ class SketchPropSpec extends Specification with ScalaCheck {
     "sum" in {
 
       "basic" in {
-        val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, 0, 10)
+        val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 2, Some(0d), Some(10d))
         val (counterSize, counterNo) = (8, 2)
         implicit val conf: CustomSketchConf = CustomSketchConf(
-          CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
-          CounterConf(counterSize, counterNo)
+          cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
+          counterSize = counterSize, counterNo = counterNo
         )
         val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
 
@@ -331,11 +332,11 @@ class SketchPropSpec extends Specification with ScalaCheck {
       }
 
       "after updated" in {
-        val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, 0, 10)
+        val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 2, Some(0d), Some(10d))
         val (counterSize, counterNo) = (8, 2)
         implicit val conf: CustomSketchConf = CustomSketchConf(
-          CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
-          CounterConf(counterSize, counterNo)
+          cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
+          counterSize = counterSize, counterNo = counterNo
         )
         val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
 

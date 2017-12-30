@@ -3,6 +3,7 @@ package sketch.scope.cmap
 import sketch.scope.hmap.HDim
 import sketch.scope.pdf._
 import sketch.scope.range.RangeP
+import sketch.scope.range.syntax._
 
 import scala.collection.immutable.TreeMap
 

@@ -2,7 +2,7 @@ package sketch.scope.plot
 
 import org.specs2.mutable._
 import org.specs2.ScalaCheck
-import sketch.scope.measure._
+import sketch.scope.measure.syntax._
 
 /**
   * Licensed by Probe Technology, Inc.

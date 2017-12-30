@@ -2,8 +2,8 @@ package sketch.scope.pdf
 
 import sketch.scope.conf.SamplingDistConf
 import sketch.scope.measure.Measure
-import sketch.scope.plot.{DensityPlot, Plot}
-import sketch.scope.range.{RangeM, RangeP}
+import sketch.scope.plot.DensityPlot
+import sketch.scope.range.RangeM
 
 import scala.language.higherKinds
 
@@ -24,7 +24,7 @@ trait SamplingDistPropLaws[D[_]<:SamplingDist[_], C<:SamplingDistConf] { self: S
 
   def pdf[A](dist: D[A], a: A): Option[Double] = for {
     plot <- densityPlot(dist)
-    density = plot.interpolation(dist.measure.asInstanceOf[Measure[A]].to(a))
+    density = DensityPlot.interpolation(plot, dist.measure.asInstanceOf[Measure[A]].to(a))
   } yield density
 
 }

@@ -39,12 +39,25 @@ class CmapSpec extends Specification with ScalaCheck {
     }
 
     "size" in {
-      implicit val cmapGen: Arbitrary[(Int, Cmap)] = CmapGen.cmapA
 
-      prop { (sizeCmap: (Int, Cmap) ) =>
-        val (size, cmap) = sizeCmap
-        if(size == cmap.size) ok else ko
-      }.setArbitrary(cmapGen)
+      "empty" in {
+        Cmap.divider(Nil).size must equalTo(1)
+      }
+
+      "basic" in {
+        val divider = (1 to 10).toList
+        Cmap.divider(divider).size must equalTo(divider.size + 1)
+      }
+
+//      "arbitrary" in {
+//        implicit val cmapGen: Arbitrary[(Int, Cmap)] = CmapGen.cmapA
+//
+//        prop { (sizeCmap: (Int, Cmap) ) =>
+//          val (size, cmap) = sizeCmap
+//          if(size == cmap.size) ok else ko
+//        }.setArbitrary(cmapGen)
+//      }
+
     }
 
     "range" in {

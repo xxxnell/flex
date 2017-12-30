@@ -1,8 +1,6 @@
 package sketch.scope.experiment
 
-import sketch.scope.ExpOutOps
-import sketch.scope._
-import sketch.scope.pdf.PeriodicSketch
+import sketch.scope.{ExpOutOps, _}
 import sketch.scope.plot.DensityPlot
 
 /**
@@ -12,16 +10,14 @@ object BasicDeltaDistExp {
 
   def main(args: Array[String]): Unit = {
     val expName = "basic-delta"
-
-    val (cmapSize, cmapNo, cmapMin, cmapMax) = (100, 2, -10, 10)
-    val (counterSize, counterNo) = (1000, 2)
     val sampleNo = 10
 
-    val conf: SketchConf = SketchConf(
-      cmapSize, cmapNo, cmapMin, cmapMax,
-      counterSize, counterNo
+    implicit val conf: SketchConf = SketchConf(
+      startThreshold = 2, thresholdPeriod = 1,
+      cmapSize = 100, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
+      counterSize = 1000, counterNo = 2
     )
-    val sketch = PeriodicSketch.emptyForPeriod(2, 1)(doubleMeasure, conf)
+    val sketch = Sketch.empty[Double]
     val (_, datas) = Dist.delta(0.1).samples(sampleNo)
 
     var tempSketchO: Option[Sketch[Double]] = Option(sketch)

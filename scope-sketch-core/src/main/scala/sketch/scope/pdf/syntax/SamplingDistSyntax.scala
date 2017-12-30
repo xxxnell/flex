@@ -1,5 +1,6 @@
 package sketch.scope.pdf.syntax
 
+import sketch.scope.conf.SamplingDistConf
 import sketch.scope.measure.Measure
 import sketch.scope.pdf.monad.SamplingDistMonad
 import sketch.scope.pdf.{Dist, SamplingDist}
@@ -25,11 +26,13 @@ trait SamplingDistPropSyntax {
 
 trait SamplingDistMonadSyntax {
 
-  lazy val distMonad: SamplingDistMonad[SamplingDist, Dist, SamplingDist] = SamplingDistMonad()
+  lazy val distMonad: SamplingDistMonad[SamplingDist, Dist, SamplingDist, SamplingDistConf] = SamplingDistMonad()
 
   implicit class SamplingDistMonadSyntaxImpl[A](dist: SamplingDist[A]) {
-    def map[B](f: A => B)(implicit measureB: Measure[B]): SamplingDist[B] = distMonad.map(dist, f, measureB)
-    def flatMap[B](f: A => Dist[B])(implicit measureB: Measure[B]): SamplingDist[B] = distMonad.bind(dist, f, measureB)
+    def map[B](f: A => B)(implicit measureB: Measure[B], conf: SamplingDistConf): SamplingDist[B] =
+      distMonad.map(dist, f, measureB, conf)
+    def flatMap[B](f: A => Dist[B])(implicit measureB: Measure[B], conf: SamplingDistConf): SamplingDist[B] =
+      distMonad.bind(dist, f, measureB, conf)
   }
 
 }
