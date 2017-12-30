@@ -1,5 +1,6 @@
 package sketch.scope.pdf
 
+import sketch.scope.conf.SmoothDistConf
 import sketch.scope.measure.Measure
 import sketch.scope.range._
 
@@ -10,7 +11,7 @@ import sketch.scope.range._
   */
 case class DeltaDist[A](measure: Measure[A], pole: Prim) extends SmoothDist[A]
 
-trait DeltaDistOps extends SmoothDistPropOps[DeltaDist] {
+trait DeltaDistOps extends SmoothDistPropOps[DeltaDist, SmoothDistConf] {
 
   def probability[A](dist: DeltaDist[A], from: A, to: A): Option[Double] = {
     if(RangeP(dist.measure.to(from), dist.measure.to(to)).contains(dist.pole)) Some(1) else Some(0)

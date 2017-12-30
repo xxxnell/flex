@@ -1,5 +1,6 @@
 package sketch.scope.pdf
 
+import sketch.scope.conf.SmoothDistConf
 import sketch.scope.measure.Measure
 
 import scala.language.higherKinds
@@ -13,7 +14,7 @@ trait PredefinedDist[A] extends SmoothDist[A] {
 
 }
 
-trait PredefinedDistOps[D[_]<:PredefinedDist[_]] extends SmoothDistPropOps[D] {
+trait PredefinedDistOps[D[_]<:PredefinedDist[_]] extends SmoothDistPropOps[D, SmoothDistConf] {
 
   def probability[A](dist: D[A], from: A, to: A): Option[Double] =
     dist.asInstanceOf[PredefinedDist[A]].probability(from, to)

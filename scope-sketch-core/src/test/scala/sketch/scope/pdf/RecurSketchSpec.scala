@@ -31,11 +31,11 @@ class RecurSketchSpec extends Specification with ScalaCheck {
 
 object RecurSketchGen {
 
-  def intRecurSketchGen: Gen[RecurSketch[Int]] = for {
-    measure <- MeasureGen.intMeasureGen
-    conf <- SketchConfGen.sketchConfGen
-  } yield RecurSketch.empty(measure, conf)
-
-  def recurSketchSample: Option[RecurSketch[Int]] = intRecurSketchGen.sample
+//  def intRecurSketchGen: Gen[RecurSketch[Int]] = for {
+//    measure <- MeasureGen.intMeasureGen
+//    conf <- SketchConfGen.sketchConfGen
+//  } yield RecurSketch.empty(measure, conf)
+//
+//  def recurSketchSample: Option[RecurSketch[Int]] = intRecurSketchGen.sample
 
 }

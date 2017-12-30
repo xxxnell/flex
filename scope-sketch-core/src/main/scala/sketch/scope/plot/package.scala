@@ -1,15 +1,17 @@
-package sketch.scope
+package sketch.scope.plot
 
-import sketch.scope.range._
+import sketch.scope.range.syntax._
 
 /**
   * Licensed by Probe Technology, Inc.
   */
-package object plot
-  extends PlotSyntax
-    with DensityPlotSyntax
-    with CountPlotSyntax {
+object `package` {
 
   type Record = (RangeP, Double)
+
+  object syntax
+    extends PlotSyntax
+      with DensityPlotSyntax
+      with CountPlotSyntax
 
 }

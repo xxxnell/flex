@@ -1,9 +1,7 @@
-package sketch.scope
+package sketch.scope.pdf
 
 import sketch.scope.cmap.Cmap
 import sketch.scope.hcounter.HCounter
-import sketch.scope.measure.TrivialMeasures
-import sketch.scope.pdf.syntax._
 
 import scala.collection.immutable.NumericRange
 import scala.language.implicitConversions
@@ -11,11 +9,7 @@ import scala.language.implicitConversions
 /**
   * Licensed by Probe Technology, Inc.
   */
-package object pdf
-  extends DistSyntax
-    with SamplingDistSyntax
-    with SmoothDistSyntax
-    with SketchSyntax {
+object `package` {
 
   type Prim = Double
 

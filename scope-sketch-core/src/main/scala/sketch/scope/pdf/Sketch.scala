@@ -1,7 +1,8 @@
 package sketch.scope.pdf
 
 import sketch.scope.cmap.Cmap
-import sketch.scope.conf.SketchConf
+import sketch.scope.conf.{PeriodicSketchConf, SketchConf}
+import sketch.scope.hcounter.HCounter
 import sketch.scope.measure.Measure
 
 import scala.language.higherKinds
@@ -15,11 +16,11 @@ trait Sketch[A] extends DataBinningDist[A] {
 
   def structures: Structures
 
-  def conf: SketchConf
-
 }
 
-trait SketchPropOps[S[_]<:Sketch[_]] extends DataBinningDistOps[S] with SketchPropLaws[S] {
+trait SketchPropOps[S[_]<:Sketch[_], C<:SketchConf]
+  extends DataBinningDistOps[S, C]
+    with SketchPropLaws[S, C] {
 
   // Read ops
 
@@ -33,16 +34,15 @@ trait SketchPropOps[S[_]<:Sketch[_]] extends DataBinningDistOps[S] with SketchPr
 
   def narrowUpdate[A](sketch: S[A], as: List[(A, Count)]): Option[S[A]]
 
-  // todo deepUpdate have to take a conf parameter to construct returned Sketch
-  def deepUpdate[A](sketch: S[A], as: List[(A, Count)]): Option[(S[A], Structure)]
+  def deepUpdate[A](sketch: S[A], as: List[(A, Count)], conf: C): Option[(S[A], Structure)]
 
   //  def clear(sketch: S): S
 
 }
 
-trait SketchPropLaws[S[_]<:Sketch[_]] { self: SketchPropOps[S] =>
+trait SketchPropLaws[S[_]<:Sketch[_], C<:SketchConf] { self: SketchPropOps[S, C] =>
 
-  def rearrange[A](sketch: S[A]): Option[S[A]] = deepUpdate(sketch, Nil).map(_._1)
+  def rearrange[A](sketch: S[A], conf: C): Option[S[A]] = deepUpdate(sketch, Nil, conf).map(_._1)
 
   def cmapNo(sketch: S[_]): Int = sketch.structures.size
 
@@ -59,24 +59,31 @@ trait SketchPropLaws[S[_]<:Sketch[_]] { self: SketchPropOps[S] =>
   def counterSize(sketch: S[_]): Int = (for {
     structure <- sketch.structures.headOption
     (_, hcounter) = structure
-  } yield hcounter.width).getOrElse(0) // sketch.structures.headOption.map { case (_, hcounter) => hcounter.structures.size }.getOrElse(0)
+  } yield hcounter.width).getOrElse(0)
 
   def lastCmap(sketch: S[_]): Option[Cmap] = for {
     structure <- sketch.structures.lastOption
     cmap = structure._1
   } yield cmap
 
+  def conf2Structures(conf: C): Structures =
+    (1 to conf.cmap.no).toList
+      .map(i => (Cmap(conf.cmap), HCounter(conf.counter, ~i)))
+
 }
 
-object Sketch extends SketchPrimPropOps[Sketch] {
+object Sketch extends SketchPrimPropOps[Sketch, SketchConf] {
 
-  def apply[A](measure: Measure[A], structure: Structures, conf: SketchConf): Sketch[A] =
-    SimpleSketch(measure, structure, conf)
+  def apply[A](measure: Measure[A], structure: Structures): Sketch[A] =
+    SimpleSketch(measure, structure)
 
   /**
     * @param measure  measure of Sketch
     * */
-  def empty[A](implicit measure: Measure[A], conf: SketchConf): Sketch[A] = RecurSketch.empty(measure, conf)
+  def empty[A](implicit measure: Measure[A], conf: SketchConf): Sketch[A] = conf match {
+    case conf: PeriodicSketchConf => PeriodicSketch.empty(measure, conf)
+    case _ => SimpleSketch.empty(measure, conf)
+  }
 
   // mapping ops
 
@@ -87,9 +94,9 @@ object Sketch extends SketchPrimPropOps[Sketch] {
 
   // syntatic sugars
 
-  def update[A](sketch: Sketch[A], as: List[(A, Count)]): Option[Sketch[A]] = sketch match {
-    case sketch: RecurSketch[A] => RecurSketch.update(sketch, as)
-    case sketch: SimpleSketch[A] => SimpleSketch.update(sketch, as)
+  def update[A](sketch: Sketch[A], as: List[(A, Count)], conf: SketchConf): Option[Sketch[A]] = sketch match {
+    case sketch: RecurSketch[A] => RecurSketch.update(sketch, as, conf)
+    case sketch: SimpleSketch[A] => SimpleSketch.update(sketch, as, conf)
     case _ => narrowUpdate(sketch, as)
   }
 

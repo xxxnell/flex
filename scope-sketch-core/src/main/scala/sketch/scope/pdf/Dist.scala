@@ -1,6 +1,7 @@
 package sketch.scope.pdf
 
 import cats.Monad
+import sketch.scope.conf.DistConf
 import sketch.scope.measure.Measure
 
 import scala.language.higherKinds
@@ -14,7 +15,7 @@ trait Dist[A] {
 
 }
 
-trait DistPropOps[D[_]<:Dist[_]] extends DistPropLaws[D] {
+trait DistPropOps[D[_]<:Dist[_], C<:DistConf] extends DistPropLaws[D, C] {
 
   def probability[A](dist: D[A], from: A, to: A): Option[Double]
 
@@ -22,7 +23,7 @@ trait DistPropOps[D[_]<:Dist[_]] extends DistPropLaws[D] {
 
 }
 
-trait DistPropLaws[D[_]<:Dist[_]] { self: DistPropOps[D] =>
+trait DistPropLaws[D[_]<:Dist[_], C<:DistConf] { self: DistPropOps[D, C] =>
 
   def numericPdf[A](dist: D[A], a: A, delta: Prim): Option[Double] = {
     val measure = dist.measure.asInstanceOf[Measure[A]]
@@ -30,6 +31,8 @@ trait DistPropLaws[D[_]<:Dist[_]] { self: DistPropOps[D] =>
 
     probability(dist, a, ap).map(prob => prob / delta)
   }
+
+  def pdf[A](dist: D[A], a: A, conf: C): Option[Double] = ???
 
   def cdf[A](sketch: D[A], a: A): Option[Double] = ???
 
@@ -42,7 +45,7 @@ trait DistPropLaws[D[_]<:Dist[_]] { self: DistPropOps[D] =>
 
 }
 
-object Dist extends DistPropOps[Dist] { self =>
+object Dist extends DistPropOps[Dist, DistConf] { self =>
 
   def delta[A](implicit measure: Measure[A]): Dist[A] = DeltaDist(measure, 0)
 
@@ -61,9 +64,10 @@ object Dist extends DistPropOps[Dist] { self =>
     case sampled: SamplingDist[A] => SamplingDist.sample(sampled)
   }
 
-  def pdf[A](dist: Dist[A], a: A): Option[Double] = dist match {
+  override def pdf[A](dist: Dist[A], a: A, conf: DistConf): Option[Double] = dist match {
     case smooth: SmoothDist[A] => SmoothDist.pdf(smooth, a)
     case sampled: SamplingDist[A] => SamplingDist.pdf(sampled, a)
+    case _ => super.pdf(dist, a, conf)
   }
 
 }

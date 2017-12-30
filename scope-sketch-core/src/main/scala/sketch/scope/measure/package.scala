@@ -1,10 +1,12 @@
-package sketch.scope
+package sketch.scope.measure
 
 /**
   * Licensed by Probe Technology, Inc.
   */
-package object measure
-  extends TrivialMeasures
-    with PrimSyntax {
+object `package` {
+
+  object syntax
+    extends TrivialMeasures
+      with PrimSyntax
 
 }

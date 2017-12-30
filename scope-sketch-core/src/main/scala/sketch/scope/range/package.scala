@@ -1,10 +1,14 @@
-package sketch.scope
+package sketch.scope.range
 
 /**
   * Licensed by Probe Technology, Inc.
   */
-package object range
-  extends RangePSyntax
-    with RangeMSyntax {
+object `package` {
+
+  object syntax
+    extends RangePSyntax
+      with RangeMSyntax
 
 }
+
+

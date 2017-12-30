@@ -3,7 +3,7 @@ package sketch.scope.pdf
 import org.scalacheck.Gen
 import org.specs2.mutable._
 import org.specs2.ScalaCheck
-import sketch.scope.conf.{CmapConf, CounterConf, SketchConf, SketchConfGen}
+import sketch.scope.conf._
 import sketch.scope.measure._
 import cats.implicits._
 import sketch.scope.cmap.{Cmap, DividerCmap}
@@ -17,11 +17,13 @@ class PeriodicSketchSpec extends Specification with ScalaCheck {
 
     "empty" in {
       // construct
-      val (cmapSize, cmapNo, cmapMin, cmapMax) = (5, 100, -100, 100)
+      val (start, period) = (0, 1)
+      val (cmapSize, cmapNo, cmapStart, cmapEnd) = (5, 100, Some(-100d), Some(100d))
       val (counterSize, counterNo) = (10, 2)
-      implicit val conf: SketchConf = SketchConf(
-        CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
-        CounterConf(counterSize, counterNo)
+      implicit val conf: PeriodicSketchConf = CustomSketchConf(
+        startThreshold = start, thresholdPeriod = period,
+        cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
+        counterSize = counterSize, counterNo = counterNo
       )
       val periodicSketch = PeriodicSketch.empty[Int]
       
@@ -59,13 +61,15 @@ class PeriodicSketchSpec extends Specification with ScalaCheck {
     "update" in {
 
       "check cmap changes for periodic sketch" in {
-        val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 1, 0, 10)
+        val (start, period) = (0, 1)
+        val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 1, Some(0d), Some(10d))
         val (counterSize, counterNo) = (2, 1)
-        implicit val conf: SketchConf = SketchConf(
-          CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
-          CounterConf(counterSize, counterNo)
+        implicit val conf: PeriodicSketchConf = CustomSketchConf(
+          startThreshold = start, thresholdPeriod = period,
+          cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
+          counterSize = counterSize, counterNo = counterNo
         )
-        val sketch0: Sketch[Double] = PeriodicSketch.emptyForPeriod[Double](0, 1)
+        val sketch0: Sketch[Double] = PeriodicSketch.empty[Double]
         val datas = Stream.from(1, 1).take(3)
 
         val sequencialSketchsO: Option[List[Sketch[Double]]] = datas

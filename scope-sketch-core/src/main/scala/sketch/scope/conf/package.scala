@@ -5,6 +5,4 @@ package sketch.scope
   */
 package object conf {
 
-  implicit val defaultSketchConf: SketchConf = SketchConf.default
-
 }

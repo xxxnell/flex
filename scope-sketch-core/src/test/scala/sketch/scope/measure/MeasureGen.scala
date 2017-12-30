@@ -1,6 +1,7 @@
 package sketch.scope.measure
 
 import org.scalacheck.Gen
+import sketch.scope.measure.syntax._
 
 /**
   * Licensed by Probe Technology, Inc.
