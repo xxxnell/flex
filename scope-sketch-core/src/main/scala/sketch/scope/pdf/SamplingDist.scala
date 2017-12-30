@@ -1,5 +1,6 @@
 package sketch.scope.pdf
 
+import sketch.scope.conf.SamplingDistConf
 import sketch.scope.measure.Measure
 import sketch.scope.plot.{DensityPlot, Plot}
 import sketch.scope.range.{RangeM, RangeP}
@@ -11,13 +12,15 @@ import scala.language.higherKinds
   */
 trait SamplingDist[A] extends Dist[A]
 
-trait SamplingDistPropOps[D[_]<:SamplingDist[_]] extends DistPropOps[D] with SamplingDistPropLaws[D] {
+trait SamplingDistPropOps[D[_]<:SamplingDist[_], C<:SamplingDistConf]
+  extends DistPropOps[D, C]
+    with SamplingDistPropLaws[D, C] {
 
   def densityPlot(dist: D[_]): Option[DensityPlot]
 
 }
 
-trait SamplingDistPropLaws[D[_]<:SamplingDist[_]] { self: SamplingDistPropOps[D] =>
+trait SamplingDistPropLaws[D[_]<:SamplingDist[_], C<:SamplingDistConf] { self: SamplingDistPropOps[D, C] =>
 
   def pdf[A](dist: D[A], a: A): Option[Double] = for {
     plot <- densityPlot(dist)
@@ -26,7 +29,7 @@ trait SamplingDistPropLaws[D[_]<:SamplingDist[_]] { self: SamplingDistPropOps[D]
 
 }
 
-object SamplingDist extends SamplingDistPropOps[SamplingDist] {
+object SamplingDist extends SamplingDistPropOps[SamplingDist, SamplingDistConf] {
 
   def forSmoothDist[A](dist: SmoothDist[A], domains: List[RangeM[A]]): Option[SamplingDist[A]] =
     dist.toSamplingDist(domains)

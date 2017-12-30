@@ -1,5 +1,6 @@
 package sketch.scope.sim
 
+import sketch.scope.conf.DistConf
 import sketch.scope.pdf.{Dist, SamplingDist, SmoothDist}
 import sketch.scope.plot._
 
@@ -13,7 +14,8 @@ import scala.math._
   */
 object KLD {
 
-  def apply[A](d1: SamplingDist[A], d2: Dist[A]): Option[Double] = kldForSampling(d1, d2)
+  def apply[A](d1: SamplingDist[A], d2: Dist[A])(implicit conf2: DistConf): Option[Double] =
+    kldForSampling(d1, d2, conf2)
 
   def point(value1: Double, value2: Double): Double = (value1, value2) match {
     case (0, _) => 0
@@ -21,15 +23,15 @@ object KLD {
     case (_, _) => value1 * log(value1 / value2)
   }
 
-  def kldForSampling[A](d1: SamplingDist[A], d2: Dist[A]): Option[Double] = for {
-    density <- kldDensityForSampling(d1, d2)
+  def kldForSampling[A](d1: SamplingDist[A], d2: Dist[A], conf2: DistConf): Option[Double] = for {
+    density <- kldDensityForSampling(d1, d2, conf2)
   } yield density.integral(Double.MinValue, Double.MaxValue)
 
-  def kldDensityForSampling[A](d1: SamplingDist[A], d2: Dist[A]): Option[DensityPlot] = for {
+  def kldDensityForSampling[A](d1: SamplingDist[A], d2: Dist[A], conf2: DistConf): Option[DensityPlot] = for {
     plot1 <- d1.densityPlot
     // todo handle the case if the d2.pdf doesn't exists.
     kldDensityPlot = plot1.modify { case (range, value) =>
-      point(value, d2.pdf(d2.measure.from(range.middle)).getOrElse(0))
+      point(value, d2.pdf(d2.measure.from(range.middle))(conf2).getOrElse(0))
     }
   } yield kldDensityPlot
 

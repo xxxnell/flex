@@ -19,7 +19,9 @@ trait Sketch[A] extends DataBinningDist[A] {
 
 }
 
-trait SketchPropOps[S[_]<:Sketch[_]] extends DataBinningDistOps[S] with SketchPropLaws[S] {
+trait SketchPropOps[S[_]<:Sketch[_], C<:SketchConf]
+  extends DataBinningDistOps[S, C]
+    with SketchPropLaws[S, C] {
 
   // Read ops
 
@@ -40,7 +42,7 @@ trait SketchPropOps[S[_]<:Sketch[_]] extends DataBinningDistOps[S] with SketchPr
 
 }
 
-trait SketchPropLaws[S[_]<:Sketch[_]] { self: SketchPropOps[S] =>
+trait SketchPropLaws[S[_]<:Sketch[_], C<:SketchConf] { self: SketchPropOps[S, C] =>
 
   def rearrange[A](sketch: S[A]): Option[S[A]] = deepUpdate(sketch, Nil).map(_._1)
 
@@ -68,7 +70,7 @@ trait SketchPropLaws[S[_]<:Sketch[_]] { self: SketchPropOps[S] =>
 
 }
 
-object Sketch extends SketchPrimPropOps[Sketch] {
+object Sketch extends SketchPrimPropOps[Sketch, SketchConf] {
 
   def apply[A](measure: Measure[A], structure: Structures, conf: SketchConf): Sketch[A] =
     SimpleSketch(measure, structure, conf)
@@ -87,9 +89,9 @@ object Sketch extends SketchPrimPropOps[Sketch] {
 
   // syntatic sugars
 
-  def update[A](sketch: Sketch[A], as: List[(A, Count)]): Option[Sketch[A]] = sketch match {
-    case sketch: RecurSketch[A] => RecurSketch.update(sketch, as)
-    case sketch: SimpleSketch[A] => SimpleSketch.update(sketch, as)
+  def update[A](sketch: Sketch[A], as: List[(A, Count)], conf: SketchConf): Option[Sketch[A]] = sketch match {
+    case sketch: RecurSketch[A] => RecurSketch.update(sketch, as, conf)
+    case sketch: SimpleSketch[A] => SimpleSketch.update(sketch, as, conf)
     case _ => narrowUpdate(sketch, as)
   }
 

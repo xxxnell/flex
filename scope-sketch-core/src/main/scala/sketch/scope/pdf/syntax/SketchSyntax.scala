@@ -1,6 +1,7 @@
 package sketch.scope.pdf.syntax
 
 import sketch.scope.cmap.Cmap
+import sketch.scope.conf.SketchConf
 import sketch.scope.measure.Measure
 import sketch.scope.pdf.{Count, Dist, Prim, Range, Sketch, Structure}
 import sketch.scope.pdf.monad.{DistFunctor, SketchMonad}
@@ -16,8 +17,10 @@ trait SketchPropSyntax {
   implicit class SketchPropSyntaxImpl[A](sketch: Sketch[A]) {
     def sample: (Sketch[A], A) = Sketch.sample(sketch)
     def samples(n: Int): (Sketch[A], List[A]) = Sketch.samples(sketch, n)
-    def update(as: A*): Option[Sketch[A]] = Sketch.update(sketch, as.toList.map(a => (a, 1d)))
-    def update(as: List[(A, Count)]): Option[Sketch[A]] = Sketch.update(sketch, as)
+    def update(as: A*)(implicit conf: SketchConf): Option[Sketch[A]] =
+      Sketch.update(sketch, as.toList.map(a => (a, 1d)), conf)
+    def update(as: List[(A, Count)])(implicit conf: SketchConf): Option[Sketch[A]] =
+      Sketch.update(sketch, as, conf)
     def narrowUpdate(as: A*): Option[Sketch[A]] = Sketch.narrowUpdate(sketch, as.toList.map(a => (a, 1d)))
     def deepUpdate(as: A*): Option[(Sketch[A], Structure)] = Sketch.deepUpdate(sketch, as.toList.map(a => (a, 1d)))
     def count(from: A, to: A): Option[Double] = Sketch.count(sketch, from, to)

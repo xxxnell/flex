@@ -8,7 +8,7 @@ import sketch.scope.measure.Measure
   */
 case class SimpleSketch[A](measure: Measure[A], structures: Structures, conf: SketchConf) extends Sketch[A]
 
-trait SimpleSketchOps extends SketchPrimPropOps[SimpleSketch] {
+trait SimpleSketchOps extends SketchPrimPropOps[SimpleSketch, SketchConf] {
 
   def sketch2SimpleSketch[A](sketch: Sketch[A]): SimpleSketch[A] =
     SimpleSketch(sketch.measure, sketch.structures, sketch.conf)
@@ -22,6 +22,7 @@ object SimpleSketch extends SimpleSketchOps {
 
   def sample[A](dist: SimpleSketch[A]): (SimpleSketch[A], A) = ???
 
-  def update[A](sketch: SimpleSketch[A], as: List[(A, Count)]): Option[SimpleSketch[A]] = narrowUpdate(sketch, as)
+  def update[A](sketch: SimpleSketch[A], as: List[(A, Count)], conf: SketchConf): Option[SimpleSketch[A]] =
+    narrowUpdate(sketch, as)
 
 }

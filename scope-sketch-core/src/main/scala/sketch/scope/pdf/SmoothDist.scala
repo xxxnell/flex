@@ -6,19 +6,22 @@ import sketch.scope.range.{RangeM, RangeP}
 
 import scala.language.higherKinds
 import cats.implicits._
+import sketch.scope.conf.SmoothDistConf
 
 /**
   * Licensed by Probe Technology, Inc.
   */
 trait SmoothDist[A] extends Dist[A]
 
-trait SmoothDistPropOps[D[_]<:SmoothDist[_]] extends DistPropOps[D] with SmoothDistPropLaws[D] {
+trait SmoothDistPropOps[D[_]<:SmoothDist[_], C<:SmoothDistConf]
+  extends DistPropOps[D, C]
+    with SmoothDistPropLaws[D, C] {
 
   def pdf[A](dist: D[A], a: A): Option[Double]
 
 }
 
-trait SmoothDistPropLaws[D[_]<:SmoothDist[_]] { self: SmoothDistPropOps[D] =>
+trait SmoothDistPropLaws[D[_]<:SmoothDist[_], C<:SmoothDistConf] { self: SmoothDistPropOps[D, C] =>
 
   def densityPlot[A](dist: D[A], domains: List[RangeM[A]]): Option[DensityPlot] = {
     val measure = dist.measure.asInstanceOf[Measure[A]]
@@ -44,7 +47,7 @@ trait SmoothDistPropLaws[D[_]<:SmoothDist[_]] { self: SmoothDistPropOps[D] =>
 
 }
 
-object SmoothDist extends SmoothDistPropOps[SmoothDist] {
+object SmoothDist extends SmoothDistPropOps[SmoothDist, SmoothDistConf] {
 
   def probability[A](dist: SmoothDist[A], start: A, end: A): Option[Prim] = dist match {
     case predefined: PredefinedDist[A] => PredefinedDist.probability(predefined, start, end)

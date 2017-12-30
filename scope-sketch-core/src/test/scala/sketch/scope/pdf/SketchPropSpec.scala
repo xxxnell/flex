@@ -22,7 +22,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
           CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
           CounterConf(counterSize, counterNo)
         )
-        val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
+        val sketch0 = Sketch.empty[Double]
 
         (for {
           sketch1 <- sketch0.update(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)

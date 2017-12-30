@@ -1,6 +1,7 @@
 package sketch.scope.pdf
 
 import org.apache.commons.math3.distribution.NormalDistribution
+import sketch.scope.conf.SmoothDistConf
 import sketch.scope.measure.Measure
 import sketch.scope.rand._
 /**
@@ -8,7 +9,7 @@ import sketch.scope.rand._
   */
 case class NormalDist[A](measure: Measure[A], mean: Prim, variance: Prim, rng: IRng) extends SmoothDist[A]
 
-trait NormalDistOps extends SmoothDistPropOps[NormalDist] {
+trait NormalDistOps extends SmoothDistPropOps[NormalDist, SmoothDistConf] {
 
   def probability[A](dist: NormalDist[A], start: A, end: A): Option[Double] = {
     val startPrim = dist.measure.to(end)

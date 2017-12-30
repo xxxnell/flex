@@ -1,6 +1,6 @@
 package sketch.scope.pdf
 
-import sketch.scope.conf.SketchConf
+import sketch.scope.conf._
 import sketch.scope.measure.Measure
 
 import scala.language.higherKinds
@@ -16,7 +16,9 @@ trait RecurSketch[A] extends Sketch[A] {
 
 }
 
-trait RecurSketchOps[S[_]<:RecurSketch[_]] extends SketchPrimPropOps[S] with RecurSketchLaws[S] { self =>
+trait RecurSketchOps[S[_]<:RecurSketch[_]]
+  extends SketchPrimPropOps[S, SketchConf]
+    with RecurSketchLaws[S] { self =>
 
   def modifyThresholds[A](sketch: S[A], f: Stream[Double] => Option[Stream[Double]]): Option[S[A]]
 
@@ -26,7 +28,7 @@ trait RecurSketchLaws[S[_]<:RecurSketch[_]] { self: RecurSketchOps[S] =>
 
   def dropThreshold[A](sketch: S[A]): Option[S[A]] = modifyThresholds(sketch, thresholds => Some(thresholds.drop(1)))
 
-  def update[A](sketch: S[A], as: List[(A, Count)]): Option[S[A]] = for {
+  def update[A](sketch: S[A], as: List[(A, Count)], conf: SketchConf): Option[S[A]] = for {
     nextThreshold <- sketch.thresholds.headOption
     utdSketch1 <- narrowUpdate[A](sketch, as)
     sum = self.sum(utdSketch1)

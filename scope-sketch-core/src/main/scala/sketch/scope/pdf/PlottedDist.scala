@@ -1,5 +1,6 @@
 package sketch.scope.pdf
 
+import sketch.scope.conf.SamplingDistConf
 import sketch.scope.measure.Measure
 import sketch.scope.plot.DensityPlot
 
@@ -14,7 +15,7 @@ trait PlottedDist[A] extends SamplingDist[A] {
 
 }
 
-trait PlottedDistPropOps[D[_]<:PlottedDist[_]] extends SamplingDistPropOps[D] {
+trait PlottedDistPropOps[D[_]<:PlottedDist[_]] extends SamplingDistPropOps[D, SamplingDistConf] {
 
   def densityPlot(dist: D[_]): Option[DensityPlot] = Some(dist.densityPlot)
 
