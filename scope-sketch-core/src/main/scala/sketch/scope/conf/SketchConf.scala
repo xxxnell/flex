@@ -8,15 +8,22 @@ trait SketchConf extends DataBinningDistConf {
   val counter: CounterConf
 }
 
+trait CustomSketchConf extends SketchConf
+
 object SketchConf {
 
-  case class SketchConfImpl(cmap: CmapConf,
-                            counter: CounterConf) extends SketchConf
+  case class CustomSketchConfImpl(cmap: CmapConf,
+                                  counter: CounterConf) extends CustomSketchConf
 
   def default: SketchConf = DefaultSketchConf
 
   def apply(cmapConf: CmapConf,
-            counterConf: CounterConf): SketchConf =
-    SketchConfImpl(cmapConf, counterConf)
+            counterConf: CounterConf): CustomSketchConf =
+    custom(cmapConf, counterConf)
+
+  def custom(cmapConf: CmapConf,
+             counterConf: CounterConf): CustomSketchConf =
+    CustomSketchConfImpl(cmapConf, counterConf)
+
 
 }

@@ -9,7 +9,24 @@ import org.specs2.ScalaCheck
   */
 class SketchConfSpec extends Specification with ScalaCheck {
 
-  "ShetchConf" should todo
+  "ShetchConf" should {
+
+    "default" in {
+      implicitly[SketchConf] must beAnInstanceOf[SketchConf]
+    }
+
+    "customize locally" in {
+      val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, 0, 10)
+      val (counterSize, counterNo) = (8, 2)
+      implicit val conf: CustomSketchConf = SketchConf(
+        CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
+        CounterConf(counterSize, counterNo)
+      )
+
+      implicitly[SketchConf] must equalTo(conf)
+    }
+
+  }
 
 }
 
