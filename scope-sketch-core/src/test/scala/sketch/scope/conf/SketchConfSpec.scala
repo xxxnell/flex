@@ -18,7 +18,7 @@ class SketchConfSpec extends Specification with ScalaCheck {
     "customize locally" in {
       val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, 0, 10)
       val (counterSize, counterNo) = (8, 2)
-      implicit val conf: CustomSketchConf = SketchConf(
+      implicit val conf: CustomSketchConf = CustomSketchConf(
         CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
         CounterConf(counterSize, counterNo)
       )
@@ -35,7 +35,7 @@ object SketchConfGen {
   def sketchConfGen: Gen[SketchConf] = for {
     cmapConf <- cmapConfGen
     counterConf <- counterConfGen
-  } yield SketchConf(cmapConf, counterConf)
+  } yield CustomSketchConf(cmapConf, counterConf)
 
   def cmapConfGen: Gen[CmapConf] = uniformCmapConfGen
 

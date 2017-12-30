@@ -2,7 +2,7 @@ package sketch.scope.pdf
 
 import org.specs2.mutable._
 import org.specs2.ScalaCheck
-import sketch.scope.conf.{CmapConf, CounterConf, SketchConf}
+import sketch.scope.conf._
 import sketch.scope.measure.doubleMeasure
 
 /**
@@ -19,7 +19,7 @@ class SketchMonadSpec extends Specification with ScalaCheck {
         "basic" in {
           val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 1, 0, 10)
           val (counterSize, counterNo) = (2, 1)
-          implicit val conf: SketchConf = SketchConf(
+          implicit val conf: CustomSketchConf = CustomSketchConf(
             CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
             CounterConf(counterSize, counterNo)
           )
@@ -44,7 +44,7 @@ class SketchMonadSpec extends Specification with ScalaCheck {
         "basic" in {
           val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 1, 0, 10)
           val (counterSize, counterNo) = (2, 1)
-          implicit val conf: SketchConf = SketchConf(
+          implicit val conf: CustomSketchConf = CustomSketchConf(
             CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
             CounterConf(counterSize, counterNo)
           )

@@ -1,8 +1,6 @@
 package sketch.scope.benchmark
 
-import sketch.scope.pdf.Sketch
-import sketch.scope.measure._
-import sketch.scope.conf._
+import sketch.scope._
 
 /**
   * Licensed by Probe Technology, Inc.

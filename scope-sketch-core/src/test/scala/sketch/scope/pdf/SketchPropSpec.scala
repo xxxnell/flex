@@ -18,7 +18,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
       "basic 1" in {
         val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, 0, 10)
         val (counterSize, counterNo) = (8, 2)
-        implicit val conf: CustomSketchConf = SketchConf(
+        implicit val conf: CustomSketchConf = CustomSketchConf(
           CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
           CounterConf(counterSize, counterNo)
         )
@@ -34,7 +34,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
       "basic 2" in {
         val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, 0, 10)
         val (counterSize, counterNo) = (100, 2)
-        implicit val conf: CustomSketchConf = SketchConf(
+        implicit val conf: CustomSketchConf = CustomSketchConf(
           CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
           CounterConf(counterSize, counterNo)
         )
@@ -50,7 +50,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
       "count smaller space then cmap bound" in {
         val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, 0, 10)
         val (counterSize, counterNo) = (8, 2)
-        implicit val conf: CustomSketchConf = SketchConf(
+        implicit val conf: CustomSketchConf = CustomSketchConf(
           CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
           CounterConf(counterSize, counterNo)
         )
@@ -88,7 +88,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
     "narrowUpdate" in {
       val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, -10, 10)
       val (counterSize, counterNo) = (8, 2)
-      implicit val conf: CustomSketchConf = SketchConf(
+      implicit val conf: CustomSketchConf = CustomSketchConf(
         CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
         CounterConf(counterSize, counterNo)
       )
@@ -106,7 +106,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
       "empty" in {
         val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, -10, 10)
         val (counterSize, counterNo) = (8, 2)
-        implicit val conf: CustomSketchConf = SketchConf(
+        implicit val conf: CustomSketchConf = CustomSketchConf(
           CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
           CounterConf(counterSize, counterNo)
         )
@@ -119,7 +119,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
       "from min to 0 after updated" in {
         val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, 0, 10)
         val (counterSize, counterNo) = (100, 2)
-        implicit val conf: CustomSketchConf = SketchConf(
+        implicit val conf: CustomSketchConf = CustomSketchConf(
           CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
           CounterConf(counterSize, counterNo)
         )
@@ -144,7 +144,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
     "countPlot" in {
       val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, -10, 10)
       val (counterSize, counterNo) = (8, 2)
-      implicit val conf: CustomSketchConf = SketchConf(
+      implicit val conf: CustomSketchConf = CustomSketchConf(
         CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
         CounterConf(counterSize, counterNo)
       )
@@ -167,7 +167,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
     "densityPlot" in {
       val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, -10, 10)
       val (counterSize, counterNo) = (8, 2)
-      implicit val conf: CustomSketchConf = SketchConf(
+      implicit val conf: CustomSketchConf = CustomSketchConf(
         CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
         CounterConf(counterSize, counterNo)
       )
@@ -194,7 +194,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
         "basic" in {
           val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 3, -1, 10)
           val (counterSize, counterNo) = (8, 2)
-          implicit val conf: CustomSketchConf = SketchConf(
+          implicit val conf: CustomSketchConf = CustomSketchConf(
             CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
             CounterConf(counterSize, counterNo)
           )
@@ -214,7 +214,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
         "2 times" in {
           val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, -1, 10)
           val (counterSize, counterNo) = (8, 2)
-          implicit val conf: CustomSketchConf = SketchConf(
+          implicit val conf: CustomSketchConf = CustomSketchConf(
             CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
             CounterConf(counterSize, counterNo)
           )
@@ -282,7 +282,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
       "basic" in {
         val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, 0, 10)
         val (counterSize, counterNo) = (8, 2)
-        implicit val conf: CustomSketchConf = SketchConf(
+        implicit val conf: CustomSketchConf = CustomSketchConf(
           CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
           CounterConf(counterSize, counterNo)
         )
@@ -298,7 +298,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
       "empty" in {
         val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, 0, 10)
         val (counterSize, counterNo) = (8, 2)
-        implicit val conf: CustomSketchConf = SketchConf(
+        implicit val conf: CustomSketchConf = CustomSketchConf(
           CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
           CounterConf(counterSize, counterNo)
         )
@@ -317,7 +317,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
       "basic" in {
         val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, 0, 10)
         val (counterSize, counterNo) = (8, 2)
-        implicit val conf: CustomSketchConf = SketchConf(
+        implicit val conf: CustomSketchConf = CustomSketchConf(
           CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
           CounterConf(counterSize, counterNo)
         )
@@ -333,7 +333,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
       "after updated" in {
         val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 2, 0, 10)
         val (counterSize, counterNo) = (8, 2)
-        implicit val conf: CustomSketchConf = SketchConf(
+        implicit val conf: CustomSketchConf = CustomSketchConf(
           CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
           CounterConf(counterSize, counterNo)
         )

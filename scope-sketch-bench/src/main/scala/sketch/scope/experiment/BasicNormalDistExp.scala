@@ -1,9 +1,8 @@
 package sketch.scope.experiment
 
 import sketch.scope.ExpOutOps
-import sketch.scope.conf.{CmapConf, CounterConf, SketchConf}
-import sketch.scope.measure.doubleMeasure
-import sketch.scope.pdf.{Dist, PeriodicSketch, Sketch}
+import sketch.scope._
+import sketch.scope.pdf.PeriodicSketch
 import sketch.scope.plot.DensityPlot
 
 /**
@@ -21,8 +20,8 @@ object BasicNormalDistExp {
     val period = 100
 
     val conf: SketchConf = SketchConf(
-      CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
-      CounterConf(counterSize, counterNo)
+      cmapSize, cmapNo, cmapMin, cmapMax,
+      counterSize, counterNo
     )
     val sketch = PeriodicSketch.emptyForPeriod(start, period)(doubleMeasure, conf)
     val (_, datas) = Dist.normal(0.1, 1).samples(sampleNo)

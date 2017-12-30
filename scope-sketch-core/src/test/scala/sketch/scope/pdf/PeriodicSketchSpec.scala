@@ -3,7 +3,7 @@ package sketch.scope.pdf
 import org.scalacheck.Gen
 import org.specs2.mutable._
 import org.specs2.ScalaCheck
-import sketch.scope.conf.{CmapConf, CounterConf, SketchConf, SketchConfGen}
+import sketch.scope.conf._
 import sketch.scope.measure._
 import cats.implicits._
 import sketch.scope.cmap.{Cmap, DividerCmap}
@@ -19,7 +19,7 @@ class PeriodicSketchSpec extends Specification with ScalaCheck {
       // construct
       val (cmapSize, cmapNo, cmapMin, cmapMax) = (5, 100, -100, 100)
       val (counterSize, counterNo) = (10, 2)
-      implicit val conf: SketchConf = SketchConf(
+      implicit val conf: CustomSketchConf = CustomSketchConf(
         CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
         CounterConf(counterSize, counterNo)
       )
@@ -61,7 +61,7 @@ class PeriodicSketchSpec extends Specification with ScalaCheck {
       "check cmap changes for periodic sketch" in {
         val (cmapSize, cmapNo, cmapMin, cmapMax) = (10, 1, 0, 10)
         val (counterSize, counterNo) = (2, 1)
-        implicit val conf: SketchConf = SketchConf(
+        implicit val conf: CustomSketchConf = CustomSketchConf(
           CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
           CounterConf(counterSize, counterNo)
         )

@@ -1,7 +1,6 @@
 package sketch.scope.pdf.update
 
 import sketch.scope.cmap.Cmap
-import sketch.scope.hcounter.HCounter
 import sketch.scope.pdf.{Count, Prim, Sketch}
 import sketch.scope.plot._
 
@@ -11,7 +10,7 @@ import sketch.scope.plot._
 trait EqualSpaceCdfUpdate {
 
   def updateCmap(sketch: Sketch[_], ps: List[(Prim, Count)], mixingRatio: Double, window: Double): Option[Cmap] = for {
-    sketchPlot <- sketch.densityPlot
+    sketchPlot <- Sketch.densityPlot(sketch)
     mtpSketchPlot = sketchPlot * (1 / (mixingRatio + 1))
     mtpPsPlot = DensityPlot.squareKernel(ps, window) * (mixingRatio / (mixingRatio + 1))
     mergedPlot = if(ps.nonEmpty) mtpSketchPlot + mtpPsPlot else sketchPlot

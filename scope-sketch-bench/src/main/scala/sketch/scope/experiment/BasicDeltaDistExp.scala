@@ -1,10 +1,9 @@
 package sketch.scope.experiment
 
 import sketch.scope.ExpOutOps
-import sketch.scope.conf.{CmapConf, CounterConf, SketchConf}
-import sketch.scope.pdf._
-import sketch.scope.measure._
-import sketch.scope.plot.{DensityPlot, Plot}
+import sketch.scope._
+import sketch.scope.pdf.PeriodicSketch
+import sketch.scope.plot.DensityPlot
 
 /**
   * Licensed by Probe Technology, Inc.
@@ -19,8 +18,8 @@ object BasicDeltaDistExp {
     val sampleNo = 10
 
     val conf: SketchConf = SketchConf(
-      CmapConf.uniform(cmapSize, cmapNo, cmapMin, cmapMax),
-      CounterConf(counterSize, counterNo)
+      cmapSize, cmapNo, cmapMin, cmapMax,
+      counterSize, counterNo
     )
     val sketch = PeriodicSketch.emptyForPeriod(2, 1)(doubleMeasure, conf)
     val (_, datas) = Dist.delta(0.1).samples(sampleNo)
