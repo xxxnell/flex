@@ -1,7 +1,6 @@
 package sketch.scope.experiment
 
 import sketch.scope.{ExpOutOps, _}
-import sketch.scope.plot.DensityPlot
 
 /**
   * Licensed by Probe Technology, Inc.
@@ -19,13 +18,14 @@ object BasicDeltaDistExp {
     )
     val sketch = Sketch.empty[Double]
     val (_, datas) = Dist.delta(0.1).samples(sampleNo)
+    val dataIdxs = datas.zipWithIndex
 
     var tempSketchO: Option[Sketch[Double]] = Option(sketch)
-    val utdSketches: List[Option[Sketch[Double]]] = Option(sketch) :: datas.map { data =>
+    val idxUtdSketches: List[(Int, Sketch[Double])] = (0, sketch) :: dataIdxs.flatMap { case (data, idx) =>
       tempSketchO = tempSketchO.flatMap(_.update(data))
-      tempSketchO
+      tempSketchO.map(sketch => (idx + 1, sketch))
     }
-    val plots = utdSketches.map { sketchO => sketchO.flatMap(_.densityPlot) }.map(_.getOrElse(DensityPlot.empty))
+    val plots = idxUtdSketches.flatMap { case (idx, utdSkt) => utdSkt.densityPlot.map(plot => (idx, plot)) }
 
     ExpOutOps.clear(expName)
     ExpOutOps.writePlots(expName, plots)

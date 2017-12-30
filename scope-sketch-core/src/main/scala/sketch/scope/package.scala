@@ -1,4 +1,4 @@
-package sketch.scope
+package sketch
 
 import cats.data.Kleisli
 import sketch.scope.conf.CustomSketchConf
@@ -6,16 +6,18 @@ import sketch.scope.measure.TrivialMeasures
 import sketch.scope.pdf.syntax.{DistSyntax, SamplingDistSyntax, SketchSyntax, SmoothDistSyntax}
 import sketch.scope.plot.{CountPlotSyntax, DensityPlotSyntax, PlotSyntax}
 import sketch.scope.range.{RangeMSyntax, RangePSyntax}
+import sketch.scope.sim.SimSyntax
 
 /**
   * Licensed by Probe Technology, Inc.
   */
-object `package`
+package object scope
   extends ConfPkgSyntax
     with MeasurePkgSyntax
     with PdfPkgSyntax
     with PlotPkgSyntax
-    with RangePkgSyntax {
+    with RangePkgSyntax
+    with SimPkgSyntax {
 
   type Mon[A, B] = Kleisli[Some, A, B]
 
@@ -25,7 +27,7 @@ object `package`
 
 trait ConfPkgSyntax {
 
-  implicit val defaultSketchConf: conf.SketchConf = conf.SketchConf.default
+  implicit val defaultSketchConf: sketch.scope.conf.SketchConf = sketch.scope.conf.SketchConf.default
 
   type SketchConf = CustomSketchConf
 
@@ -42,22 +44,30 @@ trait PdfPkgSyntax
     with SmoothDistSyntax
     with SketchSyntax {
 
-  type Dist[A] = pdf.Dist[A]
+  type Dist[A] = sketch.scope.pdf.Dist[A]
 
-  val Dist: pdf.Dist.type = pdf.Dist
+  val Dist: sketch.scope.pdf.Dist.type = sketch.scope.pdf.Dist
 
-  type Sketch[A] = pdf.Sketch[A]
+  type Sketch[A] = sketch.scope.pdf.Sketch[A]
 
-  val Sketch: pdf.Sketch.type = pdf.Sketch
+  val Sketch: sketch.scope.pdf.Sketch.type = sketch.scope.pdf.Sketch
 
 }
 
 trait PlotPkgSyntax
   extends PlotSyntax
     with DensityPlotSyntax
-    with CountPlotSyntax
+    with CountPlotSyntax {
+
+  type CountPlot = sketch.scope.plot.CountPlot
+
+  type DensityPlot = sketch.scope.plot.DensityPlot
+
+}
 
 trait RangePkgSyntax
   extends RangePSyntax
     with RangeMSyntax
 
+trait SimPkgSyntax
+  extends SimSyntax

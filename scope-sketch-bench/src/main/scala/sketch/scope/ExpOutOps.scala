@@ -13,11 +13,20 @@ object ExpOutOps {
 
   val defaultPath = "scope-sketch-bench/experiments"
 
+  // syntax
+
   def clear(name: String): Unit = clear(defaultPath, name)
 
-  def writePlot(name: String, affix: String, plot: Plot): Unit = writePlot(defaultPath, name, affix, plot)
+  def writePlot(name: String, affix: String, plot: Plot): Unit =
+    writePlot(defaultPath, name, affix, plot)
 
-  def writePlots(name: String, plots: List[Plot]): Unit = writePlots(defaultPath, name, plots)
+  def writePlots(name: String, plots: List[(Int, Plot)]): Unit =
+    writePlotsForDetails(defaultPath, name, plots)
+
+  def writePlots(name: String, subname: String, plots: List[(Int, Plot)]): Unit =
+    writePlotsForDetailsSubname(defaultPath, name, subname, plots)
+
+  // ops
 
   def clear(path: String, name: String): Unit = Try {
     new File(s"$path/$name").listFiles.foreach(file => file.delete())
@@ -40,11 +49,19 @@ object ExpOutOps {
     fs.close()
   }
 
-  def writePlots(path: String, name: String, plots: List[Plot]): Unit = {
-    for (plotIdx <- plots.zipWithIndex) {
-      val (plot, idx) = plotIdx
-      writePlot(name, idx.toString, plot)
+  def writePlotsForDetails(path: String, name: String, plots: List[(Int, Plot)]): Unit = {
+    for (idxPlot <- plots) {
+      val (idx, plot) = idxPlot
+      writePlot(path, name, s"$idx", plot)
     }
   }
+
+  def writePlotsForDetailsSubname(path: String, name: String, subname: String, plots: List[(Int, Plot)]): Unit = {
+    for (idxPlot <- plots) {
+      val (idx, plot) = idxPlot
+      writePlot(path, name, s"$subname-$idx", plot)
+    }
+  }
+
 
 }

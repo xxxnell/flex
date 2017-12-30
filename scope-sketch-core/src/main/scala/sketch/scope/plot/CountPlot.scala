@@ -1,6 +1,6 @@
 package sketch.scope.plot
 
-import sketch.scope.plot.DensityPlot.{bare, modifyRecords, planarizeRecords}
+import sketch.scope.plot.syntax._
 import sketch.scope.range.RangeP
 
 /**

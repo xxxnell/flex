@@ -1,4 +1,4 @@
-package sketch.scope.pdf
+package sketch.scope
 
 import sketch.scope.cmap.Cmap
 import sketch.scope.hcounter.HCounter
@@ -9,7 +9,7 @@ import scala.language.implicitConversions
 /**
   * Licensed by Probe Technology, Inc.
   */
-object `package` {
+package object pdf {
 
   type Prim = Double
 

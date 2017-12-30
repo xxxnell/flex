@@ -1,9 +1,11 @@
 package sketch.scope.plot
 
 import org.apache.commons.math3.fitting.{PolynomialCurveFitter, WeightedObservedPoints}
+import sketch.scope.RangeP
 import sketch.scope.pdf.Prim
 import sketch.scope.range._
 import sketch.scope.range.syntax._
+import sketch.scope.plot.syntax._
 
 import scala.language.postfixOps
 import scala.math._
@@ -186,6 +188,8 @@ trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
 }
 
 trait PlotSyntax {
+
+  type Record = (RangeP, Double)
 
   implicit class PlotSyntaxImpl(plot: Plot) {
     def image(argument: Double): Option[Double] = Plot.image(plot, argument)

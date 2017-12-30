@@ -1,9 +1,9 @@
-package sketch.scope.measure
+package sketch.scope
 
 /**
   * Licensed by Probe Technology, Inc.
   */
-object `package` {
+package object measure {
 
   object syntax
     extends TrivialMeasures

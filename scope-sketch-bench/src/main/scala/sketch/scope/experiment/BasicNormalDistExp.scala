@@ -1,9 +1,6 @@
 package sketch.scope.experiment
 
-import sketch.scope.ExpOutOps
-import sketch.scope._
-import sketch.scope.pdf.PeriodicSketch
-import sketch.scope.plot.DensityPlot
+import sketch.scope.{ExpOutOps, _}
 
 /**
   * Licensed by Probe Technology, Inc.
@@ -13,30 +10,33 @@ object BasicNormalDistExp {
   def main(args: Array[String]): Unit = {
     val expName1 = "basic-normal"
     val sampleNo = 1000
+    val start = 50
     val period = 100
 
     implicit val conf: SketchConf = SketchConf(
-      startThreshold = 50, thresholdPeriod = period,
+      startThreshold = start, thresholdPeriod = period,
       cmapSize = 150, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10),
       counterSize = 1000, counterNo = 2
     )
     val sketch = Sketch.empty[Double]
-    val (_, datas) = Dist.normal(0.1, 1).samples(sampleNo)
+    val underlying = Dist.normal(0.1, 1)
+    val (_, datas) = underlying.samples(sampleNo)
     val dataIdxs = datas.zipWithIndex
 
-    var mul = 0
     var tempSketchO: Option[Sketch[Double]] = Option(sketch)
-    val utdSketches: List[Option[Sketch[Double]]] = Option(sketch) :: dataIdxs.flatMap { case (data, idx) =>
+    val idxUtdSketches: List[(Int, Sketch[Double])] = (0, sketch) :: dataIdxs.flatMap { case (data, idx) =>
       tempSketchO = tempSketchO.flatMap(_.update(data))
-      if(idx / period > mul) {
-        mul = idx / period
-        Some(tempSketchO)
-      } else None
+      tempSketchO.map(tempSketch => (idx + 1, tempSketch))
+    }.filter { case (idx, _) => idx % period == 0 }
+    val idxDensityPlots = idxUtdSketches.flatMap { case (idx, utdSkt) => utdSkt.densityPlot.map(plot => (idx, plot)) }
+    val idxKldPlot = idxUtdSketches.flatMap { case (idx, utdSkt) =>
+      KLDDensity(utdSkt, underlying).map(plot => (idx, plot))
     }
-    val plots = utdSketches.map { sketchO => sketchO.flatMap(_.densityPlot) }.map(_.getOrElse(DensityPlot.empty))
+    val idxKld = idxUtdSketches.flatMap { case (idx, utdSkt) => KLD(utdSkt, underlying).map(kld => (idx, kld)) }
 
     ExpOutOps.clear(expName1)
-    ExpOutOps.writePlots(expName1, plots)
+    ExpOutOps.writePlots(expName1, idxDensityPlots)
+    ExpOutOps.writePlots(expName1, "kld", idxKldPlot)
   }
 
 }

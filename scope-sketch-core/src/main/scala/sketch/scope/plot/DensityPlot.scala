@@ -2,6 +2,7 @@ package sketch.scope.plot
 
 import sketch.scope.pdf._
 import sketch.scope.range.RangeP
+import sketch.scope.plot.syntax._
 
 /**
   * Licensed by Probe Technology, Inc.

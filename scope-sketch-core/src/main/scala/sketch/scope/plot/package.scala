@@ -1,13 +1,11 @@
-package sketch.scope.plot
+package sketch.scope
 
 import sketch.scope.range.syntax._
 
 /**
   * Licensed by Probe Technology, Inc.
   */
-object `package` {
-
-  type Record = (RangeP, Double)
+package object plot {
 
   object syntax
     extends PlotSyntax
