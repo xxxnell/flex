@@ -17,7 +17,7 @@ trait PlottedDist[A] extends SamplingDist[A] {
 
 trait PlottedDistPropOps[D[_]<:PlottedDist[_]] extends SamplingDistPropOps[D, SamplingDistConf] {
 
-  def densityPlot(dist: D[_]): Option[DensityPlot] = Some(dist.densityPlot)
+  def sampling(dist: D[_]): Option[DensityPlot] = Some(dist.densityPlot)
 
 }
 

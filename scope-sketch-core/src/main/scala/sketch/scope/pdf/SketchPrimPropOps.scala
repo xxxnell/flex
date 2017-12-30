@@ -156,7 +156,7 @@ trait SketchPrimPropLaws[S[_]<:Sketch[_], C<:SketchConf] { self: SketchPrimPropO
     counts <- ranges.traverse(range => primCount(sketch, range.start, range.end))
   } yield CountPlot.disjoint(ranges.zip(counts))
 
-  def densityPlot(sketch: S[_]): Option[DensityPlot] = for {
+  def sampling(sketch: S[_]): Option[DensityPlot] = for {
     cmapHcounter <- sketch.structures.lastOption
     (cmap, _) = cmapHcounter
     ranges = cmap.bin

@@ -12,7 +12,7 @@ trait EqualSpaceCdfUpdate {
 
   def updateCmap(sketch: Sketch[_], ps: List[(Prim, Count)],
                  cmapSize: Int, mixingRatio: Double, window: Double): Option[Cmap] = for {
-    sketchPlot <- Sketch.densityPlot(sketch)
+    sketchPlot <- sketch.densityPlot
     mtpSketchPlot = sketchPlot * (1 / (mixingRatio + 1))
     mtpPsPlot = DensityPlot.squareKernel(ps, window) * (mixingRatio / (mixingRatio + 1))
     mergedPlot = if(ps.nonEmpty) mtpSketchPlot + mtpPsPlot else sketchPlot
