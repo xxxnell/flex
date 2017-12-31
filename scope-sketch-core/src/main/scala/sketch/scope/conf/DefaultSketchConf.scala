@@ -3,7 +3,8 @@ package sketch.scope.conf
 /**
   * Licensed by Probe Technology, Inc.
   */
-trait DefaultSketchConf extends PeriodicSketchConf {
+trait DefaultSketchConf
+  extends AdaPerSketchConf {
 
   val mixingRatio: Double = 1
 
@@ -12,6 +13,8 @@ trait DefaultSketchConf extends PeriodicSketchConf {
   val startThreshold: Double = 100
 
   val thresholdPeriod: Double = 100
+
+  val queueSize: Int = 100
 
   val cmap: UniformCmapConf = CmapConf.uniform(1000, 10, Some(-10000d), Some(10000d))
 

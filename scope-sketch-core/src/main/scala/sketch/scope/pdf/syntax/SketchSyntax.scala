@@ -21,7 +21,8 @@ trait SketchPropSyntax {
       Sketch.update(sketch, as.toList.map(a => (a, 1d)), conf)
     def update(as: List[(A, Count)])(implicit conf: SketchConf): Option[Sketch[A]] =
       Sketch.update(sketch, as, conf)
-    def narrowUpdate(as: A*): Option[Sketch[A]] = Sketch.narrowUpdate(sketch, as.toList.map(a => (a, 1d)))
+    def narrowUpdate(as: A*)(implicit conf: SketchConf): Option[Sketch[A]] =
+      Sketch.narrowUpdate(sketch, as.toList.map(a => (a, 1d)), conf)
     def deepUpdate(as: A*)(implicit conf: SketchConf): Option[(Sketch[A], Structure)] =
       Sketch.deepUpdate(sketch, as.toList.map(a => (a, 1d)), conf)
     def count(from: A, to: A): Option[Double] = Sketch.count(sketch, from, to)

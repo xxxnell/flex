@@ -30,7 +30,7 @@ trait RecurSketchLaws[S[_]<:RecurSketch[_], C<:SketchConf] { self: RecurSketchOp
 
   def update[A](sketch: S[A], as: List[(A, Count)], conf: C): Option[S[A]] = for {
     nextThreshold <- sketch.thresholds.headOption
-    utdSketch1 <- narrowUpdate[A](sketch, as)
+    utdSketch1 <- narrowUpdate[A](sketch, as, conf)
     sum = self.sum(utdSketch1)
     utdSketch2 <- if(nextThreshold <= sum) for {
       rearrangedSketch <- rearrange(utdSketch1, conf)
@@ -72,6 +72,13 @@ object RecurSketch extends RecurSketchOps[RecurSketch, SketchConf] {
   def sample[A](sketch: RecurSketch[A]): (RecurSketch[A], A) = sketch match {
 //    case periodic: PeriodicSketch[A] => PeriodicSketch.sample(periodic)
     case _ => ???
+  }
+
+  override def update[A](sketch: RecurSketch[A],
+                         as: List[(A, Count)],
+                         conf: SketchConf): Option[RecurSketch[A]] = (sketch, conf) match {
+    case (sketch: PeriodicSketch[A], conf: PeriodicSketchConf) => PeriodicSketch.update(sketch, as, conf)
+    case _ => super.update(sketch, as, conf)
   }
 
 }

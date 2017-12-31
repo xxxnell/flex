@@ -147,7 +147,7 @@ trait SketchPrimPropOps[S[_]<:Sketch[_], C<:SketchConf]
 
 trait SketchPrimPropLaws[S[_]<:Sketch[_], C<:SketchConf] { self: SketchPrimPropOps[S, C] =>
 
-  def narrowUpdate[A](sketch: S[A], as: List[(A, Count)]): Option[S[A]] = {
+  def narrowUpdate[A](sketch: S[A], as: List[(A, Count)], conf: C): Option[S[A]] = {
     primNarrowUpdate(sketch, as.map { case (value, count) => (sketch.measure.asInstanceOf[Measure[A]](value), count) })
   }
 
