@@ -4,9 +4,7 @@ import sketch.scope.cmap.Cmap
 import sketch.scope.conf.AdaPerSketchConf
 import sketch.scope.hcounter.HCounter
 import sketch.scope.measure.Measure
-import sketch.scope.pdf.PeriodicSketch.conf2Structures
 
-import scala.collection.immutable.Queue
 import scala.language.higherKinds
 
 /**
@@ -26,14 +24,14 @@ object AdaPerSketch extends AdaPerSketchOps[AdaPerSketch, AdaPerSketchConf] {
 
   private case class AdaPerSketchImpl1[A](measure: Measure[A],
                                           structures: List[(Cmap, HCounter)],
-                                          queue: Queue[(A, Count)],
+                                          queue: List[(A, Count)],
                                           start: Double,
                                           period: Double)
     extends AdaPerSketch[A]
 
   private case class AdaPerSketchImpl2[A](measure: Measure[A],
                                           structures: List[(Cmap, HCounter)],
-                                          queue: Queue[(A, Count)],
+                                          queue: List[(A, Count)],
                                           start: Double,
                                           period: Double,
                                           override val thresholds: Stream[Count])
@@ -41,10 +39,10 @@ object AdaPerSketch extends AdaPerSketchOps[AdaPerSketch, AdaPerSketchConf] {
 
   def empty[A](implicit measure: Measure[A], conf: AdaPerSketchConf): AdaPerSketch[A] =
     AdaPerSketchImpl1(measure, conf2Structures(conf),
-      Queue.empty[(A, Count)], conf.startThreshold, conf.thresholdPeriod)
+      List.empty[(A, Count)], conf.startThreshold, conf.thresholdPeriod)
 
   def modifyQueue[A](sketch: AdaPerSketch[A],
-                     f: Queue[(A, Count)] => Queue[(A, Count)]): AdaPerSketch[A] =
+                     f: List[(A, Count)] => List[(A, Count)]): AdaPerSketch[A] =
     AdaPerSketchImpl1(sketch.measure, sketch.structures, f(sketch.queue), sketch.start, sketch.period)
 
   def modifyStructure[A](sketch: AdaPerSketch[A],
