@@ -3,6 +3,7 @@ package sketch.scope.pdf
 import sketch.scope.conf.SamplingDistConf
 import sketch.scope.measure.Measure
 import sketch.scope.plot.DensityPlot
+import sketch.scope.range.syntax._
 
 import scala.language.higherKinds
 
@@ -18,6 +19,9 @@ trait PlottedDist[A] extends SamplingDist[A] {
 trait PlottedDistPropOps[D[_]<:PlottedDist[_]] extends SamplingDistPropOps[D, SamplingDistConf] {
 
   def sampling(dist: D[_]): Option[DensityPlot] = Some(dist.densityPlot)
+
+  def filter[A](dist: PlottedDist[A], f: RangeP => Boolean): PlottedDist[A] =
+    PlottedDist(dist.measure, DensityPlot.disjoint(dist.densityPlot.records.filter { case (range, _) => f(range) }))
 
 }
 

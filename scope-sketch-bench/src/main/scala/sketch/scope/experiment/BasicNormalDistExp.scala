@@ -13,6 +13,8 @@ object BasicNormalDistExp {
     val sampleNo = 1000
     val start = 50
     val period = 100
+    val minDomainCutoff = -10e10
+    val maxDomainCutoff = 10e10
 
     implicit val conf: SketchConf = SketchConf(
       startThreshold = start, thresholdPeriod = period,
@@ -28,18 +30,20 @@ object BasicNormalDistExp {
     val idxUtdSketches: List[(Int, Sketch[Double])] = (0, sketch) :: dataIdxs.flatMap { case (data, idx) =>
       tempSketchO = tempSketchO.flatMap(_.update(data))
       tempSketchO.map(tempSketch => (idx + 1, tempSketch))
-    }.filter { case (idx, _) => idx % period == 0 }
+    }.filter { case (idx, _) => (idx - start) % period == 0 || (idx - start + 1) % period == 0 }
     val idxDensityPlots = idxUtdSketches.flatMap { case (idx, utdSkt) => utdSkt.densityPlot.map(plot => (idx, plot)) }
     val idxKldPlot = idxUtdSketches.flatMap { case (idx, utdSkt) =>
       for {
         sampling <- underlying.sampling(utdSkt)
-        plot <- KLDDensity(sampling, utdSkt)
+        filtered = sampling.filter { range => range > minDomainCutoff && range < maxDomainCutoff }
+        plot <- KLDDensity(filtered, utdSkt)
       } yield (idx, plot)
     }
     val idxKld = idxUtdSketches.flatMap { case (idx, utdSkt) =>
       for {
         sampling <- underlying.sampling(utdSkt)
-        kld <- KLD(sampling, utdSkt)
+        filtered = sampling.filter { range => range > minDomainCutoff && range < maxDomainCutoff }
+        kld <- KLD(filtered, utdSkt)
       } yield (idx, kld)
     }
 

@@ -37,7 +37,7 @@ trait SmoothDistPropLaws[D[_]<:SmoothDist[_], C<:SmoothDistConf] { self: SmoothD
     } yield DensityPlot.disjoint(records)
   }
 
-  def toSamplingDist[A](dist: D[A], domains: List[RangeM[A]]): Option[SamplingDist[A]] = {
+  def toSamplingDist[A](dist: D[A], domains: List[RangeM[A]]): Option[PlottedDist[A]] = {
     val plotO = densityPlot(dist, domains)
 
     for {
