@@ -349,6 +349,64 @@ class SketchPropSpec extends Specification with ScalaCheck {
 
     }
 
+    "fastPdf" in {
+
+      "basic" in {
+        implicit val conf: CustomSketchConf = CustomSketchConf(
+          cmapSize = 10, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
+          counterSize = 10, counterNo = 2
+        )
+        val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
+        val sketch1O = sketch0.update(0, 1, 1, 2, 3)
+
+        (for {
+          sketch1 <- sketch1O
+          interpPdf <- SamplingDist.interpolationPdf(sketch1, 1d)
+          fastPdf <- Sketch.fastPdf(sketch1, 1d)
+          plot <- sketch1.densityPlot
+          _ = println("records:" + plot.records.mkString(", "))
+        } yield (interpPdf, fastPdf))
+          .fold(ko("Exception occurs")){ case (interpPdf, fastPdf) =>
+            if(interpPdf ~= fastPdf) ok else ko(s"interpPdf: $interpPdf, fastPdf: $fastPdf")
+          }
+      }
+
+      "boundary" in {
+
+        "least" in {
+          implicit val conf: CustomSketchConf = CustomSketchConf(
+            cmapSize = 10, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
+            counterSize = 10, counterNo = 2
+          )
+          val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
+          val sketch1O = sketch0.update(0, 1, 1, 2, 3)
+
+          (for {
+            sketch1 <- sketch1O
+            fastPdf <- Sketch.fastPdf(sketch1, Double.MinValue)
+          } yield fastPdf)
+            .fold(ko("Exception occurs")){ _ => ok }
+        }
+
+        "largest" in {
+          implicit val conf: CustomSketchConf = CustomSketchConf(
+            cmapSize = 10, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
+            counterSize = 10, counterNo = 2
+          )
+          val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
+          val sketch1O = sketch0.update(0, 1, 1, 2, 3)
+
+          (for {
+            sketch1 <- sketch1O
+            fastPdf <- Sketch.fastPdf(sketch1, Double.MaxValue)
+          } yield fastPdf)
+            .fold(ko("Exception occurs")){ _ => ok }
+        }
+
+      }
+
+    }
+
     /** End **/
 
   }

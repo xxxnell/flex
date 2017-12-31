@@ -22,7 +22,7 @@ trait SamplingDistPropOps[D[_]<:SamplingDist[_], C<:SamplingDistConf]
 
 trait SamplingDistPropLaws[D[_]<:SamplingDist[_], C<:SamplingDistConf] { self: SamplingDistPropOps[D, C] =>
 
-  def pdf[A](dist: D[A], a: A): Option[Double] = for {
+  def interpolationPdf[A](dist: D[A], a: A): Option[Double] = for {
     plot <- sampling(dist)
     density = DensityPlot.interpolation(plot, dist.measure.asInstanceOf[Measure[A]].to(a))
   } yield density
@@ -49,6 +49,11 @@ object SamplingDist extends SamplingDistPropOps[SamplingDist, SamplingDistConf] 
   def sample[A](dist: SamplingDist[A]): (SamplingDist[A], A) = dist match {
     case sketch: Sketch[_] => Sketch.sample(sketch)
     case plotted: PlottedDist[_] => PlottedDist.sample(plotted)
+  }
+
+  def pdf[A](dist: SamplingDist[A], a: A): Option[Prim] = dist match {
+    case sketch: Sketch[_] => Sketch.pdf(sketch, a)
+    case _ => super.interpolationPdf(dist, a)
   }
 
 }

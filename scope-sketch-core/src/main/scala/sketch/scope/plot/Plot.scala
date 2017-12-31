@@ -51,21 +51,18 @@ trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
       .map { case (range, value) => value }
   }
 
-  def interpolation(plot: P, argument: Double): Double = {
+  def interpolation(plot: P, x: Double): Double = {
     val dataRefSize = 2
 
     val midInterp = plot.records.sliding(dataRefSize)
-      .find { records =>
-        records.headOption.flatMap { case (headRange, _) => records.lastOption.map { case (lastRange, _) =>
-          RangeP(headRange.start, lastRange.end).contains(argument)
-        }}.getOrElse(false)
-      }.map(records => records.map { case (range, value) => (range.middle, value) })
-      .flatMap { datas => dataFitting(datas, argument) }
+      .find { records => records.headOption.forall(_._1 <= x) && records.lastOption.forall(_._1 >= x) }
+      .map(records => records.map { case (range, value) => (range.middle, value) })
+      .flatMap { datas => dataFitting(datas, x) }
 
-    val headExt = plot.records.headOption.filter { case (range, _) => range.start >= argument }
+    val headExt = plot.records.headOption.filter { case (range, _) => range.start >= x }
       .map { case (_, value) => value }
 
-    val tailExt = plot.records.lastOption.filter { case (range, _) => range.end <= argument }
+    val tailExt = plot.records.lastOption.filter { case (range, _) => range.end <= x }
       .map { case (_, value) => value }
 
     (midInterp orElse headExt orElse tailExt).getOrElse(0)
@@ -80,7 +77,8 @@ trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
     }
 
     (as.size, polyValid) match {
-      case (size, true) if size > 2 => polynomialFitting(as, x)
+      case (size, true) if size > 2 =>
+        polynomialFitting(as, x)
       case _ => for {
         start <- as.find(_._1 <= x)
         end <- as.find(_._1 >= x)

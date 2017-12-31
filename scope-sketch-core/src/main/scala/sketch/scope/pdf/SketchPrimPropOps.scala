@@ -114,12 +114,34 @@ trait SketchPrimPropOps[S[_]<:Sketch[_], C<:SketchConf]
     sums.sum / sums.size
   }
 
+  def flatDensity: Double = (BigDecimal(1) / RangeP(Cmap.max, Cmap.min).length).toDouble
+
   def primProbability(sketch: S[_], pFrom: Prim, pTo: Prim): Option[Double] = for {
     count <- primCount(sketch, pFrom, pTo)
     sum = self.sum(sketch)
-    flatDensity = BigDecimal(1) / RangeP(Cmap.max, Cmap.min).length
     flatProb = (flatDensity * RangeP(pFrom, pTo).length).toDouble
   } yield if(sum != 0) (BigDecimal(count) / BigDecimal(sum)).toDouble else flatProb
+
+  def singlePdf(cmap: Cmap, counter: HCounter, p: Prim): Option[Double] = for {
+    hdim <- Some(cmap.apply(p))
+    records = List(counter.get(hdim - 1).map((cmap.range(hdim - 1), _)),
+      counter.get(hdim).map((cmap.range(hdim), _)),
+      counter.get(hdim + 1).map((cmap.range(hdim + 1), _))).flatten
+    count = CountPlot.disjoint(records).interpolation(p)
+    sum = counter.sum
+    range = cmap.range(cmap.apply(p))
+  } yield {
+    if(sum != 0 && !range.isPoint) (count / (sum * range.length)).toDouble
+    else if(sum == 0) flatDensity
+    else if(count == 0) 0
+    else Double.PositiveInfinity
+  }
+
+  def primPdf[A](sketch: S[A], p: Prim): Option[Double] = {
+    val pdfsO = sketch.structures.traverse { case (cmap, counter) => singlePdf(cmap, counter, p) }
+
+    pdfsO.map(pdfs => if(pdfs.nonEmpty && sum(sketch) != 0) pdfs.sum / pdfs.size else flatDensity)
+  }
 
 }
 
@@ -165,5 +187,10 @@ trait SketchPrimPropLaws[S[_]<:Sketch[_], C<:SketchConf] { self: SketchPrimPropO
       .map { case (range, prob) => (range, Try(prob / range.length).toOption) }
       .flatMap { case (range, densityO) => densityO.map(density => (range, density.toDouble)) }
   } yield DensityPlot.disjoint(rangeDensities)
-  
+
+  def fastPdf[A](sketch: S[A], a: A): Option[Double] = {
+    val measure = sketch.measure.asInstanceOf[Measure[A]]
+    primPdf(sketch, measure(a))
+  }
+
 }

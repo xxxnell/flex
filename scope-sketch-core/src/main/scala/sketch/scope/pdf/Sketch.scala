@@ -72,7 +72,7 @@ trait SketchPropLaws[S[_]<:Sketch[_], C<:SketchConf] { self: SketchPropOps[S, C]
 
 }
 
-object Sketch extends SketchPrimPropOps[Sketch, SketchConf] {
+object Sketch extends SketchPrimPropOps[Sketch, SketchConf] { self =>
 
   def apply[A](measure: Measure[A], structure: Structures): Sketch[A] =
     SimpleSketch(measure, structure)
@@ -101,5 +101,7 @@ object Sketch extends SketchPrimPropOps[Sketch, SketchConf] {
   }
 
   def sample[A](sketch: Sketch[A]): (Sketch[A], A) = ???
+
+  def pdf[A](dist: Sketch[A], a: A): Option[Count] = fastPdf(dist, a)
 
 }
