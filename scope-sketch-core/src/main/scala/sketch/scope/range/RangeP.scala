@@ -38,6 +38,9 @@ trait RangePOps extends RangeMOps[GenericRangeP] {
     else 0
   }
 
+  def modifyMeasure[A](range: RangeP, measure: Measure[A]): RangeM[A] =
+    RangeM(measure.from(range.start), measure.from(range.end))(measure)
+
 }
 
 trait RangePSyntax {
@@ -47,6 +50,7 @@ trait RangePSyntax {
   implicit class RangeImpl(range: RangeP) {
     def length: BigDecimal = RangeP.length(range)
     def overlapPercent(range2: RangeP): Double = RangeP.overlapPercent(range, range2)
+    def modifyMeasure[A](measure: Measure[A]): RangeM[A] = RangeP.modifyMeasure(range, measure)
   }
 
 }

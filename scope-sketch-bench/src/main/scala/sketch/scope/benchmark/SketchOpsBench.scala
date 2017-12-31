@@ -3,7 +3,7 @@ package sketch.scope.benchmark
 import java.util.concurrent.TimeUnit
 
 import org.openjdk.jmh.annotations._
-import SketchBenchOps._
+import sketch.scope.benchmark.ops.SketchBenchOps._
 import sketch.scope.pdf.Sketch
 import sketch.scope.measure._
 import sketch.scope.conf._

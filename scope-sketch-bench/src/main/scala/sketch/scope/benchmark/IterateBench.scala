@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit
 
 import org.openjdk.jmh.annotations._
 import org.openjdk.jmh.infra.Blackhole
-import SketchBenchOps._
+import sketch.scope.benchmark.ops.SketchBenchOps._
 
 /**
   * Licensed by Probe Technology, Inc.

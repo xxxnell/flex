@@ -1,4 +1,4 @@
-package sketch.scope
+package sketch.scope.experiment.ops
 
 import java.io.{File, FileOutputStream}
 

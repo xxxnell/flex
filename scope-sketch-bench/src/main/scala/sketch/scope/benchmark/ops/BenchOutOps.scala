@@ -1,10 +1,11 @@
-package sketch.scope
+package sketch.scope.benchmark.ops
 
 import java.io.{File, FileOutputStream}
 
 import com.github.nscala_time.time.Imports._
 import org.openjdk.jmh.infra.BenchmarkParams
-import org.openjdk.jmh.results.{Result => BenchResult, RunResult}
+import org.openjdk.jmh.results.{RunResult, Result => BenchResult}
+
 import scala.collection.JavaConverters._
 
 /**

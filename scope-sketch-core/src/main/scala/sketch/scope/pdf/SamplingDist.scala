@@ -32,7 +32,7 @@ trait SamplingDistPropLaws[D[_]<:SamplingDist[_], C<:SamplingDistConf] { self: S
 object SamplingDist extends SamplingDistPropOps[SamplingDist, SamplingDistConf] {
 
   def forSmoothDist[A](dist: SmoothDist[A], domains: List[RangeM[A]]): Option[SamplingDist[A]] =
-    dist.toSamplingDist(domains)
+    dist.sampling(domains)
 
   def probability[A](dist: SamplingDist[A], start: A, end: A): Option[Double] = dist match {
     case sketch: Sketch[A] => Sketch.probability(sketch, start, end)

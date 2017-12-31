@@ -1,6 +1,7 @@
 package sketch.scope.experiment
 
-import sketch.scope.{ExpOutOps, _}
+import sketch.scope._
+import sketch.scope.experiment.ops.ExpOutOps
 
 /**
   * Licensed by Probe Technology, Inc.

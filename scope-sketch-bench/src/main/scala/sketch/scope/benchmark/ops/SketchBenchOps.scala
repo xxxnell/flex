@@ -1,4 +1,4 @@
-package sketch.scope.benchmark
+package sketch.scope.benchmark.ops
 
 import sketch.scope._
 

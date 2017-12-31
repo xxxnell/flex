@@ -1,6 +1,7 @@
 package sketch.scope.experiment
 
-import sketch.scope.{ExpOutOps, _}
+import sketch.scope._
+import sketch.scope.experiment.ops.ExpOutOps
 
 /**
   * Licensed by Probe Technology, Inc.
@@ -30,13 +31,22 @@ object BasicNormalDistExp {
     }.filter { case (idx, _) => idx % period == 0 }
     val idxDensityPlots = idxUtdSketches.flatMap { case (idx, utdSkt) => utdSkt.densityPlot.map(plot => (idx, plot)) }
     val idxKldPlot = idxUtdSketches.flatMap { case (idx, utdSkt) =>
-      KLDDensity(utdSkt, underlying).map(plot => (idx, plot))
+      for {
+        sampling <- underlying.sampling(utdSkt)
+        plot <- KLDDensity(sampling, utdSkt)
+      } yield (idx, plot)
     }
-    val idxKld = idxUtdSketches.flatMap { case (idx, utdSkt) => KLD(utdSkt, underlying).map(kld => (idx, kld)) }
+    val idxKld = idxUtdSketches.flatMap { case (idx, utdSkt) =>
+      for {
+        sampling <- underlying.sampling(utdSkt)
+        kld <- KLD(sampling, utdSkt)
+      } yield (idx, kld)
+    }
 
     ExpOutOps.clear(expName1)
     ExpOutOps.writePlots(expName1, idxDensityPlots)
     ExpOutOps.writePlots(expName1, "kld", idxKldPlot)
+    println(s"KLD Trend for normal distribution: $idxKld")
   }
 
 }
