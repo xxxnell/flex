@@ -14,6 +14,9 @@ import scala.language.higherKinds
   */
 trait Sketch[A] extends DataBinningDist[A] {
 
+  /**
+    * Internal structure list of Sketch. Order: young -> old
+    * */
   def structures: Structures
 
 }
@@ -34,7 +37,7 @@ trait SketchPropOps[S[_]<:Sketch[_], C<:SketchConf]
 
   def narrowUpdate[A](sketch: S[A], as: List[(A, Count)], conf: C): Option[S[A]]
 
-  def deepUpdate[A](sketch: S[A], as: List[(A, Count)], conf: C): Option[(S[A], Structure)]
+  def deepUpdate[A](sketch: S[A], as: List[(A, Count)], conf: C): Option[(S[A], Option[Structure])]
 
   //  def clear(sketch: S): S
 
@@ -61,14 +64,13 @@ trait SketchPropLaws[S[_]<:Sketch[_], C<:SketchConf] { self: SketchPropOps[S, C]
     (_, hcounter) = structure
   } yield hcounter.width).getOrElse(0)
 
-  def lastCmap(sketch: S[_]): Option[Cmap] = for {
-    structure <- sketch.structures.lastOption
+  def youngCmap(sketch: S[_]): Option[Cmap] = for {
+    structure <- sketch.structures.headOption
     cmap = structure._1
   } yield cmap
 
   def conf2Structures(conf: C): Structures =
-    (1 to conf.cmap.no).toList
-      .map(i => (Cmap(conf.cmap), HCounter(conf.counter, ~i)))
+    List((Cmap(conf.cmap), HCounter(conf.counter, -1)))
 
 }
 

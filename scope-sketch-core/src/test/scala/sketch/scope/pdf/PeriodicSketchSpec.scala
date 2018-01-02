@@ -80,7 +80,7 @@ class PeriodicSketchSpec extends Specification with ScalaCheck {
           } yield acc :+ utdSketch }
 
         val sequencialCmapsO: Option[List[Cmap]] = sequencialSketchsO.flatMap(sketches =>
-          sketches.traverse(sketch => sketch.lastCmap)
+          sketches.traverse(sketch => sketch.youngCmap)
         )
 
         val cond = sequencialCmapsO.exists(cmaps => cmaps.sliding(2)

@@ -25,32 +25,30 @@ trait SketchPrimPropOps[S[_]<:Sketch[_], C<:SketchConf]
   // Update ops
 
   /**
-    * Update a primitive value <code>p</code> without rearrange process.
+    * Update a list of primitive value <code>p</code> without rearranging process.
     * */
-  def primNarrowUpdate[A](sketch: S[A], ps: List[(Prim, Count)]): Option[S[A]] = modifyStructure(sketch, strs =>
-    strs.traverse { case (cmap, hcounter) =>
-      ps.foldLeft(Option(hcounter))((hcounterO, p) =>
-        hcounterO.flatMap(hcounter => hcounter.update(cmap.apply(p._1), p._2))
-      ).map(hcounter => (cmap, hcounter))
-    }
-  )
+  def primNarrowUpdate[A](sketch: S[A], ps: List[(Prim, Count)]): Option[S[A]] = modifyStructure(sketch, strs => {
+    val (effStrs, refStrO) = if (strs.headOption != strs.lastOption) (strs.init, strs.lastOption) else (strs, None)
+    def updatePs(cmap: Cmap, counter: HCounter, ps: List[(Prim, Count)]): Option[HCounter] =
+      counter.updates(ps.map { case (p, count) => (cmap(p), count) })
+
+    val utdEffStrsO = effStrs.traverse { case (cmap, counter) => updatePs(cmap, counter, ps).map((cmap, _)) }
+    refStrO.fold(utdEffStrsO)(refStr => utdEffStrsO.map(utdEffStrs => utdEffStrs :+ refStr))
+  })
 
   /**
-    * Deep update a primitive value <code>p</code> instead of <code>a</code> ∈ <code>A</code>
+    * Deep update a list of primitive value <code>p</code> instead of <code>a</code> ∈ <code>A</code>
     * */
-  def primDeepUpdate[A](sketch: S[A], ps: List[(Prim, Count)], conf: C): Option[(S[A], Structure)] = for {
+  def primDeepUpdate[A](sketch: S[A], ps: List[(Prim, Count)], conf: C): Option[(S[A], Option[Structure])] = for {
     utdCmap <- EqualSpaceCdfUpdate.updateCmap(sketch, ps, conf.cmap.size, conf.mixingRatio, conf.dataKernelWindow)
-    headTailStr <- sketch.structures match {
-      case head :: tail => Some((head, tail))
-      case _ => None
-    }
-    (oldStr, strs) = headTailStr
-    utdHCounter1 <- migrateForSketch(HCounter.empty(oldStr._2.depth, oldStr._2.width, sum(sketch).toInt), utdCmap, sketch)
-    utdHCounter2 <- migrateForPs(utdHCounter1, utdCmap, ps)
-    utdStrs = strs :+ (utdCmap, utdHCounter2)
-    utdSketch <- modifyStructure(sketch, _ => Some(utdStrs))
-  } yield (utdSketch, oldStr)
+    emptyCounter = HCounter.emptyForConf(conf.counter, sum(sketch).toInt)
+    (utdStrs, oldStrs) = ((utdCmap, emptyCounter) :: sketch.structures).splitAt(conf.cmap.no)
+    oldStrO = oldStrs.headOption
+    utdSketch1 <- modifyStructure(sketch, _ => Some(utdStrs))
+    utdSketch2 <- primNarrowUpdate(utdSketch1, ps)
+  } yield (utdSketch2, oldStrO)
 
+  @deprecated
   def migrateForSketch[A](hcounter: HCounter, cmap: Cmap, sketch: S[A]): Option[HCounter] = {
     cmap.ranges
       .flatMap { case (hdim, range) => primCount(sketch, range.start, range.end).map(count => (hdim, count)) }
@@ -59,6 +57,7 @@ trait SketchPrimPropOps[S[_]<:Sketch[_], C<:SketchConf]
       }
   }
 
+  @deprecated
   def migrateForPs(hcounter: HCounter, cmap: Cmap, ps: List[(Prim, Count)]): Option[HCounter] = {
     ps.map(p => (cmap.apply(p._1), p._2))
       .foldLeft(Option(hcounter)){ case (hcounterO, (hdim, count)) =>
@@ -148,14 +147,14 @@ trait SketchPrimPropOps[S[_]<:Sketch[_], C<:SketchConf]
 trait SketchPrimPropLaws[S[_]<:Sketch[_], C<:SketchConf] { self: SketchPrimPropOps[S, C] =>
 
   def narrowUpdate[A](sketch: S[A], as: List[(A, Count)], conf: C): Option[S[A]] = {
-    primNarrowUpdate(sketch, as.map { case (value, count) => (sketch.measure.asInstanceOf[Measure[A]](value), count) })
+    val ps = as.map { case (value, count) => (sketch.measure.asInstanceOf[Measure[A]](value), count) }
+    primNarrowUpdate(sketch, ps)
   }
 
-  def deepUpdate[A](sketch: S[A], as: List[(A, Count)], conf: C): Option[(S[A], Structure)] = primDeepUpdate(
-    sketch,
-    as.map { case (value, count) => (sketch.measure.asInstanceOf[Measure[A]](value), count) },
-    conf
-  )
+  def deepUpdate[A](sketch: S[A], as: List[(A, Count)], conf: C): Option[(S[A], Option[Structure])] = {
+    val ps = as.map { case (value, count) => (sketch.measure.asInstanceOf[Measure[A]](value), count) }
+    primDeepUpdate(sketch, ps, conf)
+  }
 
   /**
     * Get the number of elements be memorized.

@@ -14,6 +14,22 @@ class SketchPropSpec extends Specification with ScalaCheck {
 
   "Sketch" should {
 
+    "construct" in {
+
+      "structure size" in {
+        implicit val conf: CustomSketchConf = CustomSketchConf(
+          cmapSize = 10, cmapNo = 2, cmapStart = Some(0d), cmapEnd = Some(10d),
+          counterSize = 10, counterNo = 2
+        )
+        val sketch0 = Sketch.empty[Double]
+
+        if(sketch0.structures.size != 1)
+          ko(s"Initialized size of sketch structure is not1: size = ${sketch0.structures.size}")
+        else ok
+      }
+
+    }
+
     "count" in {
 
       "basic 1" in {
@@ -87,19 +103,23 @@ class SketchPropSpec extends Specification with ScalaCheck {
     }
 
     "narrowUpdate" in {
-      val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 2, Some(-10d), Some(10d))
-      val (counterSize, counterNo) = (8, 2)
-      implicit val conf: CustomSketchConf = CustomSketchConf(
-        cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
-        counterSize = counterSize, counterNo = counterNo
-      )
-      val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
 
-      (for {
-        sketch <- sketch0.narrowUpdate(0)
-        count <- sketch.count(-1, 1)
-      } yield count)
-        .fold(ko("Exception occurs."))(count => if(count > 0) ok else ko(s"count: $count, expected: 0<x<1"))
+      "basic" in {
+        val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 2, Some(-10d), Some(10d))
+        val (counterSize, counterNo) = (8, 2)
+        implicit val conf: CustomSketchConf = CustomSketchConf(
+          cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
+          counterSize = counterSize, counterNo = counterNo
+        )
+        val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
+
+        (for {
+          sketch <- sketch0.narrowUpdate(0)
+          count <- sketch.count(-1, 1)
+        } yield count)
+          .fold(ko("Exception occurs."))(count => if(count > 0) ok else ko(s"count: $count, expected: 0<x<1"))
+      }
+
     }
 
     "probability" in {
@@ -202,13 +222,13 @@ class SketchPropSpec extends Specification with ScalaCheck {
           val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
           val sketch1O = sketch0.deepUpdate(1).map(_._1)
 
-          val cond1 = sketch0.lastCmap != sketch1O.flatMap(_.lastCmap)
-          val cond2 = sketch0.lastCmap.map(_.size) == sketch1O.flatMap(_.lastCmap).map(_.size)
+          val cond1 = sketch0.youngCmap != sketch1O.flatMap(_.youngCmap)
+          val cond2 = sketch0.youngCmap.map(_.size) == sketch1O.flatMap(_.youngCmap).map(_.size)
 
           if(cond1 && cond2) ok
           else ko(
-            s"cmap1(${sketch0.lastCmap.map(_.size).getOrElse(0)}): ${sketch0.lastCmap}, " +
-              s"cmap2(${sketch1O.flatMap(_.lastCmap).map(_.size).getOrElse(0)}): ${sketch1O.flatMap(_.lastCmap)}"
+            s"cmap1(${sketch0.youngCmap.map(_.size).getOrElse(0)}): ${sketch0.youngCmap}, " +
+              s"cmap2(${sketch1O.flatMap(_.youngCmap).map(_.size).getOrElse(0)}): ${sketch1O.flatMap(_.youngCmap)}"
           )
         }
 
@@ -223,9 +243,9 @@ class SketchPropSpec extends Specification with ScalaCheck {
           val sketch1O = sketch0.deepUpdate(1).map(_._1)
           val sketch2O = sketch1O.flatMap(sketch1 => sketch1.deepUpdate(1).map(_._1))
 
-          val cmap0O = sketch0.lastCmap
-          val cmap1O = sketch1O.flatMap(_.lastCmap)
-          val cmap2O = sketch2O.flatMap(_.lastCmap)
+          val cmap0O = sketch0.youngCmap
+          val cmap1O = sketch1O.flatMap(_.youngCmap)
+          val cmap2O = sketch2O.flatMap(_.youngCmap)
 
           if(cmap0O != cmap1O && cmap1O != cmap2O) ok
           else ko(s"cmap0: $cmap0O, cmap1: $cmap1O, cmap2: $cmap2O")
@@ -233,17 +253,52 @@ class SketchPropSpec extends Specification with ScalaCheck {
 
       }
 
-      "migrate countings" in {
-//        val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 3, 0, 10)
-//        val (counterSize, counterNo) = (8, 2)
-//        implicit val conf: SketchConf = SketchConf(
-//          CmapConf.uniform(cmapSize, cmapNo, cmapStart, cmapEnd),
-//          CounterConf(counterSize, counterNo)
-//        )
-//        val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
-//        val sketch1O = sketch0.narrowU(5.5).map(_._1)
+      "structure size" in {
 
-        todo
+        "increasing" in {
+          implicit val conf: CustomSketchConf = CustomSketchConf(
+            cmapSize = 10, cmapNo = 2, cmapStart = Some(-1d), cmapEnd = Some(10d),
+            counterSize = 8, counterNo = 2
+          )
+          val sketch0 = Sketch.empty[Double]
+          val strSize0 = sketch0.structures.size
+
+          (for {
+            sketch1OldStr <- sketch0.deepUpdate(1)
+            (sketch1, oldStrO) = sketch1OldStr
+          } yield (sketch1.structures.size, oldStrO))
+            .fold(ko("Exception occurs")) { case (strSize, oldStrO) =>
+              if (strSize != strSize0 + 1)
+                ko(s"Updated structure size is not ${strSize0 + 1}: size = $strSize")
+              else if(oldStrO.isDefined)
+                ko("deepUpdate returns old structure.")
+              else ok
+            }
+        }
+
+        "bounded" in {
+          implicit val conf: CustomSketchConf = CustomSketchConf(
+            cmapSize = 10, cmapNo = 2, cmapStart = Some(-1d), cmapEnd = Some(10d),
+            counterSize = 8, counterNo = 2
+          )
+          val sketch0 = Sketch.empty[Double]
+          val strSize0 = sketch0.structures.size
+
+          (for {
+            sketch1OldStr <- sketch0.deepUpdate(1)
+            (sketch1, oldStr1) = sketch1OldStr
+            sketch2OldStr <- sketch1.deepUpdate(1)
+            (sketch2, oldStr2) = sketch2OldStr
+          } yield (sketch1.structures.size, sketch2.structures.size))
+            .fold(ko("Exception occurs")) { case (strSize1, strSize2) =>
+              if (strSize1 != strSize0 + 1)
+                ko(s"Updated structure size is not ${strSize0 + 1}: size = $strSize1")
+              else if(strSize1 != strSize2)
+                ko(s"Sketch structure size is not bounded: before = $strSize1, after = $strSize2")
+              else ok
+            }
+        }
+
       }
 
     }

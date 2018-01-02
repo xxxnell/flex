@@ -23,7 +23,7 @@ trait SketchPropSyntax {
       Sketch.update(sketch, as, conf)
     def narrowUpdate(as: A*)(implicit conf: SketchConf): Option[Sketch[A]] =
       Sketch.narrowUpdate(sketch, as.toList.map(a => (a, 1d)), conf)
-    def deepUpdate(as: A*)(implicit conf: SketchConf): Option[(Sketch[A], Structure)] =
+    def deepUpdate(as: A*)(implicit conf: SketchConf): Option[(Sketch[A], Option[Structure])] =
       Sketch.deepUpdate(sketch, as.toList.map(a => (a, 1d)), conf)
     def count(from: A, to: A): Option[Double] = Sketch.count(sketch, from, to)
     def countPlot: Option[CountPlot] = Sketch.countPlot(sketch)
@@ -35,7 +35,7 @@ trait SketchPropSyntax {
     def caSize: Int = Sketch.cmapSize(sketch)
     def coDepth: Int = Sketch.counterNo(sketch)
     def coSize: Int = Sketch.counterSize(sketch)
-    def lastCmap: Option[Cmap] = Sketch.lastCmap(sketch)
+    def youngCmap: Option[Cmap] = Sketch.youngCmap(sketch)
   }
 
 }
