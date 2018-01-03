@@ -64,8 +64,6 @@ object PeriodicSketch extends PeriodicSketchOps[PeriodicSketch, PeriodicSketchCo
     )
   }
 
-  def sample[A](sketch: PeriodicSketch[A]): (PeriodicSketch[A], A) = ???
-
   override def update[A](sketch: PeriodicSketch[A],
                          as: List[(A, Count)],
                          conf: PeriodicSketchConf): Option[PeriodicSketch[A]] = (sketch, conf) match {

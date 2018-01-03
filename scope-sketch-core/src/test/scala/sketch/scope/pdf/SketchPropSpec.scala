@@ -418,8 +418,6 @@ class SketchPropSpec extends Specification with ScalaCheck {
           sketch1 <- sketch1O
           interpPdf <- SamplingDist.interpolationPdf(sketch1, 1d)
           fastPdf <- Sketch.fastPdf(sketch1, 1d)
-          plot <- sketch1.densityPlot
-          _ = println("records:" + plot.records.mkString(", "))
         } yield (interpPdf, fastPdf))
           .fold(ko("Exception occurs")){ case (interpPdf, fastPdf) =>
             if(interpPdf ~= fastPdf) ok else ko(s"interpPdf: $interpPdf, fastPdf: $fastPdf")

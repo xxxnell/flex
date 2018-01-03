@@ -11,7 +11,6 @@ import sketch.scope.plot._
 import sketch.scope.range._
 
 import scala.language.{higherKinds, postfixOps}
-import scala.util.Try
 
 /**
   * Licensed by Probe Technology, Inc.
@@ -25,9 +24,9 @@ trait SketchPrimPropOps[S[_]<:Sketch[_], C<:SketchConf]
   // Update ops
 
   /**
-    * Update a list of primitive value <code>p</code> without rearranging process.
+    * Update a list of primitive value <code>p</code> without rearranging process only for structures.
     * */
-  def primNarrowUpdate[A](sketch: S[A], ps: List[(Prim, Count)]): Option[S[A]] = modifyStructure(sketch, strs => {
+  def primNarrowUpdateForStr[A](sketch: S[A], ps: List[(Prim, Count)]): Option[S[A]] = modifyStructure(sketch, strs => {
     val (effStrs, refStrO) = if (strs.headOption != strs.lastOption) (strs.init, strs.lastOption) else (strs, None)
     def updatePs(cmap: Cmap, counter: HCounter, ps: List[(Prim, Count)]): Option[HCounter] =
       counter.updates(ps.map { case (p, count) => (cmap(p), count) })
@@ -41,17 +40,17 @@ trait SketchPrimPropOps[S[_]<:Sketch[_], C<:SketchConf]
     * */
   def primDeepUpdate[A](sketch: S[A], ps: List[(Prim, Count)], conf: C): Option[(S[A], Option[Structure])] = for {
     utdCmap <- EqualSpaceCdfUpdate.updateCmap(sketch, ps, conf.cmap.size, conf.mixingRatio, conf.dataKernelWindow)
-    emptyCounter = HCounter.emptyForConf(conf.counter, sum(sketch).toInt)
+    emptyCounter = HCounter.emptyForConf(conf.counter, sumForStr(sketch).toInt)
     (utdStrs, oldStrs) = ((utdCmap, emptyCounter) :: sketch.structures).splitAt(conf.cmap.no)
     oldStrO = oldStrs.headOption
     utdSketch1 <- modifyStructure(sketch, _ => Some(utdStrs))
-    utdSketch2 <- primNarrowUpdate(utdSketch1, ps)
+    utdSketch2 <- primNarrowUpdateForStr(utdSketch1, ps)
   } yield (utdSketch2, oldStrO)
 
   @deprecated
   def migrateForSketch[A](hcounter: HCounter, cmap: Cmap, sketch: S[A]): Option[HCounter] = {
     cmap.ranges
-      .flatMap { case (hdim, range) => primCount(sketch, range.start, range.end).map(count => (hdim, count)) }
+      .flatMap { case (hdim, range) => primCountForStr(sketch, range.start, range.end).map(count => (hdim, count)) }
       .foldLeft(Option(hcounter)){ case (hcounterO, (hdim, count)) =>
         hcounterO.flatMap(hcounter => hcounter.update(hdim, count))
       }
@@ -98,7 +97,7 @@ trait SketchPrimPropOps[S[_]<:Sketch[_], C<:SketchConf]
     } yield midCount + boundartCount
   }
 
-  def primCount(sketch: S[_], pFrom: Prim, pTo: Prim): Option[Double] = {
+  def primCountForStr(sketch: S[_], pFrom: Prim, pTo: Prim): Option[Double] = {
     val countsO = sketch.structures.traverse { case (cmap, hcounter) => singleCount(cmap, hcounter, pFrom, pTo) }
 
     countsO.map(counts => counts.sum / counts.size)
@@ -107,7 +106,7 @@ trait SketchPrimPropOps[S[_]<:Sketch[_], C<:SketchConf]
   /**
     * Total number of elements be memorized.
     * */
-  def sum(sketch: S[_]): Double = {
+  def sumForStr(sketch: S[_]): Double = {
     val sums = sketch.structures.map { case (_, hcounter) => hcounter.sum }
 
     sums.sum / sums.size
@@ -115,13 +114,14 @@ trait SketchPrimPropOps[S[_]<:Sketch[_], C<:SketchConf]
 
   def flatDensity: Double = (BigDecimal(1) / RangeP(Cmap.max, Cmap.min).length).toDouble
 
-  def primProbability(sketch: S[_], pFrom: Prim, pTo: Prim): Option[Double] = for {
-    count <- primCount(sketch, pFrom, pTo)
-    sum = self.sum(sketch)
+  @deprecated
+  def primProbabilityForStr(sketch: S[_], pFrom: Prim, pTo: Prim): Option[Double] = for {
+    count <- primCountForStr(sketch, pFrom, pTo)
+    sum = self.sumForStr(sketch)
     flatProb = (flatDensity * RangeP(pFrom, pTo).length).toDouble
   } yield if(sum != 0) (BigDecimal(count) / BigDecimal(sum)).toDouble else flatProb
 
-  def singlePdf(cmap: Cmap, counter: HCounter, p: Prim): Option[Double] = for {
+  def singlePdfForStr(cmap: Cmap, counter: HCounter, p: Prim): Option[Double] = for {
     hdim <- Some(cmap.apply(p))
     records = List(counter.get(hdim - 1).map((cmap.range(hdim - 1), _)),
       counter.get(hdim).map((cmap.range(hdim), _)),
@@ -136,19 +136,52 @@ trait SketchPrimPropOps[S[_]<:Sketch[_], C<:SketchConf]
     else Double.PositiveInfinity
   }
 
-  def primPdf[A](sketch: S[A], p: Prim): Option[Double] = {
-    val pdfsO = sketch.structures.traverse { case (cmap, counter) => singlePdf(cmap, counter, p) }
+  /**
+    * pdf * N (total number of counter) for single structure
+    * */
+  def singlePdfNForStr(cmap: Cmap, counter: HCounter, p: Prim): Option[Double] = for {
+    pdf <- singlePdfForStr(cmap, counter, p)
+  } yield pdf * counter.sum
 
-    pdfsO.map(pdfs => if(pdfs.nonEmpty && sum(sketch) != 0) pdfs.sum / pdfs.size else flatDensity)
+  def primPdfNForStr[A](sketch: S[A], p: Prim): Option[Double] = {
+    val pdfNsO = sketch.structures.traverse { case (cmap, counter) => singlePdfNForStr(cmap, counter, p) }
+
+    pdfNsO.map(pdfNs => pdfNs.foldLeft(0d){ case (acc, pdfN) => acc + pdfN  }) // todo decay factor
   }
+
+  def primPdfForStr[A](sketch: S[A], p: Prim): Option[Double] = for {
+    pdfN <- primPdfNForStr(sketch, p)
+    sum = self.sum(sketch)
+  } yield pdfN / sum
 
 }
 
 trait SketchPrimPropLaws[S[_]<:Sketch[_], C<:SketchConf] { self: SketchPrimPropOps[S, C] =>
 
+  def pdfNForStr[A](sketch: S[A], a: A): Option[Double] = {
+    val measure = sketch.measure.asInstanceOf[Measure[A]]
+    primPdfNForStr(sketch, measure.to(a))
+  }
+
+  def countForStr[A](sketch: S[A], start: A, end: A): Option[Double] = {
+    val measure = sketch.measure.asInstanceOf[Measure[A]]
+    primCountForStr(sketch, measure(start), measure(end))
+  }
+
+  def fastPdfForStr[A](sketch: S[A], a: A): Option[Double] = {
+    val measure = sketch.measure.asInstanceOf[Measure[A]]
+    primPdfForStr(sketch, measure(a))
+  }
+
+  // implements the Sketch ops
+
+  def count[A](sketch: S[A], start: A, end: A): Option[Double] = countForStr(sketch, start, end)
+
+  def sum(sketch: S[_]): Count = sumForStr(sketch)
+
   def narrowUpdate[A](sketch: S[A], as: List[(A, Count)], conf: C): Option[S[A]] = {
     val ps = as.map { case (value, count) => (sketch.measure.asInstanceOf[Measure[A]](value), count) }
-    primNarrowUpdate(sketch, ps)
+    primNarrowUpdateForStr(sketch, ps)
   }
 
   def deepUpdate[A](sketch: S[A], as: List[(A, Count)], conf: C): Option[(S[A], Option[Structure])] = {
@@ -156,40 +189,16 @@ trait SketchPrimPropLaws[S[_]<:Sketch[_], C<:SketchConf] { self: SketchPrimPropO
     primDeepUpdate(sketch, ps, conf)
   }
 
-  /**
-    * Get the number of elements be memorized.
-    * */
-  def count[A](sketch: S[A], from: A, to: A): Option[Double] = {
-    val measure = sketch.measure.asInstanceOf[Measure[A]]
-    primCount(sketch, measure(from), measure(to))
-  }
-
-  /***/
-  def probability[A](sketch: S[A], from: A, to: A): Option[Double] = {
-    val measure = sketch.measure.asInstanceOf[Measure[A]]
-    primProbability(sketch, measure(from), measure(to))
-  }
-
+  @deprecated
   def countPlot(sketch: S[_]): Option[CountPlot] = for {
     cmapHcounter <- sketch.structures.lastOption
     (cmap, _) = cmapHcounter
     ranges = cmap.bin
-    counts <- ranges.traverse(range => primCount(sketch, range.start, range.end))
+    counts <- ranges.traverse(range => primCountForStr(sketch, range.start, range.end))
   } yield CountPlot.disjoint(ranges.zip(counts))
 
-  def sampling(sketch: S[_]): Option[DensityPlot] = for {
-    cmapHcounter <- sketch.structures.lastOption
-    (cmap, _) = cmapHcounter
-    ranges = cmap.bin
-    rangeProbs <- ranges.traverse(range => primProbability(sketch, range.start, range.end).map(prob => (range, prob)))
-    rangeDensities = rangeProbs
-      .map { case (range, prob) => (range, Try(prob / range.length).toOption) }
-      .flatMap { case (range, densityO) => densityO.map(density => (range, density.toDouble)) }
-  } yield DensityPlot.disjoint(rangeDensities)
+  def fastPdf[A](sketch: S[A], a: A): Option[Double] = fastPdfForStr(sketch, a)
 
-  def fastPdf[A](sketch: S[A], a: A): Option[Double] = {
-    val measure = sketch.measure.asInstanceOf[Measure[A]]
-    primPdf(sketch, measure(a))
-  }
+  def sample[A](dist: S[A]): (S[A], A) = ???
 
 }

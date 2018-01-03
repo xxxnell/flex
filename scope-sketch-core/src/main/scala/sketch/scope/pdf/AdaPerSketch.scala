@@ -55,6 +55,4 @@ object AdaPerSketch extends AdaPerSketchOps[AdaPerSketch, AdaPerSketchConf] {
       AdaPerSketchImpl2(sketch.measure, sketch.structures, sketch.queue, sketch.start, sketch.period, thr)
     )
 
-  def sample[A](dist: AdaPerSketch[A]): (AdaPerSketch[A], A) = ???
-
 }

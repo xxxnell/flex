@@ -4,8 +4,12 @@ import sketch.scope.cmap.Cmap
 import sketch.scope.conf.{AdaptiveSketchConf, PeriodicSketchConf, SketchConf}
 import sketch.scope.hcounter.HCounter
 import sketch.scope.measure.Measure
+import sketch.scope.plot.DensityPlot
 
 import scala.language.higherKinds
+import scala.util.Try
+import cats.implicits._
+import sketch.scope.range.RangeP
 
 /**
   * Licensed by Probe Technology, Inc.
@@ -25,13 +29,20 @@ trait SketchPropOps[S[_]<:Sketch[_], C<:SketchConf]
   extends DataBinningDistOps[S, C]
     with SketchPropLaws[S, C] {
 
-  // Read ops
+  // create ops
 
+  def sample[A](dist: S[A]): (S[A], A)
+
+  // read ops
+
+  /**
+    * Get the number of effective elements be memorized.
+    * */
   def count[A](sketch: S[A], from: A, to: A): Option[Count]
 
   def sum(sketch: S[_]): Count
 
-  // Update ops
+  // update ops
 
   def modifyStructure[A](sketch: S[A], f: Structures => Option[Structures]): Option[S[A]]
 
@@ -44,6 +55,22 @@ trait SketchPropOps[S[_]<:Sketch[_], C<:SketchConf]
 }
 
 trait SketchPropLaws[S[_]<:Sketch[_], C<:SketchConf] { self: SketchPropOps[S, C] =>
+
+  def probability[A](sketch: S[A], start: A, end: A): Option[Double] = for {
+    count <- count(sketch, start, end)
+    sum = self.sum(sketch)
+  } yield count / sum
+
+  def sampling[A](sketch: S[A]): Option[DensityPlot] = for {
+    cmapHcounter <- sketch.structures.lastOption
+    (cmap, _) = cmapHcounter
+    rangePs = cmap.bin
+    rangeMs = rangePs.map(rangeP => rangeP.modifyMeasure(sketch.measure.asInstanceOf[Measure[A]]))
+    rangeProbs <- rangeMs.traverse(rangeM => probability(sketch, rangeM.start, rangeM.end).map(prob => (rangeM, prob)))
+    rangeDensities = rangeProbs
+      .map { case (rangeM, prob) => (RangeP.forRangeM(rangeM), Try(prob / rangeM.length).toOption) }
+      .flatMap { case (range, densityO) => densityO.map(density => (range, density.toDouble)) }
+  } yield DensityPlot.disjoint(rangeDensities)
 
   def rearrange[A](sketch: S[A], conf: C): Option[S[A]] = deepUpdate(sketch, Nil, conf).map(_._1)
 
@@ -104,11 +131,33 @@ object Sketch extends SketchPrimPropOps[Sketch, SketchConf] { self =>
     case _ => narrowUpdate(sketch, as, conf)
   }
 
-  def sample[A](sketch: Sketch[A]): (Sketch[A], A) = ???
-
-  def pdf[A](dist: Sketch[A], a: A): Option[Count] = fastPdf(dist, a)
+  def pdf[A](sketch: Sketch[A], a: A): Option[Count] = sketch match {
+    case sketch: AdaptiveSketch[A] => AdaptiveSketch.fastPdf(sketch, a)
+    case _ => super.fastPdf(sketch, a)
+  }
 
   // overrides
+
+  override def probability[A](sketch: Sketch[A], start: A, end: A): Option[Count] = sketch match {
+    case sketch: AdaptiveSketch[A] => AdaptiveSketch.probability(sketch, start, end)
+    case _ => super.probability(sketch, start, end)
+  }
+
+  override def sampling[A](sketch: Sketch[A]): Option[DensityPlot] = sketch match {
+    case sketch: AdaptiveSketch[A] => AdaptiveSketch.sampling(sketch)
+    case _ => super.sampling(sketch)
+  }
+
+  override def count[A](sketch: Sketch[A], start: A, end: A): Option[Count] = sketch match {
+    case sketch: AdaptiveSketch[A] => AdaptiveSketch.count(sketch, start, end)
+    case _ => super.count(sketch, start, end)
+  }
+
+  override def sum(sketch: Sketch[_]): Count = sketch match {
+    case sketch: AdaptiveSketch[_] => AdaptiveSketch.sum(sketch)
+    case _ => super.sum(sketch)
+  }
+
 
   override def narrowUpdate[A](sketch: Sketch[A],
                                as: List[(A, Count)],

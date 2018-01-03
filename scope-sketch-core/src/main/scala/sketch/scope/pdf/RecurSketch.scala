@@ -31,7 +31,7 @@ trait RecurSketchLaws[S[_]<:RecurSketch[_], C<:SketchConf] { self: RecurSketchOp
   def update[A](sketch: S[A], as: List[(A, Count)], conf: C): Option[S[A]] = for {
     nextThreshold <- sketch.thresholds.headOption
     utdSketch1 <- narrowUpdate[A](sketch, as, conf)
-    sum = self.sum(utdSketch1)
+    sum = self.sumForStr(utdSketch1)
     utdSketch2 <- if(nextThreshold <= sum) for {
       rearrangedSketch <- rearrange(utdSketch1, conf)
       droppedSketch <- dropThreshold(rearrangedSketch)
@@ -59,19 +59,14 @@ object RecurSketch extends RecurSketchOps[RecurSketch, SketchConf] {
 
   def modifyStructure[A](sketch: RecurSketch[A],
                          f: Structures => Option[Structures]): Option[RecurSketch[A]] = sketch match {
-//    case periodic: PeriodicSketch[A] => PeriodicSketch.modifyStructure(periodic, f)
+    case periodic: PeriodicSketch[A] => PeriodicSketch.modifyStructure(periodic, f)
     case _ => f(sketch.structures).map(structure => bare(sketch.measure, structure, sketch.thresholds))
   }
 
   def modifyThresholds[A](sketch: RecurSketch[A],
                           f: Stream[Double] => Option[Stream[Double]]): Option[RecurSketch[A]] = sketch match {
-//    case periodic: PeriodicSketch[A] => PeriodicSketch.modifyThresholds(periodic, f)
+    case periodic: PeriodicSketch[A] => PeriodicSketch.modifyThresholds(periodic, f)
     case _ => f(sketch.thresholds).map(threshold => bare(sketch.measure, sketch.structures, threshold))
-  }
-
-  def sample[A](sketch: RecurSketch[A]): (RecurSketch[A], A) = sketch match {
-//    case periodic: PeriodicSketch[A] => PeriodicSketch.sample(periodic)
-    case _ => ???
   }
 
   override def update[A](sketch: RecurSketch[A],

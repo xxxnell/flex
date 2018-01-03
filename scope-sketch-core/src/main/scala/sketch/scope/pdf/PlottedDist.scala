@@ -12,22 +12,22 @@ import scala.language.higherKinds
   */
 trait PlottedDist[A] extends SamplingDist[A] {
 
-  def densityPlot: DensityPlot
+  def sampling: DensityPlot
 
 }
 
 trait PlottedDistPropOps[D[_]<:PlottedDist[_]] extends SamplingDistPropOps[D, SamplingDistConf] {
 
-  def sampling(dist: D[_]): Option[DensityPlot] = Some(dist.densityPlot)
+  def sampling[A](dist: D[A]): Option[DensityPlot] = Some(dist.sampling)
 
   def filter[A](dist: PlottedDist[A], f: RangeP => Boolean): PlottedDist[A] =
-    PlottedDist(dist.measure, DensityPlot.disjoint(dist.densityPlot.records.filter { case (range, _) => f(range) }))
+    PlottedDist(dist.measure, DensityPlot.disjoint(dist.sampling.records.filter { case (range, _) => f(range) }))
 
 }
 
 object PlottedDist extends PlottedDistPropOps[PlottedDist] {
 
-  case class PlottedDistImpl[A](measure: Measure[A], densityPlot: DensityPlot) extends PlottedDist[A]
+  case class PlottedDistImpl[A](measure: Measure[A], sampling: DensityPlot) extends PlottedDist[A]
 
   def apply[A](measure: Measure[A], densityPlot: DensityPlot): PlottedDist[A] = PlottedDistImpl(measure, densityPlot)
 
