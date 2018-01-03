@@ -59,6 +59,8 @@ object RangeP extends RangePOps {
 
   private case class RangePImpl(start: Prim, end: Prim) extends RangeP
 
+  def apply(p: Prim): RangeP = point(p)
+
   def apply(start: Prim, end: Prim): RangeP = bare(start, end)
 
   def bare(start: Prim, end: Prim): RangeP = {

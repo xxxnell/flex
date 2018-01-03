@@ -10,7 +10,7 @@ object BasicNormalDistExp {
 
   def main(args: Array[String]): Unit = {
     val expName1 = "basic-normal"
-    val sampleNo = 100
+    val sampleNo = 1000
     val start = 50
     val period = 100
     val minDomainCutoff = -10e10
