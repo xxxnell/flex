@@ -2,6 +2,7 @@ package sketch.scope.pdf
 
 import sketch.scope.conf.{AdaPerSketchConf, AdaptiveSketchConf}
 import sketch.scope.measure.Measure
+import sketch.scope.plot.CountPlot
 
 import scala.language.higherKinds
 
@@ -73,12 +74,27 @@ trait AdaptiveSketchLaws[S[_]<:AdaptiveSketch[_], C<:AdaptiveSketchConf] { self:
   def pdfForQueue[A](sketch: S[A], a: A): Option[Double] = for {
     cmap <- youngCmap(sketch)
     measure = sketch.measure.asInstanceOf[Measure[A]]
-    adim = cmap(measure.to(a))
     queue = sketch.queue.asInstanceOf[List[(A, Count)]]
-    filteredQ = queue.filter { case (_a, _) => cmap(measure.to(_a)) == adim }
-    count = filteredQ.foldLeft(0d){ case (acc, (_, _count)) => acc + _count }
-    range = cmap.range(adim)
-  } yield if(range.length != 0) (count / range.length).toDouble else Double.PositiveInfinity
+    p = measure.to(a)
+    adim = cmap(p)
+    filteredQ1 = queue.filter { case (_a, _) => cmap(measure.to(_a)) == adim -1 }
+    filteredQ2 = queue.filter { case (_a, _) => cmap(measure.to(_a)) == adim }
+    filteredQ3 = queue.filter { case (_a, _) => cmap(measure.to(_a)) == adim + 1 }
+    count1 = filteredQ1.foldLeft(0d){ case (acc, (_, _count)) => acc + _count }
+    count2 = filteredQ2.foldLeft(0d){ case (acc, (_, _count)) => acc + _count }
+    count3 = filteredQ3.foldLeft(0d){ case (acc, (_, _count)) => acc + _count }
+    range1 = cmap.range(adim - 1)
+    range2 = cmap.range(adim)
+    range3 = cmap.range(adim + 1)
+    records = (range1, count1) :: (range2, count2) :: (range3, count3) :: Nil
+    count = CountPlot.disjoint(records).interpolation(p)
+    sum = sumForQueue(sketch)
+  } yield {
+    if(sum != 0 && !range2.isPoint) (count / (sum * range2.length)).toDouble
+    else if(sum == 0) flatDensity
+    else if(count == 0) 0
+    else Double.PositiveInfinity
+  }
 
 }
 

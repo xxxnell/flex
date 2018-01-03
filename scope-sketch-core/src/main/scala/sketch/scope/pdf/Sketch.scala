@@ -9,7 +9,7 @@ import sketch.scope.plot.DensityPlot
 import scala.language.higherKinds
 import scala.util.Try
 import cats.implicits._
-import sketch.scope.range.RangeP
+import sketch.scope.range.{RangeM, RangeP}
 
 /**
   * Licensed by Probe Technology, Inc.
@@ -56,14 +56,17 @@ trait SketchPropOps[S[_]<:Sketch[_], C<:SketchConf]
 
 trait SketchPropLaws[S[_]<:Sketch[_], C<:SketchConf] { self: SketchPropOps[S, C] =>
 
+  def flatDensity: Double = (BigDecimal(1) / RangeP(Cmap.max, Cmap.min).length).toDouble
+
   def probability[A](sketch: S[A], start: A, end: A): Option[Double] = for {
     count <- count(sketch, start, end)
     sum = self.sum(sketch)
-  } yield count / sum
+    measure = sketch.measure.asInstanceOf[Measure[A]]
+    flatProb = (flatDensity * RangeM.bare(start, end, measure).length).toDouble
+  } yield if(sum > 0) count / sum else flatProb
 
   def sampling[A](sketch: S[A]): Option[DensityPlot] = for {
-    cmapHcounter <- sketch.structures.lastOption
-    (cmap, _) = cmapHcounter
+    cmap <- youngCmap(sketch)
     rangePs = cmap.bin
     rangeMs = rangePs.map(rangeP => rangeP.modifyMeasure(sketch.measure.asInstanceOf[Measure[A]]))
     rangeProbs <- rangeMs.traverse(rangeM => probability(sketch, rangeM.start, rangeM.end).map(prob => (rangeM, prob)))
@@ -158,7 +161,6 @@ object Sketch extends SketchPrimPropOps[Sketch, SketchConf] { self =>
     case _ => super.sum(sketch)
   }
 
-
   override def narrowUpdate[A](sketch: Sketch[A],
                                as: List[(A, Count)],
                                conf: SketchConf): Option[Sketch[A]] = (sketch, conf) match {
@@ -169,6 +171,11 @@ object Sketch extends SketchPrimPropOps[Sketch, SketchConf] { self =>
   override def rearrange[A](sketch: Sketch[A], conf: SketchConf): Option[Sketch[A]] = (sketch, conf) match {
     case (sketch: AdaptiveSketch[A], conf: AdaptiveSketchConf) => AdaptiveSketch.rearrange(sketch, conf)
     case _ => super.rearrange(sketch, conf)
+  }
+
+  override def fastPdf[A](sketch: Sketch[A], a: A): Option[Count] = sketch match {
+    case sketch: AdaptiveSketch[_] => AdaptiveSketch.fastPdf(sketch, a)
+    case _ => super.fastPdf(sketch, a)
   }
 
 }

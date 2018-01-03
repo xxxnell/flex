@@ -5,6 +5,7 @@ import org.specs2.mutable._
 import org.specs2.ScalaCheck
 import sketch.scope.conf._
 import sketch.scope.measure._
+import sketch.scope.pdf.syntax._
 import cats.implicits._
 import sketch.scope.cmap.{Cmap, DividerCmap}
 
@@ -29,8 +30,8 @@ class PeriodicSketchSpec extends Specification with ScalaCheck {
       
       // test
       val strSize = periodicSketch.structures.size
-      val cmapSizes = periodicSketch
-        .structures
+      val cmapSizes = periodicSketch.
+        structures
         .map { case (cmap, hcounter) => cmap.size }
       val counterNos = periodicSketch
         .structures
@@ -39,12 +40,12 @@ class PeriodicSketchSpec extends Specification with ScalaCheck {
         .structures
         .map { case (cmap, hcounter) => hcounter.width }
 
-      if(strSize == cmapNo &&
+      if(strSize == 1 &&
         cmapSizes.forall(_ == cmapSize) &&
         counterNos.forall(_ == counterNo) &&
         counterSizes.forall(_ == counterSize)) ok
       else ko(
-        s"strSize: $strSize (expected: $cmapNo), " +
+        s"strSize: $strSize (expected: 1), " +
           s"cmapSizes: $cmapSizes (expected: $cmapSize), " +
           s"counterNos: $counterNos (expected: $counterNo), " +
           s"counterSizes: $counterSizes (expected: $counterSize)"

@@ -26,15 +26,16 @@ trait SketchPropSyntax {
     def deepUpdate(as: A*)(implicit conf: SketchConf): Option[(Sketch[A], Option[Structure])] =
       Sketch.deepUpdate(sketch, as.toList.map(a => (a, 1d)), conf)
     def count(from: A, to: A): Option[Double] = Sketch.count(sketch, from, to)
+    @deprecated
     def countPlot: Option[CountPlot] = Sketch.countPlot(sketch)
     def sum: Double = Sketch.sum(sketch)
     //    def clear: Sketch = Sketch.clear(sketch)
     def probability(from: A, to: A): Option[Double] = Sketch.probability(sketch, from, to)
     def rearrange(implicit conf: SketchConf): Option[Sketch[A]] = Sketch.rearrange(sketch, conf)
-    def caDepth: Int = Sketch.cmapNo(sketch)
-    def caSize: Int = Sketch.cmapSize(sketch)
-    def coDepth: Int = Sketch.counterNo(sketch)
-    def coSize: Int = Sketch.counterSize(sketch)
+    def cmapNo: Int = Sketch.cmapNo(sketch)
+    def cmapSize: Int = Sketch.cmapSize(sketch)
+    def counterNo: Int = Sketch.counterNo(sketch)
+    def counterSize: Int = Sketch.counterSize(sketch)
     def youngCmap: Option[Cmap] = Sketch.youngCmap(sketch)
   }
 

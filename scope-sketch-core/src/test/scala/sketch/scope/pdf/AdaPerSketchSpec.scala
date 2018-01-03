@@ -168,11 +168,11 @@ class AdaPerSketchSpec extends Specification with ScalaCheck {
 
     "fastPdf" in {
 
-      "basic" in {
-        val queueSize = 1
+      "queue only" in {
+        val queueSize = 10
         implicit val conf: CustomAdaPerSketchConf = SketchConf(
           queueSize = queueSize,
-          cmapSize = 100, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
+          cmapSize = 20, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
           counterSize = 20, counterNo = 2
         )
         val sketch0 = AdaPerSketch.empty[Double]
@@ -180,6 +180,46 @@ class AdaPerSketchSpec extends Specification with ScalaCheck {
 
         (for {
           sketch1 <- sketch0.update(0, 0, 1, 2, 4, 5)
+          interpPdf <- SamplingDist.interpolationPdf(sketch1, p)
+          fastPdf <- Sketch.pdf(sketch1, p)
+        } yield (interpPdf, fastPdf))
+          .fold(ko("Exception occurs.")){ case (interpPdf, fastPdf) =>
+            if(interpPdf ~= fastPdf) ok else ko(s"interpPdf: $interpPdf, fastPdf: $fastPdf")
+          }
+      }
+
+      "structure dominant" in {
+        val queueSize = 1
+        implicit val conf: CustomAdaPerSketchConf = SketchConf(
+          queueSize = queueSize,
+          cmapSize = 20, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
+          counterSize = 20, counterNo = 2
+        )
+        val sketch0 = AdaPerSketch.empty[Double]
+        val p = 0.5
+
+        (for {
+          sketch1 <- sketch0.update(0, 0, 1, 2, 4, 5)
+          interpPdf <- SamplingDist.interpolationPdf(sketch1, p)
+          fastPdf <- Sketch.pdf(sketch1, p)
+        } yield (interpPdf, fastPdf))
+          .fold(ko("Exception occurs.")){ case (interpPdf, fastPdf) =>
+            if(interpPdf ~= fastPdf) ok else ko(s"interpPdf: $interpPdf, fastPdf: $fastPdf")
+          }
+      }
+
+      "mixed" in {
+        val queueSize = 3
+        implicit val conf: CustomAdaPerSketchConf = SketchConf(
+          queueSize = queueSize,
+          cmapSize = 20, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
+          counterSize = 20, counterNo = 2
+        )
+        val sketch0 = AdaPerSketch.empty[Double]
+        val p = 0.5
+
+        (for {
+          sketch1 <- sketch0.update(0, 1, 2, 4, 5, 0)
           interpPdf <- SamplingDist.interpolationPdf(sketch1, p)
           fastPdf <- Sketch.pdf(sketch1, p)
         } yield (interpPdf, fastPdf))

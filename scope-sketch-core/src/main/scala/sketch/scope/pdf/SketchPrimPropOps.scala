@@ -112,8 +112,6 @@ trait SketchPrimPropOps[S[_]<:Sketch[_], C<:SketchConf]
     sums.sum / sums.size
   }
 
-  def flatDensity: Double = (BigDecimal(1) / RangeP(Cmap.max, Cmap.min).length).toDouble
-
   @deprecated
   def primProbabilityForStr(sketch: S[_], pFrom: Prim, pTo: Prim): Option[Double] = for {
     count <- primCountForStr(sketch, pFrom, pTo)
@@ -151,7 +149,7 @@ trait SketchPrimPropOps[S[_]<:Sketch[_], C<:SketchConf]
 
   def primPdfForStr[A](sketch: S[A], p: Prim): Option[Double] = for {
     pdfN <- primPdfNForStr(sketch, p)
-    sum = self.sum(sketch)
+    sum = self.sumForStr(sketch)
   } yield pdfN / sum
 
 }
