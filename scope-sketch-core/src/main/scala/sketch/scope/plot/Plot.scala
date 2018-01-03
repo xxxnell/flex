@@ -157,7 +157,7 @@ trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
     val samples: List[(Prim, Double)] = plot.records
       .flatMap { case (range, value) => (range.start, value) :: (range.end, value) :: Nil }
 
-    val slidings = samples.sliding(2).flatMap {
+    val slidings = samples.sliding(2).toList.flatMap {
       case s1 :: s2 :: Nil => Some((s1, s2))
       case _ => None
     }
@@ -168,14 +168,14 @@ trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
       .sum
 
     val startBoundary: Double = slidings
-      .find { case ((x1, _), (x2, _)) => RangeP(x1, x2).contains(start) }
+      .filter { case ((x1, _), (x2, _)) => RangeP(x1, x2).contains(start) }
       .map { case ((x1, y1), (x2, y2)) => area(x1, y1, x2, y2) }
-      .getOrElse(0)
+      .sum
 
     val endBoundary: Double = slidings
-      .find { case ((x1, _), (x2, _)) => RangeP(x1, x2).contains(end) }
+      .filter { case ((x1, _), (x2, _)) => RangeP(x1, x2).contains(end) }
       .map { case ((x1, y1), (x2, y2)) => area(x1, y1, x2, y2) }
-      .getOrElse(0)
+      .sum
 
     mid + startBoundary + endBoundary
   }

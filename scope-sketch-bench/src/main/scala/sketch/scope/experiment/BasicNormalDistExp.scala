@@ -10,15 +10,15 @@ object BasicNormalDistExp {
 
   def main(args: Array[String]): Unit = {
     val expName1 = "basic-normal"
-    val sampleNo = 1000
+    val sampleNo = 100
     val start = 50
     val period = 100
     val minDomainCutoff = -10e10
     val maxDomainCutoff = 10e10
 
     implicit val conf: SketchConf = SketchConf(
-      startThreshold = start, thresholdPeriod = period,
-      cmapSize = 150, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10),
+      startThreshold = start, thresholdPeriod = period, queueSize = 30,
+      cmapSize = 150, cmapNo = 5, cmapStart = Some(-10d), cmapEnd = Some(10),
       counterSize = 1000, counterNo = 2
     )
     val sketch = Sketch.empty[Double]

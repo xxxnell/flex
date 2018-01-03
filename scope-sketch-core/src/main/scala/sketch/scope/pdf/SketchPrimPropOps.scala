@@ -3,14 +3,15 @@ package sketch.scope.pdf
 import sketch.scope.cmap.Cmap
 import sketch.scope.hcounter.HCounter
 import sketch.scope.hmap.HDim
-import cats.implicits._
 import sketch.scope.conf.SketchConf
 import sketch.scope.measure.Measure
 import sketch.scope.pdf.update.EqualSpaceCdfUpdate
 import sketch.scope.plot._
 import sketch.scope.range._
+import sketch.scope.range.syntax._
 
 import scala.language.{higherKinds, postfixOps}
+import cats.implicits._
 
 /**
   * Licensed by Probe Technology, Inc.
@@ -35,16 +36,30 @@ trait SketchPrimPropOps[S[_]<:Sketch[_], C<:SketchConf]
     refStrO.fold(utdEffStrsO)(refStr => utdEffStrsO.map(utdEffStrs => utdEffStrs :+ refStr))
   })
 
+  def primNarrowPlotUpdateForStr[A](sketch: S[A], counts: CountPlot): Option[S[A]] = for {
+    cmap <- youngCmap(sketch)
+    domain <- counts.domain
+    (startHdim, endHdim) = (cmap.apply(domain.start), cmap.apply(domain.end))
+    ps = (startHdim to endHdim).toList.map { hdim =>
+      val range = cmap.range(hdim)
+      val start = if(range.start > domain.start) range.start else domain.start
+      val end = if(range.end < domain.end) range.end else domain.end
+      (range.middle, counts.integral(start, end)) // todo range.middle is hacky approach
+    }
+    utdSketch <- primNarrowUpdateForStr(sketch, ps)
+  } yield utdSketch
+
   /**
     * Deep update a list of primitive value <code>p</code> instead of <code>a</code> ∈ <code>A</code>
     * */
   def primDeepUpdate[A](sketch: S[A], ps: List[(Prim, Count)], conf: C): Option[(S[A], Option[Structure])] = for {
     utdCmap <- EqualSpaceCdfUpdate.updateCmap(sketch, ps, conf.cmap.size, conf.mixingRatio, conf.dataKernelWindow)
-    emptyCounter = HCounter.emptyForConf(conf.counter, sumForStr(sketch).toInt)
+    emptyCounter = HCounter.emptyForConf(conf.counter, sum(sketch).toInt)
     (utdStrs, oldStrs) = ((utdCmap, emptyCounter) :: sketch.structures).splitAt(conf.cmap.no)
     oldStrO = oldStrs.headOption
     utdSketch1 <- modifyStructure(sketch, _ => Some(utdStrs))
-    utdSketch2 <- primNarrowUpdateForStr(utdSketch1, ps)
+    smoothingPs = EqualSpaceCdfUpdate.smoothingPsForEqualSpaceCumulative(ps)
+    utdSketch2 <- primNarrowPlotUpdateForStr(utdSketch1, smoothingPs)
   } yield (utdSketch2, oldStrO)
 
   @deprecated

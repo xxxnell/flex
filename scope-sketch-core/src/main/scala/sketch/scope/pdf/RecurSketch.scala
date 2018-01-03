@@ -31,7 +31,7 @@ trait RecurSketchLaws[S[_]<:RecurSketch[_], C<:SketchConf] { self: RecurSketchOp
   def update[A](sketch: S[A], as: List[(A, Count)], conf: C): Option[S[A]] = for {
     nextThreshold <- sketch.thresholds.headOption
     utdSketch1 <- narrowUpdate[A](sketch, as, conf)
-    sum = self.sumForStr(utdSketch1)
+    sum = self.sum(utdSketch1)
     utdSketch2 <- if(nextThreshold <= sum) for {
       rearrangedSketch <- rearrange(utdSketch1, conf)
       droppedSketch <- dropThreshold(rearrangedSketch)

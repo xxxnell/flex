@@ -8,7 +8,7 @@ trait DefaultSketchConf
 
   val mixingRatio: Double = 1
 
-  val dataKernelWindow: Double = 1e-10
+  val dataKernelWindow: Double = 1e-5
 
   val startThreshold: Double = 100
 
