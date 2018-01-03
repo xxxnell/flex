@@ -25,9 +25,7 @@ object SimpleSketch extends SimpleSketchOps {
   def modifyStructure[A](sketch: SimpleSketch[A], f: Structures => Option[Structures]): Option[SimpleSketch[A]] =
     f(sketch.structures).map(structure => SimpleSketch(sketch.measure, structure))
 
-  def sample[A](dist: SimpleSketch[A]): (SimpleSketch[A], A) = ???
-
   def update[A](sketch: SimpleSketch[A], as: List[(A, Count)], conf: SketchConf): Option[SimpleSketch[A]] =
-    narrowUpdate(sketch, as)
+    narrowUpdate(sketch, as, conf)
 
 }

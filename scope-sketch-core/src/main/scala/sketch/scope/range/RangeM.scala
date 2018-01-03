@@ -31,12 +31,14 @@ trait RangeMOps[R[_]<:RangeM[_]] {
 
   def primEnd[A](range: R[A]): Prim = range.measure.asInstanceOf[Measure[A]].to(range.end.asInstanceOf[A])
 
-  def containsP(start: Prim, end: Prim, p: Prim): Boolean =
-    ((start >= p) && end <= p) ||
+  def containsP(start: Prim, end: Prim, p: Prim): Boolean = {
+    ((start >= p) && (end <= p)) ||
       ((start <= p) && (end >= p))
+  }
 
-  def contains[A](range: R[A], a: A): Boolean =
+  def contains[A](range: R[A], a: A): Boolean = {
     containsP(primStart(range), primEnd(range), range.measure.asInstanceOf[Measure[A]].to(a))
+  }
 
   def greater[A](range: R[A], a: A): Boolean = primStart(range) > range.measure.asInstanceOf[Measure[A]].to(a)
 

@@ -157,7 +157,7 @@ trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
     val samples: List[(Prim, Double)] = plot.records
       .flatMap { case (range, value) => (range.start, value) :: (range.end, value) :: Nil }
 
-    val slidings = samples.sliding(2).flatMap {
+    val slidings = samples.sliding(2).toList.flatMap {
       case s1 :: s2 :: Nil => Some((s1, s2))
       case _ => None
     }
@@ -168,16 +168,28 @@ trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
       .sum
 
     val startBoundary: Double = slidings
-      .find { case ((x1, _), (x2, _)) => RangeP(x1, x2).contains(start) }
-      .map { case ((x1, y1), (x2, y2)) => area(x1, y1, x2, y2) }
-      .getOrElse(0)
+      .filter { case ((x1, _), (x2, _)) => RangeP(x1, x2).contains(start) }
+      .map { case ((x1, y1), (x2, y2)) =>
+        val yi = CountPlot.disjoint((RangeP(x1), y1) :: (RangeP(x2), y2) :: Nil).interpolation(start)
+        area(start, yi, x2, y2)
+      }.sum
 
     val endBoundary: Double = slidings
-      .find { case ((x1, _), (x2, _)) => RangeP(x1, x2).contains(end) }
-      .map { case ((x1, y1), (x2, y2)) => area(x1, y1, x2, y2) }
-      .getOrElse(0)
+      .filter { case ((x1, _), (x2, _)) => RangeP(x1, x2).contains(end) }
+      .map { case ((x1, y1), (x2, y2)) =>
+        val yi = CountPlot.disjoint((RangeP(x1), y1) :: (RangeP(x2), y2) :: Nil).interpolation(end)
+        area(x1, y1, end, yi)
+      }.sum
 
-    mid + startBoundary + endBoundary
+    val startEndBoundary: Double = slidings
+      .filter { case ((x1, _), (x2, _)) => RangeP(x1, x2).contains(start) && RangeP(x1, x2).contains(end) }
+      .map { case ((x1, y1), (x2, y2)) =>
+        val yi1 = CountPlot.disjoint((RangeP(x1), y1) :: (RangeP(x2), y2) :: Nil).interpolation(start)
+        val yi2 = CountPlot.disjoint((RangeP(x1), y1) :: (RangeP(x2), y2) :: Nil).interpolation(end)
+        area(start, yi1, end, yi2)
+      }.sum
+
+    if(startEndBoundary == 0) mid + startBoundary + endBoundary else startEndBoundary
   }
 
   def area(x1: Double, y1: Double, x2: Double, y2: Double): Double = (x2 - x1) * (y2 + y1) / 2

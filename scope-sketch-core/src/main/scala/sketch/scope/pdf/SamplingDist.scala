@@ -16,7 +16,7 @@ trait SamplingDistPropOps[D[_]<:SamplingDist[_], C<:SamplingDistConf]
   extends DistPropOps[D, C]
     with SamplingDistPropLaws[D, C] {
 
-  def sampling(dist: D[_]): Option[DensityPlot]
+  def sampling[A](dist: D[A]): Option[DensityPlot]
 
 }
 
@@ -40,9 +40,9 @@ object SamplingDist extends SamplingDistPropOps[SamplingDist, SamplingDistConf] 
     case _ => ???
   }
 
-  def sampling(dist: SamplingDist[_]): Option[DensityPlot] = dist match {
-    case sketch: Sketch[_] => Sketch.sampling(sketch)
-    case plotted: PlottedDist[_] => PlottedDist.sampling(plotted)
+  def sampling[A](dist: SamplingDist[A]): Option[DensityPlot] = dist match {
+    case sketch: Sketch[A] => Sketch.sampling(sketch)
+    case plotted: PlottedDist[A] => PlottedDist.sampling(plotted)
     case _ => ???
   }
 

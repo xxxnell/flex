@@ -21,20 +21,22 @@ trait SketchPropSyntax {
       Sketch.update(sketch, as.toList.map(a => (a, 1d)), conf)
     def update(as: List[(A, Count)])(implicit conf: SketchConf): Option[Sketch[A]] =
       Sketch.update(sketch, as, conf)
-    def narrowUpdate(as: A*): Option[Sketch[A]] = Sketch.narrowUpdate(sketch, as.toList.map(a => (a, 1d)))
-    def deepUpdate(as: A*)(implicit conf: SketchConf): Option[(Sketch[A], Structure)] =
+    def narrowUpdate(as: A*)(implicit conf: SketchConf): Option[Sketch[A]] =
+      Sketch.narrowUpdate(sketch, as.toList.map(a => (a, 1d)), conf)
+    def deepUpdate(as: A*)(implicit conf: SketchConf): Option[(Sketch[A], Option[Structure])] =
       Sketch.deepUpdate(sketch, as.toList.map(a => (a, 1d)), conf)
     def count(from: A, to: A): Option[Double] = Sketch.count(sketch, from, to)
+    @deprecated
     def countPlot: Option[CountPlot] = Sketch.countPlot(sketch)
     def sum: Double = Sketch.sum(sketch)
     //    def clear: Sketch = Sketch.clear(sketch)
     def probability(from: A, to: A): Option[Double] = Sketch.probability(sketch, from, to)
     def rearrange(implicit conf: SketchConf): Option[Sketch[A]] = Sketch.rearrange(sketch, conf)
-    def caDepth: Int = Sketch.cmapNo(sketch)
-    def caSize: Int = Sketch.cmapSize(sketch)
-    def coDepth: Int = Sketch.counterNo(sketch)
-    def coSize: Int = Sketch.counterSize(sketch)
-    def lastCmap: Option[Cmap] = Sketch.lastCmap(sketch)
+    def cmapNo: Int = Sketch.cmapNo(sketch)
+    def cmapSize: Int = Sketch.cmapSize(sketch)
+    def counterNo: Int = Sketch.counterNo(sketch)
+    def counterSize: Int = Sketch.counterSize(sketch)
+    def youngCmap: Option[Cmap] = Sketch.youngCmap(sketch)
   }
 
 }

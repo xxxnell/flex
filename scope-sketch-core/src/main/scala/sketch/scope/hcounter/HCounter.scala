@@ -5,6 +5,7 @@ import sketch.scope.conf.CounterConf
 import sketch.scope.counter.{CDim, Counter}
 import sketch.scope.hcounter.HCounter.width
 import sketch.scope.hmap.{HDim, Hmap}
+import sketch.scope.pdf.Count
 
 import scala.util.hashing.byteswap32
 
@@ -35,6 +36,9 @@ trait HCounterOps[HC<:HCounter] {
     }
   } yield HCounter(updated, hc.sum + count)
 
+  def updates(hc: HCounter, as: List[(HDim, Count)]): Option[HCounter] =
+    as.foldLeft(Option(hc)) { case (hcO, (hdim, count)) => hcO.flatMap(hc => hc.update(hdim, count)) }
+
   def get(hc: HCounter, hdim: HDim): Option[Double] = for {
     counts <- hc.structures.traverse { case (hmap, counter) =>
       for {
@@ -61,7 +65,8 @@ trait HCounterOps[HC<:HCounter] {
 trait HCounterSyntax {
 
   implicit class HCounterSyntaxImpl(hcounter: HCounter) {
-    def update(hdim: HDim, count: Double): Option[HCounter] = HCounter.update(hcounter, hdim, count)
+    def update(hdim: HDim, count: Count): Option[HCounter] = HCounter.update(hcounter, hdim, count)
+    def updates(as: List[(HDim, Count)]): Option[HCounter] = HCounter.updates(hcounter, as)
     def get(hdim: HDim): Option[Double] = HCounter.get(hcounter, hdim)
     def sum: Double = HCounter.sum(hcounter)
     def count(from: HDim, to: HDim): Option[Double] = HCounter.count(hcounter, from, to)
@@ -77,7 +82,7 @@ object HCounter extends HCounterOps[HCounter] { self =>
 
   def apply(structure: List[(Hmap, Counter)], sum: Double): HCounter = bare(structure, sum)
 
-  def apply(conf: CounterConf, seed: Int): HCounter = empty(conf.no, conf.size, seed)
+  def apply(conf: CounterConf, seed: Int): HCounter = emptyForConf(conf, seed)
 
   def bare(structures: List[(Hmap, Counter)], sum: Double): HCounter = HCounterImpl(structures, sum)
 
@@ -89,5 +94,7 @@ object HCounter extends HCounterOps[HCounter] { self =>
     val strs = (0 until depth).toList.map(i => (Hmap(hmapSeed(i)), Counter.empty(width)))
     bare(strs, 0)
   }
+
+  def emptyForConf(conf: CounterConf, seed: Int): HCounter = empty(conf.no, conf.size, seed)
 
 }

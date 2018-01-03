@@ -3,15 +3,15 @@ package sketch.scope.pdf
 import sketch.scope.cmap.Cmap
 import sketch.scope.hcounter.HCounter
 import sketch.scope.hmap.HDim
-import cats.implicits._
 import sketch.scope.conf.SketchConf
 import sketch.scope.measure.Measure
 import sketch.scope.pdf.update.EqualSpaceCdfUpdate
 import sketch.scope.plot._
 import sketch.scope.range._
+import sketch.scope.range.syntax._
 
 import scala.language.{higherKinds, postfixOps}
-import scala.util.Try
+import cats.implicits._
 
 /**
   * Licensed by Probe Technology, Inc.
@@ -25,40 +25,53 @@ trait SketchPrimPropOps[S[_]<:Sketch[_], C<:SketchConf]
   // Update ops
 
   /**
-    * Update a primitive value <code>p</code> without rearrange process.
+    * Update a list of primitive value <code>p</code> without rearranging process only for structures.
     * */
-  def primNarrowUpdate[A](sketch: S[A], ps: List[(Prim, Count)]): Option[S[A]] = modifyStructure(sketch, strs =>
-    strs.traverse { case (cmap, hcounter) =>
-      ps.foldLeft(Option(hcounter))((hcounterO, p) =>
-        hcounterO.flatMap(hcounter => hcounter.update(cmap.apply(p._1), p._2))
-      ).map(hcounter => (cmap, hcounter))
+  def primNarrowUpdateForStr[A](sketch: S[A], ps: List[(Prim, Count)]): Option[S[A]] = modifyStructure(sketch, strs => {
+    val (effStrs, refStrO) = if (strs.headOption != strs.lastOption) (strs.init, strs.lastOption) else (strs, None)
+    def updatePs(cmap: Cmap, counter: HCounter, ps: List[(Prim, Count)]): Option[HCounter] =
+      counter.updates(ps.map { case (p, count) => (cmap(p), count) })
+
+    val utdEffStrsO = effStrs.traverse { case (cmap, counter) => updatePs(cmap, counter, ps).map((cmap, _)) }
+    refStrO.fold(utdEffStrsO)(refStr => utdEffStrsO.map(utdEffStrs => utdEffStrs :+ refStr))
+  })
+
+  def primNarrowPlotUpdateForStr[A](sketch: S[A], counts: CountPlot): Option[S[A]] = for {
+    cmap <- youngCmap(sketch)
+    domain <- counts.domain
+    (startHdim, endHdim) = (cmap.apply(domain.start), cmap.apply(domain.end))
+    ps = (startHdim to endHdim).toList.map { hdim =>
+      val range = cmap.range(hdim)
+      val start = if(range.start > domain.start) range.start else domain.start
+      val end = if(range.end < domain.end) range.end else domain.end
+      (range.middle, counts.integral(start, end)) // todo range.middle is hacky approach
     }
-  )
+    utdSketch <- primNarrowUpdateForStr(sketch, ps)
+  } yield utdSketch
 
   /**
-    * Deep update a primitive value <code>p</code> instead of <code>a</code> ∈ <code>A</code>
+    * Deep update a list of primitive value <code>p</code> instead of <code>a</code> ∈ <code>A</code>
     * */
-  def primDeepUpdate[A](sketch: S[A], ps: List[(Prim, Count)], conf: C): Option[(S[A], Structure)] = for {
+  def primDeepUpdate[A](sketch: S[A], ps: List[(Prim, Count)], conf: C): Option[(S[A], Option[Structure])] = for {
     utdCmap <- EqualSpaceCdfUpdate.updateCmap(sketch, ps, conf.cmap.size, conf.mixingRatio, conf.dataKernelWindow)
-    headTailStr <- sketch.structures match {
-      case head :: tail => Some((head, tail))
-      case _ => None
-    }
-    (oldStr, strs) = headTailStr
-    utdHCounter1 <- migrateForSketch(HCounter.empty(oldStr._2.depth, oldStr._2.width, sum(sketch).toInt), utdCmap, sketch)
-    utdHCounter2 <- migrateForPs(utdHCounter1, utdCmap, ps)
-    utdStrs = strs :+ (utdCmap, utdHCounter2)
-    utdSketch <- modifyStructure(sketch, _ => Some(utdStrs))
-  } yield (utdSketch, oldStr)
+    emptyCounter = HCounter.emptyForConf(conf.counter, sum(sketch).toInt)
+    (utdStrs, oldStrs) = ((utdCmap, emptyCounter) :: sketch.structures).splitAt(conf.cmap.no)
+    oldStrO = oldStrs.headOption
+    utdSketch1 <- modifyStructure(sketch, _ => Some(utdStrs))
+    smoothingPs = EqualSpaceCdfUpdate.smoothingPsForEqualSpaceCumulative(ps)
+    utdSketch2 <- primNarrowPlotUpdateForStr(utdSketch1, smoothingPs)
+  } yield (utdSketch2, oldStrO)
 
+  @deprecated
   def migrateForSketch[A](hcounter: HCounter, cmap: Cmap, sketch: S[A]): Option[HCounter] = {
     cmap.ranges
-      .flatMap { case (hdim, range) => primCount(sketch, range.start, range.end).map(count => (hdim, count)) }
+      .flatMap { case (hdim, range) => primCountForStr(sketch, range.start, range.end).map(count => (hdim, count)) }
       .foldLeft(Option(hcounter)){ case (hcounterO, (hdim, count)) =>
         hcounterO.flatMap(hcounter => hcounter.update(hdim, count))
       }
   }
 
+  @deprecated
   def migrateForPs(hcounter: HCounter, cmap: Cmap, ps: List[(Prim, Count)]): Option[HCounter] = {
     ps.map(p => (cmap.apply(p._1), p._2))
       .foldLeft(Option(hcounter)){ case (hcounterO, (hdim, count)) =>
@@ -99,7 +112,7 @@ trait SketchPrimPropOps[S[_]<:Sketch[_], C<:SketchConf]
     } yield midCount + boundartCount
   }
 
-  def primCount(sketch: S[_], pFrom: Prim, pTo: Prim): Option[Double] = {
+  def primCountForStr(sketch: S[_], pFrom: Prim, pTo: Prim): Option[Double] = {
     val countsO = sketch.structures.traverse { case (cmap, hcounter) => singleCount(cmap, hcounter, pFrom, pTo) }
 
     countsO.map(counts => counts.sum / counts.size)
@@ -108,21 +121,20 @@ trait SketchPrimPropOps[S[_]<:Sketch[_], C<:SketchConf]
   /**
     * Total number of elements be memorized.
     * */
-  def sum(sketch: S[_]): Double = {
+  def sumForStr(sketch: S[_]): Double = {
     val sums = sketch.structures.map { case (_, hcounter) => hcounter.sum }
 
     sums.sum / sums.size
   }
 
-  def flatDensity: Double = (BigDecimal(1) / RangeP(Cmap.max, Cmap.min).length).toDouble
-
-  def primProbability(sketch: S[_], pFrom: Prim, pTo: Prim): Option[Double] = for {
-    count <- primCount(sketch, pFrom, pTo)
-    sum = self.sum(sketch)
+  @deprecated
+  def primProbabilityForStr(sketch: S[_], pFrom: Prim, pTo: Prim): Option[Double] = for {
+    count <- primCountForStr(sketch, pFrom, pTo)
+    sum = self.sumForStr(sketch)
     flatProb = (flatDensity * RangeP(pFrom, pTo).length).toDouble
   } yield if(sum != 0) (BigDecimal(count) / BigDecimal(sum)).toDouble else flatProb
 
-  def singlePdf(cmap: Cmap, counter: HCounter, p: Prim): Option[Double] = for {
+  def singlePdfForStr(cmap: Cmap, counter: HCounter, p: Prim): Option[Double] = for {
     hdim <- Some(cmap.apply(p))
     records = List(counter.get(hdim - 1).map((cmap.range(hdim - 1), _)),
       counter.get(hdim).map((cmap.range(hdim), _)),
@@ -137,60 +149,69 @@ trait SketchPrimPropOps[S[_]<:Sketch[_], C<:SketchConf]
     else Double.PositiveInfinity
   }
 
-  def primPdf[A](sketch: S[A], p: Prim): Option[Double] = {
-    val pdfsO = sketch.structures.traverse { case (cmap, counter) => singlePdf(cmap, counter, p) }
+  /**
+    * pdf * N (total number of counter) for single structure
+    * */
+  def singlePdfNForStr(cmap: Cmap, counter: HCounter, p: Prim): Option[Double] = for {
+    pdf <- singlePdfForStr(cmap, counter, p)
+  } yield pdf * counter.sum
 
-    pdfsO.map(pdfs => if(pdfs.nonEmpty && sum(sketch) != 0) pdfs.sum / pdfs.size else flatDensity)
+  def primPdfNForStr[A](sketch: S[A], p: Prim): Option[Double] = {
+    val pdfNsO = sketch.structures.traverse { case (cmap, counter) => singlePdfNForStr(cmap, counter, p) }
+
+    pdfNsO.map(pdfNs => pdfNs.foldLeft(0d){ case (acc, pdfN) => acc + pdfN  }) // todo decay factor
   }
+
+  def primPdfForStr[A](sketch: S[A], p: Prim): Option[Double] = for {
+    pdfN <- primPdfNForStr(sketch, p)
+    sum = self.sumForStr(sketch)
+  } yield pdfN / sum
 
 }
 
 trait SketchPrimPropLaws[S[_]<:Sketch[_], C<:SketchConf] { self: SketchPrimPropOps[S, C] =>
 
-  def narrowUpdate[A](sketch: S[A], as: List[(A, Count)]): Option[S[A]] = {
-    primNarrowUpdate(sketch, as.map { case (value, count) => (sketch.measure.asInstanceOf[Measure[A]](value), count) })
-  }
-
-  def deepUpdate[A](sketch: S[A], as: List[(A, Count)], conf: C): Option[(S[A], Structure)] = primDeepUpdate(
-    sketch,
-    as.map { case (value, count) => (sketch.measure.asInstanceOf[Measure[A]](value), count) },
-    conf
-  )
-
-  /**
-    * Get the number of elements be memorized.
-    * */
-  def count[A](sketch: S[A], from: A, to: A): Option[Double] = {
+  def pdfNForStr[A](sketch: S[A], a: A): Option[Double] = {
     val measure = sketch.measure.asInstanceOf[Measure[A]]
-    primCount(sketch, measure(from), measure(to))
+    primPdfNForStr(sketch, measure.to(a))
   }
 
-  /***/
-  def probability[A](sketch: S[A], from: A, to: A): Option[Double] = {
+  def countForStr[A](sketch: S[A], start: A, end: A): Option[Double] = {
     val measure = sketch.measure.asInstanceOf[Measure[A]]
-    primProbability(sketch, measure(from), measure(to))
+    primCountForStr(sketch, measure(start), measure(end))
   }
 
+  def fastPdfForStr[A](sketch: S[A], a: A): Option[Double] = {
+    val measure = sketch.measure.asInstanceOf[Measure[A]]
+    primPdfForStr(sketch, measure(a))
+  }
+
+  // implements the Sketch ops
+
+  def count[A](sketch: S[A], start: A, end: A): Option[Double] = countForStr(sketch, start, end)
+
+  def sum(sketch: S[_]): Count = sumForStr(sketch)
+
+  def narrowUpdate[A](sketch: S[A], as: List[(A, Count)], conf: C): Option[S[A]] = {
+    val ps = as.map { case (value, count) => (sketch.measure.asInstanceOf[Measure[A]](value), count) }
+    primNarrowUpdateForStr(sketch, ps)
+  }
+
+  def deepUpdate[A](sketch: S[A], as: List[(A, Count)], conf: C): Option[(S[A], Option[Structure])] = {
+    val ps = as.map { case (value, count) => (sketch.measure.asInstanceOf[Measure[A]](value), count) }
+    primDeepUpdate(sketch, ps, conf)
+  }
+
+  @deprecated
   def countPlot(sketch: S[_]): Option[CountPlot] = for {
     cmapHcounter <- sketch.structures.lastOption
     (cmap, _) = cmapHcounter
     ranges = cmap.bin
-    counts <- ranges.traverse(range => primCount(sketch, range.start, range.end))
+    counts <- ranges.traverse(range => primCountForStr(sketch, range.start, range.end))
   } yield CountPlot.disjoint(ranges.zip(counts))
 
-  def sampling(sketch: S[_]): Option[DensityPlot] = for {
-    cmapHcounter <- sketch.structures.lastOption
-    (cmap, _) = cmapHcounter
-    ranges = cmap.bin
-    rangeProbs <- ranges.traverse(range => primProbability(sketch, range.start, range.end).map(prob => (range, prob)))
-    rangeDensities = rangeProbs
-      .map { case (range, prob) => (range, Try(prob / range.length).toOption) }
-      .flatMap { case (range, densityO) => densityO.map(density => (range, density.toDouble)) }
-  } yield DensityPlot.disjoint(rangeDensities)
+  def fastPdf[A](sketch: S[A], a: A): Option[Double] = fastPdfForStr(sketch, a)
 
-  def fastPdf[A](sketch: S[A], a: A): Option[Double] = {
-    val measure = sketch.measure.asInstanceOf[Measure[A]]
-    primPdf(sketch, measure(a))
-  }
+  def sample[A](dist: S[A]): (S[A], A) = ???
 
 }

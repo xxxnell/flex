@@ -1,16 +1,18 @@
 package sketch.scope.experiment
 
 import sketch.scope._
-import sketch.scope.experiment.ops._
+import sketch.scope.experiment.ops.ExpOutOps
 
 /**
-  * Licensed by Probe Technology, Inc.
-  */
-object BasicNormalDistExp {
+  * A experiment for sudden concept drift.
+  * https://edouardfouche.com/img/concept-drift/conceptdrift.png
+  * */
+object SuddenConceptDriftExp {
 
   def main(args: Array[String]): Unit = {
-    val expName1 = "basic-normal"
-    val sampleNo = 1000
+    val expName1 = "sudden-cd-normal"
+    val sampleNo1 = 200
+    val sampleNo2 = 1000
     val start = 50
     val period = 100
     val minDomainCutoff = -10e10
@@ -22,9 +24,11 @@ object BasicNormalDistExp {
       counterSize = 1000, counterNo = 2
     )
     val sketch = Sketch.empty[Double]
-    val underlying = Dist.normal(0.1, 1)
-    val (_, datas) = underlying.samples(sampleNo)
-    val dataIdxs = datas.zipWithIndex
+    val underlying1 = Dist.normal(0.1, 1)
+    val (_, datas1) = underlying1.samples(sampleNo1)
+    val underlying2 = Dist.normal(5.1, 1)
+    val (_, datas2) = underlying2.samples(sampleNo2)
+    val dataIdxs = (datas1 ++ datas2).zipWithIndex
 
     var tempSketchO: Option[Sketch[Double]] = Option(sketch)
     val idxUtdSketches: List[(Int, Sketch[Double])] = (0, sketch) :: dataIdxs.flatMap { case (data, idx) =>
@@ -34,14 +38,14 @@ object BasicNormalDistExp {
     val idxDensityPlots = idxUtdSketches.flatMap { case (idx, utdSkt) => utdSkt.densityPlot.map(plot => (idx, plot)) }
     val idxKldPlot = idxUtdSketches.flatMap { case (idx, utdSkt) =>
       for {
-        sampling <- underlying.sampling(utdSkt)
+        sampling <- if(idx < sampleNo1) underlying1.sampling(utdSkt) else underlying2.sampling(utdSkt)
         filtered = sampling.filter { range => range > minDomainCutoff && range < maxDomainCutoff }
         plot <- KLDDensity(filtered, utdSkt)
       } yield (idx, plot)
     }
     val idxKld = idxUtdSketches.flatMap { case (idx, utdSkt) =>
       for {
-        sampling <- underlying.sampling(utdSkt)
+        sampling <- if(idx < sampleNo1) underlying1.sampling(utdSkt) else underlying2.sampling(utdSkt)
         filtered = sampling.filter { range => range > minDomainCutoff && range < maxDomainCutoff }
         kld <- KLD(filtered, utdSkt)
       } yield (idx, kld)
