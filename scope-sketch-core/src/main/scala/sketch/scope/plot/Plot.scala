@@ -99,7 +99,7 @@ trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
 
         (slope * x + c).toDouble
       } else ((y1B + y2B) / 2).toDouble // todo throw an exception when x is not sim to x1B
-    } else throw new IllegalArgumentException(s"Cannot linear interpolating with: ${(x1, y1)}, ${(x2, y2)}")
+    } else throw new IllegalArgumentException(s"Can't linear interpolat with: ${(x1, y1)}, ${(x2, y2)}")
   }
 
   def polynomialFitting(as: List[(Double, Double)], x: Double): Option[Double] = Try {
