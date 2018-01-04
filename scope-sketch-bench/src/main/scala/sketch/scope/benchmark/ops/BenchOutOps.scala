@@ -8,9 +8,6 @@ import org.openjdk.jmh.results.{RunResult, Result => BenchResult}
 
 import scala.collection.JavaConverters._
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 object BenchOutOps {
 
   def write(path: String, results: Iterable[RunResult]): Unit = {

@@ -1,8 +1,5 @@
 package sketch.scope.counter
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 trait ListCounter extends Counter {
   def cs: List[Double]
 }

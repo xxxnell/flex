@@ -5,9 +5,6 @@ import org.specs2.ScalaCheck
 import sketch.scope.conf._
 import sketch.scope._
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 class SketchMonadSpec extends Specification with ScalaCheck {
 
   "Sketch" should {

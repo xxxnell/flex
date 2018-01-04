@@ -7,9 +7,6 @@ import sketch.scope.measure.Measure
 
 import scala.language.higherKinds
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 trait PeriodicSketch[A] extends RecurSketch[A] {
 
   val start: Double

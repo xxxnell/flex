@@ -8,9 +8,6 @@ import sketch.scope.pdf.Sketch
 import sketch.scope.measure._
 import sketch.scope.conf._
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 @BenchmarkMode(Array(Mode.AverageTime))
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @State(Scope.Thread)

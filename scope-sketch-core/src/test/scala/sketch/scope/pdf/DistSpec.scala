@@ -5,9 +5,6 @@ import org.specs2.ScalaCheck
 import sketch.scope.measure._
 import sketch.scope.conf._
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 class DistSpec extends Specification with ScalaCheck {
 
   "Dist" should {

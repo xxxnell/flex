@@ -3,9 +3,6 @@ package sketch.scope.range
 import org.specs2.mutable._
 import org.specs2.ScalaCheck
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 class RangePSpec extends Specification with ScalaCheck {
 
   "RangeP" should {

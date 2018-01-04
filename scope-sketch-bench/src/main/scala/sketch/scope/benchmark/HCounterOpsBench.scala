@@ -7,9 +7,6 @@ import sketch.scope.hcounter.HCounter
 
 import scala.util.Random
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 @BenchmarkMode(Array(Mode.AverageTime))
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @State(Scope.Thread)

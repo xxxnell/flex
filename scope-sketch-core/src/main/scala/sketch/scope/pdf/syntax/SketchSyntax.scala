@@ -7,9 +7,6 @@ import sketch.scope.pdf.{Count, Dist, Prim, Range, Sketch, Structure}
 import sketch.scope.pdf.monad.{DistFunctor, SketchMonad}
 import sketch.scope.plot.CountPlot
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 trait SketchSyntax extends SketchPropSyntax with SketchMonadSyntax
 
 trait SketchPropSyntax {

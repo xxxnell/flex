@@ -8,8 +8,6 @@ import sketch.scope.pdf.syntax._
 import scala.math._
 
 /**
-  * Licensed by Probe Technology, Inc.
-  *
   * Kullback–Leibler divergence
   * https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence
   */

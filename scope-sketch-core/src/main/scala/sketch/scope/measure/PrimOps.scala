@@ -2,9 +2,6 @@ package sketch.scope.measure
 
 import sketch.scope.pdf.Prim
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 object PrimOps {
 
   def similar(prim1: Prim, prim2: Prim, error: Double): Boolean = {

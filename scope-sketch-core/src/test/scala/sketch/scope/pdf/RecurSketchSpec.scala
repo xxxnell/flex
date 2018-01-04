@@ -6,9 +6,6 @@ import org.specs2.ScalaCheck
 import sketch.scope.conf.SketchConfGen
 import sketch.scope.measure.MeasureGen
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 class RecurSketchSpec extends Specification with ScalaCheck {
 
   "PeroidicSketch" should {

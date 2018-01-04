@@ -9,9 +9,6 @@ import sketch.scope.pdf.syntax._
 import cats.implicits._
 import sketch.scope.cmap.{Cmap, DividerCmap}
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 class PeriodicSketchSpec extends Specification with ScalaCheck {
 
   "PeriodicSketch" should {

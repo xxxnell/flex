@@ -8,8 +8,8 @@ import sketch.scope.range.RangeM
 import scala.language.higherKinds
 
 /**
-  * Licensed by Probe Technology, Inc.
-  */
+  * Sampling distribution provides the sampling points and its probability density value.
+  * */
 trait SamplingDist[A] extends Dist[A]
 
 trait SamplingDistPropOps[D[_]<:SamplingDist[_], C<:SamplingDistConf]

@@ -6,9 +6,6 @@ import sketch.scope.pdf.{DeltaDist, Dist, Prim, SamplingDist, Sketch}
 
 import scala.language.higherKinds
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 trait DistMonad[D1[_]<:Dist[_], D2[_]<:Dist[_], D3[_]<:Dist[_], C<:DistConf]
   extends DistMonadLaws[D1, D2, D3, C]
     with DistFunctor[D1, C] {

@@ -1,8 +1,5 @@
 package sketch.scope.cmap
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 class UniformCmap(n: Int, start: Option[Double], end: Option[Double]) extends DividerCmap {
 
   val divider: List[Double] = {

@@ -3,8 +3,8 @@ package sketch.scope.measure
 import sketch.scope.pdf.Prim
 
 /**
-  * Licensed by Probe Technology, Inc.
-  */
+  * Measure of A provides bijective map between A and Prim.
+  * */
 trait Measure[A] {
 
   def apply(a: A): Prim = to(a)

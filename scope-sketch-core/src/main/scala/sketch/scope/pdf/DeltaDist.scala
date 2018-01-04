@@ -5,8 +5,6 @@ import sketch.scope.measure.Measure
 import sketch.scope.range._
 
 /**
-  * Licensed by Probe Technology, Inc.
-  *
   * Dirac Delta Function.
   */
 case class DeltaDist[A](measure: Measure[A], pole: Prim) extends SmoothDist[A]

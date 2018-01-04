@@ -5,8 +5,6 @@ import sketch.scope.{Epi, Mon}
 import sketch.scope.counter.CDim
 
 /**
-  * Licensed by Probe Technology, Inc.
-  *
   * Hashing Map.
   */
 trait Hmap {

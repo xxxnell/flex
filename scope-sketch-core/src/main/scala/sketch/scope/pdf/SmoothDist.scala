@@ -8,9 +8,6 @@ import scala.language.higherKinds
 import cats.implicits._
 import sketch.scope.conf.SmoothDistConf
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 trait SmoothDist[A] extends Dist[A]
 
 trait SmoothDistPropOps[D[_]<:SmoothDist[_], C<:SmoothDistConf]

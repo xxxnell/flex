@@ -2,9 +2,6 @@ package sketch.scope.benchmark.ops
 
 import sketch.scope._
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 object SketchBenchOps {
 
   val defaultSketch: Sketch[Double] = Sketch.empty[Double]

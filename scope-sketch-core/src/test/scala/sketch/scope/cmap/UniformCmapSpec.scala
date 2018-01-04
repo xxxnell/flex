@@ -5,9 +5,6 @@ import org.specs2.mutable._
 import org.specs2.ScalaCheck
 import sketch.scope.pdf.Prim
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 class UniformCmapSpec extends Specification with ScalaCheck {
 
   "UniformCmap" should {

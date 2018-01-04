@@ -6,9 +6,6 @@ import org.openjdk.jmh.annotations._
 import org.openjdk.jmh.infra.Blackhole
 import sketch.scope.benchmark.ops.SketchBenchOps._
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 @BenchmarkMode(Array(Mode.AverageTime))
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
 @State(Scope.Thread)

@@ -3,9 +3,6 @@ package sketch.scope.plot
 import sketch.scope.plot.syntax._
 import sketch.scope.range.RangeP
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 trait CountPlot extends Plot
 
 trait CountPlotOps extends PlotOps[CountPlot] {

@@ -4,11 +4,7 @@ import org.scalacheck.{Arbitrary, Gen}
 import org.specs2.mutable._
 import org.specs2.ScalaCheck
 import sketch.scope.cmap.DividerCmapGen.dividerGen
-//import sketch.scope.cmap.Cmap
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 class CmapSpec extends Specification with ScalaCheck {
 
   "Cmap" should {

@@ -12,9 +12,7 @@ import cats.implicits._
 import sketch.scope.range.{RangeM, RangeP}
 
 /**
-  * Licensed by Probe Technology, Inc.
-  *
-  * Sketch Data Structure Interface.
+  * Sketch provides
   */
 trait Sketch[A] extends DataBinningDist[A] {
 

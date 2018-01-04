@@ -4,9 +4,6 @@ import org.scalacheck.Gen
 import org.specs2.mutable._
 import org.specs2.ScalaCheck
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 class ListCounterSpec extends Specification with ScalaCheck {
   
     "ListCounter" should {

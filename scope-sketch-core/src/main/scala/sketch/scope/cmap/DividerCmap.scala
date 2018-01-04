@@ -7,9 +7,6 @@ import sketch.scope.range.syntax._
 
 import scala.collection.immutable.TreeMap
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 trait DividerCmap extends Cmap {
 
   val divider: List[Prim]

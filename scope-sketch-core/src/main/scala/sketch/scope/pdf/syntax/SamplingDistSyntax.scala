@@ -6,9 +6,6 @@ import sketch.scope.pdf.monad.SamplingDistMonad
 import sketch.scope.pdf.{Dist, SamplingDist}
 import sketch.scope.plot.DensityPlot
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 trait SamplingDistSyntax
   extends SamplingDistPropSyntax
     with SamplingDistMonadSyntax

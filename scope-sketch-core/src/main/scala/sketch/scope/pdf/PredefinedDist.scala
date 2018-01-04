@@ -5,9 +5,6 @@ import sketch.scope.measure.Measure
 
 import scala.language.higherKinds
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 trait PredefinedDist[A] extends SmoothDist[A] {
 
   def probability(from: A, to: A): Option[Double]

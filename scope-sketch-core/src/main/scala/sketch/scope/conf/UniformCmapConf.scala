@@ -2,9 +2,6 @@ package sketch.scope.conf
 
 import sketch.scope.pdf.Prim
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 trait UniformCmapConf extends CmapConf {
   val start: Option[Prim]
   val end: Option[Prim]

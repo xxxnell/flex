@@ -4,9 +4,6 @@ import sbt.Keys._
 import Dependencies._
 import Resolvers._
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 object SketchBuilds {
 
   val buildSettings = Seq(

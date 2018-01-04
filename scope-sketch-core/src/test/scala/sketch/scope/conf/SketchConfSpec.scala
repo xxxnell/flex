@@ -4,9 +4,6 @@ import org.scalacheck.Gen
 import org.specs2.mutable._
 import org.specs2.ScalaCheck
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 class SketchConfSpec extends Specification with ScalaCheck {
 
   "ShetchConf" should {

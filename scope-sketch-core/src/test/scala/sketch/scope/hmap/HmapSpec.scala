@@ -5,9 +5,6 @@ import org.specs2.mutable._
 import org.specs2.ScalaCheck
 import sketch.scope.counter.CDim
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 class HmapSpec extends Specification with ScalaCheck {
 
   "Hmap" should {

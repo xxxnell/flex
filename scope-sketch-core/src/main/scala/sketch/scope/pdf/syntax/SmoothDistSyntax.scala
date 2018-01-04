@@ -4,9 +4,6 @@ import sketch.scope.pdf.{Dist, PlottedDist, Prim, SamplingDist, SmoothDist}
 import sketch.scope.range.syntax.RangeP
 import sketch.scope.range.{RangeM, RangeP}
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 trait SmoothDistSyntax extends SmoothDistPropSyntax
 
 trait SmoothDistPropSyntax {

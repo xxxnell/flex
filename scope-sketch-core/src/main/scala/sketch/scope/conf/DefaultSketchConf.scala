@@ -1,8 +1,5 @@
 package sketch.scope.conf
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 trait DefaultSketchConf
   extends AdaPerSketchConf {
 

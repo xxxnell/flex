@@ -5,9 +5,6 @@ import sketch.scope.conf.SketchConf
 import sketch.scope.hcounter.HCounter
 import sketch.scope.measure.Measure
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 case class SimpleSketch[A](measure: Measure[A], structures: Structures) extends Sketch[A]
 
 trait SimpleSketchOps extends SketchPrimPropOps[SimpleSketch, SketchConf] {

@@ -7,9 +7,7 @@ import sketch.scope.pdf._
 import sketch.scope.range.syntax._
 
 /**
-  * Licensed by Probe Technology, Inc.
-  *
-  * Characteristic Map of Sketch Algorithm.
+  * Characteristic Map of sketch algorithm.
   */
 trait Cmap {
 

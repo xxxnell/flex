@@ -5,9 +5,6 @@ import sketch.scope.counter.CDim
 import scala.util.Try
 import scala.util.hashing.byteswap32
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 class Byteswap32Hmap(seed: Int) extends Hmap {
 
   val hseed: Int = byteswap32(seed)

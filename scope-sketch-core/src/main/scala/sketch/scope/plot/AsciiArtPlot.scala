@@ -3,9 +3,6 @@ package sketch.scope.plot
 import sketch.scope.pdf.Dist
 import sketch.scope.range.RangeM
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 object AsciiArtPlot {
 
   def histogram[A](dist: Dist[A], ranges: List[RangeM[A]]): String = {

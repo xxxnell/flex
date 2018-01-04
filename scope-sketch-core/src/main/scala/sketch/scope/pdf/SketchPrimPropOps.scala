@@ -14,8 +14,6 @@ import scala.language.{higherKinds, postfixOps}
 import cats.implicits._
 
 /**
-  * Licensed by Probe Technology, Inc.
-  *
   * This Ops introduces the update function with primitive type as a parameter.
   */
 trait SketchPrimPropOps[S[_]<:Sketch[_], C<:SketchConf]

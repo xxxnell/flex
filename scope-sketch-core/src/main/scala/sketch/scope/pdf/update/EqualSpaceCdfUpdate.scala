@@ -6,9 +6,6 @@ import sketch.scope.plot._
 import sketch.scope.plot.syntax._
 import sketch.scope.range.RangeP
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 trait EqualSpaceCdfUpdate {
 
   def updateCmap(sketch: Sketch[_], ps: List[(Prim, Count)],

@@ -1,5 +1,8 @@
 package sketch.scope.conf
 
+/**
+  * A configuration for PeroidicSketch.
+  * */
 trait PeriodicSketchConf extends SketchConf {
 
   val startThreshold: Double

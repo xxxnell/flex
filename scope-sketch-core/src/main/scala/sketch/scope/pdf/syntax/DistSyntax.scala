@@ -9,9 +9,6 @@ import sketch.scope.range.RangeM
 
 import scala.language.higherKinds
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 trait DistSyntax extends DistPropSyntax with DistMonadSyntax
 
 trait DistPropSyntax {

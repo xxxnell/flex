@@ -4,9 +4,6 @@ import cats.data.State
 
 import scala.util.Random
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 trait GenericIRng[S<:Seed, A<:Out] extends Rng[S, A]
 
 trait IRngOps extends RngOps[Seed, Out, GenericIRng] {

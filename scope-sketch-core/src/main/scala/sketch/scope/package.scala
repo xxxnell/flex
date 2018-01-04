@@ -8,9 +8,6 @@ import sketch.scope.plot.{CountPlotSyntax, DensityPlotSyntax, PlotSyntax}
 import sketch.scope.range.{RangeMSyntax, RangePSyntax}
 import sketch.scope.sim.SimSyntax
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 package object scope
   extends ConfPkgSyntax
     with MeasurePkgSyntax

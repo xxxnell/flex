@@ -7,8 +7,8 @@ import sketch.scope.measure.Measure
 import scala.language.higherKinds
 
 /**
-  * Licensed by Probe Technology, Inc.
-  */
+  * Distribution, or probability bistribution provides to get probability for given domain.
+  * */
 trait Dist[A] {
 
   def measure: Measure[A]

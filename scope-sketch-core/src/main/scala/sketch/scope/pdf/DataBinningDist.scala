@@ -5,8 +5,8 @@ import sketch.scope.conf.DataBinningDistConf
 import scala.language.higherKinds
 
 /**
-  * Licensed by Probe Technology, Inc.
-  */
+  * Data binning distribution.
+  * */
 trait DataBinningDist[A] extends SamplingDist[A]
 
 trait DataBinningDistOps[D[_]<:DataBinningDist[_], C<:DataBinningDistConf]

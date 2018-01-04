@@ -4,9 +4,6 @@ import sketch.scope.conf.SketchConf
 import sketch.scope.measure.Measure
 import sketch.scope.pdf.{Dist, Sketch}
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 object PointToPointSketchMonad extends SketchMonad[Sketch, Dist, Sketch, SketchConf] {
 
   def map[A, B](dist: Sketch[A], f: A => B, measureB: Measure[B], conf: SketchConf): Sketch[B] =

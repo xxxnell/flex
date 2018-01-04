@@ -9,9 +9,6 @@ import sketch.scope.pdf.Count
 
 import scala.util.hashing.byteswap32
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 trait HCounter {
 
   def structures: List[(Hmap, Counter)]

@@ -6,9 +6,6 @@ import org.specs2.ScalaCheck
 import sketch.scope.measure._
 import sketch.scope._
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 class DeltaDistSpec extends Specification with ScalaCheck {
 
   "DeltaDist" should {

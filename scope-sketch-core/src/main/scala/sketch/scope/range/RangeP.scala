@@ -8,9 +8,7 @@ import sketch.scope.range.syntax._
 import scala.collection.immutable.NumericRange
 
 /**
-  * Licensed by Probe Technology, Inc.
-  *
-  * Range with primitive type of Sketch.
+  * Range for primitive type of Sketch.
   */
 trait GenericRangeP[G] extends RangeM[Prim] {
   def measure: Measure[Prim] = doubleMeasure

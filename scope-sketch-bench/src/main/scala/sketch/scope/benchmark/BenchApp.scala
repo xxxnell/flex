@@ -7,9 +7,6 @@ import sketch.scope.benchmark.ops.BenchOutOps
 
 import scala.collection.JavaConverters._
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 object BenchApp {
 
   def main(args: Array[String]): Unit = {

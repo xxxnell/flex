@@ -5,8 +5,6 @@ import cats.data.State
 import scala.language.higherKinds
 
 /**
-  * Licensed by Probe Technology, Inc.
-  *
   * Random Generator
   */
 trait Rng[S, A] {

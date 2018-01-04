@@ -5,9 +5,6 @@ import org.specs2.ScalaCheck
 import sketch.scope.measure.syntax._
 import sketch.scope.range.RangeP
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 class PlotSpec extends Specification with ScalaCheck {
 
   "Plot" should {

@@ -3,9 +3,6 @@ package sketch.scope.pdf.arithmetic
 import sketch.scope.measure.Measure
 import sketch.scope.pdf.{Dist, PredefinedDist}
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 object Sum {
 
   def weightedSum[A](weightDists: List[(Double, Dist[A])], measureB: Measure[A]): PredefinedDist[A] = {

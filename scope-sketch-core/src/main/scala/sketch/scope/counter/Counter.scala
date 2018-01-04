@@ -3,8 +3,6 @@ package sketch.scope.counter
 import scala.util.Try
 
 /**
-  * Licensed by Probe Technology, Inc.
-  *
   * Counter for memorizing counts.
   */
 trait Counter {

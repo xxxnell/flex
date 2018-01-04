@@ -4,9 +4,6 @@ import org.scalacheck.{Arbitrary, Gen}
 import org.specs2.ScalaCheck
 import org.specs2.mutable._
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 class CounterSpec extends Specification with ScalaCheck {
 
   "Counter" in {

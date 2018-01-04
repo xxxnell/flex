@@ -7,9 +7,6 @@ import sketch.scope.conf._
 import sketch.scope.measure.Measure
 import sketch.scope.measure.syntax._
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 class SketchPropSpec extends Specification with ScalaCheck {
 
   "Sketch" should {

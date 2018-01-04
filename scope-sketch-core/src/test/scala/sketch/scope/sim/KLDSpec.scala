@@ -6,9 +6,6 @@ import sketch.scope.conf.DistConf
 import sketch.scope.pdf.Dist
 import sketch.scope.range.RangeP
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 class KLDSpec extends Specification with ScalaCheck {
 
   "KLD" should {

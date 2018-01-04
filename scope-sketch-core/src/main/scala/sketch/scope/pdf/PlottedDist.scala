@@ -7,9 +7,6 @@ import sketch.scope.range.syntax._
 
 import scala.language.higherKinds
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 trait PlottedDist[A] extends SamplingDist[A] {
 
   def sampling: DensityPlot

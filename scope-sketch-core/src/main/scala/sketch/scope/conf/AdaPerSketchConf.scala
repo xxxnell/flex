@@ -1,5 +1,8 @@
 package sketch.scope.conf
 
+/**
+  * A configuration for AdaPerSketch.
+  * */
 trait AdaPerSketchConf
   extends AdaptiveSketchConf
     with PeriodicSketchConf {

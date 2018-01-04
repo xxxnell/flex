@@ -1,10 +1,5 @@
 package sketch.scope.measure
 
-import sketch.scope.pdf.Prim
-
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 trait TrivialMeasures {
 
   implicit val intMeasure: Measure[Int] = Measure((x: Int) => x.toDouble, (y: Double) => Math.round(y).toInt)

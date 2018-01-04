@@ -6,9 +6,6 @@ import sketch.scope.plot.Plot
 
 import scala.util.Try
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 object ExpOutOps {
 
   val defaultPath = "scope-sketch-bench/experiments"

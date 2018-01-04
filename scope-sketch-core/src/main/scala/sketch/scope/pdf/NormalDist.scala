@@ -4,9 +4,10 @@ import org.apache.commons.math3.distribution.NormalDistribution
 import sketch.scope.conf.SmoothDistConf
 import sketch.scope.measure.Measure
 import sketch.scope.rand._
+
 /**
-  * Licensed by Probe Technology, Inc.
-  */
+  * Normal distribution.
+  * */
 case class NormalDist[A](measure: Measure[A], mean: Prim, variance: Prim, rng: IRng) extends SmoothDist[A]
 
 trait NormalDistOps extends SmoothDistPropOps[NormalDist, SmoothDistConf] {

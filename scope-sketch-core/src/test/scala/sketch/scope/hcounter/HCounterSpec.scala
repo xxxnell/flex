@@ -5,9 +5,6 @@ import org.specs2.mutable._
 import org.specs2.ScalaCheck
 import sketch.scope.counter.CounterGen
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 class HCounterSpec extends Specification with ScalaCheck {
 
   "HCounter" should {

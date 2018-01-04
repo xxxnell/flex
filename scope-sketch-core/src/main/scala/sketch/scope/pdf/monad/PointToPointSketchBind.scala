@@ -6,9 +6,6 @@ import sketch.scope.range._
 import sketch.scope.pdf._
 import sketch.scope.pdf.arithmetic._
 
-/**
-  * Licensed by Probe Technology, Inc.
-  */
 object PointToPointSketchBind extends SketchBind[Sketch, Dist, Sketch, SketchConf] {
 
   def bind[A, B](sketch: Sketch[A], f: A => Dist[B], measureB: Measure[B], conf: SketchConf): Sketch[B] = (for {

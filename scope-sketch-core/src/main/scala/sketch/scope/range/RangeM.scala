@@ -7,7 +7,7 @@ import scala.collection.immutable.NumericRange
 import scala.language.{higherKinds, implicitConversions}
 
 /**
-  * Licensed by Probe Technology, Inc.
+  * Range for measurable value.
   */
 trait RangeM[A] {
   def measure: Measure[A]

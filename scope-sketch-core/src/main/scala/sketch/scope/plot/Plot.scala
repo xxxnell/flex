@@ -12,9 +12,7 @@ import scala.math._
 import scala.util.Try
 
 /**
-  * Licensed by Probe Technology, Inc.
-  *
-  * Disjoint set of range and value
+  * Disjoint and sorted set of range and value.
   */
 trait Plot {
 
