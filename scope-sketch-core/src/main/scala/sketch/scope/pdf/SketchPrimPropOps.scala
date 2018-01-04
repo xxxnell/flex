@@ -59,7 +59,7 @@ trait SketchPrimPropOps[S[_]<:Sketch[_], C<:SketchConf]
     oldStrO = oldStrs.headOption
     utdSketch1 <- modifyStructure(sketch, _ => Some(utdStrs))
     smoothingPs = EqualSpaceCdfUpdate.smoothingPsForEqualSpaceCumulative(ps)
-    utdSketch2 <- primNarrowPlotUpdateForStr(utdSketch1, smoothingPs)
+    utdSketch2 <- if(smoothingPs.nonEmpty) primNarrowPlotUpdateForStr(utdSketch1, smoothingPs) else Some(utdSketch1)
   } yield (utdSketch2, oldStrO)
 
   @deprecated

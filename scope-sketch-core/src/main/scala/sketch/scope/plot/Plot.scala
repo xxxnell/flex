@@ -194,6 +194,7 @@ trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
 
   def area(x1: Double, y1: Double, x2: Double, y2: Double): Double = (x2 - x1) * (y2 + y1) / 2
 
+  def isEmpty(plot: Plot): Boolean = plot.records.isEmpty
 
 }
 
@@ -206,6 +207,8 @@ trait PlotSyntax {
     def value(argument: Double): Option[Double] = Plot.image(plot, argument)
     def interpolation(argument: Double): Double = Plot.interpolation(plot, argument)
     def integral(start: Double, end: Double): Double = Plot.integral(plot, start, end)
+    def isEmpty: Boolean = Plot.isEmpty(plot)
+    def nonEmpty: Boolean = !Plot.isEmpty(plot)
   }
 
 }
