@@ -403,6 +403,37 @@ class SketchPropSpec extends Specification with ScalaCheck {
           .fold(ko)(sum => if(sum ~= 5) ok else ko(s"sum: $sum, expected: 5"))
       }
 
+      "after rearrange" in {
+        implicit val conf: CustomSketchConf = CustomSketchConf(
+          cmapSize = 10, cmapNo = 2, cmapStart = Some(0d), cmapEnd = Some(10d),
+          counterSize = 100, counterNo = 2
+        )
+        val sketch0 = Sketch.empty[Double]
+
+        (for {
+          sketch1 <- sketch0.update(1, 2, 3, 4, 5)
+          sketch2 <- sketch1.rearrange
+          sum = sketch2.sum
+        } yield sum)
+          .fold(ko)(sum => if(sum ~= 5d/2) ok else ko(s"sum: $sum, expected: ${5d/2}"))
+      }
+
+      "after rearrange update" in {
+        implicit val conf: CustomSketchConf = CustomSketchConf(
+          cmapSize = 10, cmapNo = 2, cmapStart = Some(0d), cmapEnd = Some(10d),
+          counterSize = 100, counterNo = 2
+        )
+        val sketch0 = Sketch.empty[Double]
+
+        (for {
+          sketch1 <- sketch0.update(1, 2, 3, 4, 5)
+          sketch2 <- sketch1.rearrange
+          sketch3 <- sketch2.update(1, 2, 3, 4, 5)
+          sum = sketch3.sum
+        } yield sum)
+          .fold(ko)(sum => if(sum ~= 5d/2 + 5) ok else ko(s"sum: $sum, expected: ${5d/2 + 5}"))
+      }
+
     }
 
     "fastPdf" in {
