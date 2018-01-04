@@ -44,7 +44,11 @@ trait RangeMOps[R[_]<:RangeM[_]] {
 
   def less[A](range: R[A], a: A): Boolean = primEnd(range) < range.measure.asInstanceOf[Measure[A]].to(a)
 
-  def middleP[A](start: Prim, end: Prim): Prim = ((BigDecimal(start) + BigDecimal(end)) / 2).toDouble
+  def middleP[A](start: Prim, end: Prim): Prim = {
+    if(start == Double.NegativeInfinity && end == Double.NegativeInfinity) Double.NegativeInfinity
+    else if(start == Double.PositiveInfinity && end == Double.PositiveInfinity) Double.PositiveInfinity
+    else ((BigDecimal(start) + BigDecimal(end)) / 2).toDouble
+  }
 
   def middle[A](range: R[A]): A =
     range.measure.asInstanceOf[Measure[A]].from(middleP(primStart(range), primEnd(range)))

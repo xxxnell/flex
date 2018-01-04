@@ -87,15 +87,19 @@ trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
   def linearFitting(a1: (Double, Double), a2: (Double, Double), x: Double): Double = {
     val (x1, y1) = a1
     val (x2, y2) = a2
-    val (x1B, y1B) = (BigDecimal(x1), BigDecimal(y1))
-    val (x2B, y2B) = (BigDecimal(x2), BigDecimal(y2))
 
-    if (x2B != x1B) {
-      val slope = (y2B - y1B) / (x2B - x1B)
-      val c = y1B - slope * x1B
+    if(y1 == y2) y1
+    else if(!x1.isInfinity && !x2.isInfinity) {
+      val (x1B, y1B) = (BigDecimal(x1), BigDecimal(y1))
+      val (x2B, y2B) = (BigDecimal(x2), BigDecimal(y2))
 
-      (slope * x + c).toDouble
-    } else ((y1B + y2B) / 2).toDouble // todo throw an exception when x is not sim to x1B
+      if (x2B != x1B) {
+        val slope = (y2B - y1B) / (x2B - x1B)
+        val c = y1B - slope * x1B
+
+        (slope * x + c).toDouble
+      } else ((y1B + y2B) / 2).toDouble // todo throw an exception when x is not sim to x1B
+    } else throw new IllegalArgumentException(s"Cannot linear interpolating with: ${(x1, y1)}, ${(x2, y2)}")
   }
 
   def polynomialFitting(as: List[(Double, Double)], x: Double): Option[Double] = Try {
