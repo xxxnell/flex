@@ -22,37 +22,30 @@ trait AdaPerSketchOps[S[_]<:AdaPerSketch[_], C<:AdaPerSketchConf]
 
 object AdaPerSketch extends AdaPerSketchOps[AdaPerSketch, AdaPerSketchConf] {
 
-  private case class AdaPerSketchImpl1[A](measure: Measure[A],
-                                          structures: List[(Cmap, HCounter)],
-                                          queue: List[(A, Count)],
-                                          start: Double,
-                                          period: Double)
-    extends AdaPerSketch[A]
-
-  private case class AdaPerSketchImpl2[A](measure: Measure[A],
-                                          structures: List[(Cmap, HCounter)],
-                                          queue: List[(A, Count)],
-                                          start: Double,
-                                          period: Double,
-                                          override val thresholds: Stream[Count])
+  private case class AdaPerSketchImpl[A](measure: Measure[A],
+                                         structures: List[(Cmap, HCounter)],
+                                         queue: List[(A, Count)],
+                                         thresholds: Stream[Count],
+                                         count: Count)
     extends AdaPerSketch[A]
 
   def empty[A](implicit measure: Measure[A], conf: AdaPerSketchConf): AdaPerSketch[A] =
-    AdaPerSketchImpl1(measure, conf2Structures(conf),
-      List.empty[(A, Count)], conf.startThreshold, conf.thresholdPeriod)
+    AdaPerSketchImpl(measure, conf2Structures(conf),
+      List.empty[(A, Count)], thresholds(conf.startThreshold, conf.thresholdPeriod), 0)
 
   def modifyQueue[A](sketch: AdaPerSketch[A],
                      f: List[(A, Count)] => List[(A, Count)]): AdaPerSketch[A] =
-    AdaPerSketchImpl1(sketch.measure, sketch.structures, f(sketch.queue), sketch.start, sketch.period)
+    AdaPerSketchImpl(sketch.measure, sketch.structures, f(sketch.queue), sketch.thresholds, sketch.count)
 
   def modifyStructure[A](sketch: AdaPerSketch[A],
                          f: Structures => Option[Structures]): Option[AdaPerSketch[A]] = f(sketch.structures)
-    .map(utdStr => AdaPerSketchImpl1(sketch.measure, utdStr, sketch.queue, sketch.start, sketch.period))
+    .map(utdStr => AdaPerSketchImpl(sketch.measure, utdStr, sketch.queue, sketch.thresholds, sketch.count))
 
   def modifyThresholds[A](sketch: AdaPerSketch[A],
                           f: Stream[Count] => Option[Stream[Count]]): Option[AdaPerSketch[A]] = f(sketch.thresholds)
-    .map(thr =>
-      AdaPerSketchImpl2(sketch.measure, sketch.structures, sketch.queue, sketch.start, sketch.period, thr)
-    )
+    .map(thr => AdaPerSketchImpl(sketch.measure, sketch.structures, sketch.queue, thr, sketch.count))
+
+  def modifyCount[A](sketch: AdaPerSketch[A], f: Count => Count): AdaPerSketch[A] =
+    AdaPerSketchImpl(sketch.measure, sketch.structures, sketch.queue, sketch.thresholds, f(sketch.count))
 
 }
