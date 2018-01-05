@@ -25,16 +25,17 @@ trait SketchPrimPropOps[S[_]<:Sketch[_], C<:SketchConf]
   /**
     * Update a list of primitive value <code>p</code> without rearranging process only for structures.
     * */
-  def primNarrowUpdateForStr[A](sketch: S[A], ps: List[(Prim, Count)]): Option[S[A]] = modifyStructure(sketch, strs => {
-    val (effStrs, refStrO) = if (strs.headOption != strs.lastOption) (strs.init, strs.lastOption) else (strs, None)
+  def primNarrowUpdateForStr[A](sketch: S[A], ps: List[(Prim, Count)], conf: C): Option[S[A]] = modifyStructure(sketch, strs => {
+    val effNo = if(conf.cmap.no > 1) conf.cmap.no - 1 else conf.cmap.no
+    val (effStrs, refStrs) = strs.splitAt(effNo)
     def updatePs(cmap: Cmap, counter: HCounter, ps: List[(Prim, Count)]): Option[HCounter] =
       counter.updates(ps.map { case (p, count) => (cmap(p), count) })
 
     val utdEffStrsO = effStrs.traverse { case (cmap, counter) => updatePs(cmap, counter, ps).map((cmap, _)) }
-    refStrO.fold(utdEffStrsO)(refStr => utdEffStrsO.map(utdEffStrs => utdEffStrs :+ refStr))
+    utdEffStrsO.map(utdEffStrs => utdEffStrs ++ refStrs)
   })
 
-  def primNarrowPlotUpdateForStr[A](sketch: S[A], counts: CountPlot): Option[S[A]] = for {
+  def primNarrowPlotUpdateForStr[A](sketch: S[A], counts: CountPlot, conf: C): Option[S[A]] = for {
     cmap <- youngCmap(sketch)
     domain <- counts.domain
     (startHdim, endHdim) = (cmap.apply(domain.start), cmap.apply(domain.end))
@@ -44,7 +45,7 @@ trait SketchPrimPropOps[S[_]<:Sketch[_], C<:SketchConf]
       val end = if(range.end < domain.end) range.end else domain.end
       (range.middle, counts.integral(start, end)) // todo range.middle is hacky approach
     }
-    utdSketch <- primNarrowUpdateForStr(sketch, ps)
+    utdSketch <- primNarrowUpdateForStr(sketch, ps, conf)
   } yield utdSketch
 
   /**
@@ -56,8 +57,8 @@ trait SketchPrimPropOps[S[_]<:Sketch[_], C<:SketchConf]
     (utdStrs, oldStrs) = ((utdCmap, emptyCounter) :: sketch.structures).splitAt(conf.cmap.no)
     oldStrO = oldStrs.headOption
     utdSketch1 <- modifyStructure(sketch, _ => Some(utdStrs))
-    smoothingPs = EqualSpaceCdfUpdate.smoothingPsForEqualSpaceCumulative(ps)
-    utdSketch2 <- if(smoothingPs.nonEmpty) primNarrowPlotUpdateForStr(utdSketch1, smoothingPs) else Some(utdSketch1)
+    smoothPs = EqualSpaceCdfUpdate.smoothingPsForEqualSpaceCumulative(ps)
+    utdSketch2 <- if(smoothPs.nonEmpty) primNarrowPlotUpdateForStr(utdSketch1, smoothPs, conf) else Some(utdSketch1)
   } yield (utdSketch2, oldStrO)
 
   @deprecated
@@ -192,7 +193,7 @@ trait SketchPrimPropLaws[S[_]<:Sketch[_], C<:SketchConf] { self: SketchPrimPropO
 
   def narrowUpdate[A](sketch: S[A], as: List[(A, Count)], conf: C): Option[S[A]] = {
     val ps = as.map { case (value, count) => (sketch.measure.asInstanceOf[Measure[A]](value), count) }
-    primNarrowUpdateForStr(sketch, ps)
+    primNarrowUpdateForStr(sketch, ps, conf)
   }
 
   def deepUpdate[A](sketch: S[A], as: List[(A, Count)], conf: C): Option[(S[A], Option[Structure])] = {
