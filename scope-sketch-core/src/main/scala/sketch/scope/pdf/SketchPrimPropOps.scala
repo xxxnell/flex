@@ -134,56 +134,13 @@ trait SketchPrimPropOps[S[_]<:Sketch[_], C<:SketchConf]
     flatProb = (flatDensity * RangeP(pFrom, pTo).length).toDouble
   } yield if(sum != 0) (BigDecimal(count) / BigDecimal(sum)).toDouble else flatProb
 
-  def singlePdfForStr(cmap: Cmap, counter: HCounter, p: Prim): Option[Double] = for {
-    hdim <- Some(cmap.apply(p))
-    records = List(counter.get(hdim - 1).map((cmap.range(hdim - 1), _)),
-      counter.get(hdim).map((cmap.range(hdim), _)),
-      counter.get(hdim + 1).map((cmap.range(hdim + 1), _))).flatten
-    count = CountPlot.disjoint(records).interpolation(p)
-    sum = counter.sum
-    range = cmap.range(cmap.apply(p))
-  } yield {
-    if(sum != 0 && !range.isPoint) (count / (sum * range.length)).toDouble
-    else if(sum == 0) flatDensity
-    else if(count == 0) 0
-    else Double.PositiveInfinity
-  }
-
-  /**
-    * pdf * N (total number of counter) for single structure
-    * */
-  def singlePdfNForStr(cmap: Cmap, counter: HCounter, p: Prim): Option[Double] = for {
-    pdf <- singlePdfForStr(cmap, counter, p)
-  } yield pdf * counter.sum
-
-  def primPdfNForStr[A](sketch: S[A], p: Prim): Option[Double] = {
-    val pdfNsO = sketch.structures.traverse { case (cmap, counter) => singlePdfNForStr(cmap, counter, p) }
-
-    pdfNsO.map(pdfNs => pdfNs.foldLeft(0d){ case (acc, pdfN) => acc + pdfN  }) // todo decay factor
-  }
-
-  def primPdfForStr[A](sketch: S[A], p: Prim): Option[Double] = for {
-    pdfN <- primPdfNForStr(sketch, p)
-    sum = self.sumForStr(sketch)
-  } yield pdfN / sum
-
 }
 
 trait SketchPrimPropLaws[S[_]<:Sketch[_], C<:SketchConf] { self: SketchPrimPropOps[S, C] =>
 
-  def pdfNForStr[A](sketch: S[A], a: A): Option[Double] = {
-    val measure = sketch.measure.asInstanceOf[Measure[A]]
-    primPdfNForStr(sketch, measure.to(a))
-  }
-
   def countForStr[A](sketch: S[A], start: A, end: A): Option[Double] = {
     val measure = sketch.measure.asInstanceOf[Measure[A]]
     primCountForStr(sketch, measure(start), measure(end))
-  }
-
-  def fastPdfForStr[A](sketch: S[A], a: A): Option[Double] = {
-    val measure = sketch.measure.asInstanceOf[Measure[A]]
-    primPdfForStr(sketch, measure(a))
   }
 
   // implements the Sketch ops
@@ -209,8 +166,6 @@ trait SketchPrimPropLaws[S[_]<:Sketch[_], C<:SketchConf] { self: SketchPrimPropO
     ranges = cmap.bin
     counts <- ranges.traverse(range => primCountForStr(sketch, range.start, range.end))
   } yield CountPlot.disjoint(ranges.zip(counts))
-
-  def fastPdf[A](sketch: S[A], a: A): Option[Double] = fastPdfForStr(sketch, a)
 
   def sample[A](dist: S[A]): (S[A], A) = ???
 

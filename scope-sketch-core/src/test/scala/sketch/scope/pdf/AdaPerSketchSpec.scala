@@ -181,7 +181,7 @@ class AdaPerSketchSpec extends Specification with ScalaCheck {
         (for {
           sketch1 <- sketch0.update(0, 0, 1, 2, 4, 5)
           interpPdf <- SamplingDist.interpolationPdf(sketch1, p)
-          fastPdf <- Sketch.pdf(sketch1, p)
+          fastPdf <- Sketch.fastPdf(sketch1, p)
         } yield (interpPdf, fastPdf))
           .fold(ko("Exception occurs.")){ case (interpPdf, fastPdf) =>
             if(interpPdf ~= fastPdf) ok else ko(s"interpPdf: $interpPdf, fastPdf: $fastPdf")
@@ -201,7 +201,7 @@ class AdaPerSketchSpec extends Specification with ScalaCheck {
         (for {
           sketch1 <- sketch0.update(0, 0, 1, 2, 4, 5)
           interpPdf <- SamplingDist.interpolationPdf(sketch1, p)
-          fastPdf <- Sketch.pdf(sketch1, p)
+          fastPdf <- Sketch.fastPdf(sketch1, p)
         } yield (interpPdf, fastPdf))
           .fold(ko("Exception occurs.")){ case (interpPdf, fastPdf) =>
             if(interpPdf ~= fastPdf) ok else ko(s"interpPdf: $interpPdf, fastPdf: $fastPdf")
@@ -221,7 +221,27 @@ class AdaPerSketchSpec extends Specification with ScalaCheck {
         (for {
           sketch1 <- sketch0.update(0, 1, 2, 4, 5, 0)
           interpPdf <- SamplingDist.interpolationPdf(sketch1, p)
-          fastPdf <- Sketch.pdf(sketch1, p)
+          fastPdf <- Sketch.fastPdf(sketch1, p)
+        } yield (interpPdf, fastPdf))
+          .fold(ko("Exception occurs.")){ case (interpPdf, fastPdf) =>
+            if(interpPdf ~= fastPdf) ok else ko(s"interpPdf: $interpPdf, fastPdf: $fastPdf")
+          }
+      }
+
+      "multiple cmaps" in {
+        implicit val conf: CustomAdaPerSketchConf = SketchConf(
+          queueSize = 3,
+          startThreshold = 2d, thresholdPeriod = 2d,
+          cmapSize = 20, cmapNo = 3, cmapStart = Some(-10d), cmapEnd = Some(10d),
+          counterSize = 20, counterNo = 2
+        )
+        val sketch0 = AdaPerSketch.empty[Double]
+        val p = 2.2
+
+        (for {
+          sketch1 <- sketch0.update(0, 1, 2, 4, 5, 0, 1, 2, 3, 4, 5, 2, 2)
+          interpPdf <- SamplingDist.interpolationPdf(sketch1, p)
+          fastPdf <- Sketch.fastPdf(sketch1, p)
         } yield (interpPdf, fastPdf))
           .fold(ko("Exception occurs.")){ case (interpPdf, fastPdf) =>
             if(interpPdf ~= fastPdf) ok else ko(s"interpPdf: $interpPdf, fastPdf: $fastPdf")

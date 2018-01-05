@@ -52,7 +52,7 @@ object SamplingDist extends SamplingDistPropOps[SamplingDist, SamplingDistConf] 
   }
 
   def pdf[A](dist: SamplingDist[A], a: A): Option[Prim] = dist match {
-    case sketch: Sketch[_] => Sketch.pdf(sketch, a)
+    case sketch: Sketch[_] => Sketch.fastPdf(sketch, a)
     case _ => super.interpolationPdf(dist, a)
   }
 

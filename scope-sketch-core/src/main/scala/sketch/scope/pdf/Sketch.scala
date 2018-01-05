@@ -67,11 +67,24 @@ trait SketchPropLaws[S[_]<:Sketch[_], C<:SketchConf] { self: SketchPropOps[S, C]
     cmap <- youngCmap(sketch)
     rangePs = cmap.bin
     rangeMs = rangePs.map(rangeP => rangeP.modifyMeasure(sketch.measure.asInstanceOf[Measure[A]]))
-    rangeProbs <- rangeMs.traverse(rangeM => probability(sketch, rangeM.start, rangeM.end).map(prob => (rangeM, prob)))
+    sampling <- samplingForRanges(sketch, rangeMs)
+  } yield sampling
+
+  def samplingForRanges[A](sketch: S[A], ranges: List[RangeM[A]]): Option[DensityPlot] = for {
+    rangeProbs <- ranges.traverse(range => probability(sketch, range.start, range.end).map(prob => (range, prob)))
     rangeDensities = rangeProbs
       .map { case (rangeM, prob) => (RangeP.forRangeM(rangeM), Try(prob / rangeM.length).toOption) }
       .flatMap { case (range, densityO) => densityO.map(density => (range, density.toDouble)) }
   } yield DensityPlot.disjoint(rangeDensities)
+
+  def fastPdf[A](sketch: S[A], a: A): Option[Double] = for {
+    cmap <- youngCmap(sketch)
+    p = sketch.measure.asInstanceOf[Measure[A]].to(a)
+    idx = cmap(p)
+    rangePs = cmap.range(idx - 1) :: cmap.range(idx) :: cmap.range(idx + 1) :: Nil
+    rangeMs = rangePs.map(rangeP => rangeP.modifyMeasure(sketch.measure.asInstanceOf[Measure[A]]))
+    sampling <- samplingForRanges(sketch, rangeMs)
+  } yield sampling.interpolation(p)
 
   def rearrange[A](sketch: S[A], conf: C): Option[S[A]] = deepUpdate(sketch, Nil, conf).map(_._1)
 
@@ -132,11 +145,6 @@ object Sketch extends SketchPrimPropOps[Sketch, SketchConf] { self =>
     case _ => narrowUpdate(sketch, as, conf)
   }
 
-  def pdf[A](sketch: Sketch[A], a: A): Option[Count] = sketch match {
-    case sketch: AdaptiveSketch[A] => AdaptiveSketch.fastPdf(sketch, a)
-    case _ => super.fastPdf(sketch, a)
-  }
-
   // overrides
 
   override def probability[A](sketch: Sketch[A], start: A, end: A): Option[Count] = sketch match {
@@ -171,9 +179,6 @@ object Sketch extends SketchPrimPropOps[Sketch, SketchConf] { self =>
     case _ => super.rearrange(sketch, conf)
   }
 
-  override def fastPdf[A](sketch: Sketch[A], a: A): Option[Count] = sketch match {
-    case sketch: AdaptiveSketch[_] => AdaptiveSketch.fastPdf(sketch, a)
-    case _ => super.fastPdf(sketch, a)
-  }
+  override def pdf[A](dist: Sketch[A], a: A, conf: SketchConf): Option[Count] = fastPdf(dist, a)
 
 }

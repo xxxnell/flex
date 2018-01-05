@@ -38,13 +38,6 @@ trait AdaptiveSketchOps[S[_]<:AdaptiveSketch[_], C<:AdaptiveSketchConf]
     sketch2 = clearQueue(sketch1)
   } yield sketch2
 
-  override def fastPdf[A](sketch: S[A], a: A): Option[Count] = for {
-    pdfNStr <- pdfNForStr(sketch, a)
-    pdfQ <- pdfForQueue(sketch, a)
-    pdfNQ = pdfQ * sumForQueue(sketch)
-    sum = self.sum(sketch)
-  } yield (pdfNStr + pdfNQ) / sum
-
 }
 
 trait AdaptiveSketchLaws[S[_]<:AdaptiveSketch[_], C<:AdaptiveSketchConf] { self: AdaptiveSketchOps[S, C] =>
