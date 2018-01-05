@@ -26,7 +26,7 @@ trait EqualSpaceCdfUpdate {
     Cmap.divider(divider)
   }
 
-  def smoothingPsForEqualSpaceCumulative(ps: List[(Prim, Count)]): CountPlot = {
+  def smoothingPsForEqualSpaceCumulative(ps: List[(Prim, Count)]): DensityPlot = {
     val sorted = ps.sortBy(_._1)
     val sliding: List[List[(Prim, Count)]] = sorted.sliding(2).toList
     val headAppendingO: Option[(Prim, Count)] = sliding.headOption.flatMap {
@@ -40,11 +40,13 @@ trait EqualSpaceCdfUpdate {
 
     val records = (headAppendingO.toList ::: sorted ::: lastAppendingO.toList).sliding(2).toList
       .flatMap {
-        case d1 :: d2 :: Nil => Some((RangeP(d1._1, d2._1), (d1._2 + d2._2) / 2))
+        case d1 :: d2 :: Nil =>
+          val range = RangeP(d1._1, d2._1)
+          if(!range.isPoint) Some((range, (d1._2 + d2._2) / (2 * range.length).toDouble)) else None
         case _ => None
       }
 
-    CountPlot.disjoint(records)
+    DensityPlot.disjoint(records)
   }
 
 }

@@ -35,15 +35,15 @@ trait SketchPrimPropOps[S[_]<:Sketch[_], C<:SketchConf]
     utdEffStrsO.map(utdEffStrs => utdEffStrs ++ refStrs)
   })
 
-  def primNarrowPlotUpdateForStr[A](sketch: S[A], counts: CountPlot, conf: C): Option[S[A]] = for {
+  def primNarrowPlotUpdateForStr[A](sketch: S[A], pdensity: DensityPlot, conf: C): Option[S[A]] = for {
     cmap <- youngCmap(sketch)
-    domain <- counts.domain
+    domain <- pdensity.domain
     (startHdim, endHdim) = (cmap.apply(domain.start), cmap.apply(domain.end))
     ps = (startHdim to endHdim).toList.map { hdim =>
       val range = cmap.range(hdim)
       val start = if(range.start > domain.start) range.start else domain.start
       val end = if(range.end < domain.end) range.end else domain.end
-      (range.middle, counts.integral(start, end)) // todo range.middle is hacky approach
+      (range.middle, pdensity.integral(start, end)) // todo range.middle is hacky approach
     }
     utdSketch <- primNarrowUpdateForStr(sketch, ps, conf)
   } yield utdSketch
