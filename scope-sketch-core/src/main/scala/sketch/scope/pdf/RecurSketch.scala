@@ -30,15 +30,11 @@ trait RecurSketchLaws[S[_]<:RecurSketch[_], C<:SketchConf] { self: RecurSketchOp
   def update[A](sketch: S[A], as: List[(A, Count)], conf: C): Option[S[A]] = for {
     nextThreshold <- sketch.thresholds.headOption
     utdSketch1 <- narrowUpdate[A](sketch, as, conf)
-    utdSketch2 = modifyCount(utdSketch1, count => {
-
-      count + as.map(_._2).sum
-    })
+    utdSketch2 = modifyCount(utdSketch1, count => count + as.map(_._2).sum)
     utdSketch3 <- if(nextThreshold <= utdSketch2.count) for {
       rearranged <- rearrange(utdSketch2, conf)
       dropped <- dropThreshold(rearranged)
     } yield dropped else Some(utdSketch2)
-    _ = println(s"nextThreshold($nextThreshold) <= utdSketch2.count(${utdSketch2.count}): ${nextThreshold <= utdSketch2.count}")
   } yield utdSketch3
 
 }

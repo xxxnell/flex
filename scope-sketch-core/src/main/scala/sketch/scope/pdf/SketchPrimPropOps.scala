@@ -25,14 +25,13 @@ trait SketchPrimPropOps[S[_]<:Sketch[_], C<:SketchConf]
   /**
     * Update a list of primitive value <code>p</code> without rearranging process only for structures.
     * */
-  def primNarrowUpdateForStr[A](sketch: S[A], ps: List[(Prim, Count)], conf: C): Option[S[A]] = modifyStructure(sketch, strs => {
+  def primNarrowUpdateForStr[A](sketch: S[A],
+                                ps: List[(Prim, Count)],
+                                conf: C): Option[S[A]] = modifyStructure(sketch, strs => {
     val effNo = if(conf.cmap.no > 1) conf.cmap.no - 1 else conf.cmap.no
     val (effStrs, refStrs) = strs.splitAt(effNo)
     def updatePs(cmap: Cmap, counter: HCounter, ps: List[(Prim, Count)]): Option[HCounter] =
       counter.updates(ps.map { case (p, count) => (cmap(p), count) })
-
-    println(s"structure: ${strs.size}, effNo: ${effNo}, refStrs: ${refStrs.size}")
-
     val utdEffStrsO = effStrs.traverse { case (cmap, counter) => updatePs(cmap, counter, ps).map((cmap, _)) }
     utdEffStrsO.map(utdEffStrs => utdEffStrs ++ refStrs)
   })
