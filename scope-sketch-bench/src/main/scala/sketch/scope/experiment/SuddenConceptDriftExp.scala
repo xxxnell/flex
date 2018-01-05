@@ -11,7 +11,7 @@ object SuddenConceptDriftExp {
 
   def main(args: Array[String]): Unit = {
     val expName1 = "sudden-cd-normal"
-    val sampleNo1 = 200
+    val sampleNo1 = 1000
     val sampleNo2 = 1000
     val start = 50
     val period = 100
