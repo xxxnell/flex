@@ -159,30 +159,6 @@ class SketchPropSpec extends Specification with ScalaCheck {
 
     }
 
-//    DEPRECATED
-//    "countPlot" in {
-//      val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 2, Some(-10d), Some(10d))
-//      val (counterSize, counterNo) = (8, 2)
-//      implicit val conf: CustomSketchConf = CustomSketchConf(
-//        cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
-//        counterSize = counterSize, counterNo = counterNo
-//      )
-//      val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
-//
-//      sketch0.countPlot.fold(ko("Fail to call the countPlot."))(plot => {
-//        val cond1 = plot.records.nonEmpty
-//        val cond2 = plot.records.forall { case (_, value) => !value.isNaN }
-//        val cond3 = plot.records.headOption.forall { case (range, _) => range.end ~= cmapStart.value }
-//        val cond4 = plot.records.lastOption.forall { case (range, _) => range.start ~= cmapEnd.value }
-//
-//        if(!cond1) ko("Plot record is empty.")
-//        else if(!cond2) ko("Some value is NaN")
-//        else if(!cond3) ko(s"${plot.records.headOption} is first range. cmapStart: $cmapStart")
-//        else if(!cond4) ko(s"${plot.records.lastOption} is last range. cmapEnd: $cmapEnd")
-//        else ok
-//      })
-//    }
-
     "densityPlot" in {
       val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 2, Some(-10d), Some(10d))
       val (counterSize, counterNo) = (8, 2)

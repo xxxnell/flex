@@ -62,23 +62,6 @@ trait SketchPrimPropOps[S[_]<:Sketch[_], C<:SketchConf]
     utdSketch2 <- if(smoothPs.nonEmpty) primNarrowPlotUpdateForStr(utdSketch1, smoothPs, conf) else Some(utdSketch1)
   } yield (utdSketch2, oldStrO)
 
-  @deprecated
-  def migrateForSketch[A](hcounter: HCounter, cmap: Cmap, sketch: S[A]): Option[HCounter] = {
-    cmap.ranges
-      .flatMap { case (hdim, range) => primCountForStr(sketch, range.start, range.end).map(count => (hdim, count)) }
-      .foldLeft(Option(hcounter)){ case (hcounterO, (hdim, count)) =>
-        hcounterO.flatMap(hcounter => hcounter.update(hdim, count))
-      }
-  }
-
-  @deprecated
-  def migrateForPs(hcounter: HCounter, cmap: Cmap, ps: List[(Prim, Count)]): Option[HCounter] = {
-    ps.map(p => (cmap.apply(p._1), p._2))
-      .foldLeft(Option(hcounter)){ case (hcounterO, (hdim, count)) =>
-        hcounterO.flatMap(hcounter => hcounter.update(hdim, count))
-      }
-  }
-
   // Read ops
 
   def singleCount(cmap: Cmap, hcounter: HCounter, pStart: Double, pEnd: Double): Option[Double] = {
@@ -127,13 +110,6 @@ trait SketchPrimPropOps[S[_]<:Sketch[_], C<:SketchConf]
     sums.sum / sums.size
   }
 
-  @deprecated
-  def primProbabilityForStr(sketch: S[_], pFrom: Prim, pTo: Prim): Option[Double] = for {
-    count <- primCountForStr(sketch, pFrom, pTo)
-    sum = self.sumForStr(sketch)
-    flatProb = (flatDensity * RangeP(pFrom, pTo).length).toDouble
-  } yield if(sum != 0) (BigDecimal(count) / BigDecimal(sum)).toDouble else flatProb
-
 }
 
 trait SketchPrimPropLaws[S[_]<:Sketch[_], C<:SketchConf] { self: SketchPrimPropOps[S, C] =>
@@ -158,14 +134,6 @@ trait SketchPrimPropLaws[S[_]<:Sketch[_], C<:SketchConf] { self: SketchPrimPropO
     val ps = as.map { case (value, count) => (sketch.measure.asInstanceOf[Measure[A]](value), count) }
     primDeepUpdate(sketch, ps, conf)
   }
-
-  @deprecated
-  def countPlot(sketch: S[_]): Option[CountPlot] = for {
-    cmapHcounter <- sketch.structures.lastOption
-    (cmap, _) = cmapHcounter
-    ranges = cmap.bin
-    counts <- ranges.traverse(range => primCountForStr(sketch, range.start, range.end))
-  } yield CountPlot.disjoint(ranges.zip(counts))
 
   def sample[A](dist: S[A]): (S[A], A) = ???
 

@@ -23,8 +23,6 @@ trait SketchPropSyntax {
     def deepUpdate(as: A*)(implicit conf: SketchConf): Option[(Sketch[A], Option[Structure])] =
       Sketch.deepUpdate(sketch, as.toList.map(a => (a, 1d)), conf)
     def count(from: A, to: A): Option[Double] = Sketch.count(sketch, from, to)
-    @deprecated
-    def countPlot: Option[CountPlot] = Sketch.countPlot(sketch)
     def sum: Double = Sketch.sum(sketch)
     //    def clear: Sketch = Sketch.clear(sketch)
     def probability(from: A, to: A): Option[Double] = Sketch.probability(sketch, from, to)
