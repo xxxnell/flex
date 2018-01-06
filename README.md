@@ -10,7 +10,7 @@ Scope Sketch is the probablistic data structure that measures the frequency - or
 ## Getting Started 
 
 ``` scala 
-import sketch.scope._
+import flip._
 
 // set uniform distribution
 val dist = 0.0 until 1.0 by 0.01

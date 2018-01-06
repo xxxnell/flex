@@ -1,17 +1,17 @@
 import sbt.Keys._
-import sketch.scope.Dependencies._
-import sketch.scope.SketchBuilds
+import flip.Dependencies._
+import flip.FlipBuilds
 
-name := "scope-sketch"
+name := "flip"
 
-lazy val root = Project(id = "scope-sketch", base = file("."))
-  .aggregate(sketchCore, sketchBench)
+lazy val root = Project(id = "flip", base = file("."))
+  .aggregate(flipCore, flipBench)
 
-lazy val sketchCore = sketchModule("scope-sketch-core")
+lazy val flipCore = flipModule("flip-core")
 
-lazy val sketchBench = sketchModule("scope-sketch-bench")
-  .dependsOn(sketchCore)
+lazy val flipBench = flipModule("flip-bench")
+  .dependsOn(flipCore)
 
-def sketchModule(name: String): Project =
+def flipModule(name: String): Project =
   Project(id = name, base = file(name))
-    .settings(SketchBuilds.buildSettings)
+    .settings(FlipBuilds.buildSettings)

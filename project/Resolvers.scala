@@ -1,4 +1,4 @@
-package sketch.scope
+package flip
 
 import sbt._
 
