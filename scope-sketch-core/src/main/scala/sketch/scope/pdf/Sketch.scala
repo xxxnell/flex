@@ -36,9 +36,9 @@ trait SketchPropOps[S[_]<:Sketch[_], C<:SketchConf]
   /**
     * Get the number of effective elements be memorized.
     * */
-  def count[A](sketch: S[A], from: A, to: A): Option[Count]
+  def count[A](sketch: S[A], from: A, to: A, conf: C): Option[Count]
 
-  def sum(sketch: S[_]): Count
+  def sum(sketch: S[_], conf: C): Count
 
   // update ops
 
@@ -56,34 +56,34 @@ trait SketchPropLaws[S[_]<:Sketch[_], C<:SketchConf] { self: SketchPropOps[S, C]
 
   def flatDensity: Double = (BigDecimal(1) / RangeP(Cmap.max, Cmap.min).length).toDouble
 
-  def probability[A](sketch: S[A], start: A, end: A): Option[Double] = for {
-    count <- count(sketch, start, end)
-    sum = self.sum(sketch)
+  def probability[A](sketch: S[A], start: A, end: A, conf: C): Option[Double] = for {
+    count <- count(sketch, start, end, conf)
+    sum = self.sum(sketch, conf)
     measure = sketch.measure.asInstanceOf[Measure[A]]
     flatProb = (flatDensity * RangeM.bare(start, end, measure).length).toDouble
   } yield if(sum > 0) count / sum else flatProb
 
-  def sampling[A](sketch: S[A]): Option[DensityPlot] = for {
+  def sampling[A](sketch: S[A], conf: C): Option[DensityPlot] = for {
     cmap <- youngCmap(sketch)
     rangePs = cmap.bin
     rangeMs = rangePs.map(rangeP => rangeP.modifyMeasure(sketch.measure.asInstanceOf[Measure[A]]))
-    sampling <- samplingForRanges(sketch, rangeMs)
+    sampling <- samplingForRanges(sketch, rangeMs, conf)
   } yield sampling
 
-  def samplingForRanges[A](sketch: S[A], ranges: List[RangeM[A]]): Option[DensityPlot] = for {
-    rangeProbs <- ranges.traverse(range => probability(sketch, range.start, range.end).map(prob => (range, prob)))
+  def samplingForRanges[A](sketch: S[A], ranges: List[RangeM[A]], conf: C): Option[DensityPlot] = for {
+    rangeProbs <- ranges.traverse(range => probability(sketch, range.start, range.end, conf).map(prob => (range, prob)))
     rangeDensities = rangeProbs
       .map { case (rangeM, prob) => (RangeP.forRangeM(rangeM), Try(prob / rangeM.length).toOption) }
       .flatMap { case (range, densityO) => densityO.map(density => (range, density.toDouble)) }
   } yield DensityPlot.disjoint(rangeDensities)
 
-  def fastPdf[A](sketch: S[A], a: A): Option[Double] = for {
+  def fastPdf[A](sketch: S[A], a: A, conf: C): Option[Double] = for {
     cmap <- youngCmap(sketch)
     p = sketch.measure.asInstanceOf[Measure[A]].to(a)
     idx = cmap(p)
     rangePs = cmap.range(idx - 1) :: cmap.range(idx) :: cmap.range(idx + 1) :: Nil
     rangeMs = rangePs.map(rangeP => rangeP.modifyMeasure(sketch.measure.asInstanceOf[Measure[A]]))
-    sampling <- samplingForRanges(sketch, rangeMs)
+    sampling <- samplingForRanges(sketch, rangeMs, conf)
   } yield sampling.interpolation(p)
 
   def rearrange[A](sketch: S[A], conf: C): Option[S[A]] = deepUpdate(sketch, Nil, conf).map(_._1)
@@ -147,24 +147,24 @@ object Sketch extends SketchPrimPropOps[Sketch, SketchConf] { self =>
 
   // overrides
 
-  override def probability[A](sketch: Sketch[A], start: A, end: A): Option[Count] = sketch match {
-    case sketch: AdaptiveSketch[A] => AdaptiveSketch.probability(sketch, start, end)
-    case _ => super.probability(sketch, start, end)
+  override def probability[A](sketch: Sketch[A], start: A, end: A, conf: SketchConf): Option[Count] = (sketch, conf) match {
+    case (sketch: AdaptiveSketch[A], conf: AdaptiveSketchConf) => AdaptiveSketch.probability(sketch, start, end, conf)
+    case _ => super.probability(sketch, start, end, conf)
   }
 
-  override def sampling[A](sketch: Sketch[A]): Option[DensityPlot] = sketch match {
-    case sketch: AdaptiveSketch[A] => AdaptiveSketch.sampling(sketch)
-    case _ => super.sampling(sketch)
+  override def sampling[A](sketch: Sketch[A], conf: SketchConf): Option[DensityPlot] = (sketch, conf) match {
+    case (sketch: AdaptiveSketch[A], conf: AdaptiveSketchConf) => AdaptiveSketch.sampling(sketch, conf)
+    case _ => super.sampling(sketch, conf)
   }
 
-  override def count[A](sketch: Sketch[A], start: A, end: A): Option[Count] = sketch match {
-    case sketch: AdaptiveSketch[A] => AdaptiveSketch.count(sketch, start, end)
-    case _ => super.count(sketch, start, end)
+  override def count[A](sketch: Sketch[A], start: A, end: A, conf: SketchConf): Option[Count] = (sketch, conf) match {
+    case (sketch: AdaptiveSketch[A], conf: AdaptiveSketchConf) => AdaptiveSketch.count(sketch, start, end, conf)
+    case _ => super.count(sketch, start, end, conf)
   }
 
-  override def sum(sketch: Sketch[_]): Count = sketch match {
-    case sketch: AdaptiveSketch[_] => AdaptiveSketch.sum(sketch)
-    case _ => super.sum(sketch)
+  override def sum(sketch: Sketch[_], conf: SketchConf): Count = (sketch, conf) match {
+    case (sketch: AdaptiveSketch[_], conf: AdaptiveSketchConf) => AdaptiveSketch.sum(sketch, conf)
+    case _ => super.sum(sketch, conf)
   }
 
   override def narrowUpdate[A](sketch: Sketch[A],
@@ -179,6 +179,6 @@ object Sketch extends SketchPrimPropOps[Sketch, SketchConf] { self =>
     case _ => super.rearrange(sketch, conf)
   }
 
-  override def pdf[A](dist: Sketch[A], a: A, conf: SketchConf): Option[Count] = fastPdf(dist, a)
+  override def pdf[A](dist: Sketch[A], a: A, conf: SketchConf): Option[Count] = fastPdf(dist, a, conf)
 
 }

@@ -4,15 +4,20 @@ trait CustomSketchConf extends SketchConf
 
 object CustomSketchConf {
 
-  case class CustomSketchConfImpl(mixingRatio: Double,
+  case class CustomSketchConfImpl(delta: Double,
+                                  mixingRatio: Double,
                                   dataKernelWindow: Double,
+                                  decayFactor: Double,
                                   cmap: CmapConf,
                                   counter: CounterConf)
     extends CustomSketchConf
 
-  def apply(// sketch
+  def apply(// dist
+            delta: Double = DefaultSketchConf.delta,
+            // sketch
             mixingRatio: Double = DefaultSketchConf.mixingRatio,
             dataKernelWindow: Double = DefaultSketchConf.dataKernelWindow,
+            decayFactor: Double = DefaultSketchConf.decayFactor,
             // adaptive
             queueSize: Int = DefaultSketchConf.queueSize,
             // periodic
@@ -27,18 +32,21 @@ object CustomSketchConf {
             counterSize: Int = DefaultSketchConf.counter.size,
             counterNo: Int = DefaultSketchConf.counter.no): CustomAdaPerSketchConf =
     AdaPerSketchConf.custom(
-      mixingRatio, dataKernelWindow,
+      delta,
+      mixingRatio, dataKernelWindow, decayFactor,
       queueSize,
       startThreshold, thresholdPeriod,
       CmapConf.uniform(cmapSize, cmapNo, cmapStart, cmapEnd),
       CounterConf(counterSize, counterNo)
     )
 
-  def simple(mixingRatio: Double,
+  def simple(delta: Double,
+             mixingRatio: Double,
              dataKernelWindow: Double,
+             decayFactor: Double,
              cmapConf: CmapConf,
              counterConf: CounterConf): CustomSketchConf =
-    CustomSketchConfImpl(mixingRatio, dataKernelWindow, cmapConf, counterConf)
+    CustomSketchConfImpl(delta, mixingRatio, dataKernelWindow, decayFactor, cmapConf, counterConf)
 
   def periodic(// sketch
                mixingRatio: Double, dataKernelWindow: Double,

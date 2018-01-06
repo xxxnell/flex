@@ -3,9 +3,13 @@ package sketch.scope.conf
 trait DefaultSketchConf
   extends AdaPerSketchConf {
 
+  val delta: Double = 1e-5
+
   val mixingRatio: Double = 1
 
   val dataKernelWindow: Double = 1e-5
+
+  val decayFactor: Double = 1
 
   val startThreshold: Double = 100
 

@@ -54,7 +54,8 @@ trait SketchPrimPropOps[S[_]<:Sketch[_], C<:SketchConf]
     * */
   def primDeepUpdate[A](sketch: S[A], ps: List[(Prim, Count)], conf: C): Option[(S[A], Option[Structure])] = for {
     utdCmap <- EqualSpaceCdfUpdate.updateCmap(sketch, ps, conf.cmap.size, conf.mixingRatio, conf.dataKernelWindow)
-    emptyCounter = HCounter.emptyForConf(conf.counter, sum(sketch).toInt)
+    seed = ((sum(sketch, conf) + ps.headOption.map(_._1).getOrElse(-1d)) * 1000).toInt
+    emptyCounter = HCounter.emptyForConf(conf.counter, seed)
     (utdStrs, oldStrs) = ((utdCmap, emptyCounter) :: sketch.structures).splitAt(conf.cmap.no)
     oldStrO = oldStrs.headOption
     utdSketch1 <- modifyStructure(sketch, _ => Some(utdStrs))
@@ -63,6 +64,8 @@ trait SketchPrimPropOps[S[_]<:Sketch[_], C<:SketchConf]
   } yield (utdSketch2, oldStrO)
 
   // Read ops
+
+  def decayRate(decayFactor: Double, i: Int): Double = math.exp(-1 * decayFactor * i)
 
   def singleCount(cmap: Cmap, hcounter: HCounter, pStart: Double, pEnd: Double): Option[Double] = {
     val (startHdim, endHdim) = (cmap.apply(pStart), cmap.apply(pEnd))
@@ -95,35 +98,45 @@ trait SketchPrimPropOps[S[_]<:Sketch[_], C<:SketchConf]
     } yield midCount + boundartCount
   }
 
-  def primCountForStr(sketch: S[_], pFrom: Prim, pTo: Prim): Option[Double] = {
+  def primCountForStr(sketch: S[_], pFrom: Prim, pTo: Prim, conf: C): Option[Double] = {
     val countsO = sketch.structures.traverse { case (cmap, hcounter) => singleCount(cmap, hcounter, pFrom, pTo) }
 
-    countsO.map(counts => counts.sum / counts.size)
+    val decayRates = (0 until conf.cmap.no)
+      .map(i => decayRate(conf.decayFactor, i))
+      .take(countsO.map(_.size).getOrElse(0))
+    val weightedCountSumO = countsO.map(counts => (counts zip decayRates).map { case (count, r) => count * r }.sum)
+    val normalization = decayRates.sum
+
+    weightedCountSumO.map(sum => sum / normalization)
   }
 
   /**
-    * Total number of elements be memorized.
+    * Total number of elements be effective memorized.
     * */
-  def sumForStr(sketch: S[_]): Double = {
+  def sumForStr(sketch: S[_], conf: C): Double = {
     val sums = sketch.structures.map { case (_, hcounter) => hcounter.sum }
 
-    sums.sum / sums.size
+    val decayRates = (0 until conf.cmap.no).map(i => decayRate(conf.decayFactor, i)).take(sums.size)
+    val weightedSumSum = (sums zip decayRates).map { case (sum, r) => sum * r }.sum
+    val normalization = decayRates.sum
+
+    weightedSumSum / normalization
   }
 
 }
 
 trait SketchPrimPropLaws[S[_]<:Sketch[_], C<:SketchConf] { self: SketchPrimPropOps[S, C] =>
 
-  def countForStr[A](sketch: S[A], start: A, end: A): Option[Double] = {
+  def countForStr[A](sketch: S[A], start: A, end: A, conf: C): Option[Double] = {
     val measure = sketch.measure.asInstanceOf[Measure[A]]
-    primCountForStr(sketch, measure(start), measure(end))
+    primCountForStr(sketch, measure(start), measure(end), conf)
   }
 
   // implements the Sketch ops
 
-  def count[A](sketch: S[A], start: A, end: A): Option[Double] = countForStr(sketch, start, end)
+  def count[A](sketch: S[A], start: A, end: A, conf: C): Option[Double] = countForStr(sketch, start, end, conf)
 
-  def sum(sketch: S[_]): Count = sumForStr(sketch)
+  def sum(sketch: S[_], conf: C): Count = sumForStr(sketch, conf)
 
   def narrowUpdate[A](sketch: S[A], as: List[(A, Count)], conf: C): Option[S[A]] = {
     val ps = as.map { case (value, count) => (sketch.measure.asInstanceOf[Measure[A]](value), count) }
