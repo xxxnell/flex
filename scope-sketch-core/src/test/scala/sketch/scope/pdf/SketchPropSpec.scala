@@ -159,30 +159,6 @@ class SketchPropSpec extends Specification with ScalaCheck {
 
     }
 
-//    DEPRECATED
-//    "countPlot" in {
-//      val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 2, Some(-10d), Some(10d))
-//      val (counterSize, counterNo) = (8, 2)
-//      implicit val conf: CustomSketchConf = CustomSketchConf(
-//        cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
-//        counterSize = counterSize, counterNo = counterNo
-//      )
-//      val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
-//
-//      sketch0.countPlot.fold(ko("Fail to call the countPlot."))(plot => {
-//        val cond1 = plot.records.nonEmpty
-//        val cond2 = plot.records.forall { case (_, value) => !value.isNaN }
-//        val cond3 = plot.records.headOption.forall { case (range, _) => range.end ~= cmapStart.value }
-//        val cond4 = plot.records.lastOption.forall { case (range, _) => range.start ~= cmapEnd.value }
-//
-//        if(!cond1) ko("Plot record is empty.")
-//        else if(!cond2) ko("Some value is NaN")
-//        else if(!cond3) ko(s"${plot.records.headOption} is first range. cmapStart: $cmapStart")
-//        else if(!cond4) ko(s"${plot.records.lastOption} is last range. cmapEnd: $cmapEnd")
-//        else ok
-//      })
-//    }
-
     "densityPlot" in {
       val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 2, Some(-10d), Some(10d))
       val (counterSize, counterNo) = (8, 2)
@@ -369,13 +345,11 @@ class SketchPropSpec extends Specification with ScalaCheck {
     "sum" in {
 
       "basic" in {
-        val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 2, Some(0d), Some(10d))
-        val (counterSize, counterNo) = (8, 2)
         implicit val conf: CustomSketchConf = CustomSketchConf(
-          cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
-          counterSize = counterSize, counterNo = counterNo
+          cmapSize = 10, cmapNo = 2, cmapStart = Some(0d), cmapEnd = Some(10d),
+          counterSize = 100, counterNo = 2
         )
-        val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
+        val sketch0 = Sketch.empty[Double]
 
         (for {
           sketch1 <- sketch0.update(1)
@@ -385,13 +359,11 @@ class SketchPropSpec extends Specification with ScalaCheck {
       }
 
       "after updated" in {
-        val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 2, Some(0d), Some(10d))
-        val (counterSize, counterNo) = (8, 2)
         implicit val conf: CustomSketchConf = CustomSketchConf(
-          cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
-          counterSize = counterSize, counterNo = counterNo
+          cmapSize = 10, cmapNo = 2, cmapStart = Some(0d), cmapEnd = Some(10d),
+          counterSize = 100, counterNo = 2
         )
-        val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
+        val sketch0 = Sketch.empty[Double]
 
         (for {
           sketch1 <- sketch0.update(1, 2, 3, 4, 5)
@@ -400,19 +372,20 @@ class SketchPropSpec extends Specification with ScalaCheck {
           .fold(ko)(sum => if(sum ~= 5) ok else ko(s"sum: $sum, expected: 5"))
       }
 
-      "after rearrange" in {
+      "after rearrange with 2 cmap" in {
         implicit val conf: CustomSketchConf = CustomSketchConf(
           cmapSize = 10, cmapNo = 2, cmapStart = Some(0d), cmapEnd = Some(10d),
           counterSize = 100, counterNo = 2
         )
         val sketch0 = Sketch.empty[Double]
+        val expected = 5 / (1 + math.exp(-1))
 
         (for {
           sketch1 <- sketch0.update(1, 2, 3, 4, 5)
           sketch2 <- sketch1.rearrange
           sum = sketch2.sum
         } yield sum)
-          .fold(ko)(sum => if(sum ~= 5d/2) ok else ko(s"sum: $sum, expected: ${5d/2}"))
+          .fold(ko)(sum => if(sum ~= expected) ok else ko(s"sum: $sum, expected: $expected"))
       }
 
       "after rearrange update" in {
@@ -421,6 +394,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
           counterSize = 100, counterNo = 2
         )
         val sketch0 = Sketch.empty[Double]
+        val expected = 10 / (1 + math.exp(-1))
 
         (for {
           sketch1 <- sketch0.update(1, 2, 3, 4, 5)
@@ -428,7 +402,25 @@ class SketchPropSpec extends Specification with ScalaCheck {
           sketch3 <- sketch2.update(1, 2, 3, 4, 5)
           sum = sketch3.sum
         } yield sum)
-          .fold(ko)(sum => if(sum ~= 5d/2 + 5) ok else ko(s"sum: $sum, expected: ${5d/2 + 5}"))
+          .fold(ko)(sum => if(sum ~= expected) ok else ko(s"sum: $sum, expected: $expected"))
+      }
+
+      "after 2 rearrange and update with 3 cmap" in {
+        implicit val conf: CustomSketchConf = CustomSketchConf(
+          cmapSize = 10, cmapNo = 3, cmapStart = Some(0d), cmapEnd = Some(10d),
+          counterSize = 100, counterNo = 2
+        )
+        val sketch0 = Sketch.empty[Double]
+        val expected = (10 * math.exp(-1) + 5) / (1 + math.exp(-1))
+
+        (for {
+          sketch1 <- sketch0.update(1, 2, 3, 4, 5)
+          sketch2 <- sketch1.rearrange
+          sketch3 <- sketch2.rearrange
+          sketch4 <- sketch3.update(1, 2, 3, 4, 5)
+          sum = sketch4.sum
+        } yield sum)
+          .fold(ko)(sum => if(sum ~= expected) ok else ko(s"sum: $sum, expected: $expected"))
       }
 
     }
@@ -445,8 +437,8 @@ class SketchPropSpec extends Specification with ScalaCheck {
 
         (for {
           sketch1 <- sketch1O
-          interpPdf <- SamplingDist.interpolationPdf(sketch1, 1d)
-          fastPdf <- Sketch.fastPdf(sketch1, 1d)
+          interpPdf <- SamplingDist.interpolationPdf(sketch1, 1d, conf)
+          fastPdf <- Sketch.fastPdf(sketch1, 1d, conf)
         } yield (interpPdf, fastPdf))
           .fold(ko("Exception occurs")){ case (interpPdf, fastPdf) =>
             if(interpPdf ~= fastPdf) ok else ko(s"interpPdf: $interpPdf, fastPdf: $fastPdf")
@@ -465,7 +457,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
 
           (for {
             sketch1 <- sketch1O
-            fastPdf <- Sketch.fastPdf(sketch1, Double.MinValue)
+            fastPdf <- Sketch.fastPdf(sketch1, Double.MinValue, conf)
           } yield fastPdf)
             .fold(ko("Exception occurs")){ _ => ok }
         }
@@ -480,7 +472,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
 
           (for {
             sketch1 <- sketch1O
-            fastPdf <- Sketch.fastPdf(sketch1, Double.MaxValue)
+            fastPdf <- Sketch.fastPdf(sketch1, Double.MaxValue, conf)
           } yield fastPdf)
             .fold(ko("Exception occurs")){ _ => ok }
         }

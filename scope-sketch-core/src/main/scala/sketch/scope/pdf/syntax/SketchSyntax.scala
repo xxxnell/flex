@@ -22,13 +22,13 @@ trait SketchPropSyntax {
       Sketch.narrowUpdate(sketch, as.toList.map(a => (a, 1d)), conf)
     def deepUpdate(as: A*)(implicit conf: SketchConf): Option[(Sketch[A], Option[Structure])] =
       Sketch.deepUpdate(sketch, as.toList.map(a => (a, 1d)), conf)
-    def count(from: A, to: A): Option[Double] = Sketch.count(sketch, from, to)
-    @deprecated
-    def countPlot: Option[CountPlot] = Sketch.countPlot(sketch)
-    def sum: Double = Sketch.sum(sketch)
+    def count(from: A, to: A)(implicit conf: SketchConf): Option[Double] = Sketch.count(sketch, from, to, conf)
+    def sum(implicit conf: SketchConf): Double = Sketch.sum(sketch, conf)
     //    def clear: Sketch = Sketch.clear(sketch)
-    def probability(from: A, to: A): Option[Double] = Sketch.probability(sketch, from, to)
-    def rearrange(implicit conf: SketchConf): Option[Sketch[A]] = Sketch.rearrange(sketch, conf)
+    def probability(from: A, to: A)(implicit conf: SketchConf): Option[Double] =
+      Sketch.probability(sketch, from, to, conf)
+    def rearrange(implicit conf: SketchConf): Option[Sketch[A]] =
+      Sketch.rearrange(sketch, conf)
     def cmapNo: Int = Sketch.cmapNo(sketch)
     def cmapSize: Int = Sketch.cmapSize(sketch)
     def counterNo: Int = Sketch.counterNo(sketch)
