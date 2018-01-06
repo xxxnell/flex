@@ -14,10 +14,10 @@ trait SamplingDistPropSyntax {
 
   implicit class SamplingDistPropSyntaxImpl[A](dist: SamplingDist[A]) {
     def sample: (SamplingDist[A], A) = SamplingDist.sample(dist)
-    def pdf(a: A): Option[Double] = SamplingDist.interpolationPdf(dist, a)
+    def pdf(a: A)(implicit conf: SamplingDistConf): Option[Double] = SamplingDist.interpolationPdf(dist, a, conf)
     def samples(n: Int): (SamplingDist[A], List[A]) = SamplingDist.samples(dist, n)
-    def sampling: Option[DensityPlot] = SamplingDist.sampling(dist)
-    def densityPlot: Option[DensityPlot] = SamplingDist.sampling(dist)
+    def sampling(implicit conf: SamplingDistConf): Option[DensityPlot] = SamplingDist.sampling(dist, conf)
+    def densityPlot(implicit conf: SamplingDistConf): Option[DensityPlot] = SamplingDist.sampling(dist, conf)
   }
 
 }

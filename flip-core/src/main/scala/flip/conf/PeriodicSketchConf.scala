@@ -15,23 +15,29 @@ trait CustomPeriodicSketchConf extends PeriodicSketchConf with CustomSketchConf
 
 object PeriodicSketchConf {
 
-  private case class CustomPeriodicSketchConfImpl(mixingRatio: Double,
-                                              dataKernelWindow: Double,
-                                              startThreshold: Double,
-                                              thresholdPeriod: Double,
-                                              cmap: CmapConf,
-                                              counter: CounterConf)
+  private case class CustomPeriodicSketchConfImpl(delta: Double,
+                                                  mixingRatio: Double,
+                                                  dataKernelWindow: Double,
+                                                  decayFactor: Double,
+                                                  startThreshold: Double,
+                                                  thresholdPeriod: Double,
+                                                  cmap: CmapConf,
+                                                  counter: CounterConf)
     extends CustomPeriodicSketchConf
 
-  def custom(mixingRatio: Double,
+  def custom(delta: Double,
+             mixingRatio: Double,
              dataKernelWindow: Double,
+             decayFactor: Double,
              startThreshold: Double,
              thresholdPeriod: Double,
              cmap: CmapConf,
              counter: CounterConf): CustomPeriodicSketchConf =
     CustomPeriodicSketchConfImpl(
+      delta,
       mixingRatio,
       dataKernelWindow,
+      decayFactor,
       startThreshold,
       thresholdPeriod,
       cmap,

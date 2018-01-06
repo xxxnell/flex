@@ -20,12 +20,22 @@ trait AdaptiveSketchOps[S[_]<:AdaptiveSketch[_], C<:AdaptiveSketchConf]
 
   // overrides
 
-  override def count[A](sketch: S[A], start: A, end: A): Option[Count] = for {
-    countStr <- countForStr(sketch, start, end)
-    countQ = countForQueue(sketch, start, end)
-  } yield countStr + countQ
+  def queueCorrection(sketch: S[_], conf: C): Double = {
+    val effNo = if(conf.cmap.no > 1) conf.cmap.no - 1 else conf.cmap.no
 
-  override def sum(sketch: S[_]): Count = sumForStr(sketch) + sumForQueue(sketch)
+    val effRates = (0 until effNo).map(i => decayRate(conf.decayFactor, i))
+    val allRates = (0 until conf.cmap.no).map(i => decayRate(conf.decayFactor, i))
+
+    if(sketch.structures.size < conf.cmap.no) 1 else effRates.sum / allRates.sum
+  }
+
+  override def count[A](sketch: S[A], start: A, end: A, conf: C): Option[Count] = for {
+    countStr <- countForStr(sketch, start, end, conf)
+    countQ = countForQueue(sketch, start, end)
+  } yield countStr + queueCorrection(sketch, conf) * countQ
+
+  override def sum(sketch: S[_], conf: C): Count =
+    sumForStr(sketch, conf) + queueCorrection(sketch, conf) * sumForQueue(sketch)
 
   override def narrowUpdate[A](sketch: S[A], as: List[(A, Count)], conf: C): Option[S[A]] = for {
     (sketch1, old) <- Some(append(sketch, as, conf))
@@ -58,7 +68,8 @@ trait AdaptiveSketchLaws[S[_]<:AdaptiveSketch[_], C<:AdaptiveSketchConf] { self:
   def countForQueue[A](sketch: S[A], start: A, end: A): Count = {
     val measure: Measure[A] = sketch.measure.asInstanceOf[Measure[A]]
 
-    sketch.queue.filter { case (a: A, _) => measure.to(a) >= measure.to(start) && measure.to(a) <= measure.to(end) }
+    sketch.queue.asInstanceOf[List[(A, Count)]]
+      .filter { case (a, _) => measure.to(a) >= measure.to(start) && measure.to(a) <= measure.to(end) }
       .foldLeft(0d){ case (acc, (_, count)) => acc + count }
   }
 

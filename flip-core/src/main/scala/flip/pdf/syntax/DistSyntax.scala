@@ -14,7 +14,7 @@ trait DistSyntax extends DistPropSyntax with DistMonadSyntax
 trait DistPropSyntax {
 
   implicit class DistPropSyntaxImpl[A](dist: Dist[A]) {
-    def probability(from: A, to: A): Option[Double] = Dist.probability(dist, from, to)
+    def probability(from: A, to: A)(implicit conf: DistConf): Option[Double] = Dist.probability(dist, from, to, conf)
     def pdf(a: A)(implicit conf: DistConf): Option[Double] = Dist.pdf(dist, a, conf)
     def sample: (Dist[A], A) = Dist.sample(dist)
     def samples(n: Int): (Dist[A], List[A]) = Dist.samples(dist, n)

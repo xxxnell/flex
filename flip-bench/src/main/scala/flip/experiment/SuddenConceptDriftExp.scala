@@ -20,6 +20,7 @@ object SuddenConceptDriftExp {
     val maxDomainCutoff = 10e10
 
     implicit val conf: SketchConf = SketchConf(
+      decayFactor = 1,
       startThreshold = start, thresholdPeriod = period, queueSize = 30,
       cmapSize = 150, cmapNo = 5, cmapStart = Some(-10d), cmapEnd = Some(10),
       counterSize = 1000, counterNo = 2

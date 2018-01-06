@@ -2,14 +2,16 @@ package flip.conf
 
 trait DistConf {
 
+  val delta: Double
+
 }
 
 object DistConf {
 
-  private case class DistConfImpl() extends DistConf
+  private case class DistConfImpl(delta: Double) extends DistConf
 
-  def apply(): DistConf = bare()
+  def apply(delta: Double): DistConf = bare(delta)
 
-  def bare(): DistConf = DistConfImpl()
+  def bare(delta: Double): DistConf = DistConfImpl(delta)
 
 }

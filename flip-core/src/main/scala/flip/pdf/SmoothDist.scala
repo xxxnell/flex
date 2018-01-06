@@ -16,11 +16,16 @@ trait SmoothDistPropOps[D[_]<:SmoothDist[_], C<:SmoothDistConf]
 
   def pdf[A](dist: D[A], a: A): Option[Double]
 
+  def probability[A](dist: D[A], from: A, to: A): Option[Prim]
+
 }
 
 trait SmoothDistPropLaws[D[_]<:SmoothDist[_], C<:SmoothDistConf] { self: SmoothDistPropOps[D, C] =>
 
-  def densityPlot[A](dist: D[A], domains: List[RangeM[A]]): Option[DensityPlot] = {
+  def probability[A](dist: D[A], from: A, to: A, conf: SmoothDistConf): Option[Prim] =
+    probability(dist, from, to)
+
+  def sampling[A](dist: D[A], domains: List[RangeM[A]]): Option[DensityPlot] = {
     val measure = dist.measure.asInstanceOf[Measure[A]]
     val recordsO = domains.filter(range => !range.isPoint)
       .traverse(range =>
@@ -35,7 +40,7 @@ trait SmoothDistPropLaws[D[_]<:SmoothDist[_], C<:SmoothDistConf] { self: SmoothD
   }
 
   def toSamplingDist[A](dist: D[A], domains: List[RangeM[A]]): Option[PlottedDist[A]] = {
-    val plotO = densityPlot(dist, domains)
+    val plotO = sampling(dist, domains)
 
     for {
       plot <- plotO

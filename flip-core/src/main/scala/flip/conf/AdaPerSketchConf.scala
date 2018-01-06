@@ -13,8 +13,10 @@ trait CustomAdaPerSketchConf extends AdaPerSketchConf with CustomSketchConf
 
 object AdaPerSketchConf {
 
-  private case class AdaPerSketchConfImpl(mixingRatio: Double,
+  private case class AdaPerSketchConfImpl(delta: Double,
+                                          mixingRatio: Double,
                                           dataKernelWindow: Double,
+                                          decayFactor: Double,
                                           queueSize: Int,
                                           startThreshold: Double,
                                           thresholdPeriod: Double,
@@ -22,16 +24,20 @@ object AdaPerSketchConf {
                                           counter: CounterConf)
     extends CustomAdaPerSketchConf
 
-  def custom(mixingRatio: Double,
+  def custom(delta: Double,
+             mixingRatio: Double,
              dataKernelWindow: Double,
+             decayFactor: Double,
              queueSize: Int,
              startThreshold: Double,
              thresholdPeriod: Double,
              cmap: CmapConf,
              counter: CounterConf): CustomAdaPerSketchConf =
     AdaPerSketchConfImpl(
+      delta,
       mixingRatio,
       dataKernelWindow,
+      decayFactor,
       queueSize,
       startThreshold,
       thresholdPeriod,
