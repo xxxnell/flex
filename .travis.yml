@@ -4,7 +4,6 @@ scala:
   - 2.12.1
 
 jdk:
-#  - oraclejdk7
   - oraclejdk8
 
 script:
@@ -14,5 +13,4 @@ after_success:
   - bash <(curl -s https://codecov.io/bash)
 
 notifications:
-  slack: fpstudymeetup:49hLJXAjJrK04GUSIC9MdKB4
   email: false
