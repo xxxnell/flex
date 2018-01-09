@@ -3,39 +3,47 @@ package flip.benchmark
 import java.util.concurrent.TimeUnit
 
 import org.openjdk.jmh.annotations._
-import flip.cmap.Cmap
+import flip.cmap.{Cmap, UniformCmap}
+import flip.hmap.HDim
+import flip.range
 
 import scala.util.Random
+import flip.range.syntax._
 
 @BenchmarkMode(Array(Mode.AverageTime))
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @State(Scope.Thread)
 class CmapOpsBench {
 
-  @Param(Array("5000", "20000"))
-  var caSize: Int = _
+  @Param(Array("200", "20000"))
+  var cmapSize: Int = _
 
-  val cmap = Cmap.uniform(caSize)
+  var cmap: Cmap = _
+
+  @Setup
+  def setupCmap(): Unit = {
+    cmap = Cmap.uniform(cmapSize)
+  }
 
   @Benchmark
-  def apply = {
-    val i = new Random().nextDouble()
+  def apply: HDim = {
+    val i = 1
     cmap.apply(i)
   }
 
   @Benchmark
-  def bin = {
+  def bin: List[RangeP] = {
     cmap.bin
   }
 
   @Benchmark
-  def size = {
+  def size: HDim = {
     cmap.size
   }
 
   @Benchmark
-  def range = {
-    val i = new Random().nextInt()
+  def range: RangeP = {
+    val i = 2
     cmap.range(i)
   }
 

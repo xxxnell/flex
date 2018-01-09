@@ -4,9 +4,9 @@ import java.util.concurrent.TimeUnit
 
 import org.openjdk.jmh.annotations._
 import flip.benchmark.ops.SketchBenchOps._
-import flip.pdf.Sketch
-import flip.measure._
-import flip.conf._
+import flip._
+import flip.cmap.Cmap
+import flip.hcounter.HCounter
 
 @BenchmarkMode(Array(Mode.AverageTime))
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
@@ -14,32 +14,105 @@ import flip.conf._
 class SketchOpsBench {
 
   @Param(Array("5", "20"))
-  var caDepth: Int = _
+  var cmapNo: Int = _
 
-  @Param(Array("5000", "20000"))
-  var caSize: Int = _
+  @Param(Array("200", "2000"))
+  var cmapSize: Int = _
 
-  @Param(Array("1", "30"))
-  var coDepth: Int = _
+  @Param(Array("2", "10"))
+  var counterNo: Int = _
 
-  @Param(Array("1000", "100000"))
-  var coSize: Int = _
+  @Param(Array("40", "1000"))
+  var counterSize: Int = _
 
-  val sketch = Sketch.empty[Double]
+  var sketch: Sketch[Double] = _
+
+  @Setup
+  def setupSketch(): Unit = {
+    implicit val conf: SketchConf = SketchConf(
+      startThreshold = 50, thresholdPeriod = 100,
+      cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = Some(-10d), cmapEnd = Some(10d),
+      counterSize = counterSize, counterNo = counterNo
+    )
+
+    sketch = Sketch.empty[Double]
+  }
 
   @Benchmark
-  def construct = {
+  def construct: Sketch[Double] = {
+    implicit val conf: SketchConf = SketchConf(
+      startThreshold = 50, thresholdPeriod = 100,
+      cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = Some(-10d), cmapEnd = Some(10d),
+      counterSize = counterSize, counterNo = counterNo
+    )
+
     Sketch.empty[Double]
   }
 
   @Benchmark
-  def update = {
+  def sampling: Option[DensityPlot] = {
+    implicit val conf: SketchConf = SketchConf(
+      startThreshold = 50, thresholdPeriod = 100,
+      cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = Some(-10d), cmapEnd = Some(10d),
+      counterSize = counterSize, counterNo = counterNo
+    )
+
+    sketch.sampling
+  }
+
+  @Benchmark
+  def narrowUpdate: Option[Sketch[Double]] = {
+    implicit val conf: SketchConf = SketchConf(
+      startThreshold = 50, thresholdPeriod = 100,
+      cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = Some(-10d), cmapEnd = Some(10d),
+      counterSize = counterSize, counterNo = counterNo
+    )
+
+    sketch.narrowUpdate(1)
+  }
+
+  @Benchmark
+  def deepUpdate: Option[(Sketch[Double], Option[(Cmap, HCounter)])] = {
+    implicit val conf: SketchConf = SketchConf(
+      startThreshold = 50, thresholdPeriod = 100,
+      cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = Some(-10d), cmapEnd = Some(10d),
+      counterSize = counterSize, counterNo = counterNo
+    )
+
+    sketch.deepUpdate(1.0 to 10.0 by 1.0: _*)
+  }
+
+  @Benchmark
+  def flatMap: Sketch[Double] = {
+    implicit val conf: SketchConf = SketchConf(
+      startThreshold = 50, thresholdPeriod = 100,
+      cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = Some(-10d), cmapEnd = Some(10d),
+      counterSize = counterSize, counterNo = counterNo
+    )
+
+    sketch.flatMap(a => Dist.delta(a))
+  }
+
+  @Benchmark
+  def update: Option[Sketch[Double]] = {
+    implicit val conf: SketchConf = SketchConf(
+      startThreshold = 50, thresholdPeriod = 100,
+      cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = Some(-10d), cmapEnd = Some(10d),
+      counterSize = counterSize, counterNo = counterNo
+    )
+
     updateBench(sketch, defaultSignals, 1)
   }
 
   @Benchmark
-  def rearrange = {
-    rearrangeBench(sketch)
+  def rearrange: Option[Sketch[Double]] = {
+    implicit val conf: SketchConf = SketchConf(
+      startThreshold = 50, thresholdPeriod = 100,
+      cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = Some(-10d), cmapEnd = Some(10d),
+      counterSize = counterSize, counterNo = counterNo
+    )
+
+    sketch.rearrange
   }
 
 }

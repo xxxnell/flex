@@ -24,9 +24,24 @@ class HCounterSpec extends Specification with ScalaCheck {
 
       "get" in {
 
-        "basic" in todo
+        "basic" in {
+          val hcounter = HCounter.empty(1, 100000, 0)
+          hcounter.get(1) must beAnInstanceOf[Some[HCounter]]
+        }
 
-        "irregular index" in todo
+        "irregular index: overflow" in {
+//          val hcounter = HCounter.empty(1, 100000, 0)
+//          hcounter.get(100000).fold(ok)(hc => ko("Returns something with irregular index."))
+
+          todo
+        }
+
+        "irregular index: underflow" in {
+//          val hcounter = HCounter.empty(1, 100000, 0)
+//          hcounter.get(-1).fold(ok)(hc => ko("Returns something with irregular index."))
+
+          todo
+        }
 
       }
 

@@ -6,6 +6,8 @@ import flip._
 import flip.conf.CustomAdaPerSketchConf
 import flip.measure.syntax._
 
+import scala.language.postfixOps
+
 class AdaPerSketchSpec extends Specification with ScalaCheck {
 
   "AdaPerSketch" should {
@@ -162,7 +164,25 @@ class AdaPerSketchSpec extends Specification with ScalaCheck {
 
     }
 
-    "narrowUpdate" in todo
+    "narrowUpdate" in {
+      implicit val conf: CustomAdaPerSketchConf = SketchConf(
+        cmapSize = 2000, cmapNo = 20, cmapStart = Some(-10d), cmapEnd = Some(10d),
+        counterSize = 1000, counterNo = 10
+      )
+      val sketch0 = AdaPerSketch.empty[Double]
+
+      sketch0.narrowUpdate(0) must beAnInstanceOf[Some[Sketch[Double]]]
+    }
+
+//    "deepUpdate" in {
+//      implicit val conf: CustomAdaPerSketchConf = SketchConf(
+//        cmapSize = 2000, cmapNo = 20, cmapStart = Some(-10d), cmapEnd = Some(10d),
+//        counterSize = 10000, counterNo = 10
+//      )
+//      val sketch0 = AdaPerSketch.empty[Double]
+//
+//      sketch0.deepUpdate(0.0 to 10.0 by 0.1: _*) must beAnInstanceOf[Some[Sketch[Double]]]
+//    }
 
     "rearrange" in todo
 

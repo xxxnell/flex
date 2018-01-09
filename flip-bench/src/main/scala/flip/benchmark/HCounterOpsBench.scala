@@ -13,40 +13,45 @@ import scala.util.Random
 class HCounterOpsBench {
 
   @Param(Array("1", "30"))
-  var coDepth: Int = _
+  var counterNo: Int = _
 
   @Param(Array("1000", "100000"))
-  var coSize: Int = _
+  var counterSize: Int = _
 
   val seed = 0
-  val hcounter = HCounter.empty(coDepth, coSize, seed)
+  var hcounter: HCounter = _
 
-  @Benchmark
-  def construct = {
-    HCounter.empty(coDepth, coSize, seed)
+  @Setup
+  def setupHCounter = {
+    hcounter = HCounter.empty(counterNo, counterSize, seed)
   }
 
   @Benchmark
-  def update = {
-    val dim = new Random().nextInt() % coSize
+  def construct: HCounter = {
+    HCounter.empty(counterNo, counterSize, seed)
+  }
+
+  @Benchmark
+  def update: Option[HCounter] = {
+    val dim = 1
     hcounter.update(dim, 1)
   }
 
   @Benchmark
-  def get = {
-    val dim = new Random().nextInt() % coSize
+  def get: Option[Double] = {
+    val dim = 1
     hcounter.get(dim)
   }
 
   @Benchmark
-  def sum = {
+  def sum: Double = {
     hcounter.sum
   }
 
   @Benchmark
-  def count = {
-    val dim1 = new Random().nextInt() % coSize
-    val dim2 = new Random().nextInt() % coSize
+  def count: Option[Double] = {
+    val dim1 = 1
+    val dim2 = 3
     val range = if(dim2 > dim1) (dim1, dim2) else (dim2, dim1)
     hcounter.count(range._1, range._2)
   }

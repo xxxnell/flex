@@ -16,6 +16,4 @@ object SketchBenchOps {
       }
   }
 
-  def rearrangeBench[A](sketch: Sketch[A]): Option[Sketch[A]] = sketch.rearrange
-
 }
