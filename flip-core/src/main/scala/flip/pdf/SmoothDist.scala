@@ -53,20 +53,17 @@ object SmoothDist extends SmoothDistPropOps[SmoothDist, SmoothDistConf] {
 
   def probability[A](dist: SmoothDist[A], start: A, end: A): Option[Prim] = dist match {
     case predefined: PredefinedDist[A] => PredefinedDist.probability(predefined, start, end)
-    case delta: DeltaDist[A] => DeltaDist.probability(delta, start, end)
-    case normal: NormalDist[A] => NormalDist.probability(normal, start, end)
+    case numeric: NumericDist[A] => NumericDist.probability(numeric, start, end)
   }
 
   def sample[A](dist: SmoothDist[A]): (SmoothDist[A], A) = dist match {
     case predefined: PredefinedDist[A] => PredefinedDist.sample(predefined)
-    case delta: DeltaDist[A] => DeltaDist.sample(delta)
-    case normal: NormalDist[A] => NormalDist.sample(normal)
+    case numeric: NumericDist[A] => NumericDist.sample(numeric)
   }
 
   def pdf[A](dist: SmoothDist[A], a: A): Option[Double] = dist match {
     case predefined: PredefinedDist[A] => PredefinedDist.pdf(predefined, a)
-    case delta: DeltaDist[A] => DeltaDist.pdf(delta, a)
-    case normal: NormalDist[A] => NormalDist.pdf(normal, a)
+    case numeric: NumericDist[A] => NumericDist.pdf(numeric, a)
   }
 
 }

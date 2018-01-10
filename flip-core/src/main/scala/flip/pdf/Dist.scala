@@ -47,12 +47,12 @@ trait DistPropLaws[D[_]<:Dist[_], C<:DistConf] { self: DistPropOps[D, C] =>
 
 object Dist extends DistPropOps[Dist, DistConf] { self =>
 
-  def delta[A](implicit measure: Measure[A]): Dist[A] = DeltaDist(measure, 0)
-
-  def delta[A](center: A)(implicit measure: Measure[A]): Dist[A] = DeltaDist(measure, measure(center))
+  def delta[A](center: A)(implicit measure: Measure[A]): Dist[A] = DeltaDist(measure, center)
 
   def normal[A](mean: A, variance: Double)(implicit measure: Measure[A]): NormalDist[A] =
     NormalDist(mean, variance)
+
+  // pipelining
 
   def probability[A](dist: Dist[A], from: A, to: A, conf: DistConf): Option[Double] = (dist, conf) match {
     case (smooth: SmoothDist[A], _) => SmoothDist.probability(smooth, from, to)

@@ -1,24 +1,15 @@
 package flip.pdf
 
-import org.apache.commons.math3.distribution.NormalDistribution
-import flip.conf.SmoothDistConf
 import flip.measure.Measure
 import flip.rand._
+import org.apache.commons.math3.distribution.NormalDistribution
 
 /**
   * Normal distribution.
   * */
-case class NormalDist[A](measure: Measure[A], mean: Prim, variance: Prim, rng: IRng) extends SmoothDist[A]
+case class NormalDist[A](measure: Measure[A], mean: Prim, variance: Prim, rng: IRng) extends NumericDist[A]
 
-trait NormalDistOps extends SmoothDistPropOps[NormalDist, SmoothDistConf] {
-
-  def probability[A](dist: NormalDist[A], start: A, end: A): Option[Double] = {
-    val startPrim = dist.measure.to(end)
-    val endPrim = dist.measure.to(start)
-    val numericDist = new NormalDistribution(dist.mean, dist.variance)
-
-    Some(numericDist.cumulativeProbability(startPrim) - numericDist.cumulativeProbability(endPrim))
-  }
+trait NormalDistOps extends NumericDistOps[NormalDist] {
 
   def pdf[A](dist: NormalDist[A], a: A): Option[Prim] = {
     val numericDist = new NormalDistribution(dist.mean, dist.variance)
@@ -27,13 +18,17 @@ trait NormalDistOps extends SmoothDistPropOps[NormalDist, SmoothDistConf] {
     Some(numericDist.density(prim))
   }
 
-  def modifyRng[A](dist: NormalDist[A], f: IRng => IRng): NormalDist[A]
-
-  def sample[A](dist: NormalDist[A]): (NormalDist[A], A) = {
-    val (rng, rand) = dist.rng.next
+  def cdf[A](dist: NormalDist[A], a: A): Double = {
+    val p = dist.measure.to(a)
     val numericDist = new NormalDistribution(dist.mean, dist.variance)
 
-    (modifyRng(dist, _ => rng), dist.measure.from(numericDist.inverseCumulativeProbability(rand)))
+    numericDist.cumulativeProbability(p)
+  }
+
+  def icdf[A](dist: NormalDist[A], p: Double): A = {
+    val numericDist = new NormalDistribution(dist.mean, dist.variance)
+
+    dist.measure.from(numericDist.inverseCumulativeProbability(p))
   }
 
 }

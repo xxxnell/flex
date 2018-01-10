@@ -11,12 +11,10 @@ class DeltaDistSpec extends Specification with ScalaCheck {
   "DeltaDist" should {
 
     "sample" in {
-      implicit val deltaDistA: Arbitrary[DeltaDist[Double]] = DeltaDistGen.doubleDeltaDistA
+      val dist0 = NumericDist.delta(0d)
+      val (dist1, sample) = dist0.sample
 
-      prop { (dist0: DeltaDist[Double]) =>
-        val (dist1, sample) = dist0.sample
-        if(dist0.pole == sample) ok else ko
-      }.setArbitrary(deltaDistA)
+      if(dist0.pole == sample) ok else ko
     }
 
   }
@@ -27,7 +25,7 @@ object DeltaDistGen {
 
   def deltaDistGen[A](measure: Measure[A]): Gen[DeltaDist[A]] = for {
     mean <- Arbitrary.arbitrary[Double]
-  } yield DeltaDist(measure, mean)
+  } yield DeltaDist(measure, measure.from(mean))
 
   def doubleDeltaDistGen: Gen[DeltaDist[Double]] = deltaDistGen(doubleMeasure)
 

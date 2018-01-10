@@ -1,24 +1,35 @@
 package flip.pdf
 
-import flip.conf.SmoothDistConf
 import flip.measure.Measure
+import flip.rand._
 import flip.range._
 
 /**
   * Dirac Delta Function.
   */
-case class DeltaDist[A](measure: Measure[A], pole: Prim) extends SmoothDist[A]
+case class DeltaDist[A](measure: Measure[A], pole: A, rng: IRng = IRng(0)) extends NumericDist[A]
 
-trait DeltaDistOps extends SmoothDistPropOps[DeltaDist, SmoothDistConf] {
+trait DeltaDistOps extends NumericDistOps[DeltaDist] {
 
-  def probability[A](dist: DeltaDist[A], from: A, to: A): Option[Double] = {
-    if(RangeP(dist.measure.to(from), dist.measure.to(to)).contains(dist.pole)) Some(1) else Some(0)
+  def pdf[A](dist: DeltaDist[A], a: A): Option[Double] = {
+    val pole = dist.measure.to(dist.pole)
+
+    if(a != pole) Some(0) else Some(Double.PositiveInfinity)
   }
 
-  def pdf[A](dist: DeltaDist[A], a: A): Option[Double] = if(a != 0) Some(0) else None
+  def cdf[A](dist: DeltaDist[A], a: A): Double = {
+    val p = dist.measure.to(a)
+    val pole = dist.measure.to(dist.pole)
 
-  def sample[A](dist: DeltaDist[A]): (DeltaDist[A], A) = (dist, dist.measure.from(dist.pole))
+    if(p >= pole) 1 else 0
+  }
+
+  def icdf[A](dist: DeltaDist[A], p: Double): A = dist.pole
 
 }
 
-object DeltaDist extends DeltaDistOps
+object DeltaDist extends DeltaDistOps {
+
+  def modifyRng[A](dist: DeltaDist[A], f: IRng => IRng): DeltaDist[A] = DeltaDist(dist.measure, dist.pole, f(dist.rng))
+
+}

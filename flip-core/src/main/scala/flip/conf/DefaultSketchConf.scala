@@ -15,7 +15,7 @@ trait DefaultSketchConf
 
   val thresholdPeriod: Double = 100
 
-  val queueSize: Int = 100
+  val queueSize: Int = 50
 
   val cmap: UniformCmapConf = CmapConf.uniform(200, 10, Some(-1000d), Some(1000d))
 

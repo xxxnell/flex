@@ -10,7 +10,7 @@ trait DistMonad[D1[_]<:Dist[_], D2[_]<:Dist[_], D3[_]<:Dist[_], C<:DistConf]
   extends DistMonadLaws[D1, D2, D3, C]
     with DistFunctor[D1, C] {
 
-  def pure[A](a: A, measure: Measure[A]): Dist[A] = DeltaDist(measure, measure(a))
+  def pure[A](a: A, measure: Measure[A]): Dist[A] = DeltaDist(measure, a)
 
   def bind[A, B](dist: D1[A], f: A => D2[B], measureB: Measure[B], conf: C): D3[B]
 

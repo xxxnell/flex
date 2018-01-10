@@ -8,7 +8,7 @@ object BasicNormalDistExp {
 
   def main(args: Array[String]): Unit = {
     val expName1 = "basic-normal"
-    val sampleNo = 1000
+    val sampleNo = 300
     val start = 50
     val period = 100
     val minDomainCutoff = -10e10
@@ -20,7 +20,7 @@ object BasicNormalDistExp {
       counterSize = 1000, counterNo = 2
     )
     val sketch = Sketch.empty[Double]
-    val underlying = Dist.normal(0.1, 1)
+    val underlying = NumericDist.normal(0.0, 1)
     val (_, datas) = underlying.samples(sampleNo)
     val dataIdxs = datas.zipWithIndex
 
@@ -28,7 +28,7 @@ object BasicNormalDistExp {
     val idxUtdSketches: List[(Int, Sketch[Double])] = (0, sketch) :: dataIdxs.flatMap { case (data, idx) =>
       tempSketchO = tempSketchO.flatMap(_.update(data))
       tempSketchO.map(tempSketch => (idx + 1, tempSketch))
-    }.filter { case (idx, _) => (idx - start) % period == 0 || (idx - start + 1) % period == 0 }
+    }.filter { case (idx, _) => idx % 10 == 0 }
     val idxDensityPlots = idxUtdSketches.flatMap { case (idx, utdSkt) => utdSkt.densityPlot.map(plot => (idx, plot)) }
     val idxKldPlot = idxUtdSketches.flatMap { case (idx, utdSkt) =>
       for {
