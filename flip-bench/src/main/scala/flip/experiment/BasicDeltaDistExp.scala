@@ -26,7 +26,7 @@ object BasicDeltaDistExp {
     val plots = idxUtdSketches.flatMap { case (idx, utdSkt) => utdSkt.densityPlot.map(plot => (idx, plot)) }
 
     ExpOutOps.clear(expName)
-    ExpOutOps.writePlots(expName, plots)
+    ExpOutOps.writePlots(expName, "pdf", plots)
   }
 
 }

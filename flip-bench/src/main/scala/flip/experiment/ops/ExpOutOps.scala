@@ -14,9 +14,13 @@ object ExpOutOps {
 
   def clear(name: String): Unit = clear(defaultPath, name)
 
+  def writeStr(name: String, affix: String, str: String): Unit =
+    writeStr(defaultPath, name, affix, str)
+
   def writePlot(name: String, affix: String, plot: Plot): Unit =
     writePlot(defaultPath, name, affix, plot)
 
+  @deprecated
   def writePlots(name: String, plots: List[(Int, Plot)]): Unit =
     writePlotsForDetails(defaultPath, name, plots)
 
@@ -30,20 +34,21 @@ object ExpOutOps {
     new File(s"$path/$name").delete()
   }.getOrElse(())
 
-  def writePlot(path: String, name: String, affix: String, plot: Plot): Unit = {
-    // create fs
+  def writeStr(path: String, name: String, affix: String, c: String): Unit = {
     val f = new File(s"$path/$name/$name-$affix.out")
     f.getParentFile.getParentFile.mkdirs()
     f.getParentFile.mkdirs()
     val fs = new FileOutputStream(f)
 
-    // plot -> str
+    fs.write(c.getBytes("UTF-8"))
+    fs.close()
+  }
+
+  def writePlot(path: String, name: String, affix: String, plot: Plot): Unit = {
     val records = plot.records.map { case (range, value) => range.start :: range.end :: value :: Nil }
     val recordsStr = records.map(_.mkString(", ")).mkString("\n")
 
-    // write
-    fs.write(recordsStr.getBytes("UTF-8"))
-    fs.close()
+    writeStr(path, name, affix, recordsStr)
   }
 
   def writePlotsForDetails(path: String, name: String, plots: List[(Int, Plot)]): Unit = {
@@ -59,6 +64,5 @@ object ExpOutOps {
       writePlot(path, name, s"$subname-$idx", plot)
     }
   }
-
 
 }
