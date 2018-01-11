@@ -44,9 +44,11 @@ println(utdSketch.probability(0, 1))
 
 Here are some results for typical probability distributions: normal, log-normal, and pareto.
 
-![density estimation for normal distribution](./flip-docs/resources/basic-normal.pdf)
-![density estimation for log-normal distribution](./flip-docs/resources/basic-lognormal.pdf)
-![density estimation for pareto distribution](./flip-docs/resources/basic-pareto.pdf)
+![density estimation for normal distribution](./flip-docs/resources/basic-normal.png)
+
+![density estimation for log-normal distribution](./flip-docs/resources/basic-lognormal.png)
+
+![density estimation for pareto distribution](./flip-docs/resources/basic-pareto.png)
 
 For more example, see [`flip-bench/src/main/scala/flip/experiment`](https://github.com/xxxnell/flip/tree/develop/flip-bench/src/main/scala/flip/experiment).
 
