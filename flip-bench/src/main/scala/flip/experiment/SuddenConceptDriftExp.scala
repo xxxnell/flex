@@ -54,9 +54,9 @@ object SuddenConceptDriftExp {
     }
 
     ExpOutOps.clear(expName1)
-    ExpOutOps.writePlots(expName1, idxDensityPlots)
-    ExpOutOps.writePlots(expName1, "kld", idxKldPlot)
-    println(s"KLD Trend for $expName1: $idxKld")
+    ExpOutOps.writePlots(expName1, "pdf", idxDensityPlots)
+    ExpOutOps.writePlots(expName1, "kld-density", idxKldPlot)
+    ExpOutOps.writeStr(expName1, "kld", idxKld.map{ case (idx, kld) => s"$idx, $kld" }.mkString("\n"))
   }
 
 }
