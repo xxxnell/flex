@@ -1,12 +1,12 @@
 package flip.plot
 
-import org.apache.commons.math3.fitting.{PolynomialCurveFitter, WeightedObservedPoints}
-import flip.RangeP
 import flip.pdf.Prim
+import flip.plot.syntax._
 import flip.range._
 import flip.range.syntax._
-import flip.plot.syntax._
+import org.apache.commons.math3.fitting.{PolynomialCurveFitter, WeightedObservedPoints}
 
+import scala.collection.immutable.TreeMap
 import scala.language.postfixOps
 import scala.math._
 import scala.util.Try
@@ -17,6 +17,9 @@ import scala.util.Try
 trait Plot {
 
   def records: List[Record]
+
+  val middleIndex: TreeMap[Prim, Int] =
+    TreeMap.apply(records.map { case (range, _) => range.middle }.zipWithIndex: _*)
 
   override def toString: String = {
     val recordsStr = records.map { case (range, value) => s"$range -> $value" }.mkString(", ")
@@ -52,8 +55,20 @@ trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
   def interpolation(plot: P, x: Double): Double = {
     val dataRefSize = 2
 
-    val midInterp = plot.records.sliding(dataRefSize)
-      .find { records => records.headOption.forall(_._1 <= x) && records.lastOption.forall(_._1 >= x) }
+//    functional midRecords: refined but slow
+//    val midRecordsO1 = plot.records.sliding(dataRefSize)
+//      .find { records => records.headOption.forall(_._1 <= x) && records.lastOption.forall(_._1 >= x) }
+
+    val midRecordsO2 = {
+      val toIndex = plot.middleIndex.to(x)
+      val fromIndex = plot.middleIndex.from(x)
+      if(toIndex.nonEmpty && fromIndex.nonEmpty) {
+        Some(plot.records.apply(plot.middleIndex.to(x).last._2) ::
+          plot.records.apply(plot.middleIndex.from(x).head._2) :: Nil)
+      } else None
+    }
+
+    val midInterp = midRecordsO2
       .map(records => records.map { case (range, value) => (range.middle, value) })
       .flatMap { datas => dataFitting(datas, x) }
 
