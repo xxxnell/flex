@@ -3,7 +3,6 @@ package flip.benchmark
 import java.util.concurrent.TimeUnit
 
 import org.openjdk.jmh.annotations._
-import flip.benchmark.ops.SketchBenchOps._
 import flip._
 import flip.cmap.Cmap
 import flip.hcounter.HCounter
@@ -91,17 +90,6 @@ class SketchOpsBench {
     )
 
     sketch.flatMap(a => Dist.delta(a))
-  }
-
-  @Benchmark
-  def update: Option[Sketch[Double]] = {
-    implicit val conf: SketchConf = SketchConf(
-      startThreshold = 50, thresholdPeriod = 100,
-      cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = Some(-10d), cmapEnd = Some(10d),
-      counterSize = counterSize, counterNo = counterNo
-    )
-
-    updateBench(sketch, defaultSignals, 1)
   }
 
   @Benchmark

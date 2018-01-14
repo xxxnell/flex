@@ -5,10 +5,9 @@ import java.util.concurrent.TimeUnit
 import flip._
 import org.openjdk.jmh.annotations._
 import org.openjdk.jmh.infra.Blackhole
-import flip.benchmark.ops.SketchBenchOps._
 
 @BenchmarkMode(Array(Mode.AverageTime))
-@OutputTimeUnit(TimeUnit.MICROSECONDS)
+@OutputTimeUnit(TimeUnit.NANOSECONDS)
 @State(Scope.Thread)
 class IterateBench {
 
@@ -21,7 +20,7 @@ class IterateBench {
   @Param(Array("200"))
   var cmapSize: Int = _
 
-  @Param(Array("2"))
+  @Param(Array("3"))
   var counterNo: Int = _
 
   @Param(Array("70"))
@@ -41,8 +40,16 @@ class IterateBench {
   }
 
   @Benchmark
-  def iterate(bh: Blackhole) {
-    bh.consume(updateBench(sketch, defaultSignals, iterateBenchSize))
+  def iterate(bh: Blackhole): Unit = bh.consume {
+    val n = iterateBenchSize
+    val signals = List.fill(n)(0)
+
+    var i = 0
+    var sketchO: Option[Sketch[Double]] = Some(sketch)
+    while (i < n) {
+      sketchO = sketchO.flatMap(sketch => sketch.update(signals(i)))
+      i += 1
+    }
   }
 
 }
