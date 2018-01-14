@@ -2,6 +2,7 @@ package flip.range
 
 import flip.measure.Measure
 import flip.pdf.Prim
+import flip.range.syntax._
 
 import scala.collection.immutable.NumericRange
 import scala.language.{higherKinds, implicitConversions}
@@ -98,6 +99,21 @@ object RangeM extends RangeMOps[RangeM] {
 
   def bare[A](start: A, end: A, measure: Measure[A]): RangeM[A] = {
     if(measure(start) < measure(end)) RangeMImpl(start, end, measure) else RangeMImpl(end, start, measure)
+  }
+
+  override def greater[A](range: RangeM[A], a: A): Boolean = (range, a) match {
+    case (range: RangeP, a: Prim) => RangeP.greater(range, a)
+    case _ => super.greater(range, a)
+  }
+
+  override def less[A](range: RangeM[A], a: A): Boolean = (range, a) match {
+    case (range: RangeP, a: Prim) => RangeP.less(range, a)
+    case _ => super.less(range, a)
+  }
+
+  override def contains[A](range: RangeM[A], a: A): Boolean = (range, a) match {
+    case (range: RangeP, a: Prim) => RangeP.contains(range, a)
+    case _ => super.contains(range, a)
   }
 
 }

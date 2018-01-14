@@ -39,6 +39,16 @@ trait RangePOps extends RangeMOps[GenericRangeP] {
   def modifyMeasure[A](range: RangeP, measure: Measure[A]): RangeM[A] =
     RangeM(measure.from(range.start), measure.from(range.end))(measure)
 
+  def greater[A](range: RangeP, a: Prim): Boolean = range.start > a
+
+  def less[A](range: RangeP, a: Prim): Boolean = range.end < a
+
+  def contains[A](range: RangeP, a: Prim): Boolean = containsP(range.start, range.end, a)
+
+  def geq(range: RangeP, a: Prim): Boolean = greater(range, a) || contains(range, a)
+
+  def leq(range: RangeP, a: Prim): Boolean = less(range, a) || contains(range, a)
+
 }
 
 trait RangePSyntax {
