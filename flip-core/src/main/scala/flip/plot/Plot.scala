@@ -6,7 +6,8 @@ import flip.range._
 import flip.range.syntax._
 import org.apache.commons.math3.fitting.{PolynomialCurveFitter, WeightedObservedPoints}
 
-import scala.collection.immutable.TreeMap
+import scala.collection.immutable.{TreeMap, TreeSet}
+import scala.collection.mutable
 import scala.language.postfixOps
 import scala.math._
 import scala.util.Try
@@ -59,16 +60,16 @@ trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
 //    val midRecordsO1 = plot.records.sliding(dataRefSize)
 //      .find { records => records.headOption.forall(_._1 <= x) && records.lastOption.forall(_._1 >= x) }
 
-    val midRecordsO2 = {
+    val midRecordsO = {
       val toIndex = plot.middleIndex.to(x)
       val fromIndex = plot.middleIndex.from(x)
       if(toIndex.nonEmpty && fromIndex.nonEmpty) {
-        Some(plot.records.apply(plot.middleIndex.to(x).last._2) ::
-          plot.records.apply(plot.middleIndex.from(x).head._2) :: Nil)
+        Some(plot.records.apply(toIndex.last._2) ::
+          plot.records.apply(fromIndex.head._2) :: Nil)
       } else None
     }
 
-    val midInterp = midRecordsO2
+    val midInterp = midRecordsO
       .map(records => records.map { case (range, value) => (range.middle, value) })
       .flatMap { datas => dataFitting(datas, x) }
 
@@ -105,15 +106,20 @@ trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
 
     if(y1 == y2) y1
     else if(!x1.isInfinity && !x2.isInfinity) {
-      val (x1B, y1B) = (BigDecimal(x1), BigDecimal(y1))
-      val (x2B, y2B) = (BigDecimal(x2), BigDecimal(y2))
+      if (x2 != x1) {
+        val slope = {
+          val _slope = (y2 - y1) / (x2 - x1)
+          if(_slope.isNaN) {
+            (y2 / x2 - y1 / x2) / (1 - x1 / x2)
+          } else _slope
+        }
+        val c = y1 - slope * x1
 
-      if (x2B != x1B) {
-        val slope = (y2B - y1B) / (x2B - x1B)
-        val c = y1B - slope * x1B
-
-        (slope * x + c).toDouble
-      } else ((y1B + y2B) / 2).toDouble // todo throw an exception when x is not sim to x1B
+        slope * x + c
+      } else {
+        y1 + (y2 - y1) / 2
+      }
+      // todo throw an exception when x is not sim to x1B
     } else throw new IllegalArgumentException(s"Can't linear interpolat with: ${(x1, y1)}, ${(x2, y2)}")
   }
 
@@ -132,8 +138,8 @@ trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
     * e.g. {[0..2] -> 1, [1..3] -> 2} => {[0..1] -> {split(1)}, [1..2] -> {split(1), split(2)}, [2..3] -> split(2)}
     * */
   def planarizeRecords(records: List[Record]): List[(RangeP, List[Double])] = {
-    val boundaries: Vector[Double] =
-      records.flatMap { case (range, _) => range.start :: range.end :: Nil }.sorted.toVector
+    val boundaries: TreeSet[Double] =
+      TreeSet(records.flatMap { case (range, _) => range.start :: range.end :: Nil }: _*)
 
     records
       .flatMap { record => planarizeRecord(record, boundaries) }
@@ -143,9 +149,9 @@ trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
       .sortBy { case (range, _) => range.start }
   }
 
-  def planarizeRecord(record: Record, boundaries: Vector[Double]): List[Record] = {
+  def planarizeRecord(record: Record, boundaries: TreeSet[Double]): List[Record] = {
     val (_, planarized) = boundaries
-      .filter(b => record._1.start < b && record._1.end > b)
+      .from(record._1.start).to(record._1.end)
       .foldRight((record, List.empty[Record])){ case (b, (rem, acc)) =>
         split(rem, b).fold((rem, acc)){ case (rec1, rec2) => (rec1, rec2 :: acc) }
       }

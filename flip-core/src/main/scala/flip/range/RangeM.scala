@@ -48,7 +48,7 @@ trait RangeMOps[R[_]<:RangeM[_]] {
   def middleP[A](start: Prim, end: Prim): Prim = {
     if(start == Double.NegativeInfinity && end == Double.NegativeInfinity) Double.NegativeInfinity
     else if(start == Double.PositiveInfinity && end == Double.PositiveInfinity) Double.PositiveInfinity
-    else ((BigDecimal(start) + BigDecimal(end)) / 2).toDouble
+    else start + ((end - start) / 2)
   }
 
   def middle[A](range: R[A]): A =
@@ -59,6 +59,13 @@ trait RangeMOps[R[_]<:RangeM[_]] {
   def isPoint(range: R[_]): Boolean = if(range.start == range.end) true else false
 
   def length[A](range: R[A]): BigDecimal = BigDecimal(primEnd(range)) - BigDecimal(primStart(range))
+
+  def roughLength[A](range: R[A]): Double = {
+    val roughLength = primEnd(range) - primStart(range)
+    if(roughLength.isPosInfinity) Double.MaxValue
+    else if(roughLength.isNegInfinity) Double.MinValue
+    else roughLength
+  }
 
 }
 

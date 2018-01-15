@@ -1,13 +1,12 @@
 package flip.hcounter
 
-import cats.implicits._
 import flip.conf.CounterConf
-import flip.counter.{CDim, Counter}
-import flip.hcounter.HCounter.width
+import flip.counter.Counter
 import flip.hmap.{HDim, Hmap}
 import flip.pdf.Count
 
 import scala.util.hashing.byteswap32
+import cats.implicits._
 
 trait HCounter {
 
@@ -36,14 +35,18 @@ trait HCounterOps[HC<:HCounter] {
   def updates(hc: HCounter, as: List[(HDim, Count)]): Option[HCounter] =
     as.foldLeft(Option(hc)) { case (hcO, (hdim, count)) => hcO.flatMap(hc => hc.update(hdim, count)) }
 
-  def get(hc: HCounter, hdim: HDim): Option[Double] = for {
-    counts <- hc.structures.traverse { case (hmap, counter) =>
-      for {
-        cdim <- hmap(hdim, counter.size)
-        aa <- counter.get(cdim)
-      } yield aa
+  def get(hc: HCounter, hdim: HDim): Option[Double] = {
+    var i = 0
+    var count = 0.0
+    while (i < hc.structures.length) {
+      val (hmap, counter) = hc.structures.apply(i)
+      val cdim = hmap.apply(hdim, counter.cs.size).getOrElse(-1)
+      val singleCount = Counter.get(counter, cdim).getOrElse(0.0)
+      count = if (count < singleCount) count else singleCount
+      i += 1
     }
-  } yield counts.min
+    Some(count)
+  }
 
   def sum(hc: HCounter): Double = hc.sum
 

@@ -1,5 +1,6 @@
 package flip.pdf
 
+import flip.time
 import flip.cmap.Cmap
 import flip.hcounter.HCounter
 import flip.hmap.HDim
@@ -12,6 +13,8 @@ import flip.range.syntax._
 
 import scala.language.{higherKinds, postfixOps}
 import cats.implicits._
+
+import scala.collection.mutable.ListBuffer
 
 /**
   * This Ops introduces the update function with primitive type as a parameter.
@@ -53,13 +56,13 @@ trait SketchPrimPropOps[S[_]<:Sketch[_], C<:SketchConf]
     * Deep update a list of primitive value <code>p</code> instead of <code>a</code> ∈ <code>A</code>
     * */
   def primDeepUpdate[A](sketch: S[A], ps: List[(Prim, Count)], conf: C): Option[(S[A], Option[Structure])] = for {
-    utdCmap <- EqualSpaceCdfUpdate.updateCmap(sketch, ps, conf.cmap.size, conf.mixingRatio, conf.dataKernelWindow)
+    utdCmap <- time(EqualSpaceCdfUpdate.updateCmap(sketch, ps, conf.cmap.size, conf.mixingRatio, conf.dataKernelWindow, conf), "updateCmap", false) // 2E7
     seed = ((sum(sketch, conf) + ps.headOption.map(_._1).getOrElse(-1d)) * 1000).toInt
     emptyCounter = HCounter.emptyForConf(conf.counter, seed)
     (utdStrs, oldStrs) = ((utdCmap, emptyCounter) :: sketch.structures).splitAt(conf.cmap.no)
     oldStrO = oldStrs.headOption
     utdSketch1 <- modifyStructure(sketch, _ => Some(utdStrs))
-    smoothPs = EqualSpaceCdfUpdate.smoothingPsForEqualSpaceCumulative(ps)
+    smoothPs = time(EqualSpaceCdfUpdate.smoothingPsForEqualSpaceCumulative(ps), "smoothingPsForEqualSpaceCumulative", false) // 4E4
     utdSketch2 <- if(smoothPs.nonEmpty) primNarrowPlotUpdateForStr(utdSketch1, smoothPs, conf) else Some(utdSketch1)
   } yield (utdSketch2, oldStrO)
 
@@ -78,6 +81,7 @@ trait SketchPrimPropOps[S[_]<:Sketch[_], C<:SketchConf]
     val midCountO: Option[Double] = midRangeO.map { case (midStart, midEnd) => hcounter.count(midStart, midEnd) }
       .getOrElse(Option(0d))
 
+    // boundary count
     val boundaryCountO = if(startHdim == endHdim) {
       for {
         count <- hcounter.get(startHdim)
@@ -85,25 +89,36 @@ trait SketchPrimPropOps[S[_]<:Sketch[_], C<:SketchConf]
       } yield count * percent
     } else {
       for {
-        startCount <- hcounter.get(startHdim)
+        startCount <- HCounter.get(hcounter, startHdim)
         startPercent = startRng.overlapPercent(RangeP(pStart, startRng.end))
-        endCount <- hcounter.get(endHdim)
+        endCount <- HCounter.get(hcounter, endHdim)
         endPercent = endRng.overlapPercent(RangeP(endRng.start, pEnd))
       } yield startCount * startPercent + endCount * endPercent
     }
 
     for {
-      boundartCount <- boundaryCountO
       midCount <- midCountO
+      boundartCount <- boundaryCountO
     } yield midCount + boundartCount
   }
 
   def primCountForStr(sketch: S[_], pFrom: Prim, pTo: Prim, conf: C): Option[Double] = {
-    val countsO = sketch.structures.traverse { case (cmap, hcounter) => singleCount(cmap, hcounter, pFrom, pTo) }
+//    val countsO = sketch.structures.traverse { case (cmap, hcounter) => singleCount(cmap, hcounter, pFrom, pTo) }
 
-    val decayRates = (0 until conf.cmap.no)
+    val countsO: Option[List[Double]] = {
+      var i =0
+      val listb = new ListBuffer[Double]()
+      while(i < sketch.structures.size) {
+        val (cmap, hcounter) = sketch.structures.apply(i)
+        val count = singleCount(cmap, hcounter, pFrom, pTo).getOrElse(0.0)
+        listb.append(count)
+        i += 1
+      }
+      Some(listb.toList)
+    }
+
+    val decayRates = (0 until countsO.map(_.size).getOrElse(0))
       .map(i => decayRate(conf.decayFactor, i))
-      .take(countsO.map(_.size).getOrElse(0))
     val weightedCountSumO = countsO.map(counts => (counts zip decayRates).map { case (count, r) => count * r }.sum)
     val normalization = decayRates.sum
 

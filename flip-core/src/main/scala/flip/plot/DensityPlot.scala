@@ -1,7 +1,8 @@
 package flip.plot
 
 import flip.pdf._
-import flip.range.RangeP
+import flip.range._
+import flip.range.syntax._
 import flip.plot.syntax._
 
 trait DensityPlot extends Plot
@@ -23,7 +24,7 @@ trait DensityPlotOps extends PlotOps[DensityPlot] {
     modifyRecords(plot, (records: List[Record]) => {
       val utdRecord = records.flatMap { case (range, value) =>
         val startVal = accVal
-        val endVal = (accVal + value * range.length).toDouble
+        val endVal = accVal + value * range.roughLength
         accVal = endVal
         (RangeP.point(range.start), startVal) :: (RangeP.point(range.end), endVal) :: Nil
       }
@@ -65,8 +66,9 @@ object DensityPlot extends DensityPlotOps {
 
   def disjoint(records: List[Record]): DensityPlot = modifyRecords(empty, _ => records)
 
-  def modifyRecords(plot: DensityPlot, f: List[Record] => List[Record]): DensityPlot =
+  def modifyRecords(plot: DensityPlot, f: List[Record] => List[Record]): DensityPlot = {
     bare(planarizeRecords(f(plot.records)).flatMap { case (range, values) => values.map(value => (range, value)) })
+  }
 
   def modifyValue(plot: DensityPlot, f: Record => Double): DensityPlot =
     bare(plot.records.map(record => (record._1, f(record))))

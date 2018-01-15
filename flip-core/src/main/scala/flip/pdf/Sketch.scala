@@ -1,15 +1,16 @@
 package flip.pdf
 
+import flip._
 import flip.cmap.Cmap
 import flip.conf.{AdaptiveSketchConf, PeriodicSketchConf, SketchConf}
 import flip.hcounter.HCounter
 import flip.measure.Measure
 import flip.plot.DensityPlot
+import flip.range.{RangeM, RangeP}
 
 import scala.language.higherKinds
 import scala.util.Try
 import cats.implicits._
-import flip.range.{RangeM, RangeP}
 
 /**
   * Sketch provides
@@ -54,7 +55,7 @@ trait SketchPropOps[S[_]<:Sketch[_], C<:SketchConf]
 
 trait SketchPropLaws[S[_]<:Sketch[_], C<:SketchConf] { self: SketchPropOps[S, C] =>
 
-  def flatDensity: Double = (BigDecimal(1) / RangeP(Cmap.max, Cmap.min).length).toDouble
+  def flatDensity: Double = (1 / Cmap.max) * (1 / (1 - Cmap.min / Cmap.max))
 
   def probability[A](sketch: S[A], start: A, end: A, conf: C): Option[Double] = for {
     count <- count(sketch, start, end, conf)
@@ -66,7 +67,8 @@ trait SketchPropLaws[S[_]<:Sketch[_], C<:SketchConf] { self: SketchPropOps[S, C]
   def sampling[A](sketch: S[A], conf: C): Option[DensityPlot] = for {
     cmap <- youngCmap(sketch)
     rangePs = cmap.bin
-    rangeMs = rangePs.map(rangeP => rangeP.modifyMeasure(sketch.measure.asInstanceOf[Measure[A]]))
+    measure = sketch.measure.asInstanceOf[Measure[A]]
+    rangeMs = rangePs.map(rangeP => rangeP.modifyMeasure(measure))
     sampling <- samplingForRanges(sketch, rangeMs, conf)
   } yield sampling
 

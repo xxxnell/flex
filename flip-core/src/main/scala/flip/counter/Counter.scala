@@ -7,7 +7,7 @@ import scala.util.Try
   */
 trait Counter {
 
-  def cs: Seq[Double]
+  def cs: List[Double]
 
 }
 
