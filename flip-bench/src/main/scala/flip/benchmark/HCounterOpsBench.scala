@@ -12,7 +12,7 @@ import scala.util.Random
 @State(Scope.Thread)
 class HCounterOpsBench {
 
-  @Param(Array("1", "30"))
+  @Param(Array("2", "30"))
   var counterNo: Int = _
 
   @Param(Array("1000", "100000"))
@@ -50,10 +50,8 @@ class HCounterOpsBench {
 
   @Benchmark
   def count: Option[Double] = {
-    val dim1 = 1
-    val dim2 = 3
-    val range = if(dim2 > dim1) (dim1, dim2) else (dim2, dim1)
-    hcounter.count(range._1, range._2)
+    val (dim1, dim2) = (1, 3)
+    hcounter.count(dim1, dim2)
   }
 
 }

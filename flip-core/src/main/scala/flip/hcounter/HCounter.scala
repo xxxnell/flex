@@ -1,13 +1,12 @@
 package flip.hcounter
 
-import cats.implicits._
 import flip.conf.CounterConf
-import flip.counter.{CDim, Counter}
-import flip.hcounter.HCounter.width
+import flip.counter.Counter
 import flip.hmap.{HDim, Hmap}
 import flip.pdf.Count
 
 import scala.util.hashing.byteswap32
+import cats.implicits._
 
 trait HCounter {
 
@@ -28,29 +27,38 @@ trait HCounterOps[HC<:HCounter] {
     updated <- hc.structures.traverse { case (hmap, counter) =>
       for {
         cdim <- hmap.apply(hdim, counter.size)
-        counter2 <- counter.update(cdim, count)
-      } yield (hmap, counter2)
+        utdCounter <- counter.update(cdim, count)
+      } yield (hmap, utdCounter)
     }
   } yield HCounter(updated, hc.sum + count)
 
   def updates(hc: HCounter, as: List[(HDim, Count)]): Option[HCounter] =
     as.foldLeft(Option(hc)) { case (hcO, (hdim, count)) => hcO.flatMap(hc => hc.update(hdim, count)) }
 
-  def get(hc: HCounter, hdim: HDim): Option[Double] = for {
-    counts <- hc.structures.traverse { case (hmap, counter) =>
-      for {
-        cdim <- hmap(hdim, counter.size)
-        aa <- counter.get(cdim)
-      } yield aa
+  def get(hc: HCounter, hdim: HDim): Option[Double] = {
+    var i = 0
+    var count = Double.PositiveInfinity
+    while (i < hc.structures.length) {
+      val (hmap, counter) = hc.structures.apply(i)
+      val cdim = hmap.apply(hdim, counter.counts.size).getOrElse(-1)
+      val singleCount = Counter.get(counter, cdim).getOrElse(0.0)
+      count = if (count < singleCount) count else singleCount
+      i += 1
     }
-  } yield counts.min
+
+    if(!count.isPosInfinity) Some(count) else None
+  }
 
   def sum(hc: HCounter): Double = hc.sum
 
-  def count(hc: HCounter, from: HDim, to: HDim): Option[Double] = {
-    (from to to).toList
-      .traverse(hdim => get(hc, hdim))
-      .map(_.sum)
+  def count(hc: HCounter, start: HDim, end: HDim): Option[Double] = {
+    var hdim = start
+    var sum = 0.0
+    while(hdim <= end) {
+      sum += get(hc, hdim).getOrElse(0.0)
+      hdim += 1
+    }
+    Some(sum)
   }
 
   def depth(hc: HCounter): Int = hc.structures.size

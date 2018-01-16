@@ -2,16 +2,21 @@ package flip.hmap
 
 import flip.counter.CDim
 
-import scala.util.Try
 import scala.util.hashing.byteswap32
 
 class Byteswap32Hmap(seed: Int) extends Hmap {
 
   val hseed: Int = byteswap32(seed)
 
-  def apply(hdim: HDim, size: Int): Option[CDim] = if(size > 0) {
-    Try(Math.abs(byteswap32(hseed + hdim)) % size).toOption
-  } else None
+  def apply(hdim: HDim, size: Int): Option[CDim] = {
+    try {
+      if(size > 0) Some(Math.abs(byteswap32(hseed + hdim)) % size) else None
+    } catch {
+      case _: Exception => None
+    }
+  }
+
+  override def toString: String = s"Byteswap32Hmap(seed -> $seed)"
 
 }
 

@@ -19,7 +19,7 @@ object BenchOutOps {
     }
 
     def writeRes(fs: FileOutputStream): Unit = {
-      def records2b(records: List[String]): Array[Byte] = (records.mkString("\t") + "\n").getBytes("UTF-8")
+      def records2b(records: List[String]): Array[Byte] = (records.mkString(", ") + "\n").getBytes("UTF-8")
 
       fs.write(records2b(RecordOps.recordLabels))
       results.foreach { result: RunResult => fs.write(records2b(RecordOps.records(result))) }
@@ -44,7 +44,7 @@ object BenchOutOps {
 
     def metadata2Records(params: BenchmarkParams): List[String] = {
       params.getBenchmark ::
-        metadata2Params(params).mkString(", ") ::
+        metadata2Params(params).mkString(" & ") ::
         Nil
     }
 

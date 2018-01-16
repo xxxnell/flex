@@ -1,15 +1,18 @@
 package flip.pdf
 
+import flip._
 import flip.cmap.Cmap
 import flip.conf.{AdaptiveSketchConf, PeriodicSketchConf, SketchConf}
 import flip.hcounter.HCounter
 import flip.measure.Measure
 import flip.plot.DensityPlot
+import flip.range.{RangeM, RangeP}
 
 import scala.language.higherKinds
 import scala.util.Try
 import cats.implicits._
-import flip.range.{RangeM, RangeP}
+
+import scala.collection.mutable.ListBuffer
 
 /**
   * Sketch provides
@@ -54,28 +57,31 @@ trait SketchPropOps[S[_]<:Sketch[_], C<:SketchConf]
 
 trait SketchPropLaws[S[_]<:Sketch[_], C<:SketchConf] { self: SketchPropOps[S, C] =>
 
-  def flatDensity: Double = (BigDecimal(1) / RangeP(Cmap.max, Cmap.min).length).toDouble
+  def flatDensity: Double = (1 / Cmap.max) * (1 / (1 - Cmap.min / Cmap.max))
 
   def probability[A](sketch: S[A], start: A, end: A, conf: C): Option[Double] = for {
     count <- count(sketch, start, end, conf)
     sum = self.sum(sketch, conf)
     measure = sketch.measure.asInstanceOf[Measure[A]]
-    flatProb = (flatDensity * RangeM.bare(start, end, measure).length).toDouble
+    flatProb = flatDensity * RangeM.bare(start, end, measure).roughLength
   } yield if(sum > 0) count / sum else flatProb
 
   def sampling[A](sketch: S[A], conf: C): Option[DensityPlot] = for {
     cmap <- youngCmap(sketch)
     rangePs = cmap.bin
-    rangeMs = rangePs.map(rangeP => rangeP.modifyMeasure(sketch.measure.asInstanceOf[Measure[A]]))
+    measure = sketch.measure.asInstanceOf[Measure[A]]
+    rangeMs = rangePs.map(rangeP => rangeP.modifyMeasure(measure))
     sampling <- samplingForRanges(sketch, rangeMs, conf)
   } yield sampling
 
-  def samplingForRanges[A](sketch: S[A], ranges: List[RangeM[A]], conf: C): Option[DensityPlot] = for {
-    rangeProbs <- ranges.traverse(range => probability(sketch, range.start, range.end, conf).map(prob => (range, prob)))
-    rangeDensities = rangeProbs
-      .map { case (rangeM, prob) => (RangeP.forRangeM(rangeM), Try(prob / rangeM.length).toOption) }
-      .flatMap { case (range, densityO) => densityO.map(density => (range, density.toDouble)) }
-  } yield DensityPlot.disjoint(rangeDensities)
+  def samplingForRanges[A](sketch: S[A], ranges: List[RangeM[A]], conf: C): Option[DensityPlot] = {
+    for {
+      rangeProbs <- ranges.traverse(range => probability(sketch, range.start, range.end, conf).map(prob => (range, prob)))
+      rangeDensities = rangeProbs
+        .map { case (rangeM, prob) => (RangeP.forRangeM(rangeM), Try(prob / rangeM.length).toOption) }
+        .flatMap { case (range, densityO) => densityO.map(density => (range, density.toDouble)) }
+    } yield DensityPlot.disjoint(rangeDensities)
+  }
 
   def fastPdf[A](sketch: S[A], a: A, conf: C): Option[Double] = for {
     cmap <- youngCmap(sketch)
@@ -111,7 +117,7 @@ trait SketchPropLaws[S[_]<:Sketch[_], C<:SketchConf] { self: SketchPropOps[S, C]
   } yield cmap
 
   def conf2Structures(conf: C): Structures =
-    List((Cmap(conf.cmap), HCounter(conf.counter, -1)))
+    (Cmap(conf.cmap), HCounter(conf.counter, -1)) :: Nil
 
 }
 
@@ -146,16 +152,6 @@ object Sketch extends SketchPrimPropOps[Sketch, SketchConf] { self =>
   }
 
   // overrides
-
-  override def probability[A](sketch: Sketch[A], start: A, end: A, conf: SketchConf): Option[Count] = (sketch, conf) match {
-    case (sketch: AdaptiveSketch[A], conf: AdaptiveSketchConf) => AdaptiveSketch.probability(sketch, start, end, conf)
-    case _ => super.probability(sketch, start, end, conf)
-  }
-
-  override def sampling[A](sketch: Sketch[A], conf: SketchConf): Option[DensityPlot] = (sketch, conf) match {
-    case (sketch: AdaptiveSketch[A], conf: AdaptiveSketchConf) => AdaptiveSketch.sampling(sketch, conf)
-    case _ => super.sampling(sketch, conf)
-  }
 
   override def count[A](sketch: Sketch[A], start: A, end: A, conf: SketchConf): Option[Count] = (sketch, conf) match {
     case (sketch: AdaptiveSketch[A], conf: AdaptiveSketchConf) => AdaptiveSketch.count(sketch, start, end, conf)

@@ -18,7 +18,7 @@ trait RangeM[A] {
     val otherR = other.asInstanceOf[RangeM[A]]
 
     start == otherR.start &&
-    measure.to(start) == otherR.measure.to(otherR.start)
+    measure.to(start) == otherR.measure.to(otherR.start) &&
     end == otherR.end &&
     measure.to(end) == otherR.measure.to(otherR.end)
   }
@@ -48,7 +48,7 @@ trait RangeMOps[R[_]<:RangeM[_]] {
   def middleP[A](start: Prim, end: Prim): Prim = {
     if(start == Double.NegativeInfinity && end == Double.NegativeInfinity) Double.NegativeInfinity
     else if(start == Double.PositiveInfinity && end == Double.PositiveInfinity) Double.PositiveInfinity
-    else ((BigDecimal(start) + BigDecimal(end)) / 2).toDouble
+    else start + ((end - start) / 2)
   }
 
   def middle[A](range: R[A]): A =
@@ -58,7 +58,16 @@ trait RangeMOps[R[_]<:RangeM[_]] {
 
   def isPoint(range: R[_]): Boolean = if(range.start == range.end) true else false
 
-  def length[A](range: R[A]): BigDecimal = BigDecimal(primEnd(range)) - BigDecimal(primStart(range))
+  def length[A](range: R[A]): BigDecimal = {
+    BigDecimal(primEnd(range)) - BigDecimal(primStart(range))
+  }
+
+  def roughLength[A](range: R[A]): Double = {
+    val roughLength = primEnd(range) - primStart(range)
+    if(roughLength.isPosInfinity) Double.MaxValue
+    else if(roughLength.isNegInfinity) Double.MinValue
+    else roughLength
+  }
 
 }
 
@@ -87,6 +96,7 @@ trait RangeMSyntax {
     def middle: A = RangeM.middle(range)
     def isPoint: Boolean = RangeM.isPoint(range)
     def length: BigDecimal = RangeM.length(range)
+    def roughLength: Double = RangeM.roughLength(range)
   }
 
 }
@@ -102,17 +112,17 @@ object RangeM extends RangeMOps[RangeM] {
   }
 
   override def greater[A](range: RangeM[A], a: A): Boolean = (range, a) match {
-    case (range: RangeP, a: Prim) => RangeP.greater(range, a)
+    case (range: RangePA, a: Prim) => RangeP.greater(range, a)
     case _ => super.greater(range, a)
   }
 
   override def less[A](range: RangeM[A], a: A): Boolean = (range, a) match {
-    case (range: RangeP, a: Prim) => RangeP.less(range, a)
+    case (range: RangePA, a: Prim) => RangeP.less(range, a)
     case _ => super.less(range, a)
   }
 
   override def contains[A](range: RangeM[A], a: A): Boolean = (range, a) match {
-    case (range: RangeP, a: Prim) => RangeP.contains(range, a)
+    case (range: RangePA, a: Prim) => RangeP.contains(range, a)
     case _ => super.contains(range, a)
   }
 

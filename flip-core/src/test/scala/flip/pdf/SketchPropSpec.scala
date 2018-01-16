@@ -159,27 +159,31 @@ class SketchPropSpec extends Specification with ScalaCheck {
 
     }
 
-    "densityPlot" in {
-      val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 2, Some(-10d), Some(10d))
-      val (counterSize, counterNo) = (8, 2)
-      implicit val conf: CustomSketchConf = CustomSketchConf(
-        cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
-        counterSize = counterSize, counterNo = counterNo
-      )
-      val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
+    "sampling" in {
 
-      sketch0.densityPlot.fold(ko("Fail to call the densityPlot."))(plot => {
-        val cond1 = plot.records.nonEmpty
-        val cond2 = plot.records.forall { case (_, value) => !value.isNaN }
-        val cond3 = plot.records.headOption.forall { case (range, _) => range.end ~= cmapStart.value }
-        val cond4 = plot.records.lastOption.forall { case (range, _) => range.start ~= cmapEnd.value }
+      "basic" in {
+        val cmapStart = Some(-10d)
+        val cmapEnd = Some(10d)
+        implicit val conf: CustomSketchConf = CustomSketchConf(
+          cmapSize = 3, cmapNo = 5, cmapStart = cmapStart, cmapEnd = cmapEnd,
+          counterSize = 70, counterNo = 2
+        )
+        val sketch0 = Sketch.empty[Double]
 
-        if(!cond1) ko("Plot record is empty.")
-        else if(!cond2) ko("Some value is NaN")
-        else if(!cond3) ko(s"${plot.records.headOption} is first range. cmapStart: $cmapStart")
-        else if(!cond4) ko(s"${plot.records.lastOption} is last range. cmapEnd: $cmapEnd")
-        else ok
-      })
+        sketch0.sampling.fold(ko("Fail to call the sampling."))(plot => {
+          val cond1 = plot.records.nonEmpty
+          val cond2 = plot.records.forall { case (_, value) => !value.isNaN }
+          val cond3 = plot.records.headOption.forall { case (range, _) => range.end ~= cmapStart.value }
+          val cond4 = plot.records.lastOption.forall { case (range, _) => range.start ~= cmapEnd.value }
+
+          if(!cond1) ko("Plot record is empty.")
+          else if(!cond2) ko("Some value is NaN")
+          else if(!cond3) ko(s"${plot.records.headOption} is first range. cmapStart: $cmapStart")
+          else if(!cond4) ko(s"${plot.records.lastOption} is last range. cmapEnd: $cmapEnd")
+          else ok
+        })
+      }
+
     }
 
     "deepUpdate" in {
@@ -207,22 +211,23 @@ class SketchPropSpec extends Specification with ScalaCheck {
         }
 
         "2 times" in {
-          val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 2, Some(-1d), Some(10d))
-          val (counterSize, counterNo) = (8, 2)
           implicit val conf: CustomSketchConf = CustomSketchConf(
-            cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
-            counterSize = counterSize, counterNo = counterNo
+            cmapSize = 10, cmapNo = 2, cmapStart = Some(-1d), cmapEnd = Some(10d),
+            counterSize = 8, counterNo = 2
           )
-          val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
-          val sketch1O = sketch0.deepUpdate(1).map(_._1)
-          val sketch2O = sketch1O.flatMap(sketch1 => sketch1.deepUpdate(1).map(_._1))
+          val sketch0 = Sketch.empty[Double]
 
-          val cmap0O = sketch0.youngCmap
-          val cmap1O = sketch1O.flatMap(_.youngCmap)
-          val cmap2O = sketch2O.flatMap(_.youngCmap)
-
-          if(cmap0O != cmap1O && cmap1O != cmap2O) ok
-          else ko(s"cmap0: $cmap0O, cmap1: $cmap1O, cmap2: $cmap2O")
+          (for {
+            sketch1 <- sketch0.deepUpdate(1).map(_._1)
+            sketch2 <- sketch1.deepUpdate(1).map(_._1)
+            cmap0 <- sketch0.youngCmap
+            cmap1 <- sketch1.youngCmap
+            cmap2 <- sketch2.youngCmap
+          } yield (cmap0, cmap1, cmap2))
+            .fold(ko("Exception occurs.")){ case (cmap0, cmap1, cmap2) =>
+              if(cmap0 != cmap1 && cmap1 != cmap2) ok
+              else ko(s"cmap0: $cmap0, cmap1: $cmap1, cmap2: $cmap2")
+            }
         }
 
       }
@@ -278,45 +283,31 @@ class SketchPropSpec extends Specification with ScalaCheck {
     }
 
     "rearrange" in {
-//      val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 3, 0, 10)
-//      val (counterSize, counterNo) = (8, 2)
-//      val conf: SketchConf = SketchConf(
-//        CmapConf.uniform(cmapSize, cmapNo, cmapStart, cmapEnd),
-//        CounterConf(counterSize, counterNo)
-//      )
-//      val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
-//
-//      (for {
-//        sketch1 <- sketch0.narrowUpdate(5.5)
-//        sketch2 <- sketch1.rearrange
-//        count1 <- sketch2.count(5, 6)
-//        count2 <- sketch2.count(0, 1)
-//      } yield (count1, count2))
-//        .fold(ko){ case (count1, count2) =>
-//          val count1Exp = 1d - 1d / (cmapSize.toDouble - 2)
-//          val cond1 = count1 ~= count1Exp
-//          val cond2 = count2 ~= 0
-//
-//          if(cond1 && cond2) ok
-//          else ko(
-//            s"count 5<x<6: $count1 (expected: $count1Exp), " +
-//              s"count 0<x<1: $count2 (expected: 0)"
-//          )
-//        }
 
-      todo
+      "basic" in {
+        implicit val conf: CustomSketchConf = CustomSketchConf(
+          cmapSize = 1000, cmapNo = 5, cmapStart = Some(0d), cmapEnd = Some(10d),
+          counterSize = 500, counterNo = 2
+        )
+        val sketch0 = Sketch.empty[Double]
+
+        (for {
+          sketch1 <- sketch0.narrowUpdate(0.0 to 100.0 by 0.1: _*)
+          sketch2 <- sketch1.rearrange
+        } yield sketch2)
+          .fold(ko)(_ => ok)
+      }
+
     }
 
     "count" in {
 
       "basic" in {
-        val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 2, Some(0d), Some(10d))
-        val (counterSize, counterNo) = (8, 2)
         implicit val conf: CustomSketchConf = CustomSketchConf(
-          cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
-          counterSize = counterSize, counterNo = counterNo
+          cmapSize = 10, cmapNo = 2, cmapStart = Some(0d), cmapEnd = Some(10d),
+          counterSize = 8, counterNo = 2
         )
-        val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
+        val sketch0 = Sketch.empty[Double]
 
         (for {
           sketch1 <- sketch0.update(1)
