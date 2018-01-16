@@ -18,7 +18,7 @@ trait GenericRangeP[G] extends RangeM[Prim] {
 
 trait RangePOps extends RangeMOps[GenericRangeP] {
 
-  def intersection[A](range1: RangeP, range2: RangeP): RangeP = {
+  def intersection[A](range1: RangePA, range2: RangePA): RangeP = {
     val (start1, end1) = (range1.start, range1.end)
     val (start2, end2) = (range2.start, range2.end)
 
@@ -28,7 +28,7 @@ trait RangePOps extends RangeMOps[GenericRangeP] {
     RangeP(start, end)
   }
 
-  def overlapPercent[A](range1: RangeP, range2: RangeP): Double = {
+  def overlapPercent[A](range1: RangePA, range2: RangePA): Double = {
     val inters = intersection(range1, range2)
 
     if(roughLength(inters) == 0) 0
@@ -44,24 +44,26 @@ trait RangePOps extends RangeMOps[GenericRangeP] {
     } else 0
   }
 
-  def modifyMeasure[A](range: RangeP, measure: Measure[A]): RangeM[A] =
+  def modifyMeasure[A](range: RangePA, measure: Measure[A]): RangeM[A] =
     RangeM(measure.from(range.start), measure.from(range.end))(measure)
 
-  def greater[A](range: RangeP, a: Prim): Boolean = range.start > a
+  def greater[A](range: RangePA, a: Prim): Boolean = range.start > a
 
-  def less[A](range: RangeP, a: Prim): Boolean = range.end < a
+  def less[A](range: RangePA, a: Prim): Boolean = range.end < a
 
-  def contains[A](range: RangeP, a: Prim): Boolean = containsP(range.start, range.end, a)
+  def contains[A](range: RangePA, a: Prim): Boolean = containsP(range.start, range.end, a)
 
-  def geq(range: RangeP, a: Prim): Boolean = greater(range, a) || contains(range, a)
+  def geq(range: RangePA, a: Prim): Boolean = greater(range, a) || contains(range, a)
 
-  def leq(range: RangeP, a: Prim): Boolean = less(range, a) || contains(range, a)
+  def leq(range: RangePA, a: Prim): Boolean = less(range, a) || contains(range, a)
 
 }
 
 trait RangePSyntax {
 
   type RangeP = GenericRangeP[Nothing]
+
+  type RangePA = GenericRangeP[_]
 
   implicit class RangeImpl(range: RangeP) {
     def length: BigDecimal = RangeP.length(range)

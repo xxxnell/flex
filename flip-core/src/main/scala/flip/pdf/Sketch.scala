@@ -60,28 +60,28 @@ trait SketchPropLaws[S[_]<:Sketch[_], C<:SketchConf] { self: SketchPropOps[S, C]
   def flatDensity: Double = (1 / Cmap.max) * (1 / (1 - Cmap.min / Cmap.max))
 
   def probability[A](sketch: S[A], start: A, end: A, conf: C): Option[Double] = for {
-    count <- time(count(sketch, start, end, conf), "count", false) // 1e4
+    count <- count(sketch, start, end, conf)
     sum = self.sum(sketch, conf)
     measure = sketch.measure.asInstanceOf[Measure[A]]
-    flatProb = time(flatDensity * RangeM.bare(start, end, measure).roughLength, "flatProb", false) // 1e3
-  } yield time(if(sum > 0) count / sum else flatProb, "count / sum", false)
+    flatProb = flatDensity * RangeM.bare(start, end, measure).roughLength
+  } yield if(sum > 0) count / sum else flatProb
 
   def sampling[A](sketch: S[A], conf: C): Option[DensityPlot] = for {
-    cmap <- time(youngCmap(sketch), "youngCmap", false) // 4E3
+    cmap <- youngCmap(sketch)
     rangePs = cmap.bin
     measure = sketch.measure.asInstanceOf[Measure[A]]
-    rangeMs = time(rangePs.map(rangeP => rangeP.modifyMeasure(measure)), "rangePs -> rangeMs", false) // 1E4
-    sampling <- time(samplingForRanges(sketch, rangeMs, conf), "samplingForRanges", false) // 4E6
+    rangeMs = rangePs.map(rangeP => rangeP.modifyMeasure(measure))
+    sampling <- samplingForRanges(sketch, rangeMs, conf)
   } yield sampling
 
   def samplingForRanges[A](sketch: S[A], ranges: List[RangeM[A]], conf: C): Option[DensityPlot] = {
     for {
-      rangeProbs <- time(ranges.traverse(range => probability(sketch, range.start, range.end, conf).map(prob => (range, prob))), "rangeProbs traverse", false) // 2E6
-      rangeDensities = time(rangeProbs
+      rangeProbs <- ranges.traverse(range => probability(sketch, range.start, range.end, conf).map(prob => (range, prob)))
+      rangeDensities = rangeProbs
         .map { case (rangeM, prob) => (RangeP.forRangeM(rangeM), Try(prob / rangeM.length).toOption) }
-        .flatMap { case (range, densityO) => densityO.map(density => (range, density.toDouble)) }, "rangeProbs -> rangeDensities", false) // 3E5
-    } yield time(DensityPlot.disjoint(rangeDensities), "DensityPlot.disjoint", false)
-  } // 1e6
+        .flatMap { case (range, densityO) => densityO.map(density => (range, density.toDouble)) }
+    } yield DensityPlot.disjoint(rangeDensities)
+  }
 
   def fastPdf[A](sketch: S[A], a: A, conf: C): Option[Double] = for {
     cmap <- youngCmap(sketch)

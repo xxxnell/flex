@@ -1,8 +1,7 @@
 package flip.pdf.update
 
-import flip.time
 import flip.cmap.Cmap
-import flip.conf.{SamplingDistConf, SketchConf}
+import flip.conf.SketchConf
 import flip.pdf._
 import flip.plot._
 import flip.plot.syntax._
@@ -11,22 +10,22 @@ import flip.range.RangeP
 trait EqualSpaceCdfUpdate {
 
   def updateCmap(sketch: Sketch[_], ps: List[(Prim, Count)], conf: SketchConf): Option[Cmap] = for {
-    sketchPlot <- time(sketch.sampling(conf), "sampling", false) // 3E6
+    sketchPlot <- sketch.sampling(conf)
     mixingRatio = conf.mixingRatio
     window = conf.dataKernelWindow
     cmapSize = conf.cmap.size
     mtpSketchPlot = sketchPlot * (1 / (mixingRatio + 1))
-    mtpPsPlot = time(DensityPlot.squareKernel(ps, window) * (mixingRatio / (mixingRatio + 1)), "squareKernel", false) // 3E5
-    mergedPlot = time(if(ps.nonEmpty) mtpSketchPlot + mtpPsPlot else sketchPlot, "mergedPlot", false) // 2E6
-    cmap = time(cmapForEqualSpaceCumulative(mergedPlot, cmapSize), "cmapForEqualSpaceCumulative", false) // 4E6
+    mtpPsPlot = DensityPlot.squareKernel(ps, window) * (mixingRatio / (mixingRatio + 1))
+    mergedPlot = if(ps.nonEmpty) mtpSketchPlot + mtpPsPlot else sketchPlot
+    cmap = cmapForEqualSpaceCumulative(mergedPlot, cmapSize)
   } yield cmap
 
   def cmapForEqualSpaceCumulative(plot: DensityPlot, cmapSize: Int): Cmap = {
-    val cdf = time(plot.cumulative, "cumulative", false) // 6E4
-    val invCdf = time(cdf.inverse, "inverse", false) // 2E6
+    val cdf = plot.cumulative
+    val invCdf = cdf.inverse
     val unit = cdf.interpolation(Double.MaxValue) / cmapSize.toDouble
 
-    val divider = time((1 until cmapSize).toList.map(i => i * unit).map(a => invCdf.interpolation(a)), "divider", false) // 1E6
+    val divider = (1 until cmapSize).toList.map(i => i * unit).map(a => invCdf.interpolation(a))
     Cmap.divider(divider)
   }
 

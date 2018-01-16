@@ -1,6 +1,5 @@
 package flip.plot
 
-import flip.{range, time}
 import flip.pdf.Prim
 import flip.plot.syntax._
 import flip.range._
@@ -74,10 +73,6 @@ trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
 
   def interpolation(plot: P, x: Double): Double = {
     val dataRefSize = 2
-
-//    functional midRecords: refined but slow
-//    val midRecordsO1 = plot.records.sliding(dataRefSize)
-//      .find { records => records.headOption.forall(_._1 <= x) && records.lastOption.forall(_._1 >= x) }
 
     val midRecordsO = {
       val toIndex = plot.middleIndex.to(x)
@@ -227,8 +222,8 @@ trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
 
   def add(plot1: P, plot2: P): P =
     unsafeModifyRecords(plot1, records => {
-      val sumList = time(records ++ plot2.records, "sum list", false)
-      time(planarizeRecords(sumList).map { case (range, values) => (range, values.sum) }, "planarizeRecords", false)
+      val sumList = records ++ plot2.records
+      planarizeRecords(sumList).map { case (range, values) => (range, values.sum) }
     })
 
   def multiplyConstant(plot: P, mag: Double): P = modifyValue(plot, { case (_, value) => value * mag })

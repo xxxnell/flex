@@ -1,6 +1,5 @@
 package flip.hcounter
 
-import flip.time
 import flip.conf.CounterConf
 import flip.counter.Counter
 import flip.hmap.{HDim, Hmap}
@@ -24,17 +23,17 @@ trait HCounter {
 
 trait HCounterOps[HC<:HCounter] {
 
-  def update(hc: HCounter, hdim: HDim, count: Double): Option[HCounter] = time(for {
+  def update(hc: HCounter, hdim: HDim, count: Double): Option[HCounter] = for {
     updated <- hc.structures.traverse { case (hmap, counter) =>
-      time(for {
-        cdim <- time(hmap.apply(hdim, counter.size), "cdim", false) // 3E3
-        utdCounter <- time(counter.update(cdim, count), "counter update", false) // 7E4
-      } yield (hmap, utdCounter), "update inner loop", false) // 6E4
+      for {
+        cdim <- hmap.apply(hdim, counter.size)
+        utdCounter <- counter.update(cdim, count)
+      } yield (hmap, utdCounter)
     }
-  } yield HCounter(updated, hc.sum + count), "update", false) // 1E5
+  } yield HCounter(updated, hc.sum + count)
 
   def updates(hc: HCounter, as: List[(HDim, Count)]): Option[HCounter] =
-    time(as.foldLeft(Option(hc)) { case (hcO, (hdim, count)) => hcO.flatMap(hc => hc.update(hdim, count)) }, s"updates for ${as.size}", false) // 3E5
+    as.foldLeft(Option(hc)) { case (hcO, (hdim, count)) => hcO.flatMap(hc => hc.update(hdim, count)) }
 
   def get(hc: HCounter, hdim: HDim): Option[Double] = {
     var i = 0
