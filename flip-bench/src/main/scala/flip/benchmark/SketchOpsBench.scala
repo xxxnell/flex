@@ -10,7 +10,12 @@ import flip.hcounter.HCounter
 @BenchmarkMode(Array(Mode.AverageTime))
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @State(Scope.Thread)
-class SketchOpsBench {
+class SketchOpsBench { self =>
+
+  // parameters
+
+  @Param(Array("0", "50"))
+  var queueSize: Int = _
 
   @Param(Array("5", "20"))
   var cmapNo: Int = _
@@ -24,6 +29,10 @@ class SketchOpsBench {
   @Param(Array("40", "1000"))
   var counterSize: Int = _
 
+  // variables
+
+  implicit var conf: SketchConf =  _
+
   var sketch: Sketch[Double] = _
 
   @Setup
@@ -33,14 +42,18 @@ class SketchOpsBench {
       cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = Some(-10d), cmapEnd = Some(10d),
       counterSize = counterSize, counterNo = counterNo
     )
+    val (_, samples) = NumericDist.normal(0.0, 1).samples(100)
+    val sketch0 = Sketch.empty[Double]
 
-    sketch = Sketch.empty[Double]
+    self.conf = conf
+    self.sketch = sketch0.narrowUpdate(samples: _*).getOrElse(sketch0)
   }
 
   @Benchmark
   def construct: Sketch[Double] = {
     implicit val conf: SketchConf = SketchConf(
       startThreshold = 50, thresholdPeriod = 100,
+      queueSize = queueSize,
       cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = Some(-10d), cmapEnd = Some(10d),
       counterSize = counterSize, counterNo = counterNo
     )
@@ -50,57 +63,37 @@ class SketchOpsBench {
 
   @Benchmark
   def sampling: Option[DensityPlot] = {
-    implicit val conf: SketchConf = SketchConf(
-      startThreshold = 50, thresholdPeriod = 100,
-      cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = Some(-10d), cmapEnd = Some(10d),
-      counterSize = counterSize, counterNo = counterNo
-    )
-
     sketch.sampling
   }
 
   @Benchmark
   def narrowUpdate: Option[Sketch[Double]] = {
-    implicit val conf: SketchConf = SketchConf(
-      startThreshold = 50, thresholdPeriod = 100,
-      cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = Some(-10d), cmapEnd = Some(10d),
-      counterSize = counterSize, counterNo = counterNo
-    )
-
     sketch.narrowUpdate(1)
   }
 
   @Benchmark
   def deepUpdate: Option[(Sketch[Double], Option[(Cmap, HCounter)])] = {
-    implicit val conf: SketchConf = SketchConf(
-      startThreshold = 50, thresholdPeriod = 100,
-      cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = Some(-10d), cmapEnd = Some(10d),
-      counterSize = counterSize, counterNo = counterNo
-    )
-
     sketch.deepUpdate(1.0 to 10.0 by 1.0: _*)
   }
 
   @Benchmark
   def flatMap: Sketch[Double] = {
-    implicit val conf: SketchConf = SketchConf(
-      startThreshold = 50, thresholdPeriod = 100,
-      cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = Some(-10d), cmapEnd = Some(10d),
-      counterSize = counterSize, counterNo = counterNo
-    )
-
     sketch.flatMap(a => Dist.delta(a))
   }
 
   @Benchmark
   def rearrange: Option[Sketch[Double]] = {
-    implicit val conf: SketchConf = SketchConf(
-      startThreshold = 50, thresholdPeriod = 100,
-      cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = Some(-10d), cmapEnd = Some(10d),
-      counterSize = counterSize, counterNo = counterNo
-    )
-
     sketch.rearrange
+  }
+
+  @Benchmark
+  def probability: Option[Double] = {
+    sketch.probability(1, 2)
+  }
+
+  @Benchmark
+  def count: Option[Double] = {
+    sketch.count(1, 2)
   }
 
 }
