@@ -13,7 +13,7 @@ object BenchApp {
 
     // confs
     val opts = BenchAppConfs.envOptions
-      .param("iterateBenchSize", (0 to 500 by 10).map(_.toString).toArray: _*)
+      .param("iterateBenchSize", (0 to 550 by 10).map(_.toString).toArray: _*)
       .build()
 
     // run
@@ -28,8 +28,8 @@ object BenchApp {
 
 object BenchAppConfs {
 
-  val warmup = 3
-  val measurement = 5
+  val warmup = 20
+  val measurement = 30
   val thread = 1
   val fork = 1
 
