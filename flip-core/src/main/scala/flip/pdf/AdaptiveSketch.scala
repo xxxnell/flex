@@ -1,5 +1,6 @@
 package flip.pdf
 
+import flip.time
 import flip.conf.{AdaPerSketchConf, AdaptiveSketchConf}
 import flip.measure.Measure
 import flip.plot.CountPlot
@@ -30,8 +31,8 @@ trait AdaptiveSketchOps[S[_]<:AdaptiveSketch[_], C<:AdaptiveSketchConf]
   }
 
   override def count[A](sketch: S[A], start: A, end: A, conf: C): Option[Count] = for {
-    countStr <- countForStr(sketch, start, end, conf)
-    countQ = countForQueue(sketch, start, end)
+    countStr <- time(countForStr(sketch, start, end, conf), "countForStr", false) // 1e4
+    countQ = time(countForQueue(sketch, start, end), "countForQueue", false) // 3e3
   } yield countStr + queueCorrection(sketch, conf) * countQ
 
   override def sum(sketch: S[_], conf: C): Count =

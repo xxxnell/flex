@@ -7,7 +7,12 @@ import scala.util.Try
   */
 trait Counter {
 
-  def cs: List[Double]
+  def counts: Seq[Double]
+
+  override def toString: String = {
+    val counterStr = if(counts.size < 100) s"(${counts.mkString(", ")})" else s"(|counts| = ${counts.size})"
+    s"Counter($counterStr)"
+  }
 
 }
 
@@ -19,9 +24,9 @@ trait CounterOps[C<:Counter] extends CounterLaws[C] {
 
 trait CounterLaws[C<:Counter] { self: CounterOps[C] =>
 
-  def get(counter: C, cdim: CDim): Option[Double] = Try (counter.cs.apply(cdim)).toOption
+  def get(counter: C, cdim: CDim): Option[Double] = Try(counter.counts.apply(cdim)).toOption
 
-  def size(counter: C): Int = counter.cs.size
+  def size(counter: C): Int = counter.counts.size
 
 }
 
@@ -37,10 +42,11 @@ trait CounterSyntax {
 
 object Counter extends CounterOps[Counter] {
 
-  def empty(size: Int): ListCounter = ListCounter.empty(size)
+  def empty(size: Int): VectorCounter = VectorCounter.empty(size)
 
   def update(counter: Counter, cdim: CDim, count: Double): Option[Counter] = counter match {
     case counter: ListCounter => ListCounter.update(counter, cdim, count)
+    case counter: VectorCounter => VectorCounter.update(counter, cdim, count)
     case _ => None
   }
 

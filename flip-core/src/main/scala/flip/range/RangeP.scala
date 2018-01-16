@@ -29,11 +29,19 @@ trait RangePOps extends RangeMOps[GenericRangeP] {
   }
 
   def overlapPercent[A](range1: RangeP, range2: RangeP): Double = {
-    val range1Len = length(range1)
+    val inters = intersection(range1, range2)
 
-    if (range1Len != 0) (length(intersection(range1, range2)) / length(range1)).toDouble
-    else if(range1 == range2) 1
-    else 0
+    if(roughLength(inters) == 0) 0
+    else if(range1 == inters) 1
+    else if(roughLength(range1) != 0) {
+      lazy val perc1 = (inters.end - inters.start) / (range1.end - range1.start)
+      lazy val perc2 = (inters.end / range1.end) * (1 - inters.start / inters.end) / (1 - range1.start / range1.end)
+      lazy val perc3 = (length(intersection(range1, range2)) / length(range1)).toDouble
+
+      if(!perc1.isNaN && !perc1.isInfinity) perc1
+      else if(!perc2.isNaN && perc2.isInfinity) perc2
+      else perc3
+    } else 0
   }
 
   def modifyMeasure[A](range: RangeP, measure: Measure[A]): RangeM[A] =

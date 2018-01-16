@@ -66,14 +66,11 @@ class UniformCmapSpec extends Specification with ScalaCheck {
             val cond1 = cmap(Double.MinValue) == 0
             val cond2 = cmap(Double.MaxValue) == size - 1
             val cond3 = cmap(end + delta) == size - 1
-            if(cond1 && cond2 && cond3) ok
-            else ko(
-              s"size: $size, " +
-                s"end: $end, " +
-                s"cmap(Double.MinValue): ${cmap(Double.MinValue)}, " +
-                s"cmap(Double.MaxValue): ${cmap(Double.MaxValue)}, " +
-                s"cmap(end + delta): ${cmap(end + delta)}"
-            )
+
+            if(!cond1) ko(s"cmap(Double.MinValue) (${cmap(Double.MinValue)}) != 0")
+            else if(!cond2) ko(s"cmap(Double.MaxValue) (${cmap(Double.MaxValue)}) != size - 1 (${size - 1})")
+            else if(!cond3) ko(s"cmap(end + delta) (${cmap(end + delta)}) != size - 1 (${size - 1})")
+            else ok
           }.setArbitrary(cmapGen)
         }
 
@@ -99,6 +96,7 @@ class UniformCmapSpec extends Specification with ScalaCheck {
           val cond2 = cmap(Double.MaxValue) == size - 1
           val cond3 = cmap(start + delta) == 1
           val cond4 = cmap(end + delta) == size - 1
+
           if(cond1 && cond2 && cond3 && cond4) ok
           else ko(
             s"size: $size, " +

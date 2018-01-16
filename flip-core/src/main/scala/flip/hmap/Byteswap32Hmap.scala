@@ -16,6 +16,8 @@ class Byteswap32Hmap(seed: Int) extends Hmap {
     }
   }
 
+  override def toString: String = s"Byteswap32Hmap(seed -> $seed)"
+
 }
 
 trait Byteswap32HmapOps extends HmapOps {

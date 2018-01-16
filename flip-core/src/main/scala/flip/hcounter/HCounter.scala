@@ -1,5 +1,6 @@
 package flip.hcounter
 
+import flip.time
 import flip.conf.CounterConf
 import flip.counter.Counter
 import flip.hmap.{HDim, Hmap}
@@ -23,37 +24,42 @@ trait HCounter {
 
 trait HCounterOps[HC<:HCounter] {
 
-  def update(hc: HCounter, hdim: HDim, count: Double): Option[HCounter] = for {
+  def update(hc: HCounter, hdim: HDim, count: Double): Option[HCounter] = time(for {
     updated <- hc.structures.traverse { case (hmap, counter) =>
-      for {
-        cdim <- hmap.apply(hdim, counter.size)
-        counter2 <- counter.update(cdim, count)
-      } yield (hmap, counter2)
+      time(for {
+        cdim <- time(hmap.apply(hdim, counter.size), "cdim", false) // 3E3
+        utdCounter <- time(counter.update(cdim, count), "counter update", false) // 7E4
+      } yield (hmap, utdCounter), "update inner loop", false) // 6E4
     }
-  } yield HCounter(updated, hc.sum + count)
+  } yield HCounter(updated, hc.sum + count), "update", false) // 1E5
 
   def updates(hc: HCounter, as: List[(HDim, Count)]): Option[HCounter] =
-    as.foldLeft(Option(hc)) { case (hcO, (hdim, count)) => hcO.flatMap(hc => hc.update(hdim, count)) }
+    time(as.foldLeft(Option(hc)) { case (hcO, (hdim, count)) => hcO.flatMap(hc => hc.update(hdim, count)) }, s"updates for ${as.size}", false) // 3E5
 
   def get(hc: HCounter, hdim: HDim): Option[Double] = {
     var i = 0
-    var count = 0.0
+    var count = Double.PositiveInfinity
     while (i < hc.structures.length) {
       val (hmap, counter) = hc.structures.apply(i)
-      val cdim = hmap.apply(hdim, counter.cs.size).getOrElse(-1)
+      val cdim = hmap.apply(hdim, counter.counts.size).getOrElse(-1)
       val singleCount = Counter.get(counter, cdim).getOrElse(0.0)
       count = if (count < singleCount) count else singleCount
       i += 1
     }
-    Some(count)
+
+    if(!count.isPosInfinity) Some(count) else None
   }
 
   def sum(hc: HCounter): Double = hc.sum
 
-  def count(hc: HCounter, from: HDim, to: HDim): Option[Double] = {
-    (from to to).toList
-      .traverse(hdim => get(hc, hdim))
-      .map(_.sum)
+  def count(hc: HCounter, start: HDim, end: HDim): Option[Double] = {
+    var hdim = start
+    var sum = 0.0
+    while(hdim <= end) {
+      sum += get(hc, hdim).getOrElse(0.0)
+      hdim += 1
+    }
+    Some(sum)
   }
 
   def depth(hc: HCounter): Int = hc.structures.size

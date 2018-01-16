@@ -5,6 +5,7 @@ import org.specs2.ScalaCheck
 import flip.conf.DistConf
 import flip.pdf.Dist
 import flip.range.RangeP
+import flip.measure.syntax._
 
 class KLDSpec extends Specification with ScalaCheck {
 
@@ -18,13 +19,14 @@ class KLDSpec extends Specification with ScalaCheck {
         case s1 :: s2 :: Nil => Some(RangeP(s1, s2))
         case _ => None
       }.toList
+      val expected = 0.1234
 
       (for {
         sampling <- normal1.sampling(samples)
         kld <- KLD(sampling, normal2)
       } yield kld)
         .fold(ko("Error occurs.")){ kld =>
-          if(kld > 0) ok else ko(s"kld: $kld")
+          if(kld ~= expected) ok else ko(s"kld: $kld, expected: $expected")
         }
     }
 

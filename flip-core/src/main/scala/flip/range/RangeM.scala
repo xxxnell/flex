@@ -18,7 +18,7 @@ trait RangeM[A] {
     val otherR = other.asInstanceOf[RangeM[A]]
 
     start == otherR.start &&
-    measure.to(start) == otherR.measure.to(otherR.start)
+    measure.to(start) == otherR.measure.to(otherR.start) &&
     end == otherR.end &&
     measure.to(end) == otherR.measure.to(otherR.end)
   }
@@ -58,7 +58,9 @@ trait RangeMOps[R[_]<:RangeM[_]] {
 
   def isPoint(range: R[_]): Boolean = if(range.start == range.end) true else false
 
-  def length[A](range: R[A]): BigDecimal = BigDecimal(primEnd(range)) - BigDecimal(primStart(range))
+  def length[A](range: R[A]): BigDecimal = {
+    BigDecimal(primEnd(range)) - BigDecimal(primStart(range))
+  }
 
   def roughLength[A](range: R[A]): Double = {
     val roughLength = primEnd(range) - primStart(range)
@@ -94,6 +96,7 @@ trait RangeMSyntax {
     def middle: A = RangeM.middle(range)
     def isPoint: Boolean = RangeM.isPoint(range)
     def length: BigDecimal = RangeM.length(range)
+    def roughLength: Double = RangeM.roughLength(range)
   }
 
 }

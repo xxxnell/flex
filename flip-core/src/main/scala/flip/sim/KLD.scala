@@ -24,7 +24,8 @@ object KLD {
 
   def kldForSampling[A](d1: SamplingDist[A], d2: Dist[A], conf2: DistConf): Option[Double] = for {
     density <- kldDensityForSampling(d1, d2, conf2)
-  } yield density.integral(Double.MinValue, Double.MaxValue)
+    domain <- density.domain
+  } yield density.integral(domain.start, domain.end)
 
   def kldDensityForSampling[A](d1: SamplingDist[A], d2: Dist[A], conf2: DistConf): Option[DensityPlot] = for {
     plot1 <- d1.densityPlot
