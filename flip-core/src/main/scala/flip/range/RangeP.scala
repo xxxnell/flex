@@ -59,21 +59,6 @@ trait RangePOps extends RangeMOps[GenericRangeP] {
 
 }
 
-trait RangePSyntax {
-
-  type RangeP = GenericRangeP[Nothing]
-
-  type RangePA = GenericRangeP[_]
-
-  implicit class RangeImpl(range: RangeP) {
-    def length: BigDecimal = RangeP.length(range)
-    def roughLength: Double = RangeP.roughLength(range)
-    def overlapPercent(range2: RangeP): Double = RangeP.overlapPercent(range, range2)
-    def modifyMeasure[A](measure: Measure[A]): RangeM[A] = RangeP.modifyMeasure(range, measure)
-  }
-
-}
-
 object RangeP extends RangePOps {
 
   private case class RangePImpl(start: Prim, end: Prim) extends RangeP

@@ -1,8 +1,6 @@
 package flip.pdf
 
-import flip.cmap.Cmap
 import flip.conf.SketchConf
-import flip.hcounter.HCounter
 import flip.measure.Measure
 
 case class SimpleSketch[A](measure: Measure[A], structures: Structures) extends Sketch[A]

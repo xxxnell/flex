@@ -1,0 +1,47 @@
+package flip.conf
+
+trait SimpleSketchConf extends SketchConf
+
+trait CustomSimpleSketchConf extends SimpleSketchConf with CustomSketchConf
+
+object SimpleSketchConf {
+
+  private case class SimpleSketchConfImpl(delta: Double,
+                                          mixingRatio: Double,
+                                          dataKernelWindow: Double,
+                                          decayFactor: Double,
+                                          cmap: CmapConf,
+                                          counter: CounterConf)
+    extends CustomSimpleSketchConf
+
+  def apply(// dist
+            delta: Double = DefaultSketchConf.delta,
+            // sketch
+            mixingRatio: Double = DefaultSketchConf.mixingRatio,
+            dataKernelWindow: Double = DefaultSketchConf.dataKernelWindow,
+            decayFactor: Double = DefaultSketchConf.decayFactor,
+            // cmap
+            binNo: Int,
+            start: Double,
+            end: Double,
+            // counter
+            counterSize: Int = DefaultSketchConf.counter.size,
+            counterNo: Int = DefaultSketchConf.counter.no): CustomSimpleSketchConf = {
+    val cmapConf = CmapConf.uniform(binNo, 1, start, end)
+    val counterConf = CounterConf(counterSize, counterNo)
+    SimpleSketchConf.custom(
+      delta, mixingRatio, dataKernelWindow, decayFactor, cmapConf, counterConf
+    )
+  }
+
+  def custom(delta: Double,
+             mixingRatio: Double,
+             dataKernelWindow: Double,
+             decayFactor: Double,
+             cmapConf: CmapConf,
+             counterConf: CounterConf): CustomSimpleSketchConf =
+    SimpleSketchConfImpl(
+      delta, mixingRatio, dataKernelWindow, decayFactor, cmapConf, counterConf
+    )
+
+}
