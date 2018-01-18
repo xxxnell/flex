@@ -21,7 +21,7 @@ trait RangePOps[R[_]<:RangeM[_]] extends RangeMOps[Prim, R] {
     val startP = if(start1 > start2) start1 else start2
     val endP = if(end1 > end2) end2 else end1
 
-    modifyRange(range1, (_: A, _: A) => (measure.from(startP), measure.from(endP)))
+    setRange(range1, measure.from(startP), measure.from(endP))
   }
 
   def overlapPercent[A<:Prim](range1: R[A], range2: R[A]): Double = {

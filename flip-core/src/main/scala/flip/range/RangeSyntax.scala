@@ -36,6 +36,7 @@ trait RangeMSyntax {
     def isPoint: Boolean = RangeM.isPoint(range)
     def length: BigDecimal = RangeM.length(range)
     def roughLength: Double = RangeM.roughLength(range)
+    def uniformSplit(size: Int) = RangeM.uniformSplit(range, size)
   }
 
 }

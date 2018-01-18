@@ -16,10 +16,9 @@ trait SmoothDistPropSyntax {
       domainsM = domainsP.map(rangeP => rangeP.modifyMeasure(samplingDist.measure))
       dist <- SmoothDist.toSamplingDist(dist, domainsM)
     } yield dist
-    def uniformSampling(start: A, end: A, size: Int): Option[PlottedDist[A]] = ???
-//    {
-//      SmoothDist.toSamplingDist(dist, RangeM(start, end)(dist.measure).uniformSplit(size))
-//    }
+    def uniformSampling(start: A, end: A, size: Int): Option[PlottedDist[A]] = {
+      SmoothDist.toSamplingDist(dist, RangeM(start, end)(dist.measure).uniformSplit(size))
+    }
     def pdf(a: A): Option[Double] = SmoothDist.pdf(dist, a)
     def sample: (SmoothDist[A], A) = SmoothDist.sample(dist)
     def samples(n: Int): (SmoothDist[A], List[A]) = SmoothDist.samples(dist, n)

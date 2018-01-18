@@ -32,6 +32,9 @@ trait RangeMOps[Γ, R[_]<:RangeM[_]] {
 
   def modifyMeasure[A<:Γ, B](range: R[A], measure: Measure[B]): R[B]
 
+  def setRange[A<:Γ](range: R[A], start: A, end: A): R[A] =
+    modifyRange(range, (_: A, _: A) => (start, end))
+
   def startP[A<:Γ](range: R[A]): Prim = range.measure.asInstanceOf[Measure[A]].to(range.start.asInstanceOf[A])
 
   def endP[A<:Γ](range: R[A]): Prim = range.measure.asInstanceOf[Measure[A]].to(range.end.asInstanceOf[A])
@@ -73,6 +76,21 @@ trait RangeMOps[Γ, R[_]<:RangeM[_]] {
     if(roughLength.isPosInfinity) Double.MaxValue
     else if(roughLength.isNegInfinity) Double.MinValue
     else roughLength
+  }
+
+  def uniformSplit[A<:Γ](range: R[A], size: Int): List[R[A]] = {
+    val measure = range.measure.asInstanceOf[Measure[A]]
+    val (startP, endP) = rangeP(range)
+    val unit = (endP - startP) / size
+    lazy val unitB = (BigDecimal(endP) - BigDecimal(startP)) / size
+
+    (0 until size).toList
+      .map(i => if(!unit.isNaN && !unit.isInfinity) startP + i * unit else (startP + i * unitB).toDouble)
+      .sliding(2).toList
+      .flatMap {
+        case p1 :: p2 :: Nil => Some(setRange(range, measure.from(p1), measure.from(p2)))
+        case _ => None
+      }
   }
 
 }
