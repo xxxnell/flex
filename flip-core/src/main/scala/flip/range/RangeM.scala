@@ -5,7 +5,7 @@ import flip.pdf.Prim
 import flip.range.syntax._
 
 import scala.collection.immutable.NumericRange
-import scala.language.{higherKinds, implicitConversions}
+import scala.language.{higherKinds, implicitConversions, reflectiveCalls}
 
 /**
   * Range for measurable value.
@@ -28,9 +28,15 @@ trait RangeM[A] {
 
 trait RangeMOps[R[_]<:RangeM[_]] {
 
-  def primStart[A](range: R[A]): Prim = range.measure.asInstanceOf[Measure[A]].to(range.start.asInstanceOf[A])
+  def modifyRange[A](range: R[A], f: (A, A) => (A, A)): R[A]
 
-  def primEnd[A](range: R[A]): Prim = range.measure.asInstanceOf[Measure[A]].to(range.end.asInstanceOf[A])
+  def modifyMeasure[A, B](range: R[A], measure: Measure[B]): R[B]
+
+  def startP[A](range: R[A]): Prim = range.measure.asInstanceOf[Measure[A]].to(range.start.asInstanceOf[A])
+
+  def endP[A](range: R[A]): Prim = range.measure.asInstanceOf[Measure[A]].to(range.end.asInstanceOf[A])
+
+  def rangeP[A](range: R[A]): (Prim, Prim) = (startP(range), endP(range))
 
   def containsP(start: Prim, end: Prim, p: Prim): Boolean = {
     ((start >= p) && (end <= p)) ||
@@ -38,12 +44,12 @@ trait RangeMOps[R[_]<:RangeM[_]] {
   }
 
   def contains[A](range: R[A], a: A): Boolean = {
-    containsP(primStart(range), primEnd(range), range.measure.asInstanceOf[Measure[A]].to(a))
+    containsP(startP(range), endP(range), range.measure.asInstanceOf[Measure[A]].to(a))
   }
 
-  def greater[A](range: R[A], a: A): Boolean = primStart(range) > range.measure.asInstanceOf[Measure[A]].to(a)
+  def greater[A](range: R[A], a: A): Boolean = startP(range) > range.measure.asInstanceOf[Measure[A]].to(a)
 
-  def less[A](range: R[A], a: A): Boolean = primEnd(range) < range.measure.asInstanceOf[Measure[A]].to(a)
+  def less[A](range: R[A], a: A): Boolean = endP(range) < range.measure.asInstanceOf[Measure[A]].to(a)
 
   def middleP[A](start: Prim, end: Prim): Prim = {
     if(start == Double.NegativeInfinity && end == Double.NegativeInfinity) Double.NegativeInfinity
@@ -52,18 +58,18 @@ trait RangeMOps[R[_]<:RangeM[_]] {
   }
 
   def middle[A](range: R[A]): A =
-    range.measure.asInstanceOf[Measure[A]].from(middleP(primStart(range), primEnd(range)))
+    range.measure.asInstanceOf[Measure[A]].from(middleP(startP(range), endP(range)))
 
-  def isForward(range: R[_]): Boolean = if(primEnd(range) - primStart(range) >= 0) true else false
+  def isForward[A](range: R[A]): Boolean = if(endP(range) - startP(range) >= 0) true else false
 
   def isPoint(range: R[_]): Boolean = if(range.start == range.end) true else false
 
   def length[A](range: R[A]): BigDecimal = {
-    BigDecimal(primEnd(range)) - BigDecimal(primStart(range))
+    BigDecimal(endP(range)) - BigDecimal(startP(range))
   }
 
   def roughLength[A](range: R[A]): Double = {
-    val roughLength = primEnd(range) - primStart(range)
+    val roughLength = endP(range) - startP(range)
     if(roughLength.isPosInfinity) Double.MaxValue
     else if(roughLength.isNegInfinity) Double.MinValue
     else roughLength
@@ -81,19 +87,14 @@ object RangeM extends RangeMOps[RangeM] {
     if(measure(start) < measure(end)) RangeMImpl(start, end, measure) else RangeMImpl(end, start, measure)
   }
 
-  override def greater[A](range: RangeM[A], a: A): Boolean = (range, a) match {
-    case (range: RangePA, a: Prim) => RangeP.greater(range, a)
-    case _ => super.greater(range, a)
+  def modifyRange[A](range: RangeM[A], f: (A, A) => (A, A)): RangeM[A] = {
+    val (start, end) = f(range.start, range.end)
+    bare(start, end, range.measure)
   }
 
-  override def less[A](range: RangeM[A], a: A): Boolean = (range, a) match {
-    case (range: RangePA, a: Prim) => RangeP.less(range, a)
-    case _ => super.less(range, a)
-  }
-
-  override def contains[A](range: RangeM[A], a: A): Boolean = (range, a) match {
-    case (range: RangePA, a: Prim) => RangeP.contains(range, a)
-    case _ => super.contains(range, a)
+  def modifyMeasure[A, B](range: RangeM[A], measure: Measure[B]): RangeM[B] = {
+    val (startP, endP) = rangeP(range)
+    bare(measure.from(startP), measure.from(endP), measure)
   }
 
 }

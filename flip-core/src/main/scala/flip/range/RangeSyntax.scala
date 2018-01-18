@@ -1,6 +1,7 @@
 package flip.range
 
 import flip.measure.Measure
+import flip.pdf.Prim
 
 import scala.collection.immutable.NumericRange
 
@@ -23,6 +24,7 @@ trait RangeMSyntax {
       }.map { case (start, end) => RangeM(start, end) }
 
   implicit class RangeMSyntaxImpl[A](range: RangeM[A]) {
+    def modifyMeasure[B](measure: Measure[B]): RangeM[B] = RangeM.modifyMeasure(range, measure)
     def contains(a: A): Boolean = RangeM.contains(range, a)
     def greater(a: A): Boolean = RangeM.greater(range, a)
     def >(a: A): Boolean = RangeM.greater(range, a)
@@ -40,15 +42,10 @@ trait RangeMSyntax {
 
 trait RangePSyntax {
 
-  type RangeP = GenericRangeP[Nothing]
-
-  type RangePA = GenericRangeP[_]
+  type RangeP = RangeM[Prim]
 
   implicit class RangeImpl(range: RangeP) {
-    def length: BigDecimal = RangeP.length(range)
-    def roughLength: Double = RangeP.roughLength(range)
     def overlapPercent(range2: RangeP): Double = RangeP.overlapPercent(range, range2)
-    def modifyMeasure[A](measure: Measure[A]): RangeM[A] = RangeP.modifyMeasure(range, measure)
   }
 
 }

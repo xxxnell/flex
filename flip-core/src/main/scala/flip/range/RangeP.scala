@@ -6,36 +6,34 @@ import flip.pdf.Prim
 import flip.range.syntax._
 
 import scala.collection.immutable.NumericRange
+import scala.language.higherKinds
 
 /**
   * Range for primitive type of Sketch.
   */
-trait GenericRangeP[G] extends RangeM[Prim] {
-  def measure: Measure[Prim] = doubleMeasure
-  def start: Prim
-  def end: Prim
-}
+trait RangePOps[R[_]<:RangeM[_]] extends RangeMOps[R] {
 
-trait RangePOps extends RangeMOps[GenericRangeP] {
+  def intersection[A<:Prim](range1: R[A], range2: R[A]): R[A] = {
+    val (start1, end1) = rangeP(range1)
+    val (start2, end2) = rangeP(range2)
+    val measure = range1.measure.asInstanceOf[Measure[A]]
 
-  def intersection[A](range1: RangePA, range2: RangePA): RangeP = {
-    val (start1, end1) = (range1.start, range1.end)
-    val (start2, end2) = (range2.start, range2.end)
+    val startP = if(start1 > start2) start1 else start2
+    val endP = if(end1 > end2) end2 else end1
 
-    val start = if(start1 > start2) start1 else start2
-    val end = if(end1 > end2) end2 else end1
-
-    RangeP(start, end)
+    modifyRange(range1, { case _ => (measure.from(startP), measure.from(endP)) })
   }
 
-  def overlapPercent[A](range1: RangePA, range2: RangePA): Double = {
+  def overlapPercent[A<:Prim](range1: R[A], range2: R[A]): Double = {
+    val (range1Start, range1End) = rangeP(range1)
     val inters = intersection(range1, range2)
+    val (intersStart, intersEnd) = rangeP(inters)
 
     if(roughLength(inters) == 0) 0
     else if(range1 == inters) 1
     else if(roughLength(range1) != 0) {
-      lazy val perc1 = (inters.end - inters.start) / (range1.end - range1.start)
-      lazy val perc2 = (inters.end / range1.end) * (1 - inters.start / inters.end) / (1 - range1.start / range1.end)
+      lazy val perc1 = (intersEnd - intersStart) / (range1End - range1Start)
+      lazy val perc2 = (intersEnd / range1End) * (1 - intersStart / intersEnd) / (1 - range1Start / range1End)
       lazy val perc3 = (length(intersection(range1, range2)) / length(range1)).toDouble
 
       if(!perc1.isNaN && !perc1.isInfinity) perc1
@@ -44,24 +42,13 @@ trait RangePOps extends RangeMOps[GenericRangeP] {
     } else 0
   }
 
-  def modifyMeasure[A](range: RangePA, measure: Measure[A]): RangeM[A] =
-    RangeM(measure.from(range.start), measure.from(range.end))(measure)
-
-  def greater[A](range: RangePA, a: Prim): Boolean = range.start > a
-
-  def less[A](range: RangePA, a: Prim): Boolean = range.end < a
-
-  def contains[A](range: RangePA, a: Prim): Boolean = containsP(range.start, range.end, a)
-
-  def geq(range: RangePA, a: Prim): Boolean = greater(range, a) || contains(range, a)
-
-  def leq(range: RangePA, a: Prim): Boolean = less(range, a) || contains(range, a)
-
 }
 
-object RangeP extends RangePOps {
+object RangeP extends RangePOps[RangeM] {
 
-  private case class RangePImpl(start: Prim, end: Prim) extends RangeP
+  private case class RangePImpl(start: Prim, end: Prim) extends RangeM[Prim] {
+    val measure: Measure[Prim] = doubleMeasure
+  }
 
   def apply(p: Prim): RangeP = point(p)
 
@@ -78,5 +65,9 @@ object RangeP extends RangePOps {
   def forRangeM[A](rangeM: RangeM[A]): RangeP = {
     bare(rangeM.measure.to(rangeM.start), rangeM.measure.to(rangeM.end))
   }
+
+  def modifyRange[A](range: RangeM[A], f: (A, A) => (A, A)): RangeM[A] = RangeM.modifyRange(range, f)
+
+  def modifyMeasure[A, B](range: RangeM[A], measure: Measure[B]): RangeM[B] = RangeM.modifyMeasure(range, measure)
 
 }
