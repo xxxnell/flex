@@ -1,9 +1,10 @@
 import cats.data.Kleisli
-import flip.conf.CustomSketchConf
+import flip.conf.{CustomSimpleSketchConf, CustomSketchConf, SimpleSketchConf}
 import flip.measure.TrivialMeasures
+import flip.pdf.SimpleSketch
 import flip.pdf.syntax.{DistSyntax, SamplingDistSyntax, SketchSyntax, SmoothDistSyntax}
 import flip.plot.{CountPlotSyntax, DensityPlotSyntax, PlotSyntax}
-import flip.range.{RangeMSyntax, RangePSyntax}
+import flip.range.RangeSyntax
 import flip.sim.SimSyntax
 
 package object flip
@@ -47,6 +48,10 @@ trait ConfPkgSyntax {
 
   val SketchConf: CustomSketchConf.type = CustomSketchConf
 
+  type HistogramConf = CustomSimpleSketchConf
+
+  def HistogramConf: SimpleSketchConf.type = SimpleSketchConf
+
 }
 
 trait MeasurePkgSyntax
@@ -68,6 +73,10 @@ trait PdfPkgSyntax
 
   val Sketch: flip.pdf.Sketch.type = flip.pdf.Sketch
 
+  type Histogram[A] = flip.pdf.SimpleSketch[A]
+
+  val Histogram: SimpleSketch.type = flip.pdf.SimpleSketch
+
 }
 
 trait PlotPkgSyntax
@@ -82,8 +91,7 @@ trait PlotPkgSyntax
 }
 
 trait RangePkgSyntax
-  extends RangePSyntax
-    with RangeMSyntax
+  extends RangeSyntax
 
 trait SimPkgSyntax
   extends SimSyntax

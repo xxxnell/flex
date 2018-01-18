@@ -7,7 +7,9 @@ class RangePSpec extends Specification with ScalaCheck {
 
   "RangeP" should {
 
-    "length" in todo
+    "length" in {
+      RangeP(0, 10).length must equalTo(10)
+    }
 
     "intersection" in {
       RangeP.intersection(RangeP(0, 10), RangeP(5, 15)) must equalTo(RangeP(5, 10))

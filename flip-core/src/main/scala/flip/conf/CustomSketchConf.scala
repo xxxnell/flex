@@ -4,14 +4,6 @@ trait CustomSketchConf extends SketchConf
 
 object CustomSketchConf {
 
-  case class CustomSketchConfImpl(delta: Double,
-                                  mixingRatio: Double,
-                                  dataKernelWindow: Double,
-                                  decayFactor: Double,
-                                  cmap: CmapConf,
-                                  counter: CounterConf)
-    extends CustomSketchConf
-
   def apply(// dist
             delta: Double = DefaultSketchConf.delta,
             // sketch
@@ -39,14 +31,6 @@ object CustomSketchConf {
       CmapConf.uniform(cmapSize, cmapNo, cmapStart, cmapEnd),
       CounterConf(counterSize, counterNo)
     )
-
-  def simple(delta: Double,
-             mixingRatio: Double,
-             dataKernelWindow: Double,
-             decayFactor: Double,
-             cmapConf: CmapConf,
-             counterConf: CounterConf): CustomSketchConf =
-    CustomSketchConfImpl(delta, mixingRatio, dataKernelWindow, decayFactor, cmapConf, counterConf)
 
   def periodic(// sketch
                mixingRatio: Double, dataKernelWindow: Double,

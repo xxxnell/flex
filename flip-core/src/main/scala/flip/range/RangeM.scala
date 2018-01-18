@@ -5,7 +5,7 @@ import flip.pdf.Prim
 import flip.range.syntax._
 
 import scala.collection.immutable.NumericRange
-import scala.language.{higherKinds, implicitConversions}
+import scala.language.{higherKinds, implicitConversions, reflectiveCalls}
 
 /**
   * Range for measurable value.
@@ -26,82 +26,76 @@ trait RangeM[A] {
   override def toString: String = s"[$start..$end]"
 }
 
-trait RangeMOps[R[_]<:RangeM[_]] {
+trait RangeMOps[Γ, R[_]<:RangeM[_]] {
 
-  def primStart[A](range: R[A]): Prim = range.measure.asInstanceOf[Measure[A]].to(range.start.asInstanceOf[A])
+  def modifyRange[A<:Γ](range: R[A], f: (A, A) => (A, A)): R[A]
 
-  def primEnd[A](range: R[A]): Prim = range.measure.asInstanceOf[Measure[A]].to(range.end.asInstanceOf[A])
+  def modifyMeasure[A<:Γ, B](range: R[A], measure: Measure[B]): R[B]
+
+  def setRange[A<:Γ](range: R[A], start: A, end: A): R[A] =
+    modifyRange(range, (_: A, _: A) => (start, end))
+
+  def startP[A<:Γ](range: R[A]): Prim = range.measure.asInstanceOf[Measure[A]].to(range.start.asInstanceOf[A])
+
+  def endP[A<:Γ](range: R[A]): Prim = range.measure.asInstanceOf[Measure[A]].to(range.end.asInstanceOf[A])
+
+  def rangeP[A<:Γ](range: R[A]): (Prim, Prim) = (startP(range), endP(range))
 
   def containsP(start: Prim, end: Prim, p: Prim): Boolean = {
     ((start >= p) && (end <= p)) ||
       ((start <= p) && (end >= p))
   }
 
-  def contains[A](range: R[A], a: A): Boolean = {
-    containsP(primStart(range), primEnd(range), range.measure.asInstanceOf[Measure[A]].to(a))
+  def contains[A<:Γ](range: R[A], a: A): Boolean = {
+    containsP(startP(range), endP(range), range.measure.asInstanceOf[Measure[A]].to(a))
   }
 
-  def greater[A](range: R[A], a: A): Boolean = primStart(range) > range.measure.asInstanceOf[Measure[A]].to(a)
+  def greater[A<:Γ](range: R[A], a: A): Boolean = startP(range) > range.measure.asInstanceOf[Measure[A]].to(a)
 
-  def less[A](range: R[A], a: A): Boolean = primEnd(range) < range.measure.asInstanceOf[Measure[A]].to(a)
+  def less[A<:Γ](range: R[A], a: A): Boolean = endP(range) < range.measure.asInstanceOf[Measure[A]].to(a)
 
-  def middleP[A](start: Prim, end: Prim): Prim = {
+  def middleP(start: Prim, end: Prim): Prim = {
     if(start == Double.NegativeInfinity && end == Double.NegativeInfinity) Double.NegativeInfinity
     else if(start == Double.PositiveInfinity && end == Double.PositiveInfinity) Double.PositiveInfinity
     else start + ((end - start) / 2)
   }
 
-  def middle[A](range: R[A]): A =
-    range.measure.asInstanceOf[Measure[A]].from(middleP(primStart(range), primEnd(range)))
+  def middle[A<:Γ](range: R[A]): A =
+    range.measure.asInstanceOf[Measure[A]].from(middleP(startP(range), endP(range)))
 
-  def isForward(range: R[_]): Boolean = if(primEnd(range) - primStart(range) >= 0) true else false
+  def isForward[A<:Γ](range: R[A]): Boolean = if(endP(range) - startP(range) >= 0) true else false
 
   def isPoint(range: R[_]): Boolean = if(range.start == range.end) true else false
 
-  def length[A](range: R[A]): BigDecimal = {
-    BigDecimal(primEnd(range)) - BigDecimal(primStart(range))
+  def length[A<:Γ](range: R[A]): BigDecimal = {
+    BigDecimal(endP(range)) - BigDecimal(startP(range))
   }
 
-  def roughLength[A](range: R[A]): Double = {
-    val roughLength = primEnd(range) - primStart(range)
+  def roughLength[A<:Γ](range: R[A]): Double = {
+    val roughLength = endP(range) - startP(range)
     if(roughLength.isPosInfinity) Double.MaxValue
     else if(roughLength.isNegInfinity) Double.MinValue
     else roughLength
   }
 
-}
+  def uniformSplit[A<:Γ](range: R[A], size: Int): List[R[A]] = {
+    val measure = range.measure.asInstanceOf[Measure[A]]
+    val (startP, endP) = rangeP(range)
+    val unit = (endP - startP) / size
+    lazy val unitB = (BigDecimal(endP) - BigDecimal(startP)) / size
 
-trait RangeMSyntax {
-
-  implicit def scalaRange2RangeMs(range: Range): List[RangeM[Int]] =
-    scalaNumericRange2RangeMs(NumericRange(range.start, range.end, range.step))
-
-  implicit def scalaNumericRange2RangeMs[A](range: NumericRange[A])
-                                           (implicit measure: Measure[A]): List[RangeM[A]] =
-    range.toList
+    (0 until size).toList
+      .map(i => if(!unit.isNaN && !unit.isInfinity) startP + i * unit else (startP + i * unitB).toDouble)
       .sliding(2).toList
       .flatMap {
-        case a1 :: a2 :: Nil => Some((a1, a2))
+        case p1 :: p2 :: Nil => Some(setRange(range, measure.from(p1), measure.from(p2)))
         case _ => None
-      }.map { case (start, end) => RangeM(start, end) }
-
-  implicit class RangeMSyntaxImpl[A](range: RangeM[A]) {
-    def contains(a: A): Boolean = RangeM.contains(range, a)
-    def greater(a: A): Boolean = RangeM.greater(range, a)
-    def >(a: A): Boolean = RangeM.greater(range, a)
-    def >=(a: A): Boolean = RangeM.greater(range, a) || RangeM.contains(range, a)
-    def less(a: A): Boolean = RangeM.less(range, a)
-    def <(a: A): Boolean = RangeM.less(range, a)
-    def <=(a: A): Boolean = RangeM.less(range, a) || RangeM.contains(range, a)
-    def middle: A = RangeM.middle(range)
-    def isPoint: Boolean = RangeM.isPoint(range)
-    def length: BigDecimal = RangeM.length(range)
-    def roughLength: Double = RangeM.roughLength(range)
+      }
   }
 
 }
 
-object RangeM extends RangeMOps[RangeM] {
+object RangeM extends RangeMOps[Any, RangeM] {
 
   case class RangeMImpl[A](start: A, end: A, measure: Measure[A]) extends RangeM[A]
 
@@ -111,19 +105,14 @@ object RangeM extends RangeMOps[RangeM] {
     if(measure(start) < measure(end)) RangeMImpl(start, end, measure) else RangeMImpl(end, start, measure)
   }
 
-  override def greater[A](range: RangeM[A], a: A): Boolean = (range, a) match {
-    case (range: RangePA, a: Prim) => RangeP.greater(range, a)
-    case _ => super.greater(range, a)
+  def modifyRange[A](range: RangeM[A], f: (A, A) => (A, A)): RangeM[A] = {
+    val (start, end) = f(range.start, range.end)
+    bare(start, end, range.measure)
   }
 
-  override def less[A](range: RangeM[A], a: A): Boolean = (range, a) match {
-    case (range: RangePA, a: Prim) => RangeP.less(range, a)
-    case _ => super.less(range, a)
-  }
-
-  override def contains[A](range: RangeM[A], a: A): Boolean = (range, a) match {
-    case (range: RangePA, a: Prim) => RangeP.contains(range, a)
-    case _ => super.contains(range, a)
+  def modifyMeasure[A, B](range: RangeM[A], measure: Measure[B]): RangeM[B] = {
+    val (startP, endP) = rangeP(range)
+    bare(measure.from(startP), measure.from(endP), measure)
   }
 
 }

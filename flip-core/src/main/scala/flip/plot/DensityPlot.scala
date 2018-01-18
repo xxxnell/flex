@@ -37,17 +37,6 @@ trait DensityPlotOps extends PlotOps[DensityPlot] {
 
 }
 
-trait DensityPlotSyntax {
-
-  implicit class DensityPlotSyntaxImpl(dPlot: DensityPlot) extends PolyPlotSyntax[DensityPlot] {
-    def plot: DensityPlot = dPlot
-    def ops: PlotOps[DensityPlot] = DensityPlot
-
-    def cumulative: DensityPlot = DensityPlot.cumulative(plot)
-  }
-
-}
-
 object DensityPlot extends DensityPlotOps {
 
   case class DensityPlotImpl(records: List[Record]) extends DensityPlot

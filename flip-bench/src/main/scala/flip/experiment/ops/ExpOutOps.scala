@@ -45,10 +45,7 @@ object ExpOutOps {
   }
 
   def writePlot(path: String, name: String, affix: String, plot: Plot): Unit = {
-    val records = plot.records.map { case (range, value) => range.start :: range.end :: value :: Nil }
-    val recordsStr = records.map(_.mkString(", ")).mkString("\n")
-
-    writeStr(path, name, affix, recordsStr)
+    writeStr(path, name, affix, plot.csv)
   }
 
   def writePlotsForDetails(path: String, name: String, plots: List[(Int, Plot)]): Unit = {
