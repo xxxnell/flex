@@ -1,7 +1,6 @@
 package flip.experiment
 
 import flip._
-import flip.experiment.ComparisonWithHistogramExp.sketch
 import flip.pdf.SmoothDist
 
 /**
