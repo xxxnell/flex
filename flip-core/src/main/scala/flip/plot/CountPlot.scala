@@ -28,15 +28,6 @@ trait CountPlotOps extends PlotOps[CountPlot] {
 
 }
 
-trait CountPlotSyntax {
-
-  implicit class CountPlotSyntaxImpl(cPlot: CountPlot) extends PolyPlotSyntax[CountPlot] {
-    def plot: CountPlot = cPlot
-    def ops: PlotOps[CountPlot] = CountPlot
-  }
-
-}
-
 object CountPlot extends CountPlotOps {
 
   case class CountPlotImpl(records: List[Record]) extends CountPlot
