@@ -11,7 +11,7 @@ import scala.language.higherKinds
 /**
   * Range for primitive type of Sketch.
   */
-trait RangePOps[R[_]<:RangeM[_]] extends RangeMOps[R] {
+trait RangePOps[R[_]<:RangeM[_]] extends RangeMOps[Prim, R] {
 
   def intersection[A<:Prim](range1: R[A], range2: R[A]): R[A] = {
     val (start1, end1) = rangeP(range1)
@@ -21,7 +21,7 @@ trait RangePOps[R[_]<:RangeM[_]] extends RangeMOps[R] {
     val startP = if(start1 > start2) start1 else start2
     val endP = if(end1 > end2) end2 else end1
 
-    modifyRange(range1, { case _ => (measure.from(startP), measure.from(endP)) })
+    modifyRange(range1, (_: A, _: A) => (measure.from(startP), measure.from(endP)))
   }
 
   def overlapPercent[A<:Prim](range1: R[A], range2: R[A]): Double = {
@@ -66,8 +66,10 @@ object RangeP extends RangePOps[RangeM] {
     bare(rangeM.measure.to(rangeM.start), rangeM.measure.to(rangeM.end))
   }
 
-  def modifyRange[A](range: RangeM[A], f: (A, A) => (A, A)): RangeM[A] = RangeM.modifyRange(range, f)
+  def modifyRange[A<:Prim](range: RangeM[A], f: (A, A) => (A, A)): RangeM[A] =
+    RangeM.modifyRange(range, f)
 
-  def modifyMeasure[A, B](range: RangeM[A], measure: Measure[B]): RangeM[B] = RangeM.modifyMeasure(range, measure)
+  def modifyMeasure[A<:Prim, B](range: RangeM[A], measure: Measure[B]): RangeM[B] =
+    RangeM.modifyMeasure(range, measure)
 
 }

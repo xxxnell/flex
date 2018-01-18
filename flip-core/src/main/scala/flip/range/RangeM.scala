@@ -26,49 +26,49 @@ trait RangeM[A] {
   override def toString: String = s"[$start..$end]"
 }
 
-trait RangeMOps[R[_]<:RangeM[_]] {
+trait RangeMOps[Γ, R[_]<:RangeM[_]] {
 
-  def modifyRange[A](range: R[A], f: (A, A) => (A, A)): R[A]
+  def modifyRange[A<:Γ](range: R[A], f: (A, A) => (A, A)): R[A]
 
-  def modifyMeasure[A, B](range: R[A], measure: Measure[B]): R[B]
+  def modifyMeasure[A<:Γ, B](range: R[A], measure: Measure[B]): R[B]
 
-  def startP[A](range: R[A]): Prim = range.measure.asInstanceOf[Measure[A]].to(range.start.asInstanceOf[A])
+  def startP[A<:Γ](range: R[A]): Prim = range.measure.asInstanceOf[Measure[A]].to(range.start.asInstanceOf[A])
 
-  def endP[A](range: R[A]): Prim = range.measure.asInstanceOf[Measure[A]].to(range.end.asInstanceOf[A])
+  def endP[A<:Γ](range: R[A]): Prim = range.measure.asInstanceOf[Measure[A]].to(range.end.asInstanceOf[A])
 
-  def rangeP[A](range: R[A]): (Prim, Prim) = (startP(range), endP(range))
+  def rangeP[A<:Γ](range: R[A]): (Prim, Prim) = (startP(range), endP(range))
 
   def containsP(start: Prim, end: Prim, p: Prim): Boolean = {
     ((start >= p) && (end <= p)) ||
       ((start <= p) && (end >= p))
   }
 
-  def contains[A](range: R[A], a: A): Boolean = {
+  def contains[A<:Γ](range: R[A], a: A): Boolean = {
     containsP(startP(range), endP(range), range.measure.asInstanceOf[Measure[A]].to(a))
   }
 
-  def greater[A](range: R[A], a: A): Boolean = startP(range) > range.measure.asInstanceOf[Measure[A]].to(a)
+  def greater[A<:Γ](range: R[A], a: A): Boolean = startP(range) > range.measure.asInstanceOf[Measure[A]].to(a)
 
-  def less[A](range: R[A], a: A): Boolean = endP(range) < range.measure.asInstanceOf[Measure[A]].to(a)
+  def less[A<:Γ](range: R[A], a: A): Boolean = endP(range) < range.measure.asInstanceOf[Measure[A]].to(a)
 
-  def middleP[A](start: Prim, end: Prim): Prim = {
+  def middleP(start: Prim, end: Prim): Prim = {
     if(start == Double.NegativeInfinity && end == Double.NegativeInfinity) Double.NegativeInfinity
     else if(start == Double.PositiveInfinity && end == Double.PositiveInfinity) Double.PositiveInfinity
     else start + ((end - start) / 2)
   }
 
-  def middle[A](range: R[A]): A =
+  def middle[A<:Γ](range: R[A]): A =
     range.measure.asInstanceOf[Measure[A]].from(middleP(startP(range), endP(range)))
 
-  def isForward[A](range: R[A]): Boolean = if(endP(range) - startP(range) >= 0) true else false
+  def isForward[A<:Γ](range: R[A]): Boolean = if(endP(range) - startP(range) >= 0) true else false
 
   def isPoint(range: R[_]): Boolean = if(range.start == range.end) true else false
 
-  def length[A](range: R[A]): BigDecimal = {
+  def length[A<:Γ](range: R[A]): BigDecimal = {
     BigDecimal(endP(range)) - BigDecimal(startP(range))
   }
 
-  def roughLength[A](range: R[A]): Double = {
+  def roughLength[A<:Γ](range: R[A]): Double = {
     val roughLength = endP(range) - startP(range)
     if(roughLength.isPosInfinity) Double.MaxValue
     else if(roughLength.isNegInfinity) Double.MinValue
@@ -77,7 +77,7 @@ trait RangeMOps[R[_]<:RangeM[_]] {
 
 }
 
-object RangeM extends RangeMOps[RangeM] {
+object RangeM extends RangeMOps[Any, RangeM] {
 
   case class RangeMImpl[A](start: A, end: A, measure: Measure[A]) extends RangeM[A]
 
