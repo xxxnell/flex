@@ -12,7 +12,7 @@ import flip.range.syntax._
 trait Cmap {
 
   /**
-    * @return option of hdim. It returns None if the given prim is out of scope.
+    * @return Prim => HDim. HDim starts from 0.
     * */
   def apply(a: Prim): HDim
 
