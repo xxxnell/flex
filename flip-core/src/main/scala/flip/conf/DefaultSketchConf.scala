@@ -9,6 +9,8 @@ trait DefaultSketchConf
 
   val dataKernelWindow: Double = 1e-5
 
+  val boundaryCorrection: Double = 1e-5
+
   val decayFactor: Double = 1
 
   val startThreshold: Double = 100
@@ -17,7 +19,7 @@ trait DefaultSketchConf
 
   val queueSize: Int = 50
 
-  val cmap: UniformCmapConf = CmapConf.uniform(200, 10, Some(-1000d), Some(1000d))
+  val cmap: UniformCmapConf = CmapConf.uniform(200, 3, Some(-1000d), Some(1000d))
 
   val counter: CounterConf = CounterConf.apply(70, 2)
 

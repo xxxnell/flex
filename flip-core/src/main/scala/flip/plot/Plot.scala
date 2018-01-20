@@ -18,10 +18,6 @@ trait Plot {
 
   def records: List[Record]
 
-  // todo consistency with startIndexedRecords and endIndexedRecords
-  lazy val middleIndex: TreeMap[Prim, Int] =
-    TreeMap.apply(records.map { case (range, _) => range.middle }.zipWithIndex: _*)
-
   lazy val samples: List[Block] = records
     .flatMap { case (range, value) => (range.start, value) :: (range.end, value) :: Nil }
     .sliding(2)
@@ -31,8 +27,11 @@ trait Plot {
       case _ => None
     }
 
-  lazy val startIndexedBlocks: TreeMap[Prim, Block] =
-    TreeMap.apply(samples.map { case block @ ((start, _), _) => (start, block) }: _*)
+  lazy val startIndexedBlocks: TreeMap[Prim, List[Block]] =
+    TreeMap.apply(samples.groupBy { case ((start, _), _) => start }.toArray: _*)
+
+  lazy val middleIndex: TreeMap[Prim, List[Block]] =
+    TreeMap.apply(samples.groupBy { case ((start, _), (end, _)) => start / 2 + end / 2 }.toArray: _*)
 
   override def toString: String = {
     val recordsStr = records.map { case (range, value) => s"$range -> $value" }.mkString(", ")
@@ -74,18 +73,30 @@ trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
   def interpolation(plot: P, x: Double): Double = {
     val dataRefSize = 2
 
-    val midRecordsO = {
-      val toIndex = plot.middleIndex.to(x)
-      val fromIndex = plot.middleIndex.from(x)
-      if(toIndex.nonEmpty && fromIndex.nonEmpty) {
-        Some(plot.records.apply(toIndex.last._2) ::
-          plot.records.apply(fromIndex.head._2) :: Nil)
-      } else None
-    }
+//    val midRecordsO = {
+//      val toIndex = plot.middleIndex.to(x)
+//      val fromIndex = plot.middleIndex.from(x)
+//      if(toIndex.nonEmpty && fromIndex.nonEmpty) {
+//        Some(plot.records.apply(toIndex.last._2) ::
+//          plot.records.apply(fromIndex.head._2) :: Nil)
+//      } else None
+//    }
 
-    val midInterp = midRecordsO
-      .map(records => records.map { case (range, value) => (range.middle, value) })
-      .flatMap { datas => dataFitting(datas, x) }
+//    val midInterp = midRecordsO
+//      .map(records => records.map { case (range, value) => (range.middle, value) })
+//      .flatMap { datas => dataFitting(datas, x) }
+
+    val midInterp = for {
+      toIndexBlocks <- plot.middleIndex.to(x).lastOption
+      fromIndexBlocks <- plot.middleIndex.from(x).headOption
+      (toPoint, toBlocks) =  toIndexBlocks
+      (fromPoint, fromBlocks) =  fromIndexBlocks
+      toP = toBlocks.map { case ((x1, y1), (x2, y2)) => (x1 / 2 + x2 / 2, y1 / 2 + y2 / 2) }
+        .maxBy { case (_, y) => y }
+      fromP = fromBlocks.map { case ((x1, y1), (x2, y2)) => (x1 / 2 + x2 / 2, y1 / 2 + y2 / 2) }
+        .minBy { case (_, y) => y }
+      fitting <- dataFitting(toP :: fromP :: Nil, x)
+    } yield fitting
 
     val headExt = plot.records.headOption.filter { case (range, _) => range.start >= x }
       .map { case (_, value) => value }
@@ -96,6 +107,9 @@ trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
     (midInterp orElse headExt orElse tailExt).getOrElse(0)
   }
 
+  /**
+    * @param as List of (x, y)
+    * */
   def dataFitting(as: List[(Double, Double)], x: Double): Option[Double] = {
     val largeCutoff = 1e300
     val smallCutoff = -1e300
@@ -232,36 +246,38 @@ trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
     lazy val startIndexedBlocksFromTo = plot.startIndexedBlocks.from(start).to(end)
 
     lazy val startBoundary: Double = (for {
-      idxBlock <- plot.startIndexedBlocks.to(start).lastOption
-      (_, block) = idxBlock
-      ((x1, y1), (x2, y2)) = block
+      idxBlocks <- plot.startIndexedBlocks.to(start).lastOption
+      (_, blocks) = idxBlocks
+      ((x1, y1), (x2, y2)) = blocks.minBy { case (_, (_x2, _)) => _x2 }
       yi = CountPlot.disjoint((RangeP(x1), y1) :: (RangeP(x2), y2) :: Nil).interpolation(start)
     } yield if(start != x1) areaPoint(start, yi, x2, y2) else 0)
       .sum
 
     lazy val endBoundary: Double = (for {
-      idxBlock <- plot.startIndexedBlocks.to(end).lastOption
-      (_, block) = idxBlock
-      ((x1, y1), (x2, y2)) = block
+      idxBlocks <- plot.startIndexedBlocks.to(end).lastOption
+      (_, blocks) = idxBlocks
+      ((x1, y1), (x2, y2)) = blocks.minBy { case (_, (_x2, _)) => _x2 }
       yi = CountPlot.disjoint((RangeP(x1), y1) :: (RangeP(x2), y2) :: Nil).interpolation(end)
     } yield areaPoint(x1, y1, end, yi))
       .sum
 
     lazy val mid: Double = (if(startIndexedBlocksFromTo.nonEmpty) {
       val endBlock = (for {
-        idxBlock <- startIndexedBlocksFromTo.lastOption
-        (_, block) = idxBlock
+        idxBlocks <- startIndexedBlocksFromTo.lastOption
+        (_, blocks) = idxBlocks
+        block = blocks.minBy { case (_, (_x2, _)) => _x2 }
       } yield areaBlock(block))
         .getOrElse(0.0)
 
-      Some(startIndexedBlocksFromTo.values.toList.map(block => areaBlock(block)).sum - endBlock)
+      Some(startIndexedBlocksFromTo.values.toList.map(blocks => areaBlocks(blocks)).sum - endBlock)
     } else None)
       .sum
 
     lazy val startEndBoundary: Double = (if(startIndexedBlocksFromTo.isEmpty) {
       for {
-        idxBlock <- plot.startIndexedBlocks.to(end).lastOption
-        (_, block) = idxBlock
+        idxBlocks <- plot.startIndexedBlocks.to(end).lastOption
+        (_, blocks) = idxBlocks
+        block <-  blocks.find { case ((x1, _), (x2, _)) => x1 <= start && x2 >= end }
         ((x1, y1), (x2, y2)) = block
         plot = CountPlot.disjoint((RangeP(x1), y1) :: (RangeP(x2), y2) :: Nil)
         yi1 = plot.interpolation(start)
@@ -281,6 +297,8 @@ trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
   def areaBlock(block: Block): Double = block match {
     case ((x1, y1), (x2, y2)) => areaPoint(x1, y1, x2, y2)
   }
+
+  def areaBlocks(blocks: List[Block]): Double = blocks.map(block => areaBlock(block)).sum
 
   def isEmpty(plot: Plot): Boolean = plot.records.isEmpty
 

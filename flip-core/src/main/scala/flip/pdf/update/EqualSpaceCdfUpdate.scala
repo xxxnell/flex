@@ -13,20 +13,37 @@ trait EqualSpaceCdfUpdate {
     sketchPlot <- sketch.sampling(conf)
     mixingRatio = conf.mixingRatio
     window = conf.dataKernelWindow
+    corr = conf.boundaryCorrection
     cmapSize = conf.cmap.size
     mtpSketchPlot = sketchPlot * (1 / (mixingRatio + 1))
     mtpPsPlot = DensityPlot.squareKernel(ps, window) * (mixingRatio / (mixingRatio + 1))
     mergedPlot = if(ps.nonEmpty) mtpSketchPlot + mtpPsPlot else sketchPlot
-    cmap = cmapForEqualSpaceCumulative(mergedPlot, cmapSize)
+    cmap = cmapForEqualSpaceCumCorr(mergedPlot, cmapSize, corr)
   } yield cmap
 
-  def cmapForEqualSpaceCumulative(plot: DensityPlot, cmapSize: Int): Cmap = {
-    val cdf = plot.cumulative
-    val invCdf = cdf.inverse
-    val unit = cdf.interpolation(Double.MaxValue) / cmapSize.toDouble
+  /**
+    * @param corr boundary marginal ratio for the separation unit.
+    *             If corr=1, cmapForEqualSpaceCumCorr is identical to standard cmapForEqualSpaceCum.
+    *             If corr=0, cmap has no margin.
+    * */
+  def cmapForEqualSpaceCumCorr(plot: DensityPlot, cmapSize: Int, corr: Double): Cmap = {
+    lazy val cdf = plot.cumulative
+    lazy val invCdf = cdf.inverse
 
-    val divider = (1 until cmapSize).toList.map(i => i * unit).map(a => invCdf.interpolation(a))
-    Cmap.divider(divider)
+    val cdfDivider = if(cmapSize < 2) {
+      Nil
+    } else if(cmapSize == 2) {
+      0.5 :: Nil
+    } else {
+      val unit = cdf.interpolation(Double.MaxValue) / (cmapSize.toDouble - 2 + 2 * corr)
+
+      (1 until cmapSize).toList
+        .map(i => unit * corr + unit * (i - 1))
+    }
+
+    val pDivider = cdfDivider.map(a => invCdf.interpolation(a))
+
+    Cmap.divider(pDivider)
   }
 
   def smoothingPsForEqualSpaceCumulative(ps: List[(Prim, Count)]): DensityPlot = {
