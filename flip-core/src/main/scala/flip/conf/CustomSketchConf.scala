@@ -9,6 +9,7 @@ object CustomSketchConf {
             // sketch
             mixingRatio: Double = DefaultSketchConf.mixingRatio,
             dataKernelWindow: Double = DefaultSketchConf.dataKernelWindow,
+            boundaryCorr: Double = DefaultSketchConf.boundaryCorrection,
             decayFactor: Double = DefaultSketchConf.decayFactor,
             // adaptive
             queueSize: Int = DefaultSketchConf.queueSize,
@@ -22,15 +23,16 @@ object CustomSketchConf {
             cmapEnd: Option[Double] = DefaultSketchConf.cmap.end,
             // counter
             counterSize: Int = DefaultSketchConf.counter.size,
-            counterNo: Int = DefaultSketchConf.counter.no): CustomAdaPerSketchConf =
+            counterNo: Int = DefaultSketchConf.counter.no): CustomAdaPerSketchConf = {
     AdaPerSketchConf.custom(
       delta,
-      mixingRatio, dataKernelWindow, decayFactor,
+      mixingRatio, dataKernelWindow, boundaryCorr, decayFactor,
       queueSize,
       startThreshold, thresholdPeriod,
       CmapConf.uniform(cmapSize, cmapNo, cmapStart, cmapEnd),
       CounterConf(counterSize, counterNo)
     )
+  }
 
   def periodic(// sketch
                mixingRatio: Double, dataKernelWindow: Double,

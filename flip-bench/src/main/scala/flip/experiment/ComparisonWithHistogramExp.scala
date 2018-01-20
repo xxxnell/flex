@@ -9,7 +9,7 @@ import flip.pdf.SmoothDist
 object ComparisonWithHistogramExp { self =>
 
   def main(args: Array[String]): Unit = {
-    val sampleNo = 600
+    val sampleNo = 1000
     val histoSampleNo = 20
     val sketchSampleNo = 20
     val underlying = NumericDist.normal(0.0, 1)
@@ -43,13 +43,11 @@ object ComparisonWithHistogramExp { self =>
 
   def sketch(no: Int): (Sketch[Double], SketchConf) = {
     implicit val sketchConf: SketchConf = SketchConf(
-      decayFactor = 1,
-      startThreshold = 50, thresholdPeriod = 100, queueSize = 30,
+      startThreshold = 100, thresholdPeriod = 50, boundaryCorr = 0.01, decayFactor = 0,
+      queueSize = 100,
       cmapSize = no, cmapNo = 5, cmapStart = Some(-10d), cmapEnd = Some(10),
       counterSize = 1000, counterNo = 2
     )
-
-    println("cmapSize: " + Sketch.empty[Double].cmapSize)
 
     (Sketch.empty[Double], sketchConf)
   }
@@ -64,6 +62,8 @@ object ComparisonWithHistogramExp { self =>
     implicit val confImpl: SketchConf = conf
     val minDomainCutoff = -10e10
     val maxDomainCutoff = 10e10
+    val samplingStart = -1.5
+    val samplingEnd = 1.5
 
     val utdSketchO = datas.foldLeft(Option(sketch)){ case (sketchO, data) =>
       for {
@@ -77,7 +77,7 @@ object ComparisonWithHistogramExp { self =>
       // pdf
       pdf <- utdSketch.sampling
       // kld density
-      underlyingSampling <- underlying.uniformSampling(-2.5, 2.5, 1000)
+      underlyingSampling <- underlying.uniformSampling(samplingStart, samplingEnd, 1000)
       underlyingFiltered = underlyingSampling.filter { range => range > minDomainCutoff && range < maxDomainCutoff }
       kldDensity <- KLDDensity(underlyingFiltered, utdSketch)
       kld <- KLD(underlyingFiltered, utdSketch)

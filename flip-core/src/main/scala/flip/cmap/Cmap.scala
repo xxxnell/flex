@@ -12,7 +12,7 @@ import flip.range.syntax._
 trait Cmap {
 
   /**
-    * @return option of hdim. It returns None if the given prim is out of scope.
+    * @return Prim => HDim. HDim starts from 0.
     * */
   def apply(a: Prim): HDim
 
@@ -38,6 +38,14 @@ trait CmapLaws[C<:Cmap] { self: CmapOps[C] =>
 
   def ranges(cmap: C): List[(HDim, RangeP)] = (for { i <- 0 until cmap.size } yield (i, range(cmap, i))).toList
 
+  def headRange(cmap: C): RangeP = range(cmap, 0)
+
+  def lastRange(cmap: C): RangeP = {
+    val size = self.size(cmap)
+
+    range(cmap, if(size > 0) size - 1 else 0)
+  }
+
 }
 
 trait CmapSyntax {
@@ -47,6 +55,8 @@ trait CmapSyntax {
     def size: Int = Cmap.size(cmap)
     def range(hdim: HDim): RangeP = Cmap.range(cmap, hdim)
     def ranges: List[(HDim, RangeP)] = Cmap.ranges(cmap)
+    def headRange: RangeP = Cmap.headRange(cmap)
+    def lastRange: RangeP = Cmap.lastRange(cmap)
   }
 
 }

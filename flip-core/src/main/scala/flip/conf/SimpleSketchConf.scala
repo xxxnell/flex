@@ -9,6 +9,7 @@ object SimpleSketchConf {
   private case class SimpleSketchConfImpl(delta: Double,
                                           mixingRatio: Double,
                                           dataKernelWindow: Double,
+                                          boundaryCorrection: Double,
                                           decayFactor: Double,
                                           cmap: CmapConf,
                                           counter: CounterConf)
@@ -19,6 +20,7 @@ object SimpleSketchConf {
             // sketch
             mixingRatio: Double = DefaultSketchConf.mixingRatio,
             dataKernelWindow: Double = DefaultSketchConf.dataKernelWindow,
+            boundaryCorr: Double = DefaultSketchConf.boundaryCorrection,
             decayFactor: Double = DefaultSketchConf.decayFactor,
             // cmap
             binNo: Int,
@@ -30,18 +32,23 @@ object SimpleSketchConf {
     val cmapConf = CmapConf.uniform(binNo, 1, start, end)
     val counterConf = CounterConf(counterSize, counterNo)
     SimpleSketchConf.custom(
-      delta, mixingRatio, dataKernelWindow, decayFactor, cmapConf, counterConf
+      delta,
+      mixingRatio, dataKernelWindow, decayFactor, boundaryCorr,
+      cmapConf, counterConf
     )
   }
 
   def custom(delta: Double,
              mixingRatio: Double,
              dataKernelWindow: Double,
+             boundaryCorr: Double,
              decayFactor: Double,
              cmapConf: CmapConf,
              counterConf: CounterConf): CustomSimpleSketchConf =
     SimpleSketchConfImpl(
-      delta, mixingRatio, dataKernelWindow, decayFactor, cmapConf, counterConf
+      delta,
+      mixingRatio, dataKernelWindow, decayFactor, boundaryCorr,
+      cmapConf, counterConf
     )
 
 }
