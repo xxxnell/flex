@@ -116,6 +116,13 @@ trait SketchPropLaws[S[_]<:Sketch[_], C<:SketchConf] { self: SketchPropOps[S, C]
     cmap = structure._1
   } yield cmap
 
+  def domain[A](sketch: S[A]): Option[RangeM[A]] = for {
+    youngCmap <- youngCmap(sketch)
+    head = youngCmap.headRange.start
+    last = youngCmap.lastRange.end
+    measure = sketch.measure.asInstanceOf[Measure[A]]
+  } yield RangeM(measure.from(head), measure.from(last))(measure)
+
   def conf2Structures(conf: C): Structures =
     (Cmap(conf.cmap), HCounter(conf.counter, -1)) :: Nil
 
