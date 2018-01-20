@@ -9,7 +9,7 @@ trait DefaultSketchConf
 
   val dataKernelWindow: Double = 1e-5
 
-  val boundaryCorrection: Double = 1e-5
+  val boundaryCorrection: Double = 1
 
   val decayFactor: Double = 1
 
