@@ -248,7 +248,9 @@ trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
     lazy val startBoundary: Double = (for {
       idxBlocks <- plot.startIndexedBlocks.to(start).lastOption
       (_, blocks) = idxBlocks
-      ((x1, y1), (x2, y2)) = blocks.minBy { case (_, (_x2, _)) => _x2 }
+      ((x1, y1), (x2, y2)) = blocks
+        .groupBy { case (_, (_x2, _)) => _x2 }.maxBy { case (_x2, _) => _x2 }._2
+        .maxBy { case ((_, _y1), (_, _y2)) => _y1 / 2 + _y2 / 2 }
       yi = CountPlot.disjoint((RangeP(x1), y1) :: (RangeP(x2), y2) :: Nil).interpolation(start)
     } yield if(start != x1) areaPoint(start, yi, x2, y2) else 0)
       .sum
@@ -256,7 +258,9 @@ trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
     lazy val endBoundary: Double = (for {
       idxBlocks <- plot.startIndexedBlocks.to(end).lastOption
       (_, blocks) = idxBlocks
-      ((x1, y1), (x2, y2)) = blocks.minBy { case (_, (_x2, _)) => _x2 }
+      ((x1, y1), (x2, y2)) = blocks
+        .groupBy { case (_, (_x2, _)) => _x2 }.minBy { case (_x2, _) => _x2 }._2
+        .minBy { case ((_, _y1), (_, _y2)) => _y1 / 2 + _y2 / 2 }
       yi = CountPlot.disjoint((RangeP(x1), y1) :: (RangeP(x2), y2) :: Nil).interpolation(end)
     } yield areaPoint(x1, y1, end, yi))
       .sum
@@ -265,7 +269,9 @@ trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
       val endBlock = (for {
         idxBlocks <- startIndexedBlocksFromTo.lastOption
         (_, blocks) = idxBlocks
-        block = blocks.minBy { case (_, (_x2, _)) => _x2 }
+        block = blocks
+          .groupBy { case (_, (_x2, _)) => _x2 }.maxBy { case (_x2, _) => _x2 }._2
+          .maxBy { case ((_, _y1), (_, _y2)) => _y1 / 2 + _y2 / 2 }
       } yield areaBlock(block))
         .getOrElse(0.0)
 

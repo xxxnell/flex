@@ -63,6 +63,27 @@ class PlotSpec extends Specification with ScalaCheck {
         if(!(integ ~= (delta / 2))) ko(s"Integration result: $integ, expected: ${delta / 2}") else ok
       }
 
+      "start + end" in {
+        val data = (RangeP(-0.7576317390892238, -0.734342705921782), 21.469332642756626) ::
+          (RangeP(-0.734342705921782, -0.7110536727543402), 42.93866528551325) ::
+          (RangeP(-0.7110536727543402, -0.5761281674030975), 7.411497162058172) ::
+          (RangeP(-0.5761281674030975, -0.23041357359154566), 2.8925594056497874) ::
+          (RangeP(-0.23041357359154566, -0.22808416326717354), 429.2931947356869) ::
+          (RangeP(-0.22808416326717354, -0.0746495347106123), 6.517433576810634) ::
+          (RangeP(-0.0746495347106123, 0.3906768031180621), 2.14902944171663)::
+          (RangeP(0.3906768031180621, 0.6729365078742464), 3.542836554951403) ::
+          (RangeP(0.6729365078742464, 0.8622586098842574), 5.282003471243531)::
+          (RangeP(0.8622586098842574, 1.2139992174514753), 2.843004129993433) ::
+          (RangeP(1.2139992174514753, 1.5657398250186931), 1.4215020649967172) :: Nil
+        val plot = DensityPlot.disjoint(data)
+        val integral = plot.integral(0.3906746488553933, 0.41911785908856847)
+        val linearInterpolationExpected = 0.07103100316402881
+
+        val cond1 = integral ~= linearInterpolationExpected
+        if(!cond1) ko(s"Integration is not in range: $integral, expected: $linearInterpolationExpected")
+        else ok
+      }
+
     }
 
     "planarized" in todo
