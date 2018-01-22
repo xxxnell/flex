@@ -7,15 +7,16 @@ object BasicDeltaDistExp {
 
   def main(args: Array[String]): Unit = {
     val expName = "basic-delta"
-    val sampleNo = 10
+    val dataNo = 10
+    val samplingNo = 100
 
     implicit val conf: SketchConf = SketchConf(
       startThreshold = 2, thresholdPeriod = 1,
-      cmapSize = 100, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
-      counterSize = 1000, counterNo = 2
+      cmapSize = samplingNo, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
+      counterSize = samplingNo
     )
     val sketch = Sketch.empty[Double]
-    val (_, datas) = Dist.delta(0.1).samples(sampleNo)
+    val (_, datas) = Dist.delta(0.1).samples(dataNo)
     val dataIdxs = datas.zipWithIndex
 
     var tempSketchO: Option[Sketch[Double]] = Option(sketch)

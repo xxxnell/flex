@@ -6,6 +6,7 @@ import flip.measure.Measure
 import flip.pdf.{Count, Dist, Prim, Range, Sketch, Structure}
 import flip.pdf.monad.{DistFunctor, SketchMonad}
 import flip.plot.CountPlot
+import flip.range.RangeM
 
 trait SketchSyntax extends SketchPropSyntax with SketchMonadSyntax
 
@@ -34,6 +35,7 @@ trait SketchPropSyntax {
     def counterNo: Int = Sketch.counterNo(sketch)
     def counterSize: Int = Sketch.counterSize(sketch)
     def youngCmap: Option[Cmap] = Sketch.youngCmap(sketch)
+    def domain: Option[RangeM[A]] = Sketch.domain(sketch)
   }
 
 }

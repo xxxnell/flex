@@ -97,9 +97,16 @@ object HCounter extends HCounterOps[HCounter] { self =>
   def empty(depth: Int, width: Int, seed: Int): HCounter = {
     val hmapSeed: Int => Int = (i: Int) => byteswap32(seed ^ Int.MaxValue) << i
     val strs = (0 until depth).toList.map(i => (Hmap(hmapSeed(i)), Counter.empty(width)))
+
     bare(strs, 0)
   }
 
   def emptyForConf(conf: CounterConf, seed: Int): HCounter = empty(conf.no, conf.size, seed)
+
+  def emptyUncompressed(size: Int): HCounter = {
+    val strs = (Hmap.identity, Counter.empty(size)) :: Nil
+
+    bare(strs, 0)
+  }
 
 }

@@ -9,16 +9,17 @@ object BasicNormalDistExp {
   def main(args: Array[String]): Unit = {
     val expName1 = "basic-normal"
     val dataNo = 1000
-    val samplingNo = 100
+    val samplingNo = 50
     val start = 50
     val period = 100
     val minDomainCutoff = -10e10
     val maxDomainCutoff = 10e10
 
     implicit val conf: SketchConf = SketchConf(
-      startThreshold = start, thresholdPeriod = period, queueSize = 30,
+      startThreshold = start, thresholdPeriod = period, boundaryCorr = 0.1, decayFactor = 0,
+      queueSize = 0,
       cmapSize = samplingNo, cmapNo = 5, cmapStart = Some(-10d), cmapEnd = Some(10),
-      counterSize = 1000, counterNo = 2
+      counterSize = samplingNo
     )
     val sketch = Sketch.empty[Double]
     val underlying = NumericDist.normal(0.0, 1)

@@ -18,7 +18,7 @@ fig = plt.figure(figsize=(20, 5))
 data_locs = [
     dir + "basic-normal-pdf-40.out",
     dir + "basic-normal-pdf-60.out",
-    dir + "basic-normal-pdf-220.out"
+    dir + "basic-normal-pdf-340.out"
 ]
 
 i = 1
@@ -60,7 +60,7 @@ ax.axvline(250, color='r', linestyle=':', linewidth=1)
 ax.set_ylabel("divergence")
 ax.set_xlabel("update count")
 ax.set_xlim(40, 300)
-ax.set_ylim(0.1, 0.25)
+ax.set_ylim(-0.05, 0.25)
 
 plt.legend()
 plt.savefig(name + '.pdf')
