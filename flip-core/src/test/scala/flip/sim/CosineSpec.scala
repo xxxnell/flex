@@ -18,10 +18,9 @@ class CosineSpec extends Specification with ScalaCheck {
 
       (for {
         sampling <- normal1.uniformSampling(-3.0, 3.0, 100)
-        cosine <- Cosine.simForPlotted(sampling, normal2, conf)
-        cosineDensity <- Cosine.simDensityForPlotted(sampling, normal2, conf)
-        _ = println(s"sampling: \n${sampling.sampling.dsv("\t")}")
-        _ = println(s"cosineDensity: \n${cosineDensity.dsv("\t")}")
+        cosineSim = Cosine(sampling, normal2, conf)
+        cosine <- cosineSim.simForPlotted(sampling, normal2, conf)
+        cosineDensity <- cosineSim.simDensityForPlotted(sampling, normal2, conf)
       } yield cosine)
         .fold(ko("Exception occurs."))(cosine =>
           if(cosine ~= expect) ok else ko(s"Cosine similarity $cosine is not $expect. ")

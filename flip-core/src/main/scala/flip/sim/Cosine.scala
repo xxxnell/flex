@@ -47,7 +47,11 @@ object Cosine {
   } yield norm(sampling))
     .getOrElse(Double.PositiveInfinity)
 
-  def norm(pdf: DensityPlot): Double =
-    math.sqrt(pdf.modify { case (_, value) => value * value }.integral(Double.MinValue, Double.MaxValue))
+  def norm(pdf: DensityPlot): Double = (for {
+    sqr <- Some(pdf.modify { case (_, value) => value * value })
+    domain <- sqr.domain
+    normsqr = sqr.integral(domain.start, domain.end)
+  } yield math.sqrt(normsqr))
+    .getOrElse(Double.PositiveInfinity)
 
 }

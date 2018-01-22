@@ -32,14 +32,14 @@ object BasicNormalDistExp {
     val idxDensityPlots = idxUtdSketches.flatMap { case (idx, utdSkt) => utdSkt.densityPlot.map(plot => (idx, plot)) }
     val idxKldPlot = idxUtdSketches.flatMap { case (idx, utdSkt) =>
       for {
-        sampling <- underlying.sampling(utdSkt)
+        sampling <- underlying.sampling(utdSkt, conf)
         filtered = sampling.filter { range => range > minDomainCutoff && range < maxDomainCutoff }
         plot <- KLDDensity(filtered, utdSkt)
       } yield (idx, plot)
     }
     val idxKld = idxUtdSketches.flatMap { case (idx, utdSkt) =>
       for {
-        sampling <- underlying.sampling(utdSkt)
+        sampling <- underlying.sampling(utdSkt, conf)
         filtered = sampling.filter { range => range > minDomainCutoff && range < maxDomainCutoff }
         kld <- KLD(filtered, utdSkt)
       } yield (idx, kld)
