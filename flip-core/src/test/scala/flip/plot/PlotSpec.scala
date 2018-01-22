@@ -84,6 +84,19 @@ class PlotSpec extends Specification with ScalaCheck {
         else ok
       }
 
+      "undefined domain" in {
+        val data =
+          (RangeP(0, 1), 1.0) :: (RangeP(1, 2), 1.0) :: Nil
+        val integral = DensityPlot.disjoint(data).integral(Double.MinValue, 0)
+        val expected = 0
+
+        val cond1 = integral ~= expected
+
+        println(integral)
+        if(!cond1) ko(s"Integral $integral is not equal to expected $expected")
+        else ok
+      }
+
     }
 
     "planarized" in todo
