@@ -15,7 +15,9 @@ trait PlottedDist[A] extends SamplingDist[A] {
 
 trait PlottedDistPropOps[D[_]<:PlottedDist[_]] extends SamplingDistPropOps[D, SamplingDistConf] {
 
-  def sampling[A](dist: D[A], conf: SamplingDistConf): Option[DensityPlot] = Some(dist.sampling)
+  def sampling[A](dist: D[A], conf: SamplingDistConf): Option[DensityPlot] = sampling(dist)
+
+  def sampling[A](dist: D[A]): Option[DensityPlot] = Some(dist.sampling)
 
   def filter[A](dist: PlottedDist[A], f: RangeP => Boolean): PlottedDist[A] =
     PlottedDist(dist.measure, DensityPlot.disjoint(dist.sampling.records.filter { case (range, _) => f(range) }))
