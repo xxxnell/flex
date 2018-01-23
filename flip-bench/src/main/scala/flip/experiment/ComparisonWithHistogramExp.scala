@@ -13,40 +13,55 @@ object ComparisonWithHistogramExp { self =>
   def main(args: Array[String]): Unit = {
     val expName = "histogram-comparison"
     val sampleNo = 1000
-    val histoSampleNo = 20
-    val sketchSampleNo = 20
+    val histoSamplingNo = 20
+    val sketchSamplingNo = 20
     val underlying = NumericDist.normal(0.0, 1)
     val (_, datas) = underlying.samples(sampleNo)
 
-    val (histogram, histoConf) = self.histogram(histoSampleNo)
-    val (sketch, sketchConf) = self.sketch(sketchSampleNo)
+    val (histogram, histoConf) = self.histogram(histoSamplingNo)
+    val (sketch, sketchConf) = self.sketch(sketchSamplingNo)
 
     val utdHistos = update(histogram, datas, 10, histoConf)
     val utdSketchs = update(sketch, datas, 10, sketchConf)
 
-    val (histoResults, sketchResults) = (for {
-      histoResults <- utdHistos.traverse { case (idx, utdHisto) =>
-        results(utdHisto, datas, underlying, histoConf).map(result => (idx, result))
-      }
-      sketchResults <- utdSketchs.traverse { case (idx, utdSkt) =>
-        results(utdSkt, datas, underlying, sketchConf).map(result => (idx, result))
-      }
-    } yield (histoResults, sketchResults))
-      .getOrElse((Nil, Nil))
+    val histoResults = utdHistos.traverse { case (idx, utdHisto) =>
+      results(utdHisto, datas, underlying, histoConf).map(result => (idx, result))
+    }.getOrElse(Nil)
+    val sketchResults = utdSketchs.traverse { case (idx, utdSkt) =>
+      results(utdSkt, datas, underlying, sketchConf).map(result => (idx, result))
+    }.getOrElse(Nil)
+
+
+    val histoPdf = histoResults.map { case (idx, (pdf, _, _)) => (idx, pdf) }
+    val histoKldd = histoResults.map { case (idx, (_, kldd, _)) => (idx, kldd) }
+    val histoKld = histoResults.map { case (idx, (_, _, kld)) => (idx, kld) }
+    val sketchPdf = sketchResults.map { case (idx, (pdf, _, _)) => (idx, pdf) }
+    val sketchKldd = sketchResults.map { case (idx, (_, kldd, _)) => (idx, kldd) }
+    val sketchKld = sketchResults.map { case (idx, (_, _, kld)) => (idx, kld) }
 
     ExpOutOps.clear(expName)
-    ExpOutOps.writePlots(expName, "histo-pdf", histoResults.map { case (idx, (pdf, _, _)) => (idx, pdf) })
-    ExpOutOps.writePlots(expName, "sketch-pdf", sketchResults.map { case (idx, (pdf, _, _)) => (idx, pdf) })
-    ExpOutOps.writePlots(expName, "histo-kld-density", histoResults.map { case (idx, (_, kldd, _)) => (idx, kldd) })
-    ExpOutOps.writePlots(expName, "sketch-kld-density", sketchResults.map { case (idx, (_, kldd, _)) => (idx, kldd) })
-    ExpOutOps.writeStr(expName, "histo-kld", histoResults.map { case (idx, (_, _, kld)) => s"$idx, $kld" }.mkString("\n"))
-    ExpOutOps.writeStr(expName, "sketch-kld", sketchResults.map { case (idx, (_, _, kld)) => s"$idx, $kld" }.mkString("\n"))
+    ExpOutOps.writePlots(expName, "histo-pdf", histoPdf)
+    ExpOutOps.writePlots(expName, "histo-kld-density", histoKldd)
+    ExpOutOps.writeStr(expName, "histo-kld", histoKld.map { case (idx, kld) => s"$idx, $kld" }.mkString("\n"))
+    ExpOutOps.writePlots(expName, "sketch-pdf", sketchPdf)
+    ExpOutOps.writePlots(expName, "sketch-kld-density", sketchKldd)
+    ExpOutOps.writeStr(expName, "sketch-kld", sketchKld.map { case (idx, kld) => s"$idx, $kld" }.mkString("\n"))
+
+    for {
+      lastHistoKld <- histoKld.lastOption
+      lastSketchKld <- sketchKld.lastOption
+      (idx1, histoKld) = lastHistoKld
+      (idx2, sketchKld) = lastSketchKld
+    } yield if(idx1 == idx2)
+      println(s"KLD for $idx1 data: \n" +
+        s" Histogram($histoSamplingNo): $histoKld \n" +
+        s" Sketch($sketchSamplingNo): $sketchKld")
   }
 
   def histogram(no: Int): (Histogram[Double], HistogramConf) = {
     implicit val histoConf: HistogramConf = HistogramConf(
-      binNo = no, start = -2.5, end = 2.5,
-      counterSize = 1000, counterNo = 2
+      binNo = no, start = -3.0, end = 3.0,
+      counterSize = no
     )
 
     (Histogram.empty[Double], histoConf)
@@ -54,9 +69,9 @@ object ComparisonWithHistogramExp { self =>
 
   def sketch(no: Int): (Sketch[Double], SketchConf) = {
     implicit val sketchConf: SketchConf = SketchConf(
-      startThreshold = 100, thresholdPeriod = 50, boundaryCorr = 0.01, decayFactor = 0,
-      queueSize = 0,
-      cmapSize = no, cmapNo = 5, cmapStart = Some(-10d), cmapEnd = Some(10),
+      startThreshold = 50, thresholdPeriod = 100, boundaryCorr = 0.01, decayFactor = 0,
+      queueSize = 20,
+      cmapSize = no, cmapNo = 5, cmapStart = Some(-3.0), cmapEnd = Some(3.0),
       counterSize = no
     )
 
@@ -94,7 +109,7 @@ object ComparisonWithHistogramExp { self =>
       // pdf
       pdf <- sketch.sampling(conf)
       // kld
-      underlyingSampling <- underlying.uniformSampling(samplingStart, samplingEnd, 1000)
+      underlyingSampling <- underlying.uniformSampling(samplingStart, samplingEnd, 100)
       underlyingFiltered = underlyingSampling.filter { range => range > minDomainCutoff && range < maxDomainCutoff }
       kldDensity <- KLDDensity(underlyingFiltered, sketch)(conf)
       kld <- KLD(underlyingFiltered, sketch)(conf)
