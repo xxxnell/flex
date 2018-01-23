@@ -25,7 +25,7 @@ object DeltaDistGen {
 
   def deltaDistGen[A](measure: Measure[A]): Gen[DeltaDist[A]] = for {
     mean <- Arbitrary.arbitrary[Double]
-  } yield DeltaDist(measure, measure.from(mean))
+  } yield DeltaDist(measure, defaultSmoothDistConf, measure.from(mean))
 
   def doubleDeltaDistGen: Gen[DeltaDist[Double]] = deltaDistGen(doubleMeasure)
 

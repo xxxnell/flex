@@ -14,14 +14,13 @@ class CosineSpec extends Specification with ScalaCheck {
     "basic 1" in {
       val normal1 = Dist.normal(0.0, 1)
       val normal2 = Dist.normal(0.0, 1)
-      val conf: DistConf = DistConf(1e-5)
       val expect = 1.0
 
       (for {
         sampling <- normal1.uniformSampling(-3.0, 3.0, 100)
-        cosineSim = Cosine(sampling, normal2, conf)
-        cosine <- cosineSim.simForPlotted(sampling, normal2, conf)
-        cosineDensity <- cosineSim.simDensityForPlotted(sampling, normal2, conf)
+        cosineSim = Cosine(sampling, normal2)
+        cosine <- cosineSim.simForSampling(sampling, normal2)
+        cosineDensity <- cosineSim.simDensityForSampling(sampling, normal2)
       } yield cosine)
         .fold(ko("Exception occurs."))(cosine =>
           if(cosine ~= expect) ok else ko(s"Cosine similarity $cosine is not $expect. ")
@@ -41,7 +40,7 @@ class CosineSpec extends Specification with ScalaCheck {
       (for {
         underlyingSmp <- underlying.uniformSampling(-3.0, 3.0, 1000)
         utdHisto <- utdHistoO
-        cos <- flip.sim.syntax.Cosine(underlyingSmp, utdHisto)(histoConf)
+        cos <- flip.sim.syntax.Cosine(underlyingSmp, utdHisto)
       } yield cos)
         .fold(ko("Exception occurs."))(cos =>
           if(cos > 1) ko(s"Theoretically, cosine similarity cannot be greater then 1. cos: $cos")

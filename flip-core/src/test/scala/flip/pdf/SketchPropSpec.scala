@@ -62,7 +62,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
           cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
           counterSize = counterSize, counterNo = counterNo
         )
-        val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
+        val sketch0 = Sketch.empty[Double]
 
         (for {
           sketch1 <- sketch0.update(1, 2, 3, 4, 5, 6, 7, 8, 9)
@@ -78,7 +78,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
           cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
           counterSize = counterSize, counterNo = counterNo
         )
-        val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
+        val sketch0 = Sketch.empty[Double]
 
         (for {
           sketch1 <- sketch0.update(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
@@ -118,7 +118,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
           cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
           counterSize = counterSize, counterNo = counterNo
         )
-        val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
+        val sketch0 = Sketch.empty[Double]
 
         (for {
           sketch <- sketch0.narrowUpdate(0)
@@ -138,7 +138,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
           cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
           counterSize = counterSize, counterNo = counterNo
         )
-        val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
+        val sketch0 = Sketch.empty[Double]
 
         sketch0.probability(0, 1)
           .fold(ko)(prob => if(prob > 0) ok else ko(s"probability: $prob"))
@@ -151,7 +151,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
           cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
           counterSize = counterSize, counterNo = counterNo
         )
-        val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
+        val sketch0 = Sketch.empty[Double]
 
         (for {
           sketch1 <- sketch0.update(-1)
@@ -207,7 +207,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
             cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
             counterSize = counterSize, counterNo = counterNo
           )
-          val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
+          val sketch0 = Sketch.empty[Double]
           val sketch1O = sketch0.deepUpdate(1).map(_._1)
 
           val cond1 = sketch0.youngCmap != sketch1O.flatMap(_.youngCmap)
@@ -433,13 +433,13 @@ class SketchPropSpec extends Specification with ScalaCheck {
           cmapSize = 10, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
           counterSize = 10, counterNo = 2
         )
-        val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
+        val sketch0 = Sketch.empty[Double]
         val sketch1O = sketch0.update(0, 1, 1, 2, 3)
 
         (for {
           sketch1 <- sketch1O
-          interpPdf <- SamplingDist.interpolationPdf(sketch1, 1d, conf)
-          fastPdf <- Sketch.fastPdf(sketch1, 1d, conf)
+          interpPdf <- SamplingDist.interpolationPdf(sketch1, 1d)
+          fastPdf <- Sketch.fastPdf(sketch1, 1d)
         } yield (interpPdf, fastPdf))
           .fold(ko("Exception occurs")){ case (interpPdf, fastPdf) =>
             if(interpPdf ~= fastPdf) ok else ko(s"interpPdf: $interpPdf, fastPdf: $fastPdf")
@@ -453,12 +453,12 @@ class SketchPropSpec extends Specification with ScalaCheck {
             cmapSize = 10, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
             counterSize = 10, counterNo = 2
           )
-          val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
+          val sketch0 = Sketch.empty[Double]
           val sketch1O = sketch0.update(0, 1, 1, 2, 3)
 
           (for {
             sketch1 <- sketch1O
-            fastPdf <- Sketch.fastPdf(sketch1, Double.MinValue, conf)
+            fastPdf <- Sketch.fastPdf(sketch1, Double.MinValue)
           } yield fastPdf)
             .fold(ko("Exception occurs")){ _ => ok }
         }
@@ -468,12 +468,12 @@ class SketchPropSpec extends Specification with ScalaCheck {
             cmapSize = 10, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
             counterSize = 10, counterNo = 2
           )
-          val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
+          val sketch0 = Sketch.empty[Double]
           val sketch1O = sketch0.update(0, 1, 1, 2, 3)
 
           (for {
             sketch1 <- sketch1O
-            fastPdf <- Sketch.fastPdf(sketch1, Double.MaxValue, conf)
+            fastPdf <- Sketch.fastPdf(sketch1, Double.MaxValue)
           } yield fastPdf)
             .fold(ko("Exception occurs")){ _ => ok }
         }
