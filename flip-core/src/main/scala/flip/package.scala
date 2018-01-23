@@ -1,5 +1,5 @@
 import cats.data.Kleisli
-import flip.conf.{CustomSimpleSketchConf, CustomSketchConf, SimpleSketchConf}
+import flip.conf.{CustomSimpleSketchConf, CustomSketchConf, SimpleSketchConf, SmoothDistConf}
 import flip.measure.TrivialMeasures
 import flip.pdf.SimpleSketch
 import flip.pdf.syntax.{DistSyntax, SamplingDistSyntax, SketchSyntax, SmoothDistSyntax}
@@ -43,6 +43,8 @@ package object flip
 trait ConfPkgSyntax {
 
   implicit val defaultSketchConf: flip.conf.SketchConf = flip.conf.SketchConf.default
+
+  implicit val defaultSmoothDistConf: flip.conf.SmoothDistConf = SmoothDistConf.default
 
   type SketchConf = CustomSketchConf
 

@@ -15,21 +15,21 @@ trait SketchPropSyntax {
   implicit class SketchPropSyntaxImpl[A](sketch: Sketch[A]) {
     def sample: (Sketch[A], A) = Sketch.sample(sketch)
     def samples(n: Int): (Sketch[A], List[A]) = Sketch.samples(sketch, n)
-    def update(as: A*)(implicit conf: SketchConf): Option[Sketch[A]] =
-      Sketch.update(sketch, as.toList.map(a => (a, 1d)), conf)
-    def update(as: List[(A, Count)])(implicit conf: SketchConf): Option[Sketch[A]] =
-      Sketch.update(sketch, as, conf)
-    def narrowUpdate(as: A*)(implicit conf: SketchConf): Option[Sketch[A]] =
-      Sketch.narrowUpdate(sketch, as.toList.map(a => (a, 1d)), conf)
-    def deepUpdate(as: A*)(implicit conf: SketchConf): Option[(Sketch[A], Option[Structure])] =
-      Sketch.deepUpdate(sketch, as.toList.map(a => (a, 1d)), conf)
-    def count(from: A, to: A)(implicit conf: SketchConf): Option[Double] = Sketch.count(sketch, from, to, conf)
-    def sum(implicit conf: SketchConf): Double = Sketch.sum(sketch, conf)
+    def update(as: A*): Option[Sketch[A]] =
+      Sketch.update(sketch, as.toList.map(a => (a, 1d)))
+    def update(as: List[(A, Count)]): Option[Sketch[A]] =
+      Sketch.update(sketch, as)
+    def narrowUpdate(as: A*): Option[Sketch[A]] =
+      Sketch.narrowUpdate(sketch, as.toList.map(a => (a, 1d)))
+    def deepUpdate(as: A*): Option[(Sketch[A], Option[Structure])] =
+      Sketch.deepUpdate(sketch, as.toList.map(a => (a, 1d)))
+    def count(from: A, to: A): Option[Double] = Sketch.count(sketch, from, to)
+    def sum: Double = Sketch.sum(sketch)
     //    def clear: Sketch = Sketch.clear(sketch)
-    def probability(from: A, to: A)(implicit conf: SketchConf): Option[Double] =
-      Sketch.probability(sketch, from, to, conf)
-    def rearrange(implicit conf: SketchConf): Option[Sketch[A]] =
-      Sketch.rearrange(sketch, conf)
+    def probability(from: A, to: A): Option[Double] =
+      Sketch.probability(sketch, from, to)
+    def rearrange: Option[Sketch[A]] =
+      Sketch.rearrange(sketch)
     def cmapNo: Int = Sketch.cmapNo(sketch)
     def cmapSize: Int = Sketch.cmapSize(sketch)
     def counterNo: Int = Sketch.counterNo(sketch)
@@ -42,14 +42,14 @@ trait SketchPropSyntax {
 
 trait SketchMonadSyntax {
 
-  lazy val sketchMonad: SketchMonad[Sketch, Dist, Sketch, SketchConf] = SketchMonad.pointToPoint
+  lazy val sketchMonad: SketchMonad[Sketch, Dist, Sketch] = SketchMonad.pointToPoint
 
   implicit class SketchMonadSyntaxImpl[A](sketch: Sketch[A]) {
-    def map[B](f: A => B)(implicit measureB: Measure[B], conf: SketchConf): Sketch[B] =
-      sketchMonad.map(sketch, f, measureB, conf)
+    def map[B](f: A => B)(implicit measureB: Measure[B]): Sketch[B] =
+      sketchMonad.map(sketch, f, measureB)
     def flatMap[B, S1<:Sketch[_], S2<:Sketch[_]](f: A => Dist[B])
-                                                (implicit measureB: Measure[B], conf: SketchConf): Sketch[B] =
-      sketchMonad.bind(sketch, f, measureB, conf)
+                                                (implicit measureB: Measure[B]): Sketch[B] =
+      sketchMonad.bind(sketch, f, measureB)
   }
 
 }

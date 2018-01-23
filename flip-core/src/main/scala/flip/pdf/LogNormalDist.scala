@@ -1,14 +1,18 @@
 package flip.pdf
 
+import flip.conf.SmoothDistConf
 import flip.measure.Measure
 import flip.rand.IRng
 import org.apache.commons.math3.distribution.LogNormalDistribution
 
-case class LogNormalDist[A](measure: Measure[A], scale: A, shape: Prim, rng: IRng) extends NumericDist[A]
+trait LogNormalDist[A] extends NumericDist[A] {
+  val scale: A
+  val shape: Prim
+}
 
 trait LogNormalDistOps extends NumericDistOps[LogNormalDist] {
 
-  def pdf[A](dist: LogNormalDist[A], a: A): Option[Double] = {
+  override def pdf[A](dist: LogNormalDist[A], a: A): Option[Double] = {
     val scale = dist.measure.to(dist.scale)
     val p = dist.measure.to(a)
     val numeric = new LogNormalDistribution(scale, dist.shape)
@@ -35,10 +39,16 @@ trait LogNormalDistOps extends NumericDistOps[LogNormalDist] {
 
 object LogNormalDist extends LogNormalDistOps {
 
-  def apply[A](scale: A, shape: Prim)(implicit measure: Measure[A]): LogNormalDist[A] =
-    LogNormalDist(measure, scale, shape, IRng(scale.hashCode() + shape.toInt))
+  private case class LogNormalDistImpl[A](measure: Measure[A], conf: SmoothDistConf, scale: A, shape: Prim, rng: IRng)
+    extends LogNormalDist[A]
+
+  def apply[A](scale: A, shape: Prim)(implicit measure: Measure[A], conf: SmoothDistConf): LogNormalDist[A] =
+    bare(measure, conf, scale, shape, IRng(scale.hashCode() + shape.toInt))
+
+  def bare[A](measure: Measure[A], conf: SmoothDistConf, scale: A, shape: Prim, rng: IRng): LogNormalDist[A] =
+    LogNormalDistImpl(measure, conf, scale, shape, rng)
 
   def modifyRng[A](dist: LogNormalDist[A], f: IRng => IRng): LogNormalDist[A] =
-    LogNormalDist(dist.measure, dist.scale, dist.shape, f(dist.rng))
+    bare(dist.measure, dist.conf, dist.scale, dist.shape, f(dist.rng))
 
 }

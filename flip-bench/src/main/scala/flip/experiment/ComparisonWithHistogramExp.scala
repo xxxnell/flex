@@ -18,35 +18,35 @@ object ComparisonWithHistogramExp { self =>
     val underlying = NumericDist.normal(0.0, 1)
     val (_, datas) = underlying.samples(sampleNo)
 
-    val (histogram, histoConf) = self.histogram(histoSamplingNo)
-    val (sketch, sketchConf) = self.sketch(sketchSamplingNo)
+    val histogram = self.histogram(histoSamplingNo)
+    val sketch = self.sketch(sketchSamplingNo)
 
     // update datas
-    val utdHistos = update(histogram, datas, 10, histoConf)
-    val utdSketchs = update(sketch, datas, 10, sketchConf)
+    val utdHistos = update(histogram, datas, 10)
+    val utdSketchs = update(sketch, datas, 10)
 
     // histogram results
-    val histoPdf = utdHistos.flatMap { case (idx, _histo) => pdfResult(_histo, histoConf).map(pdf => (idx, pdf)) }
+    val histoPdf = utdHistos.flatMap { case (idx, _histo) => pdfResult(_histo).map(pdf => (idx, pdf)) }
     val histoKlds = utdHistos.flatMap { case (idx, _histo) =>
-      kldResult(_histo, underlying, histoConf).map((idx, _))
+      kldResult(_histo, underlying).map((idx, _))
     }
     val histoKldd = histoKlds.map { case (idx, (kldd, _)) => (idx, kldd) }
     val histoKld = histoKlds.map { case (idx, (_, kld)) => (idx, kld) }
     val histoCosines = utdSketchs.flatMap { case (idx, _histo) =>
-      cosineResult(_histo, underlying, histoConf).map((idx, _))
+      cosineResult(_histo, underlying).map((idx, _))
     }
     val histoCosd = histoCosines.map { case (idx, (cosd, _)) => (idx, cosd) }
     val histoCos = histoCosines.map { case (idx, (_, cos)) => (idx, cos) }
 
     // sketch results
-    val sketchPdf = utdSketchs.flatMap { case (idx, _sketch) => pdfResult(_sketch, sketchConf).map(pdf => (idx, pdf)) }
+    val sketchPdf = utdSketchs.flatMap { case (idx, _sketch) => pdfResult(_sketch).map(pdf => (idx, pdf)) }
     val sketchKlds = utdSketchs.flatMap { case (idx, _sketch) =>
-      kldResult(_sketch, underlying, sketchConf).map((idx, _))
+      kldResult(_sketch, underlying).map((idx, _))
     }
     val sketchKldd = sketchKlds.map { case (idx, (kldd, _)) => (idx, kldd) }
     val sketchKld = sketchKlds.map { case (idx, (_, kld)) => (idx, kld) }
     val sketchCosines = utdSketchs.flatMap { case (idx, _sketch) =>
-      cosineResult(_sketch, underlying, sketchConf).map((idx, _))
+      cosineResult(_sketch, underlying).map((idx, _))
     }
     val sketchCosd = sketchCosines.map { case (idx, (cosd, _)) => (idx, cosd) }
     val sketchCos = sketchCosines.map { case (idx, (_, cos)) => (idx, cos) }
@@ -80,16 +80,16 @@ object ComparisonWithHistogramExp { self =>
         s" Sketch($sketchSamplingNo): $sketchKld")
   }
 
-  def histogram(no: Int): (Histogram[Double], HistogramConf) = {
+  def histogram(no: Int): Histogram[Double] = {
     implicit val histoConf: HistogramConf = HistogramConf(
       binNo = no, start = -3.0, end = 3.0,
       counterSize = no
     )
 
-    (Histogram.empty[Double], histoConf)
+    Histogram.empty[Double]
   }
 
-  def sketch(no: Int): (Sketch[Double], SketchConf) = {
+  def sketch(no: Int): Sketch[Double] = {
     implicit val sketchConf: SketchConf = SketchConf(
       startThreshold = 50, thresholdPeriod = 100, boundaryCorr = 0.01, decayFactor = 0,
       queueSize = 20,
@@ -97,14 +97,12 @@ object ComparisonWithHistogramExp { self =>
       counterSize = no
     )
 
-    (Sketch.empty[Double], sketchConf)
+    Sketch.empty[Double]
   }
 
   def update(sketch: Sketch[Double],
              datas: List[Double],
-             period: Int,
-             conf: SketchConf): List[(Int, Sketch[Double])] = {
-    implicit val confImpl: SketchConf = conf
+             period: Int): List[(Int, Sketch[Double])] = {
     val dataIdxs = datas.zipWithIndex
     var tempSketchO: Option[Sketch[Double]] = Option(sketch)
 
@@ -114,23 +112,22 @@ object ComparisonWithHistogramExp { self =>
     }.filter { case (idx, _) => idx % period == 0 }
   }
 
-  def pdfResult(sketch: Sketch[Double], conf: SketchConf): Option[DensityPlot] = for {
-    pdf <- sketch.sampling(conf)
+  def pdfResult(sketch: Sketch[Double]): Option[DensityPlot] = for {
+    pdf <- sketch.sampling
   } yield pdf
 
   /**
     * @return (kld density, kld)
     * */
   def kldResult(sketch: Sketch[Double],
-                underlying: SmoothDist[Double],
-                conf: SketchConf): Option[(DensityPlot, Double)] = {
+                underlying: SmoothDist[Double]): Option[(DensityPlot, Double)] = {
     val samplingStart = -1.5
     val samplingEnd = 1.5
 
     for {
       underlyingSampling <- underlying.uniformSampling(samplingStart, samplingEnd, 100)
-      kldd <- KLDDensity(underlyingSampling, sketch)(conf)
-      kld <- KLD(underlyingSampling, sketch)(conf)
+      kldd <- KLDDensity(underlyingSampling, sketch)
+      kld <- KLD(underlyingSampling, sketch)
     } yield (kldd, kld)
   }
 
@@ -138,15 +135,14 @@ object ComparisonWithHistogramExp { self =>
     * @return (consine density, cosine sim)
     * */
   def cosineResult(sketch: Sketch[Double],
-                   underlying: SmoothDist[Double],
-                   conf: SketchConf): Option[(DensityPlot, Double)] = {
+                   underlying: SmoothDist[Double]): Option[(DensityPlot, Double)] = {
     val samplingStart = -1.5
     val samplingEnd = 1.5
 
     for {
       underlyingSampling <- underlying.uniformSampling(samplingStart, samplingEnd, 100)
-      cosd <- CosineDensity(underlyingSampling, sketch)(conf)
-      cos <- Cosine(underlyingSampling, sketch)(conf)
+      cosd <- CosineDensity(underlyingSampling, sketch)
+      cos <- Cosine(underlyingSampling, sketch)
     } yield (cosd, cos)
   }
 

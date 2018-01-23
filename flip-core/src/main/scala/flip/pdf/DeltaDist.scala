@@ -1,5 +1,6 @@
 package flip.pdf
 
+import flip.conf.SmoothDistConf
 import flip.measure.Measure
 import flip.rand._
 import flip.range._
@@ -7,11 +8,12 @@ import flip.range._
 /**
   * Dirac Delta Function.
   */
-case class DeltaDist[A](measure: Measure[A], pole: A, rng: IRng = IRng(0)) extends NumericDist[A]
+case class DeltaDist[A](measure: Measure[A], conf: SmoothDistConf, pole: A, rng: IRng = IRng(0))
+  extends NumericDist[A]
 
 trait DeltaDistOps extends NumericDistOps[DeltaDist] {
 
-  def pdf[A](dist: DeltaDist[A], a: A): Option[Double] = {
+  override def pdf[A](dist: DeltaDist[A], a: A): Option[Double] = {
     val pole = dist.measure.to(dist.pole)
 
     if(a != pole) Some(0) else Some(Double.PositiveInfinity)
@@ -30,6 +32,7 @@ trait DeltaDistOps extends NumericDistOps[DeltaDist] {
 
 object DeltaDist extends DeltaDistOps {
 
-  def modifyRng[A](dist: DeltaDist[A], f: IRng => IRng): DeltaDist[A] = DeltaDist(dist.measure, dist.pole, f(dist.rng))
+  def modifyRng[A](dist: DeltaDist[A], f: IRng => IRng): DeltaDist[A] =
+    DeltaDist(dist.measure, dist.conf, dist.pole, f(dist.rng))
 
 }

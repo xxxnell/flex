@@ -22,19 +22,19 @@ object Cosine {
 
   private case class CosineImpl(norm1: Double, norm2: Double) extends Cosine
 
-  def apply[A](d1: SamplingDist[A], conf1: SamplingDistConf,
-               d2: Dist[A], conf2: DistConf): Cosine = {
-    val norm1 = normForSamplingDist(d1, conf1)
-    val norm2 = d2.sampling(d1, conf1)(conf2)
+  def apply[A](d1: SamplingDist[A],
+               d2: Dist[A]): Cosine = {
+    val norm1 = normForSamplingDist(d1)
+    val norm2 = d2.sampling(d1)
       .map(plottedD2 => normForPlotted(plottedD2))
       .getOrElse(Double.PositiveInfinity)
 
     CosineImpl(norm1, norm2)
   }
 
-  def apply[A](d1: PlottedDist[A], d2: Dist[A], conf2: DistConf): Cosine = {
+  def apply[A](d1: PlottedDist[A], d2: Dist[A]): Cosine = {
     val norm1 = normForPlotted(d1)
-    val norm2 = d2.sampling(d1)(conf2).map(samplingD2 => normForPlotted(samplingD2))
+    val norm2 = d2.sampling(d1).map(samplingD2 => normForPlotted(samplingD2))
       .getOrElse(Double.PositiveInfinity)
 
     CosineImpl(norm1, norm2)
@@ -42,8 +42,8 @@ object Cosine {
 
   def normForPlotted[A](d1: PlottedDist[A]): Double = norm(d1.sampling)
 
-  def normForSamplingDist[A](d1: SamplingDist[A], conf: SamplingDistConf): Double = (for {
-    sampling <- d1.sampling(conf)
+  def normForSamplingDist[A](d1: SamplingDist[A]): Double = (for {
+    sampling <- d1.sampling
   } yield norm(sampling))
     .getOrElse(Double.PositiveInfinity)
 

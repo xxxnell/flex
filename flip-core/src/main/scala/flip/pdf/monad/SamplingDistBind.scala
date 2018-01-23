@@ -6,7 +6,7 @@ import flip.pdf.{Dist, SamplingDist}
 
 import scala.language.higherKinds
 
-trait SamplingDistBind[SampleD1[_]<:SamplingDist[_], D[_]<:Dist[_], SampleD2[_]<:SamplingDist[_], C<:SamplingDistConf]
-  extends DistBind[SampleD1, D, SampleD2, C] {
+trait SamplingDistBind[SampleD1[_]<:SamplingDist[_], D[_]<:Dist[_], SampleD2[_]<:SamplingDist[_]]
+  extends DistBind[SampleD1, D, SampleD2] {
 
 }

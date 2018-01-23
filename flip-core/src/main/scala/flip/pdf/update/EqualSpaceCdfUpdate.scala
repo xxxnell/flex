@@ -1,7 +1,6 @@
 package flip.pdf.update
 
 import flip.cmap.Cmap
-import flip.conf.SketchConf
 import flip.pdf._
 import flip.plot._
 import flip.plot.syntax._
@@ -9,12 +8,12 @@ import flip.range.RangeP
 
 trait EqualSpaceCdfUpdate {
 
-  def updateCmap(sketch: Sketch[_], ps: List[(Prim, Count)], conf: SketchConf): Option[Cmap] = for {
-    sketchPlot <- sketch.sampling(conf)
-    mixingRatio = conf.mixingRatio
-    window = conf.dataKernelWindow
-    corr = conf.boundaryCorrection
-    cmapSize = conf.cmap.size
+  def updateCmap(sketch: Sketch[_], ps: List[(Prim, Count)]): Option[Cmap] = for {
+    sketchPlot <- sketch.sampling
+    mixingRatio = sketch.conf.mixingRatio
+    window = sketch.conf.dataKernelWindow
+    corr = sketch.conf.boundaryCorrection
+    cmapSize = sketch.conf.cmap.size
     mtpSketchPlot = sketchPlot * (1 / (mixingRatio + 1))
     mtpPsPlot = DensityPlot.squareKernel(ps, window) * (mixingRatio / (mixingRatio + 1))
     mergedPlot = if(ps.nonEmpty) mtpSketchPlot + mtpPsPlot else sketchPlot
