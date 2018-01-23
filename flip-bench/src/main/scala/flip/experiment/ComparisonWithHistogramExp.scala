@@ -32,7 +32,7 @@ object ComparisonWithHistogramExp { self =>
     }
     val histoKldd = histoKlds.map { case (idx, (kldd, _)) => (idx, kldd) }
     val histoKld = histoKlds.map { case (idx, (_, kld)) => (idx, kld) }
-    val histoCosines = utdSketchs.flatMap { case (idx, _histo) =>
+    val histoCosines = utdHistos.flatMap { case (idx, _histo) =>
       cosineResult(_histo, underlying).map((idx, _))
     }
     val histoCosd = histoCosines.map { case (idx, (cosd, _)) => (idx, cosd) }
@@ -71,13 +71,23 @@ object ComparisonWithHistogramExp { self =>
     // console print
     for {
       lastHistoKld <- histoKld.lastOption
+      (idxH1, histoKld) = lastHistoKld
       lastSketchKld <- sketchKld.lastOption
-      (idx1, histoKld) = lastHistoKld
-      (idx2, sketchKld) = lastSketchKld
-    } yield if(idx1 == idx2)
-      println(s"KLD for $idx1 data: \n" +
-        s" Histogram($histoSamplingNo): $histoKld \n" +
-        s" Sketch($sketchSamplingNo): $sketchKld")
+      (idxS1, sketchKld) = lastSketchKld
+      lastHistoCos <- histoCos.lastOption
+      (idxH2, histoCos) = lastHistoCos
+      lastSketchCos <- sketchCos.lastOption
+      (idxS2, sketchCos) = lastSketchCos
+    } yield if(idxH1 == idxS1 && idxH2 == idxS2) {
+      val str =
+        s"Simimarity for $idxH1 data: \n" +
+          s" KLD(Histogram($histoSamplingNo)): $histoKld \n" +
+          s" Cosine(Histogram($histoSamplingNo)): $histoCos \n" +
+          s" KLD(Sketch($sketchSamplingNo)): $sketchKld \n" +
+          s" Cosine(Sketch($sketchSamplingNo)): $sketchCos"
+
+      println(str)
+    } else println("Error occurs.")
   }
 
   def histogram(no: Int): Histogram[Double] = {
