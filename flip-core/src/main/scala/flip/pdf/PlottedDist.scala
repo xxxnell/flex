@@ -13,16 +13,18 @@ trait PlottedDist[A] extends SamplingDist[A] {
 
 }
 
-trait PlottedDistPropOps[D[_]<:PlottedDist[_]] extends SamplingDistPropOps[D, SamplingDistConf] {
-
-  def sampling[A](dist: D[A], conf: SamplingDistConf): Option[DensityPlot] = sampling(dist)
+trait PlottedDistPropOps[D[_]<:PlottedDist[_]] extends SamplingDistPropOps[D] {
 
   def sampling[A](dist: D[A]): Option[DensityPlot] = Some(dist.sampling)
 
   def filter[A](dist: PlottedDist[A], f: RangeP => Boolean): PlottedDist[A] =
-    PlottedDist(dist.measure, DensityPlot.disjoint(dist.sampling.records.filter { case (range, _) => f(range) }))
+    PlottedDist.bare(
+      dist.measure,
+      DensityPlot.disjoint(dist.sampling.records.filter { case (range, _) => f(range) }),
+      dist.conf
+    )
 
-  def probability[A](dist: D[A], start: A, end: A, conf: SamplingDistConf): Option[Double] = {
+  def probability[A](dist: D[A], start: A, end: A): Option[Double] = {
     val measure = dist.measure.asInstanceOf[Measure[A]]
     Some(dist.sampling.integral(measure.to(start), measure.to(end)))
   }
@@ -31,9 +33,12 @@ trait PlottedDistPropOps[D[_]<:PlottedDist[_]] extends SamplingDistPropOps[D, Sa
 
 object PlottedDist extends PlottedDistPropOps[PlottedDist] {
 
-  case class PlottedDistImpl[A](measure: Measure[A], sampling: DensityPlot) extends PlottedDist[A]
+  case class PlottedDistImpl[A](measure: Measure[A],
+                                sampling: DensityPlot,
+                                conf: SamplingDistConf) extends PlottedDist[A]
 
-  def apply[A](measure: Measure[A], densityPlot: DensityPlot): PlottedDist[A] = PlottedDistImpl(measure, densityPlot)
+  def bare[A](measure: Measure[A], densityPlot: DensityPlot, conf: SamplingDistConf): PlottedDist[A] =
+    PlottedDistImpl(measure, densityPlot, conf)
 
   def sample[A](dist: PlottedDist[A]): (PlottedDist[A], A) = ???
 

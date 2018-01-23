@@ -1,6 +1,6 @@
 package flip.pdf
 
-import flip.conf.{SamplingDistConf, SketchConf, SmoothDistConf}
+import flip.conf.SamplingDistConf
 import flip.measure.Measure
 import flip.plot.DensityPlot
 import flip.range.RangeM
@@ -10,43 +10,45 @@ import scala.language.higherKinds
 /**
   * Sampling distribution provides the sampling points and its probability density value.
   * */
-trait SamplingDist[A] extends Dist[A]
+trait SamplingDist[A] extends Dist[A] {
 
-trait SamplingDistPropOps[D[_]<:SamplingDist[_], C<:SamplingDistConf]
-  extends DistPropOps[D, C]
-    with SamplingDistPropLaws[D, C] {
-
-  def sampling[A](dist: D[A], conf: C): Option[DensityPlot]
+  def conf: SamplingDistConf
 
 }
 
-trait SamplingDistPropLaws[D[_]<:SamplingDist[_], C<:SamplingDistConf] { self: SamplingDistPropOps[D, C] =>
+trait SamplingDistPropOps[D[_]<:SamplingDist[_]]
+  extends DistPropOps[D]
+    with SamplingDistPropLaws[D] {
 
-  def interpolationPdf[A](dist: D[A], a: A, conf: C): Option[Double] = for {
-    plot <- sampling(dist, conf)
+  def sampling[A](dist: D[A]): Option[DensityPlot]
+
+}
+
+trait SamplingDistPropLaws[D[_]<:SamplingDist[_]] { self: SamplingDistPropOps[D] =>
+
+  def interpolationPdf[A](dist: D[A], a: A): Option[Double] = for {
+    plot <- sampling(dist)
     density = DensityPlot.interpolation(plot, dist.measure.asInstanceOf[Measure[A]].to(a))
   } yield density
 
 }
 
-object SamplingDist extends SamplingDistPropOps[SamplingDist, SamplingDistConf] {
+object SamplingDist extends SamplingDistPropOps[SamplingDist] {
 
-  def forSmoothDist[A](dist: SmoothDist[A], domains: List[RangeM[A]])
-                      (implicit conf: SmoothDistConf): Option[SamplingDist[A]] =
-    SmoothDist.samplingDist(dist, domains, conf)
+  def forSmoothDist[A](dist: SmoothDist[A], domains: List[RangeM[A]]): Option[SamplingDist[A]] =
+    SmoothDist.samplingDist(dist, domains)
 
   def probability[A](dist: SamplingDist[A],
                      start: A,
-                     end: A,
-                     conf: SamplingDistConf): Option[Double] = (dist, conf) match {
-    case (sketch: Sketch[A], conf: SketchConf) => Sketch.probability(sketch, start, end, conf)
-    case (plotted: PlottedDist[A], _) => PlottedDist.probability(plotted, start, end, conf)
+                     end: A): Option[Double] = dist match {
+    case (sketch: Sketch[A]) => Sketch.probability(sketch, start, end)
+    case (plotted: PlottedDist[A]) => PlottedDist.probability(plotted, start, end)
     case _ => ???
   }
 
-  def sampling[A](dist: SamplingDist[A], conf: SamplingDistConf): Option[DensityPlot] = (dist, conf) match {
-    case (sketch: Sketch[A], conf: SketchConf) => Sketch.sampling(sketch, conf)
-    case (plotted: PlottedDist[A], _) => PlottedDist.sampling(plotted)
+  def sampling[A](dist: SamplingDist[A]): Option[DensityPlot] = dist match {
+    case (sketch: Sketch[A]) => Sketch.sampling(sketch)
+    case (plotted: PlottedDist[A]) => PlottedDist.sampling(plotted)
     case _ => ???
   }
 
@@ -55,9 +57,9 @@ object SamplingDist extends SamplingDistPropOps[SamplingDist, SamplingDistConf] 
     case plotted: PlottedDist[_] => PlottedDist.sample(plotted)
   }
 
-  override def pdf[A](dist: SamplingDist[A], a: A, conf: SamplingDistConf): Option[Prim] = (dist, conf) match {
-    case (sketch: Sketch[_], conf: SketchConf) => Sketch.fastPdf(sketch, a, conf)
-    case _ => super.interpolationPdf(dist, a, conf)
+  override def pdf[A](dist: SamplingDist[A], a: A): Option[Prim] = dist match {
+    case (sketch: Sketch[_]) => Sketch.fastPdf(sketch, a)
+    case _ => super.interpolationPdf(dist, a)
   }
 
 }

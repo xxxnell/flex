@@ -6,11 +6,10 @@ import flip.pdf.arithmetic.Sum
 import flip.pdf.{Dist, SamplingDist}
 
 object PointToPointSamplingDistBind
-  extends SamplingDistBind[SamplingDist, Dist, SamplingDist, SamplingDistConf] {
+  extends SamplingDistBind[SamplingDist, Dist, SamplingDist] {
 
   def bind[A, B](dist: SamplingDist[A],
                  f: A => Dist[B],
-                 measureB: Measure[B],
-                 conf: SamplingDistConf): SamplingDist[B] = ???
+                 measureB: Measure[B]): SamplingDist[B] = ???
 
 }

@@ -9,57 +9,61 @@ import scala.language.higherKinds
 
 trait PeriodicSketch[A] extends RecurSketch[A] {
 
+  def conf: PeriodicSketchConf
+
 }
 
-trait PeriodicSketchOps[S[_]<:PeriodicSketch[_], C<:PeriodicSketchConf] extends RecurSketchOps[S, C] {
+trait PeriodicSketchOps[S[_]<:PeriodicSketch[_]] extends RecurSketchOps[S] {
 
   def thresholds(start: Double, period: Double): Stream[Count] = Stream.from(0).map(i => start + period * i)
 
 }
 
-object PeriodicSketch extends PeriodicSketchOps[PeriodicSketch, PeriodicSketchConf] {
+object PeriodicSketch extends PeriodicSketchOps[PeriodicSketch] {
 
   case class PeriodicSketchImpl[A](measure: Measure[A],
+                                   conf: PeriodicSketchConf,
                                    structures: List[(Cmap, HCounter)],
                                    thresholds: Stream[Count],
                                    count: Count)
     extends PeriodicSketch[A]
 
   def bare[A](measure: Measure[A],
+              conf: PeriodicSketchConf,
               structures: List[(Cmap, HCounter)],
               thresholds: Stream[Count],
               count: Count): PeriodicSketch[A] =
-    PeriodicSketchImpl(measure, structures, thresholds, count)
+    PeriodicSketchImpl(measure, conf, structures, thresholds, count)
 
   def empty[A](implicit measure: Measure[A], conf: PeriodicSketchConf): PeriodicSketch[A] = conf match {
     case conf: AdaPerSketchConf => AdaPerSketch.empty[A](measure, conf)
-    case _ => bare(measure, conf2Structures(conf), thresholds(conf.startThreshold, conf.thresholdPeriod), 0)
+    case _ => bare(measure, conf, conf2Structures(conf), thresholds(conf.startThreshold, conf.thresholdPeriod), 0)
   }
 
   def modifyStructure[A](sketch: PeriodicSketch[A],
                          f: Structures => Option[Structures]): Option[PeriodicSketch[A]] = sketch match {
     case sketch: AdaPerSketch[A] => AdaPerSketch.modifyStructure(sketch, f)
     case _ => f(sketch.structures).map(utdStrs =>
-      bare(sketch.measure, utdStrs, sketch.thresholds, sketch.count)
+      bare(sketch.measure, sketch.conf, utdStrs, sketch.thresholds, sketch.count)
     )
   }
 
   def modifyThresholds[A](sketch: PeriodicSketch[A],
                           f: Stream[Double] => Option[Stream[Double]]): Option[PeriodicSketch[A]] = sketch match {
     case sketch: AdaPerSketch[A] => AdaPerSketch.modifyThresholds(sketch, f)
-    case _ => f(sketch.thresholds).map(utdThrs => bare(sketch.measure, sketch.structures, utdThrs, sketch.count))
+    case _ => f(sketch.thresholds)
+      .map(utdThrs => bare(sketch.measure, sketch.conf, sketch.structures, utdThrs, sketch.count))
   }
 
   def modifyCount[A](sketch: PeriodicSketch[A], f: Count => Count): PeriodicSketch[A] = sketch match {
     case adaper: AdaPerSketch[A] => AdaPerSketch.modifyCount(adaper, f)
-    case _ => bare(sketch.measure, sketch.structures, sketch.thresholds, f(sketch.count))
+    case _ => bare(sketch.measure, sketch.conf, sketch.structures, sketch.thresholds, f(sketch.count))
   }
 
   override def update[A](sketch: PeriodicSketch[A],
-                         as: List[(A, Count)],
-                         conf: PeriodicSketchConf): Option[PeriodicSketch[A]] = (sketch, conf) match {
-    case (sketch: AdaPerSketch[A], conf: AdaPerSketchConf) => AdaPerSketch.update(sketch, as, conf)
-    case _ => super.update(sketch, as, conf)
+                         as: List[(A, Count)]): Option[PeriodicSketch[A]] = sketch match {
+    case (sketch: AdaPerSketch[A]) => AdaPerSketch.update(sketch, as)
+    case _ => super.update(sketch, as)
   }
 
 }

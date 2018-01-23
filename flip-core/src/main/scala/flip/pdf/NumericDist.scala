@@ -13,7 +13,7 @@ trait NumericDist[A] extends SmoothDist[A] {
 
 }
 
-trait NumericDistOps[D[_]<:NumericDist[_]] extends SmoothDistPropOps[D, SmoothDistConf] {
+trait NumericDistOps[D[_]<:NumericDist[_]] extends SmoothDistPropOps[D] { self =>
 
   def modifyRng[A](dist: D[A], f: IRng => IRng): D[A]
 
@@ -35,25 +35,26 @@ object NumericDist extends NumericDistOps[NumericDist] {
 
   // constructor
 
-  def delta[A](pole: A)(implicit measure: Measure[A]): DeltaDist[A] =
-    DeltaDist(measure, pole)
+  def delta[A](pole: A)(implicit measure: Measure[A], conf: SmoothDistConf): DeltaDist[A] =
+    DeltaDist(measure, conf, pole)
 
-  def normal[A](mean: A, variance: Double)(implicit measure: Measure[A]): NormalDist[A] =
+  def normal[A](mean: A, variance: Double)(implicit measure: Measure[A], conf: SmoothDistConf): NormalDist[A] =
     NormalDist(mean, variance)
 
-  def logNormal[A](scale: A, shape: Double)(implicit measure: Measure[A]): LogNormalDist[A] =
+  def logNormal[A](scale: A, shape: Double)(implicit measure: Measure[A], conf: SmoothDistConf): LogNormalDist[A] =
     LogNormalDist(scale, shape)
 
-  def pareto[A](scale: A, shape: Double)(implicit measure: Measure[A]): ParetoDist[A] =
+  def pareto[A](scale: A, shape: Double)(implicit measure: Measure[A], conf: SmoothDistConf): ParetoDist[A] =
     ParetoDist(scale, shape)
 
   // pipelining
 
-  def pdf[A](dist: NumericDist[A], a: A): Option[Prim] = dist match {
+  override def pdf[A](dist: NumericDist[A], a: A): Option[Prim] = dist match {
     case dist: ParetoDist[A] => ParetoDist.pdf(dist, a)
     case dist: LogNormalDist[A] => LogNormalDist.pdf(dist, a)
     case dist: NormalDist[A] => NormalDist.pdf(dist, a)
     case dist: DeltaDist[A] => DeltaDist.pdf(dist, a)
+    case _ => super.pdf(dist, a)
   }
 
   def cdf[A](dist: NumericDist[A], a: A): Double = dist match {

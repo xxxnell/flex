@@ -13,18 +13,17 @@ class PeriodicSketchSpec extends Specification with ScalaCheck {
 
   "PeriodicSketch" should {
 
-    "empty" in {
+    "empty & cmapSize > counterSize" in {
       // construct
-      val (start, period) = (0, 1)
-      val (cmapSize, cmapNo, cmapStart, cmapEnd) = (5, 100, Some(-100d), Some(100d))
+      val (cmapSize, cmapNo, cmapStart, cmapEnd) = (50, 100, Some(-100d), Some(100d))
       val (counterSize, counterNo) = (10, 2)
       implicit val conf: PeriodicSketchConf = CustomSketchConf(
-        startThreshold = start, thresholdPeriod = period,
+        startThreshold = 0, thresholdPeriod = 1,
         cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
         counterSize = counterSize, counterNo = counterNo
       )
       val periodicSketch = PeriodicSketch.empty[Int]
-      
+
       // test
       val strSize = periodicSketch.structures.size
       val cmapSizes = periodicSketch.
@@ -37,16 +36,51 @@ class PeriodicSketchSpec extends Specification with ScalaCheck {
         .structures
         .map { case (cmap, hcounter) => hcounter.width }
 
-      if(strSize == 1 &&
-        cmapSizes.forall(_ == cmapSize) &&
-        counterNos.forall(_ == counterNo) &&
-        counterSizes.forall(_ == counterSize)) ok
-      else ko(
-        s"strSize: $strSize (expected: 1), " +
-          s"cmapSizes: $cmapSizes (expected: $cmapSize), " +
-          s"counterNos: $counterNos (expected: $counterNo), " +
-          s"counterSizes: $counterSizes (expected: $counterSize)"
+      val cond1 = strSize == 1
+      val cond2 = cmapSizes.forall(_ == cmapSize)
+      val cond3 = counterNos.forall(_ == counterNo)
+      val cond4 = counterSizes.forall(_ == counterSize)
+
+      if(!cond1) ko(s"strSize: $strSize (expected: 1)")
+      else if(!cond2) ko(s"cmapSizes: $cmapSizes (expected: $cmapSize)")
+      else if(!cond3) ko(s"counterNos: $counterNos (expected: $counterNo)")
+      else if(!cond4) ko(s"counterSizes: $counterSizes (expected: $counterSize)")
+      else ok
+    }
+
+    "empty & cmapSize == counterSize" in {
+      // construct
+      val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 100, Some(-100d), Some(100d))
+      val (counterSize, counterNo) = (10, 2)
+      implicit val conf: PeriodicSketchConf = CustomSketchConf(
+        startThreshold = 0, thresholdPeriod = 1,
+        cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
+        counterSize = counterSize, counterNo = counterNo
       )
+      val periodicSketch = PeriodicSketch.empty[Int]
+
+      // test
+      val strSize = periodicSketch.structures.size
+      val cmapSizes = periodicSketch.
+        structures
+        .map { case (cmap, hcounter) => cmap.size }
+      val counterNos = periodicSketch
+        .structures
+        .map { case (cmap, hcounter) => hcounter.depth }
+      val counterSizes = periodicSketch
+        .structures
+        .map { case (cmap, hcounter) => hcounter.width }
+
+      val cond1 = strSize == 1
+      val cond2 = cmapSizes.forall(_ == cmapSize)
+      val cond3 = counterNos.forall(_ == 1)
+      val cond4 = counterSizes.forall(_ == counterSize)
+
+      if(!cond1) ko(s"strSize: $strSize (expected: 1)")
+      else if(!cond2) ko(s"cmapSizes: $cmapSizes (expected: $cmapSize)")
+      else if(!cond3) ko(s"counterNos: $counterNos (expected: $counterNo)")
+      else if(!cond4) ko(s"counterSizes: $counterSizes (expected: $counterSize)")
+      else ok
     }
 
     "periods" in {

@@ -1,14 +1,18 @@
 package flip.pdf
 
+import flip.conf.SmoothDistConf
 import flip.measure.Measure
 import flip.rand.IRng
 import org.apache.commons.math3.distribution.ParetoDistribution
 
-case class ParetoDist[A](measure: Measure[A], scale: A, shape: Prim, rng: IRng) extends NumericDist[A]
+trait ParetoDist[A] extends NumericDist[A] {
+  val scale: A
+  val shape: Prim
+}
 
 trait ParetoDistOps extends NumericDistOps[ParetoDist] {
 
-  def pdf[A](dist: ParetoDist[A], a: A): Option[Prim] = {
+  override def pdf[A](dist: ParetoDist[A], a: A): Option[Prim] = {
     val scale = dist.measure.to(dist.scale)
     val p = dist.measure.to(a)
     val numeric = new ParetoDistribution(scale, dist.shape)
@@ -35,11 +39,17 @@ trait ParetoDistOps extends NumericDistOps[ParetoDist] {
 
 object ParetoDist extends ParetoDistOps {
 
-  def apply[A](scale: A, shape: Double)(implicit measure: Measure[A]): ParetoDist[A] =
-    ParetoDist(measure, scale, shape, IRng(scale.hashCode() + shape.toInt))
+  private case class ParetoDistImpl[A](measure: Measure[A], conf: SmoothDistConf, scale: A, shape: Prim, rng: IRng)
+    extends ParetoDist[A]
+
+  def apply[A](scale: A, shape: Double)(implicit measure: Measure[A], conf: SmoothDistConf): ParetoDist[A] =
+    bare(measure, conf, scale, shape, IRng(scale.hashCode() + shape.toInt))
+
+  def bare[A](measure: Measure[A], conf: SmoothDistConf, scale: A, shape: Prim, rng: IRng): ParetoDist[A] =
+    ParetoDistImpl(measure, conf, scale, shape, rng)
 
   def modifyRng[A](dist: ParetoDist[A], f: IRng => IRng): ParetoDist[A] =
-    ParetoDist(dist.measure, dist.scale, dist.shape, f(dist.rng))
+    bare(dist.measure, dist.conf, dist.scale, dist.shape, f(dist.rng))
 
 }
 

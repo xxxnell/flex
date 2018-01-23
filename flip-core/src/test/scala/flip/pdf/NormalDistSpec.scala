@@ -71,7 +71,7 @@ object NormalDistGen {
   def normalDistGen[A](measure: Measure[A]): Gen[NormalDist[A]] = for {
     mean <- Gen.choose(-1000d, 1000d)
     variance <- Gen.choose(0.1d, 100d)
-  } yield NormalDist(measure, mean, variance)
+  } yield NormalDist(measure, defaultSmoothDistConf, mean, variance)
 
   def doubleNormalDistGen: Gen[NormalDist[Double]] = normalDistGen(doubleMeasure)
 

@@ -10,52 +10,56 @@ trait AdaptiveSketch[A] extends Sketch[A] {
 
   val queue: List[(A, Count)]
 
+  def conf: AdaptiveSketchConf
+
 }
 
-trait AdaptiveSketchOps[S[_]<:AdaptiveSketch[_], C<:AdaptiveSketchConf]
-  extends SketchPrimPropOps[S, C]
-    with AdaptiveSketchLaws[S, C] { self =>
+trait AdaptiveSketchOps[S[_]<:AdaptiveSketch[_]]
+  extends SketchPrimPropOps[S]
+    with AdaptiveSketchLaws[S] { self =>
 
   def modifyQueue[A](sketch: S[A], f: List[(A, Count)] => List[(A, Count)]): S[A]
 
   // overrides
 
-  def queueCorrection(sketch: S[_], conf: C): Double = {
-    val effNo = if(conf.cmap.no > 1) conf.cmap.no - 1 else conf.cmap.no
+  def queueCorrection(sketch: S[_]): Double = {
+    val cmapNo = sketch.conf.cmap.no
+    val decayFactor = sketch.conf.decayFactor
+    val effNo = if(cmapNo > 1) cmapNo - 1 else cmapNo
 
-    val effRates = (0 until effNo).map(i => decayRate(conf.decayFactor, i))
-    val allRates = (0 until conf.cmap.no).map(i => decayRate(conf.decayFactor, i))
+    val effRates = (0 until effNo).map(i => decayRate(decayFactor, i))
+    val allRates = (0 until cmapNo).map(i => decayRate(decayFactor, i))
 
-    if(sketch.structures.size < conf.cmap.no) 1 else effRates.sum / allRates.sum
+    if(sketch.structures.size < cmapNo) 1 else effRates.sum / allRates.sum
   }
 
-  override def count[A](sketch: S[A], start: A, end: A, conf: C): Option[Count] = for {
-    countStr <- countForStr(sketch, start, end, conf)
+  override def count[A](sketch: S[A], start: A, end: A): Option[Count] = for {
+    countStr <- countForStr(sketch, start, end)
     countQ = countForQueue(sketch, start, end)
-  } yield countStr + queueCorrection(sketch, conf) * countQ
+  } yield countStr + queueCorrection(sketch) * countQ
 
-  override def sum(sketch: S[_], conf: C): Count =
-    sumForStr(sketch, conf) + queueCorrection(sketch, conf) * sumForQueue(sketch)
+  override def sum(sketch: S[_]): Count =
+    sumForStr(sketch) + queueCorrection(sketch) * sumForQueue(sketch)
 
-  override def narrowUpdate[A](sketch: S[A], as: List[(A, Count)], conf: C): Option[S[A]] = for {
-    (sketch1, old) <- Some(append(sketch, as, conf))
-    sketch2 <- super.narrowUpdate(sketch1, old, conf)
+  override def narrowUpdate[A](sketch: S[A], as: List[(A, Count)]): Option[S[A]] = for {
+    (sketch1, old) <- Some(append(sketch, as))
+    sketch2 <- super.narrowUpdate(sketch1, old)
   } yield sketch2
 
-  override def rearrange[A](sketch: S[A], conf: C): Option[S[A]] = for {
-    sketch1OldStr <- deepUpdate(sketch, sketch.queue.asInstanceOf[List[(A, Count)]], conf)
+  override def rearrange[A](sketch: S[A]): Option[S[A]] = for {
+    sketch1OldStr <- deepUpdate(sketch, sketch.queue.asInstanceOf[List[(A, Count)]])
     (sketch1, _) = sketch1OldStr
     sketch2 = clearQueue(sketch1)
   } yield sketch2
 
 }
 
-trait AdaptiveSketchLaws[S[_]<:AdaptiveSketch[_], C<:AdaptiveSketchConf] { self: AdaptiveSketchOps[S, C] =>
+trait AdaptiveSketchLaws[S[_]<:AdaptiveSketch[_]] { self: AdaptiveSketchOps[S] =>
 
-  def append[A](sketch: S[A], as: List[(A, Count)], conf: C): (S[A], List[(A, Count)]) = {
+  def append[A](sketch: S[A], as: List[(A, Count)]): (S[A], List[(A, Count)]) = {
     var oldAs = List.empty[(A, Count)]
     val utdSkt = modifyQueue(sketch, (queue: List[(A, Count)]) => {
-      val (utd, old) = (as ++ queue).splitAt(conf.queueSize)
+      val (utd, old) = (as ++ queue).splitAt(sketch.conf.queueSize)
       oldAs = old
       utd
     })
@@ -102,7 +106,7 @@ trait AdaptiveSketchLaws[S[_]<:AdaptiveSketch[_], C<:AdaptiveSketchConf] { self:
 
 }
 
-object AdaptiveSketch extends AdaptiveSketchOps[AdaptiveSketch, AdaptiveSketchConf] {
+object AdaptiveSketch extends AdaptiveSketchOps[AdaptiveSketch] {
 
   def modifyQueue[A](sketch: AdaptiveSketch[A],
                      f: List[(A, Count)] => List[(A, Count)]): AdaptiveSketch[A] = sketch match {
@@ -115,10 +119,9 @@ object AdaptiveSketch extends AdaptiveSketchOps[AdaptiveSketch, AdaptiveSketchCo
   }
 
   def update[A](sketch: AdaptiveSketch[A],
-                as: List[(A, Count)],
-                conf: AdaptiveSketchConf): Option[AdaptiveSketch[A]] = (sketch, conf) match {
-    case (sketch: AdaPerSketch[A], conf: AdaPerSketchConf) => AdaPerSketch.update(sketch, as, conf)
-    case _ => narrowUpdate(sketch, as, conf)
+                as: List[(A, Count)]): Option[AdaptiveSketch[A]] = sketch match {
+    case (sketch: AdaPerSketch[A]) => AdaPerSketch.update(sketch, as)
+    case _ => narrowUpdate(sketch, as)
   }
 
 }
