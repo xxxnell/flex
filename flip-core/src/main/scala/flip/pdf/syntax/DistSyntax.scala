@@ -3,7 +3,7 @@ package flip.pdf.syntax
 import flip.conf.{DistConf, SamplingDistConf, SketchConf}
 import flip.measure.Measure
 import flip.pdf.monad.{DistBind, DistFunctor, DistMonad}
-import flip.pdf.{Dist, Prim, SamplingDist, Sketch}
+import flip.pdf.{Dist, PlottedDist, Prim, SamplingDist, Sketch, SmoothDist}
 import flip.plot.AsciiArtPlot
 import flip.range.RangeM
 
@@ -18,6 +18,11 @@ trait DistPropSyntax {
     def pdf(a: A)(implicit conf: DistConf): Option[Double] = Dist.pdf(dist, a, conf)
     def sample: (Dist[A], A) = Dist.sample(dist)
     def samples(n: Int): (Dist[A], List[A]) = Dist.samples(dist, n)
+    def sampling(pltDist: PlottedDist[A])(implicit conf: DistConf): Option[PlottedDist[A]] =
+      Dist.samplingDistForPlottedDist(dist, conf, pltDist)
+    def sampling(smplDist: SamplingDist[A], smplDistConf: SamplingDistConf)
+                (implicit conf: DistConf): Option[PlottedDist[A]] =
+      Dist.samplingDistForSamplingDist(dist, conf, smplDist, smplDistConf)
     def histogram(ranges: List[RangeM[A]]): String = AsciiArtPlot.histogram(dist, ranges)
   }
 

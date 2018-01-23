@@ -25,12 +25,6 @@ trait HmapOps {
 
 }
 
-object Hmap extends HmapOps {
-
-  def apply(seed: Int): Hmap = new Byteswap32Hmap(seed)
-
-}
-
 trait HmapSyntax {
 
   implicit class HmapSyntaxImpl(hmap: Hmap) {
@@ -38,3 +32,14 @@ trait HmapSyntax {
   }
 
 }
+
+object Hmap extends HmapOps {
+
+  def apply(seed: Int): Hmap = byteswap32(seed)
+
+  def byteswap32(seed: Int): Byteswap32Hmap = Byteswap32Hmap(seed)
+
+  def identity: IdentityHmap = IdentityHmap()
+
+}
+

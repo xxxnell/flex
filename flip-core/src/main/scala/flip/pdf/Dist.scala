@@ -1,10 +1,12 @@
 package flip.pdf
 
-import cats.Monad
 import flip.conf.{DistConf, SamplingDistConf}
 import flip.measure.Measure
+import flip.plot.DensityPlot
+import flip.range.{RangeM, RangeP}
 
 import scala.language.higherKinds
+import cats.implicits._
 
 /**
   * Distribution, or probability bistribution provides to get probability for given domain.
@@ -42,6 +44,46 @@ trait DistPropLaws[D[_]<:Dist[_], C<:DistConf] { self: DistPropOps[D, C] =>
       (utdDist2, s :: acc)
     }
   }
+
+  def sampling[A](probability: (A, A) => Option[Double], domains: List[RangeM[A]]): Option[DensityPlot] = {
+    val recordsO = domains.filter(range => !range.isPoint)
+      .traverse(range =>
+        probability(range.start, range.end).map { prob =>
+          (RangeP.forRangeM(range), (prob / range.length).toDouble)
+        }
+      )
+
+    for {
+      records <- recordsO
+    } yield DensityPlot.disjoint(records)
+  }
+
+  def samplingForDomain[A](dist: D[A], domains: List[RangeM[A]], conf: C): Option[DensityPlot] = {
+    sampling((start: A, end: A) => probability(dist, start, end, conf), domains)
+  }
+
+  def samplingDist[A](dist: D[A], domains: List[RangeM[A]], conf: C): Option[PlottedDist[A]] = for {
+    plot <- samplingForDomain(dist, domains, conf)
+  } yield PlottedDist(dist.measure.asInstanceOf[Measure[A]], plot)
+
+  def samplingDistForPlottedDist[A](dist: D[A],
+                                    conf: C,
+                                    pltDist: PlottedDist[A]): Option[PlottedDist[A]] = for {
+    densityPlot <- Option(pltDist.sampling)
+    domainsP = densityPlot.records.map(_._1)
+    domainsM = domainsP.map(rangeP => rangeP.modifyMeasure(pltDist.measure))
+    dist <- samplingDist(dist, domainsM, conf)
+  } yield dist
+
+  def samplingDistForSamplingDist[A](dist: D[A],
+                                     conf: C,
+                                     smplDist: SamplingDist[A],
+                                     smplDistconf: SamplingDistConf): Option[PlottedDist[A]] = for {
+    densityPlot <- smplDist.sampling(smplDistconf)
+    domainsP = densityPlot.records.map(_._1)
+    domainsM = domainsP.map(rangeP => rangeP.modifyMeasure(smplDist.measure))
+    dist <- samplingDist(dist, domainsM, conf)
+  } yield dist
 
 }
 

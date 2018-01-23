@@ -1,6 +1,6 @@
 package flip.pdf
 
-import flip.conf.{SamplingDistConf, SketchConf}
+import flip.conf.{SamplingDistConf, SketchConf, SmoothDistConf}
 import flip.measure.Measure
 import flip.plot.DensityPlot
 import flip.range.RangeM
@@ -31,8 +31,9 @@ trait SamplingDistPropLaws[D[_]<:SamplingDist[_], C<:SamplingDistConf] { self: S
 
 object SamplingDist extends SamplingDistPropOps[SamplingDist, SamplingDistConf] {
 
-  def forSmoothDist[A](dist: SmoothDist[A], domains: List[RangeM[A]]): Option[SamplingDist[A]] =
-    dist.sampling(domains)
+  def forSmoothDist[A](dist: SmoothDist[A], domains: List[RangeM[A]])
+                      (implicit conf: SmoothDistConf): Option[SamplingDist[A]] =
+    SmoothDist.samplingDist(dist, domains, conf)
 
   def probability[A](dist: SamplingDist[A],
                      start: A,
@@ -45,7 +46,7 @@ object SamplingDist extends SamplingDistPropOps[SamplingDist, SamplingDistConf] 
 
   def sampling[A](dist: SamplingDist[A], conf: SamplingDistConf): Option[DensityPlot] = (dist, conf) match {
     case (sketch: Sketch[A], conf: SketchConf) => Sketch.sampling(sketch, conf)
-    case (plotted: PlottedDist[A], _) => PlottedDist.sampling(plotted, conf)
+    case (plotted: PlottedDist[A], _) => PlottedDist.sampling(plotted)
     case _ => ???
   }
 

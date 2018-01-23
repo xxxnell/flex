@@ -123,8 +123,13 @@ trait SketchPropLaws[S[_]<:Sketch[_], C<:SketchConf] { self: SketchPropOps[S, C]
     measure = sketch.measure.asInstanceOf[Measure[A]]
   } yield RangeM(measure.from(head), measure.from(last))(measure)
 
-  def conf2Structures(conf: C): Structures =
-    (Cmap(conf.cmap), HCounter(conf.counter, -1)) :: Nil
+  def conf2Structures(conf: C): Structures = {
+    if(conf.cmap.size > conf.counter.size) {
+      (Cmap(conf.cmap), HCounter(conf.counter, -1)) :: Nil
+    } else {
+      (Cmap(conf.cmap), HCounter.emptyUncompressed(conf.cmap.size)) :: Nil
+    }
+  }
 
 }
 
