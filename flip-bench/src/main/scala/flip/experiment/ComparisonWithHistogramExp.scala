@@ -11,8 +11,8 @@ object ComparisonWithHistogramExp { self =>
   def main(args: Array[String]): Unit = {
     val expName = "histogram-comparison"
     val sampleNo = 1000
-    val histoSamplingNo = 20
-    val sketchSamplingNo = 20
+    val histoSamplingNo = 200
+    val sketchSamplingNo = 200
     val underlying = (0.5, NumericDist.normal(-2.0, 1)) + (0.5, NumericDist.normal(2.0, 1))
     val (_, datas) = underlying.samples(sampleNo)
 
