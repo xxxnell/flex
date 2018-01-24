@@ -3,6 +3,7 @@ package flip.pdf
 import cats.implicits._
 import flip.conf.{DistConf, SamplingDistConf, SmoothDistConf}
 import flip.measure.Measure
+import flip.pdf.arithmetic.CombinationDist
 import flip.plot.DensityPlot
 import flip.range.{RangeM, RangeP}
 
@@ -21,7 +22,7 @@ trait Dist[A] {
 
 trait DistPropOps[D[_]<:Dist[_]] extends DistPropLaws[D] {
 
-  def probability[A](dist: D[A], from: A, to: A): Option[Double]
+  def probability[A](dist: D[A], start: A, end: A): Option[Double]
 
   def sample[A](dist: D[A]): (D[A], A)
 
@@ -39,7 +40,7 @@ trait DistPropLaws[D[_]<:Dist[_]] { self: DistPropOps[D] =>
 
   def pdf[A](dist: D[A], a: A): Option[Double] = ???
 
-//  def cdf[A](sketch: D[A], a: A): Option[Double] = ???
+  def cdf[A](sketch: D[A], a: A): Option[Double] = ???
 
   def samples[A](dist: D[A], n: Int): (D[A], List[A]) = {
     (0 until n).foldLeft[(D[A], List[A])]((dist, Nil)){ case ((utdDist1, acc), _) =>
@@ -103,20 +104,30 @@ object Dist extends DistPropOps[Dist] { self =>
 
   // pipelining
 
-  def probability[A](dist: Dist[A], from: A, to: A): Option[Double] = dist match {
-    case (smooth: SmoothDist[A]) => SmoothDist.probability(smooth, from, to)
-    case (sampling: SamplingDist[A]) => SamplingDist.probability(sampling, from, to)
+  def probability[A](dist: Dist[A], start: A, end: A): Option[Double] = dist match {
+    case smooth: SmoothDist[A] => SmoothDist.probability(smooth, start, end)
+    case sampling: SamplingDist[A] => SamplingDist.probability(sampling, start, end)
+    case combination: CombinationDist[A] => CombinationDist.probability(combination, start, end)
   }
 
   def sample[A](dist: Dist[A]): (Dist[A], A) = dist match {
     case smooth: SmoothDist[A] => SmoothDist.sample(smooth)
     case sampling: SamplingDist[A] => SamplingDist.sample(sampling)
+    case combination: CombinationDist[A] => CombinationDist.sample(combination)
   }
 
   override def pdf[A](dist: Dist[A], a: A): Option[Double] = dist match {
     case smooth: SmoothDist[A] => SmoothDist.pdf(smooth, a)
     case sampling: SamplingDist[A] => SamplingDist.pdf(sampling, a)
+    case combination: CombinationDist[A] => CombinationDist.pdf(combination, a)
     case _ => super.pdf(dist, a)
+  }
+
+  override def cdf[A](dist: Dist[A], a: A): Option[Prim] = dist match {
+    case smooth: SmoothDist[A] => SmoothDist.cdf(smooth, a)
+    case sampling: SamplingDist[A] => SamplingDist.cdf(sampling, a)
+    case combination: CombinationDist[A] => CombinationDist.cdf(combination, a)
+    case _ => super.cdf(dist, a)
   }
 
 }

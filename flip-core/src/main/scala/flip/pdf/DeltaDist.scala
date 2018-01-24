@@ -19,11 +19,11 @@ trait DeltaDistOps extends NumericDistOps[DeltaDist] {
     if(a != pole) Some(0) else Some(Double.PositiveInfinity)
   }
 
-  def cdf[A](dist: DeltaDist[A], a: A): Double = {
+  override def cdf[A](dist: DeltaDist[A], a: A): Option[Double] = {
     val p = dist.measure.to(a)
     val pole = dist.measure.to(dist.pole)
 
-    if(p >= pole) 1 else 0
+    if(p >= pole) Some(1) else Some(0)
   }
 
   def icdf[A](dist: DeltaDist[A], p: Double): A = dist.pole

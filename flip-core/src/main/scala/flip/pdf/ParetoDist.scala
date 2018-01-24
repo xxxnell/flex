@@ -20,12 +20,12 @@ trait ParetoDistOps extends NumericDistOps[ParetoDist] {
     Some(numeric.density(p))
   }
 
-  def cdf[A](dist: ParetoDist[A], a: A): Prim = {
+  override def cdf[A](dist: ParetoDist[A], a: A): Option[Prim] = {
     val scale = dist.measure.to(dist.scale)
     val p = dist.measure.to(a)
     val numeric = new ParetoDistribution(scale, dist.shape)
 
-    numeric.cumulativeProbability(p)
+    Some(numeric.cumulativeProbability(p))
   }
 
   def icdf[A](dist: ParetoDist[A], p: Double): A = {

@@ -1,6 +1,6 @@
 package flip.experiment.ops
 
-import flip.pdf.{SamplingDist, Sketch, SmoothDist}
+import flip.pdf.{Dist, SamplingDist, Sketch, SmoothDist}
 
 object ComparisonOps {
 
@@ -8,11 +8,11 @@ object ComparisonOps {
 
   val defaultMaxCutoff: Double = 10e10
 
-  def identicalDomain[A, B](dist: SmoothDist[A], sketch: Sketch[A],
+  def identicalDomain[A, B](dist: Dist[A], sketch: Sketch[A],
                             compare: (SamplingDist[A], Sketch[A]) => Option[B]): Option[B] =
     identicalDomainForCutoff(dist, defaultMinCutoff, defaultMaxCutoff, sketch, compare)
 
-  def identicalDomainForCutoff[A, B](dist: SmoothDist[A], minCutoff: Double, maxCutoff: Double,
+  def identicalDomainForCutoff[A, B](dist: Dist[A], minCutoff: Double, maxCutoff: Double,
                                      sketch: Sketch[A],
                                      compare: (SamplingDist[A], Sketch[A]) => Option[B]): Option[B] = for {
     sampling <- dist.sampling(sketch)
@@ -20,12 +20,12 @@ object ComparisonOps {
     ff <- compare(filtered, sketch)
   } yield ff
 
-  def uniformDomain[A, B](dist: SmoothDist[A], start: A, end: A, no: Int,
+  def uniformDomain[A, B](dist: Dist[A], start: A, end: A, no: Int,
                           sketch: Sketch[A],
                           compare: (SamplingDist[A], Sketch[A]) => Option[B]): Option[B] =
     uniformDomainForCutoff(dist, start, end, no, defaultMinCutoff, defaultMaxCutoff, sketch, compare)
 
-  def uniformDomainForCutoff[A, B](dist: SmoothDist[A], start: A, end: A, no: Int,
+  def uniformDomainForCutoff[A, B](dist: Dist[A], start: A, end: A, no: Int,
                                    minCutoff: Double, maxCutoff: Double,
                                    sketch: Sketch[A],
                                    compare: (SamplingDist[A], Sketch[A]) => Option[B]): Option[B] = for {

@@ -17,11 +17,12 @@ trait NumericDistOps[D[_]<:NumericDist[_]] extends SmoothDistPropOps[D] { self =
 
   def modifyRng[A](dist: D[A], f: IRng => IRng): D[A]
 
-  def cdf[A](dist: D[A], a: A): Double
-
   def icdf[A](dist: D[A], a: Double): A
 
-  def probability[A](dist: D[A], start: A, end: A): Option[Double] = Some(cdf(dist, end) - cdf(dist, start))
+  def probability[A](dist: D[A], start: A, end: A): Option[Double] = for {
+    cdfStart <- cdf(dist, start)
+    cdfEnd <- cdf(dist, end)
+  } yield cdfEnd - cdfStart
 
   def sample[A](dist: D[A]): (D[A], A) = {
     val (rng, rand) = dist.rng.next
@@ -57,7 +58,7 @@ object NumericDist extends NumericDistOps[NumericDist] {
     case _ => super.pdf(dist, a)
   }
 
-  def cdf[A](dist: NumericDist[A], a: A): Double = dist match {
+  override def cdf[A](dist: NumericDist[A], a: A): Option[Double] = dist match {
     case dist: ParetoDist[A] => ParetoDist.cdf(dist, a)
     case dist: LogNormalDist[A] => LogNormalDist.cdf(dist, a)
     case dist: NormalDist[A] => NormalDist.cdf(dist, a)

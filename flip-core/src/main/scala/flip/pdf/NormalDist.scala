@@ -22,11 +22,11 @@ trait NormalDistOps extends NumericDistOps[NormalDist] {
     Some(numericDist.density(prim))
   }
 
-  def cdf[A](dist: NormalDist[A], a: A): Double = {
+  override def cdf[A](dist: NormalDist[A], a: A): Option[Double] = {
     val p = dist.measure.to(a)
     val numericDist = new NormalDistribution(dist.mean, dist.variance)
 
-    numericDist.cumulativeProbability(p)
+    Some(numericDist.cumulativeProbability(p))
   }
 
   def icdf[A](dist: NormalDist[A], p: Double): A = {
