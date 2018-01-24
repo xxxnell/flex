@@ -1,7 +1,6 @@
 package flip.sim
 
-import flip.{Histogram, HistogramConf, NumericDist, SketchConf}
-import flip.conf.DistConf
+import flip.{Histogram, HistogramConf, NumericDist}
 import flip.pdf.Dist
 import org.specs2.mutable._
 import org.specs2.ScalaCheck

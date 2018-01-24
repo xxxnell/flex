@@ -1,13 +1,18 @@
 package flip.measure
 
 import flip.pdf.Prim
+import org.scalactic._
+import TripleEquals._
+import org.scalactic.Tolerance._
 
 object PrimOps {
 
-  def similar(prim1: Prim, prim2: Prim, error: Double): Boolean = {
-    if(prim1 != 0) Math.abs((prim1 - prim2) / prim1) <= error
-    else if(prim2 != 0) Math.abs((prim1 - prim2) / prim2) <= error
-    else true
+  def similarForError(prim1: Prim, prim2: Prim, error: Double): Boolean = {
+    prim1 === (prim2 +- (prim1 * error))
+  }
+
+  def similarForTolerance(prim1: Prim, prim2: Prim, tol: Prim): Boolean = {
+    prim1 === (prim2 +- tol)
   }
 
 }
@@ -17,7 +22,8 @@ trait PrimSyntax {
   implicit val defaultError: Double = 0.05
 
   implicit class PrimSyntaxImpl(prim: Prim) {
-    def ~=(prim2: Prim)(implicit error: Double): Boolean = PrimOps.similar(prim, prim2, error)
+    def ~=(prim2: Prim)(implicit error: Double): Boolean = PrimOps.similarForError(prim, prim2, error)
+    def ~=(primTol: (Prim, Prim)): Boolean = PrimOps.similarForTolerance(prim, primTol._1, primTol._2)
   }
 
 }

@@ -12,6 +12,7 @@ trait PlotSyntax {
     def value(argument: Double): Option[Double] = Plot.image(plot, argument)
     def interpolation(argument: Double): Double = Plot.interpolation(plot, argument)
     def integral(start: Double, end: Double): Double = Plot.integral(plot, start, end)
+    def integralAll: Double = Plot.integralAll(plot)
     def isEmpty: Boolean = Plot.isEmpty(plot)
     def nonEmpty: Boolean = !Plot.isEmpty(plot)
     def csv: String = ShowPlot.dsv(plot, ", ")

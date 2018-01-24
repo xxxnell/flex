@@ -6,6 +6,7 @@ import flip.plot.DensityPlot
 trait SimSyntax
   extends ConsineSyntax
     with KLDSyntax
+    with L2SqSyntax
 
 trait ConsineSyntax {
 
@@ -28,5 +29,22 @@ trait KLDSyntax {
 
   def KLDDensity[A](d1: SamplingDist[A], d2: Dist[A]): Option[DensityPlot] =
     kld.simDensityForSampling(d1, d2)
+
+}
+
+trait L2SqSyntax {
+
+  private val l2sq = flip.sim.L2Sq
+
+  def L2Sq[A](d1: SamplingDist[A], d2: Dist[A]): Option[Double] =
+    l2sq.simForSampling(d1, d2)
+
+  def L2SqDensity[A](d1: SamplingDist[A], d2: Dist[A]): Option[DensityPlot] =
+    l2sq.simDensityForSampling(d1, d2)
+
+  def L2[A](d1: SamplingDist[A], d2: Dist[A]): Option[Double] =
+    L2Sq(d1, d2).map(l2sq => math.sqrt(l2sq))
+
+  def Euclidean[A](d1: SamplingDist[A], d2: Dist[A]): Option[Double] = L2(d1, d2)
 
 }

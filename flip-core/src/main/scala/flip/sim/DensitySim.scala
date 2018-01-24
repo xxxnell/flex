@@ -1,7 +1,6 @@
 package flip.sim
 
-import flip.conf.{DistConf, SamplingDistConf}
-import flip.pdf.{Dist, PlottedDist, Prim, SamplingDist}
+import flip.pdf.{Dist, Prim, SamplingDist}
 import flip.plot.DensityPlot
 
 trait DensitySim {

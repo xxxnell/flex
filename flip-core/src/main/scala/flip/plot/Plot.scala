@@ -295,6 +295,8 @@ trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
     if(startIndexedBlocksFromTo.nonEmpty) mid + startBoundary + endBoundary else startEndBoundary
   }
 
+  def integralAll(plot: P): Double = domain(plot).map(range => integral(plot, range.start, range.end)).getOrElse(0.0)
+
   def areaPoint(x1: Double, y1: Double, x2: Double, y2: Double): Double = {
     if (y1 == 0 && y2 == 0) 0
     else (x2 - x1) * (y2 / 2 + y1 / 2)
