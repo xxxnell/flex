@@ -29,6 +29,8 @@ trait DistPropSyntax {
       Dist.samplingDistForPlottedDist(dist, pltDist)
     def sampling(smplDist: SamplingDist[A]): Option[PlottedDist[A]] =
       Dist.samplingDistForSamplingDist(dist, smplDist)
+    def uniformSampling(start: A, end: A, size: Int): Option[PlottedDist[A]] =
+      Dist.uniformSampling(dist, start, end, size)
     def histogram(ranges: List[RangeM[A]]): String = AsciiArtPlot.histogram(dist, ranges)
   }
 

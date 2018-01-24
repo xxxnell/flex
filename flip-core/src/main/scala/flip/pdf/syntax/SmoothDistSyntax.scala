@@ -13,12 +13,6 @@ trait SmoothDistPropSyntax {
     def pdf(a: A): Option[Double] = SmoothDist.pdf(dist, a)
     def sample: (SmoothDist[A], A) = SmoothDist.sample(dist)
     def samples(n: Int): (SmoothDist[A], List[A]) = SmoothDist.samples(dist, n)
-    def sampling(domains: List[RangeM[A]]): Option[PlottedDist[A]] =
-      SmoothDist.samplingDist(dist, domains)
-    def sampling(smplDist: SamplingDist[A]): Option[PlottedDist[A]] =
-      SmoothDist.samplingDistForSamplingDist(dist, smplDist)
-    def uniformSampling(start: A, end: A, size: Int): Option[PlottedDist[A]] =
-      SmoothDist.uniformSampling(dist, start, end, size)
   }
 
   implicit class PlottedDistPropSyntaxImpl[A](dist: PlottedDist[A]) {

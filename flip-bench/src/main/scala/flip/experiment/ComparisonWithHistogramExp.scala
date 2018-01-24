@@ -1,8 +1,6 @@
 package flip.experiment
 
 import flip._
-import flip.pdf.SmoothDist
-import cats.implicits._
 import flip.experiment.ops.{ComparisonOps, ExpOutOps}
 
 /**
@@ -15,7 +13,7 @@ object ComparisonWithHistogramExp { self =>
     val sampleNo = 1000
     val histoSamplingNo = 20
     val sketchSamplingNo = 20
-    val underlying = NumericDist.normal(0.0, 1)
+    val underlying = (0.5, NumericDist.normal(-2.0, 1)) + (0.5, NumericDist.normal(2.0, 1))
     val (_, datas) = underlying.samples(sampleNo)
 
     val emptyHisto = self.histogram(histoSamplingNo)
@@ -28,25 +26,25 @@ object ComparisonWithHistogramExp { self =>
     // histogram results
     val histoPdf = utdHistos.flatMap { case (idx, histo) => histo.sampling.map((idx, _)) }
     val histoKld = utdHistos.flatMap { case (idx, histo) =>
-      ComparisonOps.uniformDomain(underlying, -1.5, 1.5, histoSamplingNo * 3, histo, KLD[Double]).map((idx, _))
+      ComparisonOps.uniformDomain(underlying, -3.0, 3.0, histoSamplingNo * 3, histo, KLD[Double]).map((idx, _))
     }
     val histoCos = utdHistos.flatMap { case (idx, histo) =>
-      ComparisonOps.uniformDomain(underlying, -1.5, 1.5, histoSamplingNo * 3, histo, Cosine[Double]).map((idx, _))
+      ComparisonOps.uniformDomain(underlying, -3.0, 3.0, histoSamplingNo * 3, histo, Cosine[Double]).map((idx, _))
     }
     val histoEuc = utdHistos.flatMap { case (idx, histo) =>
-      ComparisonOps.uniformDomain(underlying, -1.5, 1.5, histoSamplingNo * 3, histo, Euclidean[Double]).map((idx, _))
+      ComparisonOps.uniformDomain(underlying, -3.0, 3.0, histoSamplingNo * 3, histo, Euclidean[Double]).map((idx, _))
     }
 
     // sketch results
     val sketchPdf = utdSketches.flatMap { case (idx, sketch) => sketch.sampling.map((idx, _)) }
     val sketchKld = utdSketches.flatMap { case (idx, sketch) =>
-      ComparisonOps.uniformDomain(underlying, -1.5, 1.5, sketchSamplingNo * 3, sketch, KLD[Double]).map((idx, _))
+      ComparisonOps.uniformDomain(underlying, -3.0, 3.0, sketchSamplingNo * 3, sketch, KLD[Double]).map((idx, _))
     }
     val sketchCos = utdSketches.flatMap { case (idx, sketch) =>
-      ComparisonOps.uniformDomain(underlying, -1.5, 1.5, sketchSamplingNo * 3, sketch, Cosine[Double]).map((idx, _))
+      ComparisonOps.uniformDomain(underlying, -3.0, 3.0, sketchSamplingNo * 3, sketch, Cosine[Double]).map((idx, _))
     }
     val sketchEuc = utdSketches.flatMap { case (idx, sketch) =>
-      ComparisonOps.uniformDomain(underlying, -1.5, 1.5, sketchSamplingNo * 3, sketch, Euclidean[Double]).map((idx, _))
+      ComparisonOps.uniformDomain(underlying, -3.0, 3.0, sketchSamplingNo * 3, sketch, Euclidean[Double]).map((idx, _))
     }
 
     ExpOutOps.clear(expName)
@@ -93,7 +91,7 @@ object ComparisonWithHistogramExp { self =>
 
   def histogram(no: Int): Histogram[Double] = {
     implicit val histoConf: HistogramConf = HistogramConf(
-      binNo = no, start = -3.0, end = 3.0,
+      binNo = no, start = -5.0, end = 5.0,
       counterSize = no
     )
 
@@ -104,7 +102,7 @@ object ComparisonWithHistogramExp { self =>
     implicit val sketchConf: SketchConf = SketchConf(
       startThreshold = 50, thresholdPeriod = 100, boundaryCorr = 0.01, decayFactor = 0,
       queueSize = 20,
-      cmapSize = no, cmapNo = 5, cmapStart = Some(-3.0), cmapEnd = Some(3.0),
+      cmapSize = no, cmapNo = 5, cmapStart = Some(-5.0), cmapEnd = Some(5.0),
       counterSize = no
     )
 
@@ -122,39 +120,5 @@ object ComparisonWithHistogramExp { self =>
       tempSketchO.map(tempSketch => (idx + 1, tempSketch))
     }.filter { case (idx, _) => idx % period == 0 }
   }
-
-//  def pdfResult(sketch: Sketch[Double]): Option[DensityPlot] = for {
-//    pdf <- sketch.sampling
-//  } yield pdf
-//
-//  /**
-//    * @return (kld density, kld)
-//    * */
-//  def kldResult(sketch: Sketch[Double],
-//                underlying: SmoothDist[Double]): Option[(DensityPlot, Double)] = {
-//    val samplingStart = -1.5
-//    val samplingEnd = 1.5
-//
-//    for {
-//      underlyingSampling <- underlying.uniformSampling(samplingStart, samplingEnd, 100)
-//      kldd <- KLDDensity(underlyingSampling, sketch)
-//      kld <- KLD(underlyingSampling, sketch)
-//    } yield (kldd, kld)
-//  }
-//
-//  /**
-//    * @return (consine density, cosine sim)
-//    * */
-//  def cosineResult(sketch: Sketch[Double],
-//                   underlying: SmoothDist[Double]): Option[(DensityPlot, Double)] = {
-//    val samplingStart = -1.5
-//    val samplingEnd = 1.5
-//
-//    for {
-//      underlyingSampling <- underlying.uniformSampling(samplingStart, samplingEnd, 100)
-//      cosd <- CosineDensity(underlyingSampling, sketch)
-//      cos <- Cosine(underlyingSampling, sketch)
-//    } yield (cosd, cos)
-//  }
 
 }

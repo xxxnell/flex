@@ -40,11 +40,7 @@ package object flip
 
 }
 
-trait ConfPkgSyntax {
-
-  implicit val defaultSketchConf: flip.conf.SketchConf = flip.conf.SketchConf.default
-
-  implicit val defaultSmoothDistConf: flip.conf.SmoothDistConf = SmoothDistConf.default
+trait ConfPkgSyntax extends ConfPkgSyntax1 {
 
   type SketchConf = CustomSketchConf
 
@@ -53,6 +49,18 @@ trait ConfPkgSyntax {
   type HistogramConf = CustomSimpleSketchConf
 
   def HistogramConf: SimpleSketchConf.type = SimpleSketchConf
+
+}
+
+trait ConfPkgSyntax1 extends ConfPkgSyntax2 {
+
+  implicit val defaultSmoothDistConf: flip.conf.SmoothDistConf = SmoothDistConf.default
+
+}
+
+trait ConfPkgSyntax2 {
+
+  implicit val defaultSketchConf: flip.conf.SketchConf = flip.conf.SketchConf.default
 
 }
 
