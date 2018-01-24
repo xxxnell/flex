@@ -20,12 +20,12 @@ trait LogNormalDistOps extends NumericDistOps[LogNormalDist] {
     Some(numeric.density(p))
   }
 
-  def cdf[A](dist: LogNormalDist[A], a: A): Double = {
+  override def cdf[A](dist: LogNormalDist[A], a: A): Option[Double] = {
     val scale = dist.measure.to(dist.scale)
     val p = dist.measure.to(a)
     val numeric = new LogNormalDistribution(scale, dist.shape)
 
-    numeric.cumulativeProbability(p)
+    Some(numeric.cumulativeProbability(p))
   }
 
   def icdf[A](dist: LogNormalDist[A], p: Double): A = {

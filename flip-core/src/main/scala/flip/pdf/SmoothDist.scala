@@ -14,10 +14,6 @@ trait SmoothDistPropOps[D[_]<:SmoothDist[_]]
   extends DistPropOps[D]
     with SmoothDistPropLaws[D] {
 
-  def pdf[A](dist: D[A], a: A): Option[Double]
-
-  def probability[A](dist: D[A], start: A, end: A): Option[Prim]
-
 }
 
 trait SmoothDistPropLaws[D[_]<:SmoothDist[_]] { self: SmoothDistPropOps[D] =>
@@ -39,6 +35,12 @@ object SmoothDist extends SmoothDistPropOps[SmoothDist] {
   override def pdf[A](dist: SmoothDist[A], a: A): Option[Double] = dist match {
     case predefined: PredefinedDist[A] => PredefinedDist.pdf(predefined, a)
     case numeric: NumericDist[A] => NumericDist.pdf(numeric, a)
+    case _ => super.pdf(dist, a)
+  }
+
+  override def cdf[A](dist: SmoothDist[A], a: A): Option[Double] = dist match {
+    case predefined: PredefinedDist[A] => PredefinedDist.cdf(predefined, a)
+    case numeric: NumericDist[A] => NumericDist.cdf(numeric, a)
     case _ => super.pdf(dist, a)
   }
 

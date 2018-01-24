@@ -1,6 +1,8 @@
 package flip.pdf.syntax
 
+import flip.conf.DistConf
 import flip.measure.Measure
+import flip.pdf.arithmetic.CombinationDist
 import flip.pdf.monad.{DistFunctor, DistMonad}
 import flip.pdf.{Dist, PlottedDist, SamplingDist, Sketch}
 import flip.plot.AsciiArtPlot
@@ -8,13 +10,19 @@ import flip.range.RangeM
 
 import scala.language.higherKinds
 
-trait DistSyntax extends DistPropSyntax with DistMonadSyntax
+trait DistSyntax
+  extends DistPropSyntax
+    with DistMonadSyntax
+    with DistArthmeticSyntax
+
+// props
 
 trait DistPropSyntax {
 
   implicit class DistPropSyntaxImpl[A](dist: Dist[A]) {
     def probability(from: A, to: A): Option[Double] = Dist.probability(dist, from, to)
     def pdf(a: A): Option[Double] = Dist.pdf(dist, a)
+    def cdf(a: A): Option[Double] = Dist.cdf(dist, a)
     def sample: (Dist[A], A) = Dist.sample(dist)
     def samples(n: Int): (Dist[A], List[A]) = Dist.samples(dist, n)
     def sampling(pltDist: PlottedDist[A]): Option[PlottedDist[A]] =
@@ -25,6 +33,8 @@ trait DistPropSyntax {
   }
 
 }
+
+// monad
 
 trait DistBindAux[InD[_]<:Dist[_], OutD[_]<:Dist[_]] {
   type Out[A] = OutD[A]
@@ -66,5 +76,21 @@ trait DistMonadSyntax3 {
 
   implicit def bindAux3: DistBindAux[Dist, Dist] = new DistBindAux[Dist, Dist] {}
   implicit def distMonad3: DistMonad[Dist, Dist, Dist] = DistMonad.dist
+
+}
+
+// arthemetic
+
+trait DistArthmeticSyntax {
+
+  implicit class DistArthmeticSyntaxImpl1[A](weightDist: (Double, Dist[A])) {
+    def +(weightDist2: (Double, Dist[A]))(implicit measure: Measure[A], conf: DistConf): CombinationDist[A] =
+      CombinationDist.apply(weightDist2, weightDist)
+  }
+
+  implicit class DistArthmeticSyntaxImpl2[A](combi: CombinationDist[A]) {
+    def +(weightDist2: (Double, Dist[A]))(implicit measure: Measure[A], conf: DistConf): CombinationDist[A] =
+      CombinationDist.apply((weightDist2 :: combi.components).toList: _*)
+  }
 
 }
