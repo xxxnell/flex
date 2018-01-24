@@ -52,11 +52,16 @@ trait CombinationDistOps[D[_]<:CombinationDist[_]] extends DistPropOps[D] {
     val components = normalizing(combi.components)
     val (utdRng, rnd) = combi.rng.next
 
-    var cum = 0.0
-    val ((_, targetDist), targetIdx) = components.zipWithIndex.map { case ((weight, dist), idx) =>
-      cum += weight
-      ((cum, dist), idx)
-    }.find { case ((cumWeight, _), _) => cumWeight <= rnd && cumWeight >= rnd }
+    val cumWeightDist = {
+      var cum = 0.0
+      components.map { case (weight, dist) =>
+        val prevCum = cum
+        cum += weight
+        (prevCum, dist)
+      }
+    }
+    val ((_, targetDist), targetIdx) = cumWeightDist.zipWithIndex
+      .find { case ((cumWeight, _), _) => cumWeight >= rnd }
       .getOrElse((components.head, 0))
 
     val (utdDist, sample) = targetDist.asInstanceOf[Dist[A]].sample
