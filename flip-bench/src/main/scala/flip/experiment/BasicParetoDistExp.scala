@@ -1,7 +1,7 @@
 package flip.experiment
 
 import flip._
-import flip.experiment.ops.ExpOutOps
+import flip.experiment.ops.{ComparisonOps, ExpOutOps}
 
 object BasicParetoDistExp {
 
@@ -11,8 +11,6 @@ object BasicParetoDistExp {
     val samplingNo = 150
     val start = 50
     val period = 100
-    val minDomainCutoff = -10e10
-    val maxDomainCutoff = 10e10
 
     implicit val conf: SketchConf = SketchConf(
       startThreshold = start, thresholdPeriod = period, boundaryCorr = 0.1, decayFactor = 0,
@@ -31,25 +29,21 @@ object BasicParetoDistExp {
       tempSketchO.map(tempSketch => (idx + 1, tempSketch))
     }.filter { case (idx, _) => idx % 10 == 0 }
     val idxDensityPlots = idxUtdSketches.flatMap { case (idx, utdSkt) => utdSkt.densityPlot.map(plot => (idx, plot)) }
-    val idxKldPlot = idxUtdSketches.flatMap { case (idx, utdSkt) =>
-      for {
-        sampling <- underlying.sampling(utdSkt)
-        filtered = sampling.filter { range => range > minDomainCutoff && range < maxDomainCutoff }
-        plot <- KLDDensity(filtered, utdSkt)
-      } yield (idx, plot)
-    }
     val idxKld = idxUtdSketches.flatMap { case (idx, utdSkt) =>
-      for {
-        sampling <- underlying.sampling(utdSkt)
-        filtered = sampling.filter { range => range > minDomainCutoff && range < maxDomainCutoff }
-        kld <- KLD(filtered, utdSkt)
-      } yield (idx, kld)
+      ComparisonOps.identicalDomain(underlying, utdSkt, KLD[Double]).map((idx, _))
+    }
+    val idxCosine = idxUtdSketches.flatMap { case (idx, utdSkt) =>
+      ComparisonOps.uniformDomain(underlying, 0.0, 10.0, samplingNo * 3, utdSkt, CosineDensity[Double]).map((idx, _))
+    }
+    val idxEuclidean = idxUtdSketches.flatMap { case (idx, utdSkt) =>
+      ComparisonOps.uniformDomain(underlying, 0.0, 10.0, samplingNo * 3, utdSkt, Euclidean[Double]).map((idx, _))
     }
 
     ExpOutOps.clear(expName1)
     ExpOutOps.writePlots(expName1, "pdf", idxDensityPlots)
-    ExpOutOps.writePlots(expName1, "kld-density", idxKldPlot)
     ExpOutOps.writeStr(expName1, "kld", idxKld.map{ case (idx, kld) => s"$idx, $kld" }.mkString("\n"))
+    ExpOutOps.writeStr(expName1, "cosine", idxCosine.map{ case (idx, cosine) => s"$idx, $cosine" }.mkString("\n"))
+    ExpOutOps.writeStr(expName1, "euclidean", idxEuclidean.map{ case (idx, euc) => s"$idx, $euc" }.mkString("\n"))
   }
 
 }
