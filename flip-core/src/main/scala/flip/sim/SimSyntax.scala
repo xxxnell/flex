@@ -37,10 +37,10 @@ trait L2SqSyntax {
   private val l2sq = flip.sim.L2Sq
 
   def L2Sq[A](d1: SamplingDist[A], d2: Dist[A]): Option[Double] =
-    l2sq.simForSampling(d1, d2)
+    l2sq(d1, d2).simForSampling(d1, d2)
 
   def L2SqDensity[A](d1: SamplingDist[A], d2: Dist[A]): Option[DensityPlot] =
-    l2sq.simDensityForSampling(d1, d2)
+    l2sq(d1, d2).simDensityForSampling(d1, d2)
 
   def L2[A](d1: SamplingDist[A], d2: Dist[A]): Option[Double] =
     L2Sq(d1, d2).map(l2sq => math.sqrt(l2sq))
