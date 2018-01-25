@@ -62,6 +62,7 @@ object GradualConceptDriftExp {
         underlying(idx), draftStartingPoint - domainWidth, center(idx) + domainWidth, samplingNo * 3,
         skt, Euclidean[Double]).map((idx, _))
     }
+    val idxSktMedian = idxUtdSketches.flatMap { case (idx, skt) => skt.median.map((idx, _)) }
 
     // out
 
@@ -71,6 +72,8 @@ object GradualConceptDriftExp {
     ExpOutOps.writeStr(expName, "kld", idxKld.map { case (idx, kld) => s"$idx, $kld" }.mkString("\n"))
     ExpOutOps.writeStr(expName, "cosine", idxCos.map { case (idx, cos) => s"$idx, $cos" }.mkString("\n"))
     ExpOutOps.writeStr(expName, "euclidean", idxEuc.map { case (idx, euc) => s"$idx, $euc" }.mkString("\n"))
+    ExpOutOps.writeStr(expName, "median",
+      idxSktMedian.map { case (idx, sktMed) => s"$idx, ${center(idx)}, $sktMed" }.mkString("\n"))
 
     // console print
     val avgSize = 10

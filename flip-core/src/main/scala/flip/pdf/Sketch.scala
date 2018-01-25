@@ -66,6 +66,8 @@ trait SketchPropLaws[S[_]<:Sketch[_]] { self: SketchPropOps[S] =>
     flatProb = flatDensity * RangeM.bare(start, end, measure).roughLength
   } yield if(sum > 0) count / sum else flatProb
 
+  def rearrange[A](sketch: S[A]): Option[S[A]] = deepUpdate(sketch, Nil).map(_._1)
+
   def sampling[A](sketch: S[A]): Option[DensityPlot] = for {
     cmap <- youngCmap(sketch)
     rangePs = cmap.bin
@@ -92,7 +94,20 @@ trait SketchPropLaws[S[_]<:Sketch[_]] { self: SketchPropOps[S] =>
     sampling <- samplingForRanges(sketch, rangeMs)
   } yield sampling.interpolation(p)
 
-  def rearrange[A](sketch: S[A]): Option[S[A]] = deepUpdate(sketch, Nil).map(_._1)
+  override def cdf[A](sketch: S[A], a: A): Option[Double] = for {
+    cdf <- cdfPlot(sketch)
+    p = sketch.measure.asInstanceOf[Measure[A]].to(a)
+  } yield cdf.interpolation(p)
+
+  def cdfPlot[A](sketch: S[A]): Option[DensityPlot] = for {
+    pdf <- sampling(sketch)
+    cdf = pdf.cumulative
+  } yield cdf
+
+  def median[A](sketch: S[A]): Option[Double] = for {
+    cdf <- cdfPlot(sketch)
+    icdf = cdf.inverse
+  } yield icdf.interpolation(0.5)
 
   def cmapNo(sketch: S[_]): Int = sketch.structures.size
 

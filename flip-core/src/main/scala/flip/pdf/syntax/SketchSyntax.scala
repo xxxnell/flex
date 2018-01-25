@@ -36,6 +36,7 @@ trait SketchPropSyntax {
     def counterSize: Int = Sketch.counterSize(sketch)
     def youngCmap: Option[Cmap] = Sketch.youngCmap(sketch)
     def domain: Option[RangeM[A]] = Sketch.domain(sketch)
+    def median: Option[Double] = Sketch.median(sketch)
   }
 
 }
