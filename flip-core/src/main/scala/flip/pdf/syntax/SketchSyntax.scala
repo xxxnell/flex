@@ -1,11 +1,10 @@
 package flip.pdf.syntax
 
 import flip.cmap.Cmap
-import flip.conf.SketchConf
 import flip.measure.Measure
-import flip.pdf.{Count, Dist, Prim, Range, Sketch, Structure}
-import flip.pdf.monad.{DistFunctor, SketchMonad}
-import flip.plot.CountPlot
+import flip.pdf.monad.SketchMonad
+import flip.pdf.{Count, Dist, Sketch, Structure}
+import flip.plot.DensityPlot
 import flip.range.RangeM
 
 trait SketchSyntax extends SketchPropSyntax with SketchMonadSyntax
@@ -36,6 +35,7 @@ trait SketchPropSyntax {
     def counterSize: Int = Sketch.counterSize(sketch)
     def youngCmap: Option[Cmap] = Sketch.youngCmap(sketch)
     def domain: Option[RangeM[A]] = Sketch.domain(sketch)
+    def cdfPlot: Option[DensityPlot] = Sketch.cdfPlot(sketch)
     def median: Option[Double] = Sketch.median(sketch)
   }
 
