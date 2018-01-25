@@ -42,7 +42,7 @@ class SketchOpsBench { self =>
       cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = Some(-10d), cmapEnd = Some(10d),
       counterSize = counterSize, counterNo = counterNo
     )
-    val (_, samples) = NumericDist.normal(0.0, 1).samples(100)
+    val (_, samples) = NumericDist.normal(0.0, 1).samples(queueSize)
     val sketch0 = Sketch.empty[Double]
 
     self.conf = conf
