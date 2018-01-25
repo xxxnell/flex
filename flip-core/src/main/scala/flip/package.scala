@@ -73,6 +73,12 @@ trait PdfPkgSyntax
     with SmoothDistSyntax
     with SketchSyntax {
 
+//trait PdfPkgSyntax
+//  extends SketchSyntax
+//    with SamplingDistSyntax
+//    with SmoothDistSyntax
+//    with DistSyntax {
+
   type Dist[A] = flip.pdf.Dist[A]
 
   val Dist: flip.pdf.Dist.type = flip.pdf.Dist

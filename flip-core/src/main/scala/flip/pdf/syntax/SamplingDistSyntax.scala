@@ -18,6 +18,7 @@ trait SamplingDistPropSyntax {
     def samples(n: Int): (SamplingDist[A], List[A]) = SamplingDist.samples(dist, n)
     def sampling: Option[DensityPlot] = SamplingDist.sampling(dist)
     def densityPlot: Option[DensityPlot] = SamplingDist.sampling(dist)
+    def pdfPlot: Option[DensityPlot] = SamplingDist.sampling(dist)
   }
 
 }
