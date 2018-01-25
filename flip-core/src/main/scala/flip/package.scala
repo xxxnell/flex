@@ -77,6 +77,8 @@ trait PdfPkgSyntax
 
   val Dist: flip.pdf.Dist.type = flip.pdf.Dist
 
+  type NumericDist[A] = flip.pdf.NumericDist[A]
+
   val NumericDist: flip.pdf.NumericDist.type = flip.pdf.NumericDist
 
   type Sketch[A] = flip.pdf.Sketch[A]

@@ -46,10 +46,13 @@ object NormalDist extends NormalDistOps {
                                        rng: IRng) extends NormalDist[A]
 
   def apply[A](measure: Measure[A], conf: SmoothDistConf, mean: Prim, variance: Prim): NormalDist[A] =
-    bare(measure, conf, mean, variance, IRng(mean.toInt + variance.toInt))
+    bare(measure, conf, mean, variance, IRng(mean.hashCode() + variance.hashCode()))
 
   def apply[A](mean: A, variance: Prim)(implicit measure: Measure[A], conf: SmoothDistConf): NormalDist[A] =
     apply(measure, conf, measure.to(mean), variance)
+
+  def apply[A](mean: A, variance: Prim, rng: IRng)(implicit measure: Measure[A], conf: SmoothDistConf): NormalDist[A] =
+    bare(measure, conf, measure.to(mean), variance, rng)
 
   def bare[A](measure: Measure[A], conf: SmoothDistConf, mean: Prim, variance: Prim, rng: IRng): NormalDist[A] =
     NormalDistImpl(measure, conf, mean, variance, rng)

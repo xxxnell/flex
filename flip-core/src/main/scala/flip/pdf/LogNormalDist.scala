@@ -45,6 +45,9 @@ object LogNormalDist extends LogNormalDistOps {
   def apply[A](scale: A, shape: Prim)(implicit measure: Measure[A], conf: SmoothDistConf): LogNormalDist[A] =
     bare(measure, conf, scale, shape, IRng(scale.hashCode() + shape.toInt))
 
+  def apply[A](scale: A, shape: Prim, rng: IRng)(implicit measure: Measure[A], conf: SmoothDistConf): LogNormalDist[A] =
+    bare(measure, conf, scale, shape, rng)
+
   def bare[A](measure: Measure[A], conf: SmoothDistConf, scale: A, shape: Prim, rng: IRng): LogNormalDist[A] =
     LogNormalDistImpl(measure, conf, scale, shape, rng)
 

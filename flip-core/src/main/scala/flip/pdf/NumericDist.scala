@@ -36,17 +36,37 @@ object NumericDist extends NumericDistOps[NumericDist] {
 
   // constructor
 
-  def delta[A](pole: A)(implicit measure: Measure[A], conf: SmoothDistConf): DeltaDist[A] =
+  def delta[A](pole: A)
+              (implicit measure: Measure[A], conf: SmoothDistConf): DeltaDist[A] =
     DeltaDist(measure, conf, pole)
 
-  def normal[A](mean: A, variance: Double)(implicit measure: Measure[A], conf: SmoothDistConf): NormalDist[A] =
+  def delta[A](pole: A, rng: IRng)
+              (implicit measure: Measure[A], conf: SmoothDistConf): DeltaDist[A] =
+    DeltaDist(measure, conf, pole, rng)
+
+  def normal[A](mean: A, variance: Double)
+               (implicit measure: Measure[A], conf: SmoothDistConf): NormalDist[A] =
     NormalDist(mean, variance)
 
-  def logNormal[A](scale: A, shape: Double)(implicit measure: Measure[A], conf: SmoothDistConf): LogNormalDist[A] =
+  def normal[A](mean: A, variance: Double, rng: IRng)
+               (implicit measure: Measure[A], conf: SmoothDistConf): NormalDist[A] =
+    NormalDist(mean, variance, rng)
+
+  def logNormal[A](scale: A, shape: Double)
+                  (implicit measure: Measure[A], conf: SmoothDistConf): LogNormalDist[A] =
     LogNormalDist(scale, shape)
 
-  def pareto[A](scale: A, shape: Double)(implicit measure: Measure[A], conf: SmoothDistConf): ParetoDist[A] =
+  def logNormal[A](scale: A, shape: Double, rng: IRng)
+                  (implicit measure: Measure[A], conf: SmoothDistConf): LogNormalDist[A] =
+    LogNormalDist(scale, shape, rng)
+
+  def pareto[A](scale: A, shape: Double)
+               (implicit measure: Measure[A], conf: SmoothDistConf): ParetoDist[A] =
     ParetoDist(scale, shape)
+
+  def pareto[A](scale: A, shape: Double, rng: IRng)
+               (implicit measure: Measure[A], conf: SmoothDistConf): ParetoDist[A] =
+    ParetoDist(scale, shape, rng)
 
   // pipelining
 

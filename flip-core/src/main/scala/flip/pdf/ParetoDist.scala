@@ -43,7 +43,10 @@ object ParetoDist extends ParetoDistOps {
     extends ParetoDist[A]
 
   def apply[A](scale: A, shape: Double)(implicit measure: Measure[A], conf: SmoothDistConf): ParetoDist[A] =
-    bare(measure, conf, scale, shape, IRng(scale.hashCode() + shape.toInt))
+    bare(measure, conf, scale, shape, IRng(scale.hashCode() + shape.hashCode))
+
+  def apply[A](scale: A, shape: Double, rng: IRng)(implicit measure: Measure[A], conf: SmoothDistConf): ParetoDist[A] =
+    bare(measure, conf, scale, shape, rng)
 
   def bare[A](measure: Measure[A], conf: SmoothDistConf, scale: A, shape: Prim, rng: IRng): ParetoDist[A] =
     ParetoDistImpl(measure, conf, scale, shape, rng)
