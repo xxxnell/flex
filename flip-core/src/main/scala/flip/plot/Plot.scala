@@ -73,19 +73,6 @@ trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
   def interpolation(plot: P, x: Double): Double = {
     val dataRefSize = 2
 
-//    val midRecordsO = {
-//      val toIndex = plot.middleIndex.to(x)
-//      val fromIndex = plot.middleIndex.from(x)
-//      if(toIndex.nonEmpty && fromIndex.nonEmpty) {
-//        Some(plot.records.apply(toIndex.last._2) ::
-//          plot.records.apply(fromIndex.head._2) :: Nil)
-//      } else None
-//    }
-
-//    val midInterp = midRecordsO
-//      .map(records => records.map { case (range, value) => (range.middle, value) })
-//      .flatMap { datas => dataFitting(datas, x) }
-
     val midInterp = for {
       toIndexBlocks <- plot.middleIndex.to(x).lastOption
       fromIndexBlocks <- plot.middleIndex.from(x).headOption
@@ -124,21 +111,26 @@ trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
       case _ => for {
         start <- as.find(_._1 <= x)
         end <- as.find(_._1 >= x)
-      } yield linearFitting(start, end, x)
+        fitting <- linearFitting(start, end, x)
+      } yield fitting
     }
   }
 
-  def linearFitting(a1: (Double, Double), a2: (Double, Double), x: Double): Double = {
+  def linearFitting(a1: (Double, Double), a2: (Double, Double), x: Double): Option[Double] = {
     val (x1, y1) = a1
     val (x2, y2) = a2
     lazy val p = linearFittingDouble(a1, a2, x)
 
-    if(!p.isNaN) p
-    else linearFittingBigDecimal(
-      (BigDecimal(x1), BigDecimal(y1)),
-      (BigDecimal(x2), BigDecimal(y2)),
-      BigDecimal(x)
-    ).toDouble
+    if(!p.isNaN) Some(p)
+    else try {
+      Some(linearFittingBigDecimal(
+        (BigDecimal(x1), BigDecimal(y1)),
+        (BigDecimal(x2), BigDecimal(y2)),
+        BigDecimal(x)
+      ).toDouble)
+    } catch {
+      case _: Exception => None
+    }
   }
 
   def linearFittingDouble(a1: (Double, Double), a2: (Double, Double), x: Double): Double = {
