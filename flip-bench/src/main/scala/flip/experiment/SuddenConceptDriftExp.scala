@@ -1,8 +1,7 @@
 package flip.experiment
 
-import flip.experiment.ops.ExpOutOps
 import flip._
-import flip.experiment.ops.ExpOutOps
+import flip.experiment.ops.{ComparisonOps, DataOps, ExpOutOps}
 
 /**
   * A experiment for sudden concept drift.
@@ -11,13 +10,11 @@ import flip.experiment.ops.ExpOutOps
 object SuddenConceptDriftExp {
 
   def main(args: Array[String]): Unit = {
-    val expName1 = "sudden-cd-normal"
+    val expName = "sudden-cd-normal"
     val sampleNo1 = 1000
     val sampleNo2 = 1000
     val start = 50
     val period = 100
-    val minDomainCutoff = -10e10
-    val maxDomainCutoff = 10e10
 
     implicit val conf: SketchConf = SketchConf(
       decayFactor = 1,
@@ -26,37 +23,36 @@ object SuddenConceptDriftExp {
       counterSize = 1000, counterNo = 2
     )
     val sketch = Sketch.empty[Double]
-    val underlying1 = NumericDist.normal(0.0, 1)
+    val (mean1, mean2) = (0.0, 5.0)
+    val underlying1 = NumericDist.normal(mean1, 1)
     val (_, datas1) = underlying1.samples(sampleNo1)
-    val underlying2 = NumericDist.normal(5.0, 1)
+    val underlying2 = NumericDist.normal(mean2, 1)
     val (_, datas2) = underlying2.samples(sampleNo2)
-    val dataIdxs = (datas1 ++ datas2).zipWithIndex
+    def underlying(idx: Int) = if(idx < sampleNo1) underlying1 else underlying2
+    def center(idx: Int) = if(idx < sampleNo1) mean1 else mean2
+    val datas = datas1 ++ datas2
+    val dataIdxs = (datas.indices zip datas).toList
 
-    var tempSketchO: Option[Sketch[Double]] = Option(sketch)
-    val idxUtdSketches: List[(Int, Sketch[Double])] = (0, sketch) :: dataIdxs.flatMap { case (data, idx) =>
-      tempSketchO = tempSketchO.flatMap(_.update(data))
-      tempSketchO.map(tempSketch => (idx + 1, tempSketch))
-    }.filter { case (idx, _) => (idx - start) % period == 0 || (idx - start + 1) % period == 0 }
-    val idxDensityPlots = idxUtdSketches.flatMap { case (idx, utdSkt) => utdSkt.densityPlot.map(plot => (idx, plot)) }
-    val idxKldPlot = idxUtdSketches.flatMap { case (idx, utdSkt) =>
-      for {
-        sampling <- if(idx < sampleNo1) underlying1.sampling(utdSkt) else underlying2.sampling(utdSkt)
-        filtered = sampling.filter { range => range > minDomainCutoff && range < maxDomainCutoff }
-        plot <- KLDDensity(filtered, utdSkt)
-      } yield (idx, plot)
-    }
+    val idxUtdSketches = DataOps.update(sketch, dataIdxs).filter { case (idx, _) => idx % 10 == 0 }
+    val idxDensityPlots = idxUtdSketches.flatMap { case (idx, utdSkt) => utdSkt.pdfPlot.map((idx, _)) }
     val idxKld = idxUtdSketches.flatMap { case (idx, utdSkt) =>
-      for {
-        sampling <- if(idx < sampleNo1) underlying1.sampling(utdSkt) else underlying2.sampling(utdSkt)
-        filtered = sampling.filter { range => range > minDomainCutoff && range < maxDomainCutoff }
-        kld <- KLD(filtered, utdSkt)
-      } yield (idx, kld)
+      ComparisonOps.identicalDomain(underlying(idx), utdSkt, KLD[Double]).map((idx, _))
     }
+    val idxCos = idxUtdSketches.flatMap { case (idx, utdSkt) =>
+      ComparisonOps.identicalDomain(underlying(idx), utdSkt, Cosine[Double]).map((idx, _))
+    }
+    val idxEuc = idxUtdSketches.flatMap { case (idx, utdSkt) =>
+      ComparisonOps.identicalDomain(underlying(idx), utdSkt, Euclidean[Double]).map((idx, _))
+    }
+    val idxSktMedian = idxUtdSketches.flatMap { case (idx, skt) => skt.median.map((idx, _)) }
 
-    ExpOutOps.clear(expName1)
-    ExpOutOps.writePlots(expName1, "pdf", idxDensityPlots)
-    ExpOutOps.writePlots(expName1, "kld-density", idxKldPlot)
-    ExpOutOps.writeStr(expName1, "kld", idxKld.map{ case (idx, kld) => s"$idx, $kld" }.mkString("\n"))
+    ExpOutOps.clear(expName)
+    ExpOutOps.writePlots(expName, "pdf", idxDensityPlots)
+    ExpOutOps.writeStr(expName, "kld", idxKld.map{ case (idx, kld) => s"$idx, $kld" }.mkString("\n"))
+    ExpOutOps.writeStr(expName, "cosine", idxCos.map{ case (idx, cos) => s"$idx, $cos" }.mkString("\n"))
+    ExpOutOps.writeStr(expName, "euclidean", idxEuc.map{ case (idx, euc) => s"$idx, $euc" }.mkString("\n"))
+    ExpOutOps.writeStr(expName, "median",
+      idxSktMedian.map { case (idx, sktMed) => s"$idx, ${center(idx)}, $sktMed" }.mkString("\n"))
   }
 
 }

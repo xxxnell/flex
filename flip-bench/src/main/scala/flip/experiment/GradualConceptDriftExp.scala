@@ -81,7 +81,7 @@ object GradualConceptDriftExp {
     val avgCos = idxCos.takeRight(avgSize).map(_._2).sum / avgSize
     val avgEuc = idxEuc.takeRight(avgSize).map(_._2).sum / avgSize
 
-    val str = "Similarity for concept-drifted data stream: \n" +
+    val str = s"Similarity for gradual concept-drifted data stream with velocity $velocity: \n" +
       s" KLD(Sketch($samplingNo)): $avgKld \n" +
       s" Cosine(Sketch($samplingNo)): $avgCos \n" +
       s" Euclidean(Sketch($samplingNo)): $avgEuc"
