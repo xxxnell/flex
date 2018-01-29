@@ -1,7 +1,7 @@
 package flip.experiment
 
 import flip._
-import flip.experiment.ops.{ComparisonOps, ExpOutOps}
+import flip.experiment.ops.{ComparisonOps, DataOps, ExpOutOps}
 import flip.pdf.SamplingDist
 
 object BasicLogNormalDistExp {
@@ -22,22 +22,19 @@ object BasicLogNormalDistExp {
     val sketch = Sketch.empty[Double]
     val underlying = NumericDist.logNormal(0.0, 1)
     val (_, datas) = underlying.samples(dataNo)
-    val dataIdxs = datas.zipWithIndex
+    val idxDatas = (datas.indices zip datas).toList
 
-    var tempSketchO: Option[Sketch[Double]] = Option(sketch)
-    val idxUtdSketches: List[(Int, Sketch[Double])] = (0, sketch) :: dataIdxs.flatMap { case (data, idx) =>
-      tempSketchO = tempSketchO.flatMap(_.update(data))
-      tempSketchO.map(tempSketch => (idx + 1, tempSketch))
-    }.filter { case (idx, _) => idx % 10 == 0 }
+    val idxUtdSketches: List[(Int, Sketch[Double])] = DataOps.update(sketch, idxDatas)
+      .filter { case (idx, _) => idx % 10 == 0 }
     val idxDensityPlots = idxUtdSketches.flatMap { case (idx, utdSkt) => utdSkt.densityPlot.map(plot => (idx, plot)) }
     val idxKld = idxUtdSketches.flatMap { case (idx, utdSkt) =>
       ComparisonOps.identicalDomain(underlying, utdSkt, KLD[Double]).map((idx, _))
     }
     val idxCosine = idxUtdSketches.flatMap { case (idx, utdSkt) =>
-      ComparisonOps.uniformDomain(underlying, 0.0, 10.0, samplingNo * 3, utdSkt, Cosine[Double]).map((idx, _))
+      ComparisonOps.identicalDomain(underlying, utdSkt, Cosine[Double]).map((idx, _))
     }
     val idxEuclidean = idxUtdSketches.flatMap { case (idx, utdSkt) =>
-      ComparisonOps.uniformDomain(underlying, 0.0, 10.0, samplingNo * 3, utdSkt, Euclidean[Double]).map((idx, _))
+      ComparisonOps.identicalDomain(underlying, utdSkt, Euclidean[Double]).map((idx, _))
     }
 
     ExpOutOps.clear(expName1)
