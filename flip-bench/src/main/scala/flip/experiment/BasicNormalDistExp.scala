@@ -9,7 +9,7 @@ object BasicNormalDistExp {
   def main(args: Array[String]): Unit = {
     val expName1 = "basic-normal"
     val dataNo = 1000
-    val samplingNo = 50
+    val samplingNo = 20
     val start = 50
     val period = 100
 

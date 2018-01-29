@@ -8,8 +8,8 @@ object BasicLogNormalDistExp {
 
   def main(args: Array[String]): Unit = {
     val expName1 = "basic-lognormal"
-    val dataNo = 300
-    val samplingNo = 100
+    val dataNo = 1000
+    val samplingNo = 20
     val start = 50
     val period = 100
 

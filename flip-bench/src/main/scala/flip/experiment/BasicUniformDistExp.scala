@@ -7,7 +7,7 @@ object BasicUniformDistExp {
 
   def main(args: Array[String]): Unit = {
     val expName1 = "basic-uniform"
-    val dataNo = 300
+    val dataNo = 1000
     val samplingNo = 20
     val start = 50
     val period = 100
