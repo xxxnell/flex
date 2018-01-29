@@ -68,6 +68,14 @@ object NumericDist extends NumericDistOps[NumericDist] {
                (implicit measure: Measure[A], conf: SmoothDistConf): ParetoDist[A] =
     ParetoDist(scale, shape, rng)
 
+  def uniform[A](scale: A, width: Double)
+                (implicit measure: Measure[A], conf: SmoothDistConf): UniformDist[A] =
+    UniformDist(scale, width)
+
+  def uniform[A](scale: A, width: Double, rng: IRng)
+                (implicit measure: Measure[A], conf: SmoothDistConf): UniformDist[A] =
+    UniformDist(scale, width, rng)
+
   // pipelining
 
   override def pdf[A](dist: NumericDist[A], a: A): Option[Prim] = dist match {
@@ -75,6 +83,7 @@ object NumericDist extends NumericDistOps[NumericDist] {
     case dist: LogNormalDist[A] => LogNormalDist.pdf(dist, a)
     case dist: NormalDist[A] => NormalDist.pdf(dist, a)
     case dist: DeltaDist[A] => DeltaDist.pdf(dist, a)
+    case dist: UniformDist[A] => UniformDist.pdf(dist, a)
     case _ => super.pdf(dist, a)
   }
 
@@ -83,6 +92,7 @@ object NumericDist extends NumericDistOps[NumericDist] {
     case dist: LogNormalDist[A] => LogNormalDist.cdf(dist, a)
     case dist: NormalDist[A] => NormalDist.cdf(dist, a)
     case dist: DeltaDist[A] => DeltaDist.cdf(dist, a)
+    case dist: UniformDist[A] => UniformDist.cdf(dist, a)
   }
 
   def icdf[A](dist: NumericDist[A], p: Double): A = dist match {
@@ -90,6 +100,7 @@ object NumericDist extends NumericDistOps[NumericDist] {
     case dist: LogNormalDist[A] => LogNormalDist.icdf(dist, p)
     case dist: NormalDist[A] => NormalDist.icdf(dist, p)
     case dist: DeltaDist[A] => DeltaDist.icdf(dist, p)
+    case dist: UniformDist[A] => UniformDist.icdf(dist, p)
   }
 
   def modifyRng[A](dist: NumericDist[A], f: IRng => IRng): NumericDist[A] = dist match {
@@ -97,6 +108,7 @@ object NumericDist extends NumericDistOps[NumericDist] {
     case dist: LogNormalDist[A] => LogNormalDist.modifyRng(dist, f)
     case dist: NormalDist[A] => NormalDist.modifyRng(dist, f)
     case dist: DeltaDist[A] => DeltaDist.modifyRng(dist, f)
+    case dist: UniformDist[A] => UniformDist.modifyRng(dist, f)
   }
 
 }
