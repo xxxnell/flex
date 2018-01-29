@@ -25,6 +25,8 @@ trait DistPropSyntax {
     def cdf(a: A): Option[Double] = Dist.cdf(dist, a)
     def sample: (Dist[A], A) = Dist.sample(dist)
     def samples(n: Int): (Dist[A], List[A]) = Dist.samples(dist, n)
+    def sampling(ranges: List[RangeM[A]]): Option[PlottedDist[A]] =
+      Dist.samplingDist(dist, ranges)
     def sampling(pltDist: PlottedDist[A]): Option[PlottedDist[A]] =
       Dist.samplingDistForPlottedDist(dist, pltDist)
     def sampling(smplDist: SamplingDist[A]): Option[PlottedDist[A]] =

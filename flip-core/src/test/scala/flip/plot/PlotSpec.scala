@@ -12,17 +12,17 @@ class PlotSpec extends Specification with ScalaCheck {
     "linearFitting" in {
 
       "basic" in {
-        val res = Plot.linearFitting((1, 1), (2, 2), 1.5)
-        val cond1 = res ~= 1.5d
+        val resO = Plot.linearFitting((1, 1), (2, 2), 1.5)
+        val cond1 = resO.fold(false)(_ ~= 1.5d)
 
-        if(cond1) ok else ko(s"result: $res != 1.5")
+        if(cond1) ok else ko(s"result: $resO != 1.5")
       }
 
       "vertical" in {
-        val res = Plot.linearFitting((1, 1), (1, 2), 1)
-        val cond1 = res ~= 1.5d
+        val resO = Plot.linearFitting((1, 1), (1, 2), 1)
+        val cond1 = resO.fold(false)(_ ~= 1.5d)
 
-        if(cond1) ok else ko(s"result: $res != 1.5")
+        if(cond1) ok else ko(s"result: $resO != 1.5")
       }
 
     }
