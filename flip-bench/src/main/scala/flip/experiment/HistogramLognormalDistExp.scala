@@ -6,25 +6,23 @@ import flip.experiment.ops.{ComparisonOps, DataOps, ExpOutOps}
 /**
   * A experiment to compare with sketch and histogram.
   * */
-object HistogramBimodalDistExp { self =>
+object HistogramLognormalDistExp { self =>
 
   def main(args: Array[String]): Unit = {
-    val expName = "histogram-bimodal"
+    val expName = "histogram-lognormal"
     val sampleNo = 1000
     val samplingNo = 20
-    val underlying = { (0.5, NumericDist.normal(-2.0, 1)) + (0.5, NumericDist.normal(2.0, 1)) }
+    val underlying = NumericDist.logNormal(0.0, 1)
     val (_, datas) = underlying.samples(sampleNo)
     val idxDatas = (datas.indices zip datas).toList
-    val start = -4.8
-    val end = 4.8
+    val smplStart = 0.0
+    val smplEnd = underlying.icdf(0.95)
 
-    val emptyHisto = {
-      implicit val histoConf: HistogramConf = HistogramConf(
-        binNo = samplingNo, start = start, end = end,
-        counterSize = samplingNo
-      )
-      Histogram.empty[Double]
-    }
+    implicit val histoConf: HistogramConf = HistogramConf(
+      binNo = samplingNo, start = smplStart, end = smplEnd,
+      counterSize = samplingNo
+    )
+    val emptyHisto = Histogram.empty[Double]
 
     // update datas
     val utdHistos = DataOps.update(emptyHisto, idxDatas)
@@ -33,13 +31,13 @@ object HistogramBimodalDistExp { self =>
     // histogram results
     val histoPdf = utdHistos.flatMap { case (idx, histo) => histo.sampling.map((idx, _)) }
     val histoKld = utdHistos.flatMap { case (idx, histo) =>
-      ComparisonOps.uniformDomain(underlying, start, end, samplingNo * 3, histo, KLD[Double]).map((idx, _))
+      ComparisonOps.uniformDomain(underlying, smplStart, smplEnd, samplingNo * 3, histo, KLD[Double]).map((idx, _))
     }
     val histoCos = utdHistos.flatMap { case (idx, histo) =>
-      ComparisonOps.uniformDomain(underlying, start, end, samplingNo * 3, histo, Cosine[Double]).map((idx, _))
+      ComparisonOps.uniformDomain(underlying, smplStart, smplEnd, samplingNo * 3, histo, Cosine[Double]).map((idx, _))
     }
     val histoEuc = utdHistos.flatMap { case (idx, histo) =>
-      ComparisonOps.uniformDomain(underlying, start, end, samplingNo * 3, histo, Euclidean[Double]).map((idx, _))
+      ComparisonOps.uniformDomain(underlying, smplStart, smplEnd, samplingNo * 3, histo, Euclidean[Double]).map((idx, _))
     }
 
     ExpOutOps.clear(expName)

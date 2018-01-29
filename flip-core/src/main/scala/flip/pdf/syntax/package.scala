@@ -5,3 +5,4 @@ package object syntax
     with SamplingDistSyntax
     with SmoothDistSyntax
     with SketchSyntax
+    with NumericDistSyntax

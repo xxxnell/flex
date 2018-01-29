@@ -2,7 +2,7 @@ import cats.data.Kleisli
 import flip.conf.{CustomSimpleSketchConf, CustomSketchConf, SimpleSketchConf, SmoothDistConf}
 import flip.measure.TrivialMeasures
 import flip.pdf.SimpleSketch
-import flip.pdf.syntax.{DistSyntax, SamplingDistSyntax, SketchSyntax, SmoothDistSyntax}
+import flip.pdf.syntax.{DistSyntax, NumericDistSyntax, SamplingDistSyntax, SketchSyntax, SmoothDistSyntax}
 import flip.plot.{CountPlotSyntax, DensityPlotSyntax, PlotSyntax}
 import flip.range.RangeSyntax
 import flip.sim.SimSyntax
@@ -71,13 +71,8 @@ trait PdfPkgSyntax
   extends DistSyntax
     with SamplingDistSyntax
     with SmoothDistSyntax
-    with SketchSyntax {
-
-//trait PdfPkgSyntax
-//  extends SketchSyntax
-//    with SamplingDistSyntax
-//    with SmoothDistSyntax
-//    with DistSyntax {
+    with SketchSyntax
+    with NumericDistSyntax {
 
   type Dist[A] = flip.pdf.Dist[A]
 
