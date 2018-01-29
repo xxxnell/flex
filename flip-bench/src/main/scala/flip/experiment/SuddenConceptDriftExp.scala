@@ -11,25 +11,26 @@ object SuddenConceptDriftExp {
 
   def main(args: Array[String]): Unit = {
     val expName = "sudden-cd-normal"
-    val sampleNo1 = 1000
-    val sampleNo2 = 1000
+    val dataNo = 1000
+    val draftStart = 300
     val start = 50
     val period = 100
+    val samplingNo = 20
 
     implicit val conf: SketchConf = SketchConf(
       decayFactor = 1,
       startThreshold = start, thresholdPeriod = period, queueSize = 30,
-      cmapSize = 150, cmapNo = 5, cmapStart = Some(-10d), cmapEnd = Some(10),
+      cmapSize = samplingNo, cmapNo = 5, cmapStart = Some(-10d), cmapEnd = Some(10),
       counterSize = 1000, counterNo = 2
     )
     val sketch = Sketch.empty[Double]
     val (mean1, mean2) = (0.0, 5.0)
     val underlying1 = NumericDist.normal(mean1, 1)
-    val (_, datas1) = underlying1.samples(sampleNo1)
+    val (_, datas1) = underlying1.samples(draftStart)
     val underlying2 = NumericDist.normal(mean2, 1)
-    val (_, datas2) = underlying2.samples(sampleNo2)
-    def underlying(idx: Int) = if(idx < sampleNo1) underlying1 else underlying2
-    def center(idx: Int) = if(idx < sampleNo1) mean1 else mean2
+    val (_, datas2) = underlying2.samples(dataNo)
+    def underlying(idx: Int) = if(idx < draftStart) underlying1 else underlying2
+    def center(idx: Int) = if(idx < draftStart) mean1 else mean2
     val datas = datas1 ++ datas2
     val dataIdxs = (datas.indices zip datas).toList
 

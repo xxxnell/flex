@@ -16,7 +16,7 @@ object GradualConceptDriftExp {
     val draftStart = 300
     val draftStartingPoint = 0.0
     val velocity = 0.01
-    val samplingNo = 100
+    val samplingNo = 20
     val start = 50
     val period = 100
     val domainWidth = 1.5
