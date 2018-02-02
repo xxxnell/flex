@@ -92,7 +92,6 @@ class PlotSpec extends Specification with ScalaCheck {
 
         val cond1 = integral ~= expected
 
-        println(integral)
         if(!cond1) ko(s"Integral $integral is not equal to expected $expected")
         else ok
       }
@@ -119,7 +118,7 @@ class PlotSpec extends Specification with ScalaCheck {
         val plot = CountPlot.disjoint(records)
         val interp = plot.interpolation(0.125)
         val expected = Double.MinValue / 2
-
+        
         if(interp.isNaN) ko("NaN")
         else if(interp.isInfinity) ko(s"$interp")
         else if(!(interp ~= expected)) ko(s"interpolated value ($interp) != expected ($expected)")

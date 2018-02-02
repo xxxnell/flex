@@ -8,7 +8,11 @@ import org.scalactic.Tolerance._
 object PrimOps {
 
   def similarForError(prim1: Prim, prim2: Prim, error: Double): Boolean = {
-    prim1 === (prim2 +- (prim1 * error))
+    if (prim1 == 0) {
+      prim1 == prim2
+    } else {
+      prim1 === (prim2 +- math.abs(prim1 * error))
+    }
   }
 
   def similarForTolerance(prim1: Prim, prim2: Prim, tol: Prim): Boolean = {
