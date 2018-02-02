@@ -22,6 +22,7 @@ object PeriodicSketchConf {
                                             decayFactor: Double,
                                             startThreshold: Double,
                                             thresholdPeriod: Double,
+                                            bindSampling: Int,
                                             cmap: CmapConf,
                                             counter: CounterConf)
     extends CustomPeriodicSketchConf
@@ -33,6 +34,7 @@ object PeriodicSketchConf {
              decayFactor: Double,
              startThreshold: Double,
              thresholdPeriod: Double,
+             bindSampling: Int,
              cmap: CmapConf,
              counter: CounterConf): CustomPeriodicSketchConf =
     PeriodicSketchConfImpl(
@@ -43,6 +45,7 @@ object PeriodicSketchConf {
       decayFactor,
       startThreshold,
       thresholdPeriod,
+      bindSampling,
       cmap,
       counter
     )

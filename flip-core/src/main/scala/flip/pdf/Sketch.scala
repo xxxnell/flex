@@ -6,6 +6,7 @@ import flip.cmap.Cmap
 import flip.conf.{PeriodicSketchConf, SketchConf}
 import flip.hcounter.HCounter
 import flip.measure.Measure
+import flip.pdf.update.EqualSpaceCdfUpdate
 import flip.plot.DensityPlot
 import flip.range.{RangeM, RangeP}
 
@@ -69,12 +70,16 @@ trait SketchPropLaws[S[_]<:Sketch[_]] { self: SketchPropOps[S] =>
   def rearrange[A](sketch: S[A]): Option[S[A]] = deepUpdate(sketch, Nil).map(_._1)
 
   def sampling[A](sketch: S[A]): Option[DensityPlot] = for {
+    sps <- samplingPoints(sketch)
+    sampling <- samplingForRanges(sketch, sps)
+  } yield sampling
+
+  def samplingPoints[A](sketch: S[A]): Option[List[RangeM[A]]] = for {
     cmap <- youngCmap(sketch)
     rangePs = cmap.bin
     measure = sketch.measure.asInstanceOf[Measure[A]]
     rangeMs = rangePs.map(rangeP => rangeP.modifyMeasure(measure))
-    sampling <- samplingForRanges(sketch, rangeMs)
-  } yield sampling
+  } yield rangeMs
 
   def samplingForRanges[A](sketch: S[A], ranges: List[RangeM[A]]): Option[DensityPlot] = {
     for {
@@ -138,12 +143,24 @@ trait SketchPropLaws[S[_]<:Sketch[_]] { self: SketchPropOps[S] =>
     measure = sketch.measure.asInstanceOf[Measure[A]]
   } yield RangeM(measure.from(head), measure.from(last))(measure)
 
-  def conf2Structures(conf: SketchConf): Structures = {
-    if(conf.cmap.size > conf.counter.size) {
-      (Cmap(conf.cmap), HCounter(conf.counter, -1)) :: Nil
-    } else {
-      (Cmap(conf.cmap), HCounter.emptyUncompressed(conf.cmap.size)) :: Nil
-    }
+  def structures(conf: SketchConf): Structures = {
+    val counter =
+      if(conf.cmap.size > conf.counter.size) HCounter(conf.counter, -1)
+      else HCounter.emptyUncompressed(conf.cmap.size)
+
+    (Cmap(conf.cmap), counter) :: Nil
+  }
+
+  def concatStructures[A](as: List[(A, Count)], measure: Measure[A], conf: SketchConf): Structures = {
+    val ps = as.map { case (a, c) => (measure.to(a), c) }
+    val cmap = EqualSpaceCdfUpdate.updateCmap(
+      DensityPlot.empty, ps, 1000, conf.dataKernelWindow, conf.boundaryCorrection, conf.cmap.size
+    )
+    val counter =
+      if(conf.cmap.size > conf.counter.size) HCounter(conf.counter, -1)
+      else HCounter.emptyUncompressed(conf.cmap.size)
+
+    (cmap, counter) :: Nil
   }
 
 }
@@ -159,6 +176,12 @@ object Sketch extends SketchPrimPropOps[Sketch] { self =>
   def empty[A](implicit measure: Measure[A], conf: SketchConf): Sketch[A] = conf match {
     case conf: PeriodicSketchConf => PeriodicSketch.empty(measure, conf)
     case _ => SimpleSketch.empty(measure, conf)
+  }
+
+  def concat[A](ps: List[(A, Count)])
+               (implicit measure: Measure[A], conf: SketchConf): Sketch[A] = conf match {
+    case conf: PeriodicSketchConf => PeriodicSketch.concat(ps)(measure, conf)
+    case _ => SimpleSketch.concat(ps)(measure, conf)
   }
 
   // mapping ops

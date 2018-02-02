@@ -1,7 +1,7 @@
 package flip.pdf
 
 import flip.cmap.Cmap
-import flip.conf.AdaPerSketchConf
+import flip.conf.{AdaPerSketchConf, PeriodicSketchConf}
 import flip.hcounter.HCounter
 import flip.measure.Measure
 
@@ -34,9 +34,25 @@ object AdaPerSketch extends AdaPerSketchOps[AdaPerSketch] {
                                          count: Count)
     extends AdaPerSketch[A]
 
+  def bare[A](measure: Measure[A],
+              conf: AdaPerSketchConf,
+              structures: List[(Cmap, HCounter)],
+              queue: List[(A, Count)],
+              thresholds: Stream[Count],
+              count: Count): AdaPerSketch[A] =
+    AdaPerSketchImpl(measure, conf, structures, queue, thresholds, count)
+
   def empty[A](implicit measure: Measure[A], conf: AdaPerSketchConf): AdaPerSketch[A] =
-    AdaPerSketchImpl(measure, conf, conf2Structures(conf),
+    bare(measure, conf, structures(conf),
       List.empty[(A, Count)], thresholds(conf.startThreshold, conf.thresholdPeriod), 0)
+
+  def concat[A](as: List[(A, Count)])
+               (implicit measure: Measure[A], conf: AdaPerSketchConf): AdaPerSketch[A] = {
+    val emptySketch = bare(measure, conf, concatStructures(as, measure, conf),
+      List.empty[(A, Count)], thresholds(conf.startThreshold, conf.thresholdPeriod), 0)
+
+    narrowUpdate(emptySketch, as).get
+  }
 
   def modifyQueue[A](sketch: AdaPerSketch[A],
                      f: List[(A, Count)] => List[(A, Count)]): AdaPerSketch[A] =

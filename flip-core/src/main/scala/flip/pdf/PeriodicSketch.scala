@@ -36,8 +36,17 @@ object PeriodicSketch extends PeriodicSketchOps[PeriodicSketch] {
     PeriodicSketchImpl(measure, conf, structures, thresholds, count)
 
   def empty[A](implicit measure: Measure[A], conf: PeriodicSketchConf): PeriodicSketch[A] = conf match {
-    case conf: AdaPerSketchConf => AdaPerSketch.empty[A](measure, conf)
-    case _ => bare(measure, conf, conf2Structures(conf), thresholds(conf.startThreshold, conf.thresholdPeriod), 0)
+    case conf: AdaPerSketchConf => AdaPerSketch.empty(measure, conf)
+    case _ => bare(measure, conf, structures(conf), thresholds(conf.startThreshold, conf.thresholdPeriod), 0)
+  }
+
+  def concat[A](as: List[(A, Count)])
+               (implicit measure: Measure[A], conf: PeriodicSketchConf): PeriodicSketch[A] = conf match {
+    case conf: AdaPerSketchConf => AdaPerSketch.concat(as)(measure, conf)
+    case _ => narrowUpdate(bare(
+      measure, conf, concatStructures(as, measure, conf),
+      thresholds(conf.startThreshold, conf.thresholdPeriod), 0
+    ), as).get
   }
 
   def modifyStructure[A](sketch: PeriodicSketch[A],

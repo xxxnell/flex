@@ -19,6 +19,8 @@ trait DefaultSketchConf
 
   val queueSize: Int = 50
 
+  lazy val bindSampling: Int = cmap.no
+
   val cmap: UniformCmapConf = CmapConf.uniform(200, 3, Some(-1000d), Some(1000d))
 
   val counter: CounterConf = CounterConf.apply(70, 2)

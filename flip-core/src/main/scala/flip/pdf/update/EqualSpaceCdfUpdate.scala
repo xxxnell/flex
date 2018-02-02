@@ -8,24 +8,29 @@ import flip.range.RangeP
 
 trait EqualSpaceCdfUpdate {
 
-  def updateCmap(sketch: Sketch[_], ps: List[(Prim, Count)]): Option[Cmap] = for {
-    sketchPlot <- sketch.sampling
+  def updateCmapForSketch(sketch: Sketch[_], ps: List[(Prim, Count)]): Option[Cmap] = for {
+    sketchSamples <- sketch.sampling
     mixingRatio = sketch.conf.mixingRatio
     window = sketch.conf.dataKernelWindow
     corr = sketch.conf.boundaryCorrection
     cmapSize = sketch.conf.cmap.size
-    mtpSketchPlot = sketchPlot * (1 / (mixingRatio + 1))
-    mtpPsPlot = DensityPlot.squareKernel(ps, window) * (mixingRatio / (mixingRatio + 1))
-    mergedPlot = if(ps.nonEmpty) mtpSketchPlot + mtpPsPlot else sketchPlot
-    cmap = cmapForEqualSpaceCumCorr(mergedPlot, cmapSize, corr)
-  } yield cmap
+  } yield updateCmap(sketchSamples, ps, mixingRatio, window, corr, cmapSize)
+
+  def updateCmap(sketchSamples: DensityPlot, ps: List[(Prim, Count)],
+                 mixingRatio: Double, window: Double, corr: Double, cmapSize: Int): Cmap = {
+    val mtpSketchSamples = sketchSamples * (1 / (mixingRatio + 1))
+    val mtpPsPlot = DensityPlot.squareKernel(ps, window) * (mixingRatio / (mixingRatio + 1))
+    val mergedPlot = if(ps.nonEmpty) mtpSketchSamples + mtpPsPlot else sketchSamples
+
+    cmapForEqualSpaceCumCorr(mergedPlot, corr, cmapSize)
+  }
 
   /**
     * @param corr boundary marginal ratio for the separation unit.
     *             If corr=1, cmapForEqualSpaceCumCorr is identical to standard cmapForEqualSpaceCum.
     *             If corr=0, cmap has no margin.
     * */
-  def cmapForEqualSpaceCumCorr(plot: DensityPlot, cmapSize: Int, corr: Double): Cmap = {
+  def cmapForEqualSpaceCumCorr(plot: DensityPlot, corr: Double, cmapSize: Int): Cmap = {
     lazy val cdf = plot.cumulative
     lazy val invCdf = cdf.inverse
 

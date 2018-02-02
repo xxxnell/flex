@@ -12,6 +12,7 @@ trait SketchSyntax extends SketchPropSyntax with SketchMonadSyntax
 trait SketchPropSyntax {
 
   implicit class SketchPropSyntaxImpl[A](sketch: Sketch[A]) {
+    def samplingPoints: List[RangeM[A]] = Sketch.samplingPoints(sketch).getOrElse(Nil)
     def sample: (Sketch[A], A) = Sketch.sample(sketch)
     def samples(n: Int): (Sketch[A], List[A]) = Sketch.samples(sketch, n)
     def update(as: A*): Option[Sketch[A]] =

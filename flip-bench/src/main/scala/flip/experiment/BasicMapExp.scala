@@ -8,7 +8,7 @@ object BasicMapExp {
   def main(args: Array[String]): Unit = {
     val expName = "basic-map"
     val dataNo = 300
-    val samplingNo = 20
+    val samplingNo = 200
 
     implicit val conf: SketchConf = SketchConf(
       startThreshold = 50, thresholdPeriod = 100, boundaryCorr = 0.1, decayFactor = 0,
@@ -24,7 +24,7 @@ object BasicMapExp {
     val idxSketches1 = DataOps.update(sketch0, idxDatas)
     val (_, sketch1) = idxSketches1.lastOption.getOrElse((0, sketch0))
 
-    val mapped = sketch1.map(x => math.log(x))
+    val mapped = sketch1.map(x => math.exp(x))
     val prevSketchPdfO = sketch1.pdfPlot
     val bindingSketchPdfO = mapped.pdfPlot
 

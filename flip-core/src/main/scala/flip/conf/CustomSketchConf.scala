@@ -16,6 +16,8 @@ object CustomSketchConf {
             // periodic
             startThreshold: Double = DefaultSketchConf.startThreshold,
             thresholdPeriod: Double = DefaultSketchConf.thresholdPeriod,
+            // bind
+            bindSampling: Int = DefaultSketchConf.bindSampling,
             // cmap
             cmapSize: Int = DefaultSketchConf.cmap.size,
             cmapNo: Int = DefaultSketchConf.cmap.no,
@@ -29,6 +31,7 @@ object CustomSketchConf {
       mixingRatio, dataKernelWindow, boundaryCorr, decayFactor,
       queueSize,
       startThreshold, thresholdPeriod,
+      bindSampling,
       CmapConf.uniform(cmapSize, cmapNo, cmapStart, cmapEnd),
       CounterConf(counterSize, counterNo)
     )

@@ -11,17 +11,20 @@ object SimpleSketchConf {
                                           dataKernelWindow: Double,
                                           boundaryCorrection: Double,
                                           decayFactor: Double,
+                                          bindSampling: Int,
                                           cmap: CmapConf,
                                           counter: CounterConf)
     extends CustomSimpleSketchConf
 
   def apply(// dist
             delta: Double = DefaultSketchConf.delta,
-            // sketch
+            // deepUpdate
             mixingRatio: Double = DefaultSketchConf.mixingRatio,
             dataKernelWindow: Double = DefaultSketchConf.dataKernelWindow,
             boundaryCorr: Double = DefaultSketchConf.boundaryCorrection,
             decayFactor: Double = DefaultSketchConf.decayFactor,
+            // bind
+            bindSampling: Int = DefaultSketchConf.bindSampling,
             // cmap
             binNo: Int,
             start: Double,
@@ -34,6 +37,7 @@ object SimpleSketchConf {
     SimpleSketchConf.custom(
       delta,
       mixingRatio, dataKernelWindow, decayFactor, boundaryCorr,
+      bindSampling,
       cmapConf, counterConf
     )
   }
@@ -43,11 +47,13 @@ object SimpleSketchConf {
              dataKernelWindow: Double,
              boundaryCorr: Double,
              decayFactor: Double,
+             bindSampling: Int,
              cmapConf: CmapConf,
              counterConf: CounterConf): CustomSimpleSketchConf =
     SimpleSketchConfImpl(
       delta,
       mixingRatio, dataKernelWindow, decayFactor, boundaryCorr,
+      bindSampling,
       cmapConf, counterConf
     )
 

@@ -21,6 +21,7 @@ object AdaPerSketchConf {
                                           queueSize: Int,
                                           startThreshold: Double,
                                           thresholdPeriod: Double,
+                                          bindSampling: Int,
                                           cmap: CmapConf,
                                           counter: CounterConf)
     extends CustomAdaPerSketchConf
@@ -33,6 +34,7 @@ object AdaPerSketchConf {
              queueSize: Int,
              startThreshold: Double,
              thresholdPeriod: Double,
+             bindSampling: Int,
              cmap: CmapConf,
              counter: CounterConf): CustomAdaPerSketchConf =
     AdaPerSketchConfImpl(
@@ -44,6 +46,7 @@ object AdaPerSketchConf {
       queueSize,
       startThreshold,
       thresholdPeriod,
+      bindSampling,
       cmap,
       counter
     )

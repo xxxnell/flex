@@ -1,6 +1,7 @@
 package flip.measure
 
 import flip.pdf.Prim
+import scala.reflect.runtime.universe.{typeOf, TypeTag}
 
 /**
   * Measure of A provides bijective map between A and Prim.
@@ -12,6 +13,8 @@ trait Measure[A] {
   def to(a: A): Prim
 
   def from(p: Prim): A
+
+  override def toString: String = s"Measure"
 
 }
 

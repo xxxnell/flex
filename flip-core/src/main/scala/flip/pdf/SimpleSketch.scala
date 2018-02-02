@@ -15,7 +15,11 @@ trait SimpleSketchOps extends SketchPrimPropOps[SimpleSketch] {
 object SimpleSketch extends SimpleSketchOps {
 
   def empty[A](implicit measure: Measure[A], conf: SketchConf): SimpleSketch[A] =
-    SimpleSketch(measure, conf, conf2Structures(conf))
+    SimpleSketch(measure, conf, structures(conf))
+
+  def concat[A](as: List[(A, Count)])
+               (implicit measure: Measure[A], conf: SketchConf): SimpleSketch[A] =
+    narrowUpdate(SimpleSketch(measure, conf, concatStructures(as, measure, conf)), as).get
 
   def modifyStructure[A](sketch: SimpleSketch[A], f: Structures => Option[Structures]): Option[SimpleSketch[A]] =
     f(sketch.structures).map(structure => SimpleSketch(sketch.measure, sketch.conf, structure))

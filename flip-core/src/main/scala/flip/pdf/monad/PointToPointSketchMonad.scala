@@ -1,6 +1,5 @@
 package flip.pdf.monad
 
-import flip.conf.SketchConf
 import flip.measure.Measure
 import flip.pdf.{Dist, Sketch}
 

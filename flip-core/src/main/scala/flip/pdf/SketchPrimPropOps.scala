@@ -31,6 +31,7 @@ trait SketchPrimPropOps[S[_]<:Sketch[_]]
     def updatePs(cmap: Cmap, counter: HCounter, ps: List[(Prim, Count)]): Option[HCounter] =
       counter.updates(ps.map { case (p, count) => (cmap(p), count) })
     val utdEffStrsO = effStrs.traverse { case (cmap, counter) => updatePs(cmap, counter, ps).map(hc => (cmap, hc)) }
+
     utdEffStrsO.map(utdEffStrs => utdEffStrs ++ refStrs)
   })
 
@@ -38,7 +39,7 @@ trait SketchPrimPropOps[S[_]<:Sketch[_]]
     * Deep update a list of primitive value <code>p</code> instead of <code>a</code> ∈ <code>A</code>
     * */
   def primDeepUpdate[A](sketch: S[A], ps: List[(Prim, Count)]): Option[(S[A], Option[Structure])] = for {
-    utdCmap <- EqualSpaceCdfUpdate.updateCmap(sketch, ps)
+    utdCmap <- EqualSpaceCdfUpdate.updateCmapForSketch(sketch, ps)
     seed = ((sum(sketch) + ps.headOption.map(_._1).getOrElse(-1d)) * 1000).toInt
     emptyCounter = HCounter.emptyForConf(sketch.conf.counter, seed)
     (utdStrs, oldStrs) = ((utdCmap, emptyCounter) :: sketch.structures).splitAt(sketch.conf.cmap.no)
