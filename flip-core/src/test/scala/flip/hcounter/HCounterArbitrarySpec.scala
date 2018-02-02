@@ -1,9 +1,8 @@
 package flip.hcounter
 
 import org.scalacheck.Arbitrary
-import org.specs2.mutable._
 import org.specs2.ScalaCheck
-import flip.hcounter.HCounter
+import org.specs2.mutable._
 
 class HCounterArbitrarySpec extends Specification with ScalaCheck {
 

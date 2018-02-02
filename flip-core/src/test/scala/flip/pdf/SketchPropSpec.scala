@@ -112,11 +112,9 @@ class SketchPropSpec extends Specification with ScalaCheck {
     "narrowUpdate" in {
 
       "basic" in {
-        val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 2, Some(-10d), Some(10d))
-        val (counterSize, counterNo) = (8, 2)
         implicit val conf: CustomSketchConf = CustomSketchConf(
-          cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
-          counterSize = counterSize, counterNo = counterNo
+          cmapSize = 10, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
+          counterSize = 8, counterNo = 2
         )
         val sketch0 = Sketch.empty[Double]
 

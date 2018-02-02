@@ -1,10 +1,8 @@
 package flip.hcounter
 
 import org.scalacheck.{Arbitrary, Gen}
-import org.specs2.mutable._
 import org.specs2.ScalaCheck
-import flip.counter.CounterGen
-import flip.hcounter.HCounter
+import org.specs2.mutable._
 
 class HCounterSpec extends Specification with ScalaCheck {
 

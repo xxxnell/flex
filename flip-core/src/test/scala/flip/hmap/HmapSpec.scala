@@ -1,10 +1,8 @@
 package flip.hmap
 
 import org.scalacheck.{Arbitrary, Gen}
-import org.specs2.mutable._
 import org.specs2.ScalaCheck
-import flip.counter.CDim
-import flip.hmap.Hmap
+import org.specs2.mutable._
 
 class HmapSpec extends Specification with ScalaCheck {
 
