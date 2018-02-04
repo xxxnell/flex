@@ -18,9 +18,9 @@ trait EqualSpaceCdfUpdate {
 
   def updateCmap(sketchSamples: DensityPlot, ps: List[(Prim, Count)],
                  mixingRatio: Double, window: Double, corr: Double, cmapSize: Int): Cmap = {
-    lazy val mtpSketchSamples = flip.time(sketchSamples * (1 / (mixingRatio + 1)), "mtpSketchSamples", false) // 1e6 vs 0
-    lazy val mtpPsPlot = flip.time(DensityPlot.squareKernel(ps, window) * (mixingRatio / (mixingRatio + 1)), "mtpPsPlot", false) // 1e7 vs 0
-    val mergedPlot = flip.time(if(ps.nonEmpty) mtpSketchSamples + mtpPsPlot else sketchSamples, "mergedPlot", false) // 2e7 vs 2e4
+    val mergedPlot = flip.time(if(ps.nonEmpty) {
+      (1 / (mixingRatio + 1), sketchSamples) + (mixingRatio / (mixingRatio + 1), DensityPlot.squareKernel(ps, window))
+    } else sketchSamples, "mergedPlot", true) // 2e7 vs 2e4
 
     flip.time(cmapForEqualSpaceCumCorr(mergedPlot, corr, cmapSize), "cmapForEqualSpaceCumCorr", false) // 7e7 vs 2e7
   }
