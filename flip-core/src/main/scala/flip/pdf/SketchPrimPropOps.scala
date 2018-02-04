@@ -9,6 +9,7 @@ import flip.plot._
 import flip.range._
 import flip.range.syntax._
 
+import scala.collection.mutable
 import scala.language.{higherKinds, postfixOps}
 
 /**
@@ -65,7 +66,18 @@ trait SketchPrimPropOps[S[_]<:Sketch[_]]
 
   // Read ops
 
-  def decayRate(decayFactor: Double, i: Int): Double = math.exp(-1 * decayFactor * i)
+  private var decayRateCache: mutable.Map[(Double, Int), Double] = mutable.HashMap.empty
+
+  private val decayRateCacheLimit: Int = 100
+
+  def decayRate(decayFactor: Double, i: Int): Double = {
+    decayRateCache.getOrElse((decayFactor, i), {
+      val rate = math.exp(-1 * decayFactor * i)
+      decayRateCache.put((decayFactor, i), rate)
+      if (decayRateCache.size > decayRateCacheLimit) decayRateCache = decayRateCache.takeRight(decayRateCacheLimit)
+      rate
+    })
+  }
 
   def singleCount(cmap: Cmap, hcounter: HCounter, pStart: Double, pEnd: Double): Option[Double] = {
     val (startHdim, endHdim) = (cmap.apply(pStart), cmap.apply(pEnd))
