@@ -6,9 +6,9 @@ import flip.plot.DensityPlot
 import flip.range.RangeP
 import flip.measure.syntax._
 
-object EqualSpaceSmoothingPs {
+object EqualSpaceSmoothingPs extends SmoothingPs {
 
-  def apply(ps: List[(Prim, Count)]): Dist[Prim] = {
+  def apply(ps: List[(Prim, Count)], scale: Double): Dist[Prim] = {
     lazy val conf = SmoothDistConf.default
     lazy val plot = smoothingPsPlotForEqualSpaceCumulative(ps)
 

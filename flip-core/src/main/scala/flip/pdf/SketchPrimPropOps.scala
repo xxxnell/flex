@@ -4,7 +4,7 @@ import cats.implicits._
 import flip.cmap.Cmap
 import flip.hcounter.HCounter
 import flip.measure.Measure
-import flip.pdf.update.{EqualSpaceCdfUpdate, EqualSpaceSmoothingPs}
+import flip.pdf.update.{EqualSpaceCdfUpdate, EqualSpaceSmoothingPs, SmoothingPs}
 import flip.plot._
 import flip.range._
 import flip.range.syntax._
@@ -17,6 +17,8 @@ import scala.language.{higherKinds, postfixOps}
 trait SketchPrimPropOps[S[_]<:Sketch[_]]
   extends SketchPrimPropLaws[S]
     with SketchPropOps[S] { self =>
+
+  def smoothingPs: SmoothingPs = EqualSpaceSmoothingPs
 
   // Update ops
 
@@ -46,7 +48,7 @@ trait SketchPrimPropOps[S[_]<:Sketch[_]]
     oldStrO = oldStrs.headOption
     utdSketch1 <- modifyStructure(sketch, _ => Some(utdStrs))
     utdSketch2 <- flip.time(if(ps.nonEmpty) {
-      val smoothPs = flip.time(EqualSpaceSmoothingPs(ps), "smoothingPsForEqualSpaceCumulative", false) // 1e7 (vs 1e6, x10)
+      val smoothPs = flip.time(smoothingPs(ps, 0.5), "smoothingPsForEqualSpaceCumulative", false) // 1e7 (vs 1e6, x10)
       primNarrowPlotUpdateForStr(utdSketch1, smoothPs, ps.map(_._2).sum)
     } else Some(utdSketch1), "primNarrowPlotUpdateForStr", false) // 3e7 (3e4, x1000)
   } yield (utdSketch2, oldStrO)
