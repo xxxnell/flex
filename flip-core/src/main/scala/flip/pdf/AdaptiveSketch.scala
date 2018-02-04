@@ -71,10 +71,12 @@ trait AdaptiveSketchLaws[S[_]<:AdaptiveSketch[_]] { self: AdaptiveSketchOps[S] =
 
   def countForQueue[A](sketch: S[A], start: A, end: A): Count = {
     val measure: Measure[A] = sketch.measure.asInstanceOf[Measure[A]]
+    val startP = measure.to(start)
+    val endP = measure.to(end)
 
     sketch.queue.asInstanceOf[List[(A, Count)]]
-      .filter { case (a, _) => measure.to(a) >= measure.to(start) && measure.to(a) <= measure.to(end) }
-      .foldLeft(0d){ case (acc, (_, count)) => acc + count }
+      .filter { case (a, _) => measure.to(a) >= startP && measure.to(a) <= endP }
+      .map(_._2).sum
   }
 
   def sumForQueue[A](sketch: S[A]): Count = sketch.queue.foldLeft(0d){ case (acc, (_, count)) => acc + count }
