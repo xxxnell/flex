@@ -34,12 +34,12 @@ trait AdaptiveSketchOps[S[_]<:AdaptiveSketch[_]]
   }
 
   override def count[A](sketch: S[A], start: A, end: A): Option[Count] = for {
-    countStr <- flip.time(countForStr(sketch, start, end), "countForStr", false) // 2e5-2e6
-    countQ = flip.time(countForQueue(sketch, start, end), "countForQueue", false) // 2e4
+    countStr <- countForStr(sketch, start, end)
+    countQ = countForQueue(sketch, start, end)
   } yield countStr + queueCorrection(sketch) * countQ
 
   override def sum(sketch: S[_]): Count =
-    flip.time(sumForStr(sketch), "sumForStr", false) + queueCorrection(sketch) * flip.time(sumForQueue(sketch), "sumForQueue", false) // sumForStr: 3e4, sumForQueue: 2e4
+    sumForStr(sketch) + queueCorrection(sketch) * sumForQueue(sketch)
 
   override def narrowUpdate[A](sketch: S[A], as: List[(A, Count)]): Option[S[A]] = for {
     (sketch1, old) <- Some(append(sketch, as))
@@ -47,9 +47,9 @@ trait AdaptiveSketchOps[S[_]<:AdaptiveSketch[_]]
   } yield sketch2
 
   override def rearrange[A](sketch: S[A]): Option[S[A]] = for {
-    sketch1OldStr <- flip.time(deepUpdate(sketch, sketch.queue.asInstanceOf[List[(A, Count)]]), "deepUpdate tot", false) // 1e8
+    sketch1OldStr <- deepUpdate(sketch, sketch.queue.asInstanceOf[List[(A, Count)]])
     (sketch1, _) = sketch1OldStr
-    sketch2 = flip.time(clearQueue(sketch1), "clearQueue", false) // 1e5
+    sketch2 = clearQueue(sketch1)
   } yield sketch2
 
 }

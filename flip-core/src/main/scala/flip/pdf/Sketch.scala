@@ -61,16 +61,16 @@ trait SketchPropLaws[S[_]<:Sketch[_]] { self: SketchPropOps[S] =>
   def flatDensity: Double = (1 / Cmap.max) * (1 / (1 - Cmap.min / Cmap.max))
 
   def probability[A](sketch: S[A], start: A, end: A): Option[Double] = for {
-    count <- flip.time(count(sketch, start, end), "count", false) // 5e5
-    sum = flip.time(self.sum(sketch), "sum", false) // 1e5
-    measure = flip.time(sketch.measure.asInstanceOf[Measure[A]], "measure", false) // 1e3
+    count <- count(sketch, start, end)
+    sum = self.sum(sketch)
+    measure = sketch.measure.asInstanceOf[Measure[A]]
   } yield if(sum > 0) count / sum else flatDensity * RangeM.bare(start, end, measure).roughLength
 
   def rearrange[A](sketch: S[A]): Option[S[A]] = deepUpdate(sketch, Nil).map(_._1)
 
   def sampling[A](sketch: S[A]): Option[DensityPlot] = for {
-    sps <- flip.time(samplingPoints(sketch), "samplingPoints", false) // 8e6
-    sampling <- flip.time(samplingForRanges(sketch, sps), "samplingForRanges", false) // 3e7
+    sps <- samplingPoints(sketch)
+    sampling <- samplingForRanges(sketch, sps)
   } yield sampling
 
   def samplingPoints[A](sketch: S[A]): Option[List[RangeM[A]]] = for {
@@ -82,11 +82,11 @@ trait SketchPropLaws[S[_]<:Sketch[_]] { self: SketchPropOps[S] =>
 
   def samplingForRanges[A](sketch: S[A], ranges: List[RangeM[A]]): Option[DensityPlot] = {
     for {
-      rangeProbs <- flip.time(ranges.traverse(range => flip.time(probability(sketch, range.start, range.end), "probability", false).map(prob => (range, prob))), "rangeProbs", false) // 2e7, probability: 2e5
-      rangeDensities = flip.time(rangeProbs
+      rangeProbs <- ranges.traverse(range => probability(sketch, range.start, range.end).map((range, _)))
+      rangeDensities = rangeProbs
         .map { case (rangeM, prob) => (RangeP.forRangeM(rangeM), Try(prob / rangeM.roughLength).toOption) }
-        .flatMap { case (range, densityO) => densityO.map(density => (range, density)) }, "rangeDensities", false) // 2e6
-    } yield flip.time(DensityPlot.disjoint(rangeDensities), "disjoint", false) // 2e7
+        .flatMap { case (range, densityO) => densityO.map(density => (range, density)) }
+    } yield DensityPlot.disjoint(rangeDensities)
   }
 
   def fastPdf[A](sketch: S[A], a: A): Option[Double] = for {

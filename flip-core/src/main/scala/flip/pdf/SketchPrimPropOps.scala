@@ -42,25 +42,24 @@ trait SketchPrimPropOps[S[_]<:Sketch[_]]
     * Deep update a list of primitive value <code>p</code> instead of <code>a</code> ∈ <code>A</code>
     * */
   def primDeepUpdate[A](sketch: S[A], ps: List[(Prim, Count)]): Option[(S[A], Option[Structure])] = for {
-    utdCmap <- flip.time(EqualSpaceCdfUpdate.updateCmapForSketch(sketch, ps), "updateCmapForSketch", false) // 1.5e8 (vs 9e7, x1.5)
+    utdCmap <- EqualSpaceCdfUpdate.updateCmapForSketch(sketch, ps)
     seed = ((sum(sketch) + ps.headOption.map(_._1).getOrElse(-1d)) * 1000).toInt
     emptyCounter = HCounter.emptyForConf(sketch.conf.counter, seed)
     (utdStrs, oldStrs) = ((utdCmap, emptyCounter) :: sketch.structures).splitAt(sketch.conf.cmap.no)
     utdSketch1 <- modifyStructure(sketch, _ => Some(utdStrs))
-    utdSketch2 <- flip.time(if(ps.nonEmpty) {
-      val smoothPs = flip.time(smoothingPs(ps, 0.5), "smoothingPsForEqualSpaceCumulative", false) // 1e7 (vs 1e6, x10)
-      primNarrowPlotUpdateForStr(utdSketch1, smoothPs, ps.map(_._2).sum)
-    } else Some(utdSketch1), "primNarrowPlotUpdateForStr", false) // 3e7 (3e4, x1000)
+    utdSketch2 <- if(ps.nonEmpty) {
+      primNarrowPlotUpdateForStr(utdSketch1, smoothingPs(ps, 0.5), ps.map(_._2).sum)
+    } else Some(utdSketch1)
   } yield (utdSketch2, oldStrs.headOption)
 
   def primNarrowPlotUpdateForStr[A](sketch: S[A], psDist: Dist[Prim], sum: Double): Option[S[A]] = for {
-    cmap <- flip.time(youngCmap(sketch), "youngCmap", false) // 2e4
-    ps = flip.time(cmap.bin.flatMap { range =>
+    cmap <- youngCmap(sketch)
+    ps = cmap.bin.flatMap { range =>
       // todo range.middle is hacky approach
       psDist.probability(range.start, range.end)
         .map(prob => (range.middle, prob * sum))
-    }, "ps", false) // 1e7
-    utdSketch <- flip.time(primNarrowUpdateForStr(sketch, ps), "primNarrowUpdateForStr", false) // 1e6
+    }
+    utdSketch <- primNarrowUpdateForStr(sketch, ps)
   } yield utdSketch
 
   // Read ops
