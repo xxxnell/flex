@@ -46,13 +46,12 @@ trait SketchPrimPropOps[S[_]<:Sketch[_]]
     seed = ((sum(sketch) + ps.headOption.map(_._1).getOrElse(-1d)) * 1000).toInt
     emptyCounter = HCounter.emptyForConf(sketch.conf.counter, seed)
     (utdStrs, oldStrs) = ((utdCmap, emptyCounter) :: sketch.structures).splitAt(sketch.conf.cmap.no)
-    oldStrO = oldStrs.headOption
     utdSketch1 <- modifyStructure(sketch, _ => Some(utdStrs))
     utdSketch2 <- flip.time(if(ps.nonEmpty) {
       val smoothPs = flip.time(smoothingPs(ps, 0.5), "smoothingPsForEqualSpaceCumulative", false) // 1e7 (vs 1e6, x10)
       primNarrowPlotUpdateForStr(utdSketch1, smoothPs, ps.map(_._2).sum)
     } else Some(utdSketch1), "primNarrowPlotUpdateForStr", false) // 3e7 (3e4, x1000)
-  } yield (utdSketch2, oldStrO)
+  } yield (utdSketch2, oldStrs.headOption)
 
   def primNarrowPlotUpdateForStr[A](sketch: S[A], psDist: Dist[Prim], sum: Double): Option[S[A]] = for {
     cmap <- flip.time(youngCmap(sketch), "youngCmap", false) // 2e4
@@ -125,9 +124,9 @@ trait SketchPrimPropOps[S[_]<:Sketch[_]]
   def sumForStr(sketch: S[_]): Double = {
     val sums = sketch.structures.map { case (_, hcounter) => hcounter.sum }
 
-    val decayRates = (0 until sketch.conf.cmap.no).map(i => decayRate(sketch.conf.decayFactor, i)).take(sums.size)
+    val decayRates = (0 until sketch.conf.cmap.no).map(i => decayRate(sketch.conf.decayFactor, i))
     val weightedSumSum = (sums zip decayRates).map { case (sum, r) => sum * r }.sum
-    val normalization = decayRates.sum
+    val normalization = decayRates.take(sums.size).sum
 
     weightedSumSum / normalization
   }
