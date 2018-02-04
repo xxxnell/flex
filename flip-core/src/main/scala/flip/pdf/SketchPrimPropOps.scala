@@ -4,7 +4,7 @@ import cats.implicits._
 import flip.cmap.Cmap
 import flip.hcounter.HCounter
 import flip.measure.Measure
-import flip.pdf.update.EqualSpaceCdfUpdate
+import flip.pdf.update.{EqualSpaceCdfUpdate, EqualSpaceSmoothingPs}
 import flip.plot._
 import flip.range._
 import flip.range.syntax._
@@ -39,25 +39,24 @@ trait SketchPrimPropOps[S[_]<:Sketch[_]]
     * Deep update a list of primitive value <code>p</code> instead of <code>a</code> ∈ <code>A</code>
     * */
   def primDeepUpdate[A](sketch: S[A], ps: List[(Prim, Count)]): Option[(S[A], Option[Structure])] = for {
-    utdCmap <- flip.time(EqualSpaceCdfUpdate.updateCmapForSketch(sketch, ps), "updateCmapForSketch", false) // 1e8
+    utdCmap <- flip.time(EqualSpaceCdfUpdate.updateCmapForSketch(sketch, ps), "updateCmapForSketch", false) // 1.5e8 (vs 9e7, x1.5)
     seed = ((sum(sketch) + ps.headOption.map(_._1).getOrElse(-1d)) * 1000).toInt
     emptyCounter = HCounter.emptyForConf(sketch.conf.counter, seed)
     (utdStrs, oldStrs) = ((utdCmap, emptyCounter) :: sketch.structures).splitAt(sketch.conf.cmap.no)
     oldStrO = oldStrs.headOption
     utdSketch1 <- modifyStructure(sketch, _ => Some(utdStrs))
-    smoothPs = flip.time(EqualSpaceCdfUpdate.smoothingPsForEqualSpaceCumulative(ps), "smoothingPsForEqualSpaceCumulative", false) // 3e6
-    utdSketch2 <- flip.time(if(smoothPs.nonEmpty) primNarrowPlotUpdateForStr(utdSketch1, smoothPs) else Some(utdSketch1), "primNarrowPlotUpdateForStr", false) // 2e7
+    utdSketch2 <- flip.time(if(ps.nonEmpty) {
+      val smoothPs = flip.time(EqualSpaceSmoothingPs(ps), "smoothingPsForEqualSpaceCumulative", false) // 1e7 (vs 1e6, x10)
+      primNarrowPlotUpdateForStr(utdSketch1, smoothPs, ps.map(_._2).sum)
+    } else Some(utdSketch1), "primNarrowPlotUpdateForStr", false) // 3e7 (3e4, x1000)
   } yield (utdSketch2, oldStrO)
 
-  def primNarrowPlotUpdateForStr[A](sketch: S[A], pdensity: DensityPlot): Option[S[A]] = for {
+  def primNarrowPlotUpdateForStr[A](sketch: S[A], psDist: Dist[Prim], sum: Double): Option[S[A]] = for {
     cmap <- youngCmap(sketch)
-    domain <- pdensity.domain
-    (startHdim, endHdim) = (cmap.apply(domain.start), cmap.apply(domain.end))
-    ps = (startHdim to endHdim).toList.map { hdim =>
-      val range = cmap.range(hdim)
-      val start = if(range.start > domain.start) range.start else domain.start
-      val end = if(range.end < domain.end) range.end else domain.end
-      (range.middle, pdensity.integral(start, end)) // todo range.middle is hacky approach
+    ps = cmap.bin.flatMap { range =>
+      // todo range.middle is hacky approach
+      psDist.probability(range.start, range.end)
+        .map(prob => (range.middle, prob * sum))
     }
     utdSketch <- primNarrowUpdateForStr(sketch, ps)
   } yield utdSketch
@@ -140,7 +139,8 @@ trait SketchPrimPropLaws[S[_]<:Sketch[_]] { self: SketchPrimPropOps[S] =>
   }
 
   def deepUpdate[A](sketch: S[A], as: List[(A, Count)]): Option[(S[A], Option[Structure])] = {
-    val ps = as.map { case (value, count) => (sketch.measure.asInstanceOf[Measure[A]](value), count) }
+    val measure = sketch.measure.asInstanceOf[Measure[A]]
+    val ps = as.map { case (value, count) => (measure.to(value), count) }
     primDeepUpdate(sketch, ps)
   }
 
