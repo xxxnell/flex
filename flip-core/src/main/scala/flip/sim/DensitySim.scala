@@ -10,8 +10,7 @@ trait DensitySim {
   def sim(sampling: Option[DensityPlot],
           pdf: Prim => Double): Option[Double] = for {
     density <- simDensity(sampling, pdf)
-    domain <- density.domain
-  } yield density.integral(domain.start, domain.end)
+  } yield density.integralAll
 
   def simDensity[A](sampling: Option[DensityPlot],
                     pdf: Prim => Double): Option[DensityPlot] = for {

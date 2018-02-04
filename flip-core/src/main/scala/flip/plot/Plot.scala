@@ -251,8 +251,8 @@ trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
       idxBlocks <- plot.startIndexedBlocks.to(end).lastOption
       (_, blocks) = idxBlocks
       ((x1, y1), (x2, y2)) = blocks
-        .groupBy { case (_, (_x2, _)) => _x2 }.minBy { case (_x2, _) => _x2 }._2
-        .minBy { case ((_, _y1), (_, _y2)) => _y1 / 2 + _y2 / 2 }
+        .groupBy { case (_, (_x2, _)) => _x2 }.maxBy { case (_x2, _) => _x2 }._2
+        .maxBy { case ((_, _y1), (_, _y2)) => _y1 / 2 + _y2 / 2 }
       yi = CountPlot.disjoint((RangeP(x1), y1) :: (RangeP(x2), y2) :: Nil).interpolation(end)
     } yield areaPoint(x1, y1, end, yi))
       .sum

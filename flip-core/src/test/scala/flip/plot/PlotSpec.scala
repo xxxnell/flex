@@ -77,7 +77,7 @@ class PlotSpec extends Specification with ScalaCheck {
           (RangeP(1.2139992174514753, 1.5657398250186931), 1.4215020649967172) :: Nil
         val plot = DensityPlot.disjoint(data)
         val integral = plot.integral(0.3906746488553933, 0.41911785908856847)
-        val linearInterpolationExpected = 0.07103100316402881
+        val linearInterpolationExpected = 0.10076201275
 
         val cond1 = integral ~= linearInterpolationExpected
         if(!cond1) ko(s"Integration is not in range: $integral, expected: $linearInterpolationExpected")
@@ -93,6 +93,21 @@ class PlotSpec extends Specification with ScalaCheck {
         val cond1 = integral ~= expected
 
         if(!cond1) ko(s"Integral $integral is not equal to expected $expected")
+        else ok
+      }
+
+      "endBoundary" in {
+        val data =
+          (RangeP(-2.8047412935014946, -2.6392253272180723), -0.1150254602001711) ::
+            (RangeP(-2.6392253272180723, -2.479376555757972), -0.04008159658076947) ::
+            (RangeP(-2.479376555757972, -2.437451683193987), -0.13353172896112908) ::
+            (RangeP(-2.437451683193987, -1.9248637118510263), 0.04866936698806567) :: Nil
+        val plot = DensityPlot.disjoint(data)
+        val integral = plot.integralAll
+        val linearExpected = -0.006
+
+        val cond1 = integral ~= linearExpected
+        if(!cond1) ko(s"Integration is not in range: $integral, expected: $linearExpected")
         else ok
       }
 
@@ -118,7 +133,7 @@ class PlotSpec extends Specification with ScalaCheck {
         val plot = CountPlot.disjoint(records)
         val interp = plot.interpolation(0.125)
         val expected = Double.MinValue / 2
-        
+
         if(interp.isNaN) ko("NaN")
         else if(interp.isInfinity) ko(s"$interp")
         else if(!(interp ~= expected)) ko(s"interpolated value ($interp) != expected ($expected)")
@@ -154,6 +169,8 @@ class PlotSpec extends Specification with ScalaCheck {
       }
 
     }
+
+    // End
 
   }
 
