@@ -19,8 +19,10 @@ trait EqualSpaceCdfUpdate {
   def updateCmap(sketchSamples: DensityPlot, ps: List[(Prim, Count)],
                  mixingRatio: Double, window: Double, corr: Double, cmapSize: Int): Cmap = {
     val mergedPlot = flip.time(if(ps.nonEmpty) {
-      (1 / (mixingRatio + 1), sketchSamples) + (mixingRatio / (mixingRatio + 1), DensityPlot.squareKernel(ps, window))
-    } else sketchSamples, "mergedPlot", true) // 2e7 vs 2e4
+      val c1 = 1 / (mixingRatio + 1)
+      val c2 = mixingRatio / (mixingRatio + 1)
+      (c1, sketchSamples) + (c2, DensityPlot.squareKernel(ps, window))
+    } else sketchSamples, "mergedPlot", false) // 2e7 vs 2e4
 
     flip.time(cmapForEqualSpaceCumCorr(mergedPlot, corr, cmapSize), "cmapForEqualSpaceCumCorr", false) // 7e7 vs 2e7
   }
@@ -31,15 +33,15 @@ trait EqualSpaceCdfUpdate {
     *             If corr=0, cmap has no margin.
     * */
   def cmapForEqualSpaceCumCorr(plot: DensityPlot, corr: Double, cmapSize: Int): Cmap = {
-    lazy val cdf = flip.time(plot.cumulative, "cdf", false) // 2e6
-    lazy val invCdf = flip.time(cdf.inverseCumulative, "invCdf", false) // 2e6
+    lazy val invCdf = flip.time(plot.inverseCumulative, "invCdf", false) // 2e6
 
     val cdfDivider = if(cmapSize < 2) {
       Nil
     } else if(cmapSize == 2) {
       0.5 :: Nil
     } else {
-      val unit = cdf.interpolation(Double.MaxValue) / (cmapSize.toDouble - 2 + 2 * corr)
+      val maxAccumulative = invCdf.domain.map(_.end).getOrElse(1.0)
+      val unit = maxAccumulative / (cmapSize.toDouble - 2 + 2 * corr)
 
       flip.time((1 until cmapSize).toList
         .map(i => unit * corr + unit * (i - 1)), "cdfDivider", false) // 2e5
