@@ -27,19 +27,19 @@ trait AdaptiveSketchOps[S[_]<:AdaptiveSketch[_]]
     val decayFactor = sketch.conf.decayFactor
     val effNo = if(cmapNo > 1) cmapNo - 1 else cmapNo
 
-    val effRates = (0 until effNo).map(i => decayRate(decayFactor, i))
-    val allRates = (0 until cmapNo).map(i => decayRate(decayFactor, i))
+    lazy val effRates = (0 until effNo).map(i => decayRate(decayFactor, i))
+    lazy val allRates = (0 until cmapNo).map(i => decayRate(decayFactor, i))
 
     if(sketch.structures.size < cmapNo) 1 else effRates.sum / allRates.sum
   }
 
   override def count[A](sketch: S[A], start: A, end: A): Option[Count] = for {
-    countStr <- countForStr(sketch, start, end)
-    countQ = countForQueue(sketch, start, end)
+    countStr <- flip.time(countForStr(sketch, start, end), "countForStr", false) // 2e5-2e6
+    countQ = flip.time(countForQueue(sketch, start, end), "countForQueue", false) // 2e4
   } yield countStr + queueCorrection(sketch) * countQ
 
   override def sum(sketch: S[_]): Count =
-    sumForStr(sketch) + queueCorrection(sketch) * sumForQueue(sketch)
+    flip.time(sumForStr(sketch), "sumForStr", false) + queueCorrection(sketch) * flip.time(sumForQueue(sketch), "sumForQueue", false) // sumForStr: 3e4, sumForQueue: 2e4
 
   override def narrowUpdate[A](sketch: S[A], as: List[(A, Count)]): Option[S[A]] = for {
     (sketch1, old) <- Some(append(sketch, as))
@@ -47,9 +47,9 @@ trait AdaptiveSketchOps[S[_]<:AdaptiveSketch[_]]
   } yield sketch2
 
   override def rearrange[A](sketch: S[A]): Option[S[A]] = for {
-    sketch1OldStr <- deepUpdate(sketch, sketch.queue.asInstanceOf[List[(A, Count)]])
+    sketch1OldStr <- flip.time(deepUpdate(sketch, sketch.queue.asInstanceOf[List[(A, Count)]]), "deepUpdate tot", false) // 1e8
     (sketch1, _) = sketch1OldStr
-    sketch2 = clearQueue(sketch1)
+    sketch2 = flip.time(clearQueue(sketch1), "clearQueue", false) // 1e5
   } yield sketch2
 
 }

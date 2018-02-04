@@ -35,6 +35,12 @@ trait DensityPlotOps extends PlotOps[DensityPlot] {
     })
   }
 
+  def inverseCumulative(plot: DensityPlot): DensityPlot = {
+    unsafeModifyRecords(cumulative(plot), (records: List[Record]) =>
+      records.map { case (range, value) => (RangeP.point(value), range.middle) }
+    )
+  }
+
 }
 
 object DensityPlot extends DensityPlotOps {

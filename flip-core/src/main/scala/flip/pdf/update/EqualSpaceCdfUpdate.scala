@@ -9,7 +9,7 @@ import flip.range.RangeP
 trait EqualSpaceCdfUpdate {
 
   def updateCmapForSketch(sketch: Sketch[_], ps: List[(Prim, Count)]): Option[Cmap] = for {
-    sketchSamples <- sketch.sampling
+    sketchSamples <- flip.time(sketch.sampling, "sampling", false) // 3e7
     mixingRatio = sketch.conf.mixingRatio
     window = sketch.conf.dataKernelWindow
     corr = sketch.conf.boundaryCorrection
@@ -18,11 +18,11 @@ trait EqualSpaceCdfUpdate {
 
   def updateCmap(sketchSamples: DensityPlot, ps: List[(Prim, Count)],
                  mixingRatio: Double, window: Double, corr: Double, cmapSize: Int): Cmap = {
-    val mtpSketchSamples = sketchSamples * (1 / (mixingRatio + 1))
-    val mtpPsPlot = DensityPlot.squareKernel(ps, window) * (mixingRatio / (mixingRatio + 1))
-    val mergedPlot = if(ps.nonEmpty) mtpSketchSamples + mtpPsPlot else sketchSamples
+    lazy val mtpSketchSamples = flip.time(sketchSamples * (1 / (mixingRatio + 1)), "mtpSketchSamples", false) // 1e6 vs 0
+    lazy val mtpPsPlot = flip.time(DensityPlot.squareKernel(ps, window) * (mixingRatio / (mixingRatio + 1)), "mtpPsPlot", false) // 1e7 vs 0
+    val mergedPlot = flip.time(if(ps.nonEmpty) mtpSketchSamples + mtpPsPlot else sketchSamples, "mergedPlot", false) // 2e7 vs 2e4
 
-    cmapForEqualSpaceCumCorr(mergedPlot, corr, cmapSize)
+    flip.time(cmapForEqualSpaceCumCorr(mergedPlot, corr, cmapSize), "cmapForEqualSpaceCumCorr", false) // 7e7 vs 2e7
   }
 
   /**
@@ -31,8 +31,8 @@ trait EqualSpaceCdfUpdate {
     *             If corr=0, cmap has no margin.
     * */
   def cmapForEqualSpaceCumCorr(plot: DensityPlot, corr: Double, cmapSize: Int): Cmap = {
-    lazy val cdf = plot.cumulative
-    lazy val invCdf = cdf.inverse
+    lazy val cdf = flip.time(plot.cumulative, "cdf", false) // 2e6
+    lazy val invCdf = flip.time(cdf.inverseCumulative, "invCdf", false) // 2e6
 
     val cdfDivider = if(cmapSize < 2) {
       Nil
@@ -41,13 +41,13 @@ trait EqualSpaceCdfUpdate {
     } else {
       val unit = cdf.interpolation(Double.MaxValue) / (cmapSize.toDouble - 2 + 2 * corr)
 
-      (1 until cmapSize).toList
-        .map(i => unit * corr + unit * (i - 1))
+      flip.time((1 until cmapSize).toList
+        .map(i => unit * corr + unit * (i - 1)), "cdfDivider", false) // 2e5
     }
 
-    val pDivider = cdfDivider.map(a => invCdf.interpolation(a))
+    val pDivider = flip.time(cdfDivider.map(a => invCdf.interpolation(a)), "pDivider", false) // 3e6
 
-    Cmap.divider(pDivider)
+    flip.time(Cmap.divider(pDivider), "Cmap.divider", false) // 3e6
   }
 
   def smoothingPsForEqualSpaceCumulative(ps: List[(Prim, Count)]): DensityPlot = {
