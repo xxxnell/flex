@@ -4,7 +4,7 @@ import cats.implicits._
 import flip.cmap.Cmap
 import flip.hcounter.HCounter
 import flip.measure.Measure
-import flip.pdf.update.{EqualSpaceCdfUpdate, EqualSpaceSmoothingPs, SmoothingPs}
+import flip.pdf.update.{EqualSpaceCdfUpdate, EqualSpaceSmoothingPs, NormalSmoothingPs, SmoothingPs}
 import flip.plot._
 import flip.range._
 import flip.range.syntax._
@@ -54,13 +54,13 @@ trait SketchPrimPropOps[S[_]<:Sketch[_]]
   } yield (utdSketch2, oldStrO)
 
   def primNarrowPlotUpdateForStr[A](sketch: S[A], psDist: Dist[Prim], sum: Double): Option[S[A]] = for {
-    cmap <- youngCmap(sketch)
-    ps = cmap.bin.flatMap { range =>
+    cmap <- flip.time(youngCmap(sketch), "youngCmap", false) // 2e4
+    ps = flip.time(cmap.bin.flatMap { range =>
       // todo range.middle is hacky approach
       psDist.probability(range.start, range.end)
         .map(prob => (range.middle, prob * sum))
-    }
-    utdSketch <- primNarrowUpdateForStr(sketch, ps)
+    }, "ps", false) // 1e7
+    utdSketch <- flip.time(primNarrowUpdateForStr(sketch, ps), "primNarrowUpdateForStr", false) // 1e6
   } yield utdSketch
 
   // Read ops
