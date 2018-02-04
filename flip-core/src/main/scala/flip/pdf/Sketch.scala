@@ -64,8 +64,7 @@ trait SketchPropLaws[S[_]<:Sketch[_]] { self: SketchPropOps[S] =>
     count <- count(sketch, start, end)
     sum = self.sum(sketch)
     measure = sketch.measure.asInstanceOf[Measure[A]]
-    flatProb = flatDensity * RangeM.bare(start, end, measure).roughLength
-  } yield if(sum > 0) count / sum else flatProb
+  } yield if(sum > 0) count / sum else flatDensity * RangeM.bare(start, end, measure).roughLength
 
   def rearrange[A](sketch: S[A]): Option[S[A]] = deepUpdate(sketch, Nil).map(_._1)
 
@@ -83,10 +82,10 @@ trait SketchPropLaws[S[_]<:Sketch[_]] { self: SketchPropOps[S] =>
 
   def samplingForRanges[A](sketch: S[A], ranges: List[RangeM[A]]): Option[DensityPlot] = {
     for {
-      rangeProbs <- ranges.traverse(range => probability(sketch, range.start, range.end).map(prob => (range, prob)))
+      rangeProbs <- ranges.traverse(range => probability(sketch, range.start, range.end).map((range, _)))
       rangeDensities = rangeProbs
-        .map { case (rangeM, prob) => (RangeP.forRangeM(rangeM), Try(prob / rangeM.length).toOption) }
-        .flatMap { case (range, densityO) => densityO.map(density => (range, density.toDouble)) }
+        .map { case (rangeM, prob) => (RangeP.forRangeM(rangeM), Try(prob / rangeM.roughLength).toOption) }
+        .flatMap { case (range, densityO) => densityO.map(density => (range, density)) }
     } yield DensityPlot.disjoint(rangeDensities)
   }
 

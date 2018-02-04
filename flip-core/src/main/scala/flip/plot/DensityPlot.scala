@@ -1,5 +1,6 @@
 package flip.plot
 
+import cats.data.NonEmptyList
 import flip.pdf._
 import flip.range._
 import flip.range.syntax._
@@ -33,6 +34,29 @@ trait DensityPlotOps extends PlotOps[DensityPlot] {
 
       utdRecord.headOption.fold(utdRecord)(utdHead => if(utdHead._1 != cumHead._1) cumHead :: utdRecord else utdRecord)
     })
+  }
+
+  def inverseCumulative(plot: DensityPlot): DensityPlot = {
+    unsafeModifyRecords(cumulative(plot), (records: List[Record]) =>
+      records.map { case (range, value) => (RangeP.point(value), range.middle) }
+    )
+  }
+
+  def weightedAdd(wps: NonEmptyList[(Double, DensityPlot)]): DensityPlot = {
+    val listWps = wps.toList
+    val norm = listWps.map(_._1).sum
+    val normWps = listWps.map { case (weight, plot) =>
+      val normWeight = if(norm != 0) weight / norm else 1 / listWps.size.toDouble
+      (normWeight, plot)
+    }
+
+    val concatRecords: List[Record] = normWps.map { case (weight, plot) =>
+      plot.records.map { case (range, value) => (range, weight * value) }
+    }.foldLeft(List.empty[Record]){ case (acc, rec) => acc ++ rec }
+
+    val mgdRecords = planarizeRecords(concatRecords).map { case (range, values) => (range, values.sum) }
+
+    unsafeModifyRecords(wps.head._2, _ => mgdRecords)
   }
 
 }

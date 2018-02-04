@@ -1,5 +1,6 @@
 package flip.plot
 
+import cats.data.NonEmptyList
 import flip.range.syntax._
 import flip.plot.syntax._
 
@@ -51,6 +52,11 @@ trait DensityPlotSyntax {
     def ops: PlotOps[DensityPlot] = DensityPlot
 
     def cumulative: DensityPlot = DensityPlot.cumulative(plot)
+    def inverseCumulative: DensityPlot = DensityPlot.inverseCumulative(plot)
+  }
+
+  implicit class DensityPlotAddSyntaxImpl(wp: (Double, DensityPlot)) {
+    def +(wp2: (Double, DensityPlot)): DensityPlot = DensityPlot.weightedAdd(NonEmptyList.of(wp, wp2))
   }
 
 }

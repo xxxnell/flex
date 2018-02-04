@@ -27,8 +27,8 @@ trait AdaptiveSketchOps[S[_]<:AdaptiveSketch[_]]
     val decayFactor = sketch.conf.decayFactor
     val effNo = if(cmapNo > 1) cmapNo - 1 else cmapNo
 
-    val effRates = (0 until effNo).map(i => decayRate(decayFactor, i))
-    val allRates = (0 until cmapNo).map(i => decayRate(decayFactor, i))
+    lazy val effRates = (0 until effNo).map(i => decayRate(decayFactor, i))
+    lazy val allRates = (0 until cmapNo).map(i => decayRate(decayFactor, i))
 
     if(sketch.structures.size < cmapNo) 1 else effRates.sum / allRates.sum
   }
@@ -71,10 +71,12 @@ trait AdaptiveSketchLaws[S[_]<:AdaptiveSketch[_]] { self: AdaptiveSketchOps[S] =
 
   def countForQueue[A](sketch: S[A], start: A, end: A): Count = {
     val measure: Measure[A] = sketch.measure.asInstanceOf[Measure[A]]
+    val startP = measure.to(start)
+    val endP = measure.to(end)
 
     sketch.queue.asInstanceOf[List[(A, Count)]]
-      .filter { case (a, _) => measure.to(a) >= measure.to(start) && measure.to(a) <= measure.to(end) }
-      .foldLeft(0d){ case (acc, (_, count)) => acc + count }
+      .filter { case (a, _) => measure.to(a) >= startP && measure.to(a) <= endP }
+      .map(_._2).sum
   }
 
   def sumForQueue[A](sketch: S[A]): Count = sketch.queue.foldLeft(0d){ case (acc, (_, count)) => acc + count }

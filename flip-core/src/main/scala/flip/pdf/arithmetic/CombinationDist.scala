@@ -10,6 +10,8 @@ import scala.language.higherKinds
 
 trait CombinationDist[A] extends Dist[A] {
 
+  lazy val normalized: NonEmptyList[(Out, Dist[A])] = CombinationDist.normalizing(components)
+
   /**
     * @return list of (weight, distribution)
     * */
@@ -40,7 +42,7 @@ trait CombinationDistOps[D[_]<:CombinationDist[_]] extends DistPropOps[D] {
   }
 
   def probability[A](combi: D[A], start: A, end: A): Option[Double] = {
-    val components = normalizing(combi.components)
+    val components = combi.normalized
     val probs = components.map { case (weight, dist) =>
       (weight, dist.asInstanceOf[Dist[A]].probability(start, end).get)
     }
@@ -49,7 +51,7 @@ trait CombinationDistOps[D[_]<:CombinationDist[_]] extends DistPropOps[D] {
   }
 
   def sample[A](combi: D[A]): (D[A], A) = {
-    val components = normalizing(combi.components)
+    val components = combi.normalized
     val (utdRng, rnd) = combi.rng.next
 
     val cumWeightDist = {
@@ -72,7 +74,7 @@ trait CombinationDistOps[D[_]<:CombinationDist[_]] extends DistPropOps[D] {
   }
 
   override def pdf[A](combi: D[A], a: A): Option[Double] = {
-    val components = normalizing(combi.components)
+    val components = combi.normalized
     val pdfs = components.map { case (weight, dist) =>
       (weight, dist.asInstanceOf[Dist[A]].pdf(a).get)
     }
@@ -81,7 +83,7 @@ trait CombinationDistOps[D[_]<:CombinationDist[_]] extends DistPropOps[D] {
   }
 
   override def cdf[A](combi: D[A], a: A): Option[Double] = {
-    val components = normalizing(combi.components)
+    val components = combi.normalized
     val cdfs = components.map { case (weight, dist) =>
       (weight, dist.asInstanceOf[Dist[A]].cdf(a).get)
     }
@@ -110,6 +112,10 @@ object CombinationDist extends CombinationDistOps[CombinationDist] {
     val nonEmptyComponents = NonEmptyList.fromList(components.toList).get
 
     bare(measure, conf, nonEmptyComponents, IRng(nonEmptyComponents.head._1.hashCode()))
+  }
+
+  def apply[A](components: NonEmptyList[(Double, Dist[A])])(implicit measure: Measure[A], conf: DistConf): CombinationDist[A] = {
+    bare(measure, conf, components, IRng(components.head._1.hashCode()))
   }
 
   def bare[A](measure: Measure[A], conf: DistConf, components: Components[A], rng: IRng): CombinationDist[A] =

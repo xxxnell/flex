@@ -4,11 +4,12 @@ import cats.implicits._
 import flip.cmap.Cmap
 import flip.hcounter.HCounter
 import flip.measure.Measure
-import flip.pdf.update.EqualSpaceCdfUpdate
+import flip.pdf.update.{EqualSpaceCdfUpdate, EqualSpaceSmoothingPs, NormalSmoothingPs, SmoothingPs}
 import flip.plot._
 import flip.range._
 import flip.range.syntax._
 
+import scala.collection.mutable
 import scala.language.{higherKinds, postfixOps}
 
 /**
@@ -17,6 +18,8 @@ import scala.language.{higherKinds, postfixOps}
 trait SketchPrimPropOps[S[_]<:Sketch[_]]
   extends SketchPrimPropLaws[S]
     with SketchPropOps[S] { self =>
+
+  def smoothingPs: SmoothingPs = EqualSpaceSmoothingPs
 
   // Update ops
 
@@ -43,28 +46,36 @@ trait SketchPrimPropOps[S[_]<:Sketch[_]]
     seed = ((sum(sketch) + ps.headOption.map(_._1).getOrElse(-1d)) * 1000).toInt
     emptyCounter = HCounter.emptyForConf(sketch.conf.counter, seed)
     (utdStrs, oldStrs) = ((utdCmap, emptyCounter) :: sketch.structures).splitAt(sketch.conf.cmap.no)
-    oldStrO = oldStrs.headOption
     utdSketch1 <- modifyStructure(sketch, _ => Some(utdStrs))
-    smoothPs = EqualSpaceCdfUpdate.smoothingPsForEqualSpaceCumulative(ps)
-    utdSketch2 <- if(smoothPs.nonEmpty) primNarrowPlotUpdateForStr(utdSketch1, smoothPs) else Some(utdSketch1)
-  } yield (utdSketch2, oldStrO)
+    utdSketch2 <- if(ps.nonEmpty) {
+      primNarrowPlotUpdateForStr(utdSketch1, smoothingPs(ps, 0.5), ps.map(_._2).sum)
+    } else Some(utdSketch1)
+  } yield (utdSketch2, oldStrs.headOption)
 
-  def primNarrowPlotUpdateForStr[A](sketch: S[A], pdensity: DensityPlot): Option[S[A]] = for {
+  def primNarrowPlotUpdateForStr[A](sketch: S[A], psDist: Dist[Prim], sum: Double): Option[S[A]] = for {
     cmap <- youngCmap(sketch)
-    domain <- pdensity.domain
-    (startHdim, endHdim) = (cmap.apply(domain.start), cmap.apply(domain.end))
-    ps = (startHdim to endHdim).toList.map { hdim =>
-      val range = cmap.range(hdim)
-      val start = if(range.start > domain.start) range.start else domain.start
-      val end = if(range.end < domain.end) range.end else domain.end
-      (range.middle, pdensity.integral(start, end)) // todo range.middle is hacky approach
+    ps = cmap.bin.flatMap { range =>
+      // todo range.middle is hacky approach
+      psDist.probability(range.start, range.end)
+        .map(prob => (range.middle, prob * sum))
     }
     utdSketch <- primNarrowUpdateForStr(sketch, ps)
   } yield utdSketch
 
   // Read ops
 
-  def decayRate(decayFactor: Double, i: Int): Double = math.exp(-1 * decayFactor * i)
+  private var decayRateCache: mutable.Map[(Double, Int), Double] = mutable.HashMap.empty
+
+  private val decayRateCacheLimit: Int = 100
+
+  def decayRate(decayFactor: Double, i: Int): Double = {
+    decayRateCache.getOrElse((decayFactor, i), {
+      val rate = math.exp(-1 * decayFactor * i)
+      decayRateCache.put((decayFactor, i), rate)
+      if (decayRateCache.size > decayRateCacheLimit) decayRateCache = decayRateCache.takeRight(decayRateCacheLimit)
+      rate
+    })
+  }
 
   def singleCount(cmap: Cmap, hcounter: HCounter, pStart: Double, pEnd: Double): Option[Double] = {
     val (startHdim, endHdim) = (cmap.apply(pStart), cmap.apply(pEnd))
@@ -112,9 +123,9 @@ trait SketchPrimPropOps[S[_]<:Sketch[_]]
   def sumForStr(sketch: S[_]): Double = {
     val sums = sketch.structures.map { case (_, hcounter) => hcounter.sum }
 
-    val decayRates = (0 until sketch.conf.cmap.no).map(i => decayRate(sketch.conf.decayFactor, i)).take(sums.size)
+    val decayRates = (0 until sketch.conf.cmap.no).map(i => decayRate(sketch.conf.decayFactor, i))
     val weightedSumSum = (sums zip decayRates).map { case (sum, r) => sum * r }.sum
-    val normalization = decayRates.sum
+    val normalization = decayRates.take(sums.size).sum
 
     weightedSumSum / normalization
   }
@@ -140,7 +151,8 @@ trait SketchPrimPropLaws[S[_]<:Sketch[_]] { self: SketchPrimPropOps[S] =>
   }
 
   def deepUpdate[A](sketch: S[A], as: List[(A, Count)]): Option[(S[A], Option[Structure])] = {
-    val ps = as.map { case (value, count) => (sketch.measure.asInstanceOf[Measure[A]](value), count) }
+    val measure = sketch.measure.asInstanceOf[Measure[A]]
+    val ps = as.map { case (value, count) => (measure.to(value), count) }
     primDeepUpdate(sketch, ps)
   }
 
