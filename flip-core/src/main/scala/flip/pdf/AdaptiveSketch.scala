@@ -38,8 +38,9 @@ trait AdaptiveSketchOps[S[_]<:AdaptiveSketch[_]]
     countQ = countForQueue(sketch, start, end)
   } yield countStr + queueCorrection(sketch) * countQ
 
-  override def sum(sketch: S[_]): Count =
+  override def sum(sketch: S[_]): Count = {
     sumForStr(sketch) + queueCorrection(sketch) * sumForQueue(sketch)
+  }
 
   override def narrowUpdate[A](sketch: S[A], as: List[(A, Count)]): Option[S[A]] = for {
     (sketch1, old) <- Some(append(sketch, as))

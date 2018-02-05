@@ -3,7 +3,7 @@ package flip.pdf
 import org.specs2.mutable._
 import org.specs2.ScalaCheck
 import flip._
-import flip.conf.CustomAdaPerSketchConf
+import flip.conf.{CustomAdaPerSketchConf, CustomSketchConf}
 import flip.measure.syntax._
 
 import scala.language.postfixOps
@@ -174,17 +174,37 @@ class AdaPerSketchSpec extends Specification with ScalaCheck {
       sketch0.narrowUpdate(0) must beAnInstanceOf[Some[Sketch[Double]]]
     }
 
-//    "deepUpdate" in {
-//      implicit val conf: CustomAdaPerSketchConf = SketchConf(
-//        cmapSize = 2000, cmapNo = 20, cmapStart = Some(-10d), cmapEnd = Some(10d),
-//        counterSize = 10000, counterNo = 10
-//      )
-//      val sketch0 = AdaPerSketch.empty[Double]
-//
-//      sketch0.deepUpdate(0.0 to 10.0 by 0.1: _*) must beAnInstanceOf[Some[Sketch[Double]]]
-//    }
+    "deepUpdate" in {
+      implicit val conf: CustomAdaPerSketchConf = SketchConf(
+        cmapSize = 2000, cmapNo = 20, cmapStart = Some(-10d), cmapEnd = Some(10d),
+        counterSize = 10000, counterNo = 10
+      )
+      val sketch0 = AdaPerSketch.empty[Double]
 
-    "rearrange" in todo
+      sketch0.deepUpdate(0.0 to 10.0 by 0.1: _*) must beAnInstanceOf[Some[Sketch[Double]]]
+    }
+
+    "rearrange" in {
+
+      "" in {
+        val cmapSize = 20
+        implicit val conf: CustomAdaPerSketchConf = CustomSketchConf(
+          cmapSize = cmapSize, cmapNo = 2, cmapStart = Some(-10.0), cmapEnd = Some(10.0),
+          queueSize = 50,
+          counterSize = cmapSize
+        )
+        val sketch0 = AdaPerSketch.empty[Double]
+        val (_, samples) = NumericDist.normal(0.0, 1).samples(100)
+
+        (for {
+          sketch1 <- sketch0.narrowUpdate(samples: _*)
+          sketch2 <- sketch1.rearrange
+          sketch3 <- sketch2.narrowUpdate(samples: _*)
+        } yield sketch3)
+          .fold(ko)(_ => ok)
+      }
+
+    }
 
     "fastPdf" in {
 
@@ -269,6 +289,8 @@ class AdaPerSketchSpec extends Specification with ScalaCheck {
       }
 
     }
+
+    // End
 
   }
 

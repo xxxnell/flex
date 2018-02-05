@@ -20,6 +20,7 @@ object EqualSpaceSmoothingPs extends SmoothingPs {
   }
 
   def smoothingPsPlotForEqualSpaceCumulative(ps: List[(Prim, Count)]): DensityPlot = {
+    val sum = ps.map(_._2).sum
     val sorted = ps.sortBy(_._1)
     val sliding: List[List[(Prim, Count)]] = sorted.sliding(2).toList
     val headAppendingO: Option[(Prim, Count)] = sliding.headOption.flatMap {
@@ -31,16 +32,16 @@ object EqualSpaceSmoothingPs extends SmoothingPs {
       case _ => None
     }
 
-    val records = (headAppendingO.toList ::: sorted ::: lastAppendingO.toList)
+    val densityRecords = (headAppendingO.toList ::: sorted ::: lastAppendingO.toList)
       .sliding(2).toList
       .flatMap {
         case (p1, count1) :: (p2, count2) :: Nil if !p1.isInfinity && !p2.isInfinity =>
           val range = RangeP(p1, p2)
           if(!range.isPoint) Some((range, (count1 + count2) / (2 * range.length).toDouble)) else None
         case _ => None
-      }
+      }.map { case (range, count) => (range, count / sum) }
 
-    DensityPlot.disjoint(records)
+    DensityPlot.disjoint(densityRecords)
   }
 
 }
