@@ -3,10 +3,13 @@ package flip.pdf
 import flip.conf.SmoothDistConf
 import flip.measure.Measure
 import flip.rand.IRng
-import org.apache.commons.math3.distribution.NormalDistribution
 
 import scala.language.higherKinds
 
+/**
+  * NumericDist, or Numeric distribution means that the shape of the
+  * distribution - pdf, cdf, and icdf - is defined numerically.
+  * */
 trait NumericDist[A] extends SmoothDist[A] {
 
   def rng: IRng

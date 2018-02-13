@@ -5,6 +5,11 @@ import flip.measure.Measure
 import flip.rand.IRng
 import org.apache.commons.math3.distribution.ParetoDistribution
 
+/**
+  * Pareto distribution.
+  *
+  * @see <a href="https://en.wikipedia.org/wiki/Pareto_distribution">Pareto distribution - Wikipedia</a>
+  * */
 trait ParetoDist[A] extends NumericDist[A] {
   val scale: A
   val shape: Prim

@@ -6,7 +6,8 @@ import flip.plot.DensityPlot
 
 /**
   * Cosine similarity between two probability density function.
-  * https://en.wikipedia.org/wiki/Hilbert_space
+  *
+  * @see <a href="https://en.wikipedia.org/wiki/Cosine_similarity">Cosine similarity - Wikipedia</a>
   * */
 trait Cosine extends DensitySim {
 

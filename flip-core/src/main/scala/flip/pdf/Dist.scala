@@ -10,7 +10,8 @@ import flip.range.{RangeM, RangeP}
 import scala.language.higherKinds
 
 /**
-  * Distribution, or probability bistribution provides to get probability for given domain.
+  * Distribution, or probability distribution provides to get probability for
+  * given domain.
   * */
 trait Dist[A] {
 

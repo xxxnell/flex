@@ -3,6 +3,9 @@ package flip.sim
 import flip.pdf.{PlottedDist, SamplingDist}
 import flip.plot.DensityPlot
 
+/**
+  * Set of operations for distribution on Hilbert space.
+  * */
 object Hilbert {
 
   def normForSamplingDist[A](d1: SamplingDist[A]): Double = (for {

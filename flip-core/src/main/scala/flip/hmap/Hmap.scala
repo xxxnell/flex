@@ -5,7 +5,7 @@ import flip.{Epi, Mon}
 import flip.counter.CDim
 
 /**
-  * Hashing Map.
+  * Hmap, or Hashing Map is hashing function.
   */
 trait Hmap {
 

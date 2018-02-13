@@ -5,7 +5,8 @@ import flip.conf.DataBinningDistConf
 import scala.language.higherKinds
 
 /**
-  * Data binning distribution.
+  * Data binning distribution is Sampling distribution, and it ensures that you
+  * can update the dataset.
   * */
 trait DataBinningDist[A] extends SamplingDist[A]
 

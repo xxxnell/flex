@@ -8,6 +8,13 @@ import flip.pdf.Count
 import scala.util.hashing.byteswap32
 import cats.implicits._
 
+/**
+  * The HCounter, or Hashing Counter, is a probabilistic data structure that
+  * uses only low memory to count the number of finite countable elements. This
+  * structure is similar to the Count-min Sketch algorithm.
+  *
+  * @see <a href="https://en.wikipedia.org/wiki/Count%E2%80%93min_sketch"></a>
+  * */
 trait HCounter {
 
   def structures: List[(Hmap, Counter)]

@@ -8,7 +8,8 @@ import flip.range.RangeM
 import scala.language.higherKinds
 
 /**
-  * Sampling distribution provides the sampling points and its probability density value.
+  * SamplingDist, or Sampling distribution provides the sampling points and its
+  * probability density.
   * */
 trait SamplingDist[A] extends Dist[A] {
 

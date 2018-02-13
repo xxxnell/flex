@@ -5,6 +5,10 @@ import flip.measure.Measure
 
 import scala.language.higherKinds
 
+/**
+  * PredefinedDist, or Predefined distribution can calculate the probability
+  * for arbitrary interval.
+  * */
 trait PredefinedDist[A] extends SmoothDist[A] {
 
   def probability(from: A, to: A): Option[Double]

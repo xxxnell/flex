@@ -4,6 +4,12 @@ import flip.conf.SmoothDistConf
 import flip.measure.Measure
 import flip.rand.IRng
 
+/**
+  * UniformDist, or Uniform distribution.
+  *
+  * @see <a href="https://en.wikipedia.org/wiki/Uniform_distribution_(continuous)">
+  *        Uniform distribution - Wikipedia</a>
+  * */
 trait UniformDist[A] extends NumericDist[A] {
   val scale: A
   val width: Double

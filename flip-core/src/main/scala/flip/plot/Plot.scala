@@ -12,7 +12,7 @@ import scala.math._
 import scala.util.Try
 
 /**
-  * Disjoint and sorted set of range and value.
+  * Plot is disjoint and sorted set of range and value.
   */
 trait Plot {
 

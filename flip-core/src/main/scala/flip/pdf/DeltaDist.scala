@@ -6,7 +6,9 @@ import flip.rand._
 import flip.range._
 
 /**
-  * Dirac Delta Function.
+  * Dirac delta function.
+  *
+  * @see <a href="https://en.wikipedia.org/wiki/Dirac_delta_function">Dirac delta function - Wikipedia</a>
   */
 case class DeltaDist[A](measure: Measure[A], conf: SmoothDistConf, pole: A, rng: IRng = IRng(0))
   extends NumericDist[A]

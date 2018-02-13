@@ -4,6 +4,9 @@ import flip.conf.SmoothDistConf
 
 import scala.language.higherKinds
 
+/**
+  * SmoothDist, or Smooth distribution is the opposite of SamplingDist.
+  * */
 trait SmoothDist[A] extends Dist[A] {
 
   def conf: SmoothDistConf

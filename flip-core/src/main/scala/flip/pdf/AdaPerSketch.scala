@@ -8,7 +8,8 @@ import flip.measure.Measure
 import scala.language.higherKinds
 
 /**
-  * Adaptive and Periodic Sketch.
+  * AdaPerSketch, or Adaptive and Periodic Sketch is both AdaptiveSketch and
+  * PeriodicSketch.
   * */
 trait AdaPerSketch[A]
   extends AdaptiveSketch[A]

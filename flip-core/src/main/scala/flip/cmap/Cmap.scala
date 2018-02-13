@@ -7,7 +7,8 @@ import flip.pdf._
 import flip.range.syntax._
 
 /**
-  * Characteristic Map of sketch algorithm.
+  * Cmap, or Characteristic Map is a component of the Sketch algorithm. This is
+  * the projection from the primitive value of Sketch to the index of the Hmap.
   */
 trait Cmap {
 

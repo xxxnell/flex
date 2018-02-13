@@ -5,6 +5,11 @@ import flip.measure.Measure
 
 import scala.language.higherKinds
 
+/**
+  * RecurSketch, or Recurrent Sketch has a stream of thresholds. RecurSketch
+  * consumes the thresholds and rearranges itself when its counter for
+  * number of data exceeds the threshold.
+  * */
 trait RecurSketch[A] extends Sketch[A] {
 
   def count: Count

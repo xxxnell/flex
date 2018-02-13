@@ -14,7 +14,12 @@ import scala.language.higherKinds
 import scala.util.Try
 
 /**
-  * Sketch provides
+  * Sketch is a probabilistic summarization data structure that quantizes and
+  * stores data streams. And It is a nonparametric density estimation algorithm.
+  * However, unlike other quantization algorithms such as histogram, Sketch
+  * picks quantization points adaptively for incoming data. Thus, Sketch does
+  * not have distortion without requiring a prior knowledge of the incoming
+  * dataset.
   */
 trait Sketch[A] extends DataBinningDist[A] {
 

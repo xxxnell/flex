@@ -3,8 +3,10 @@ package flip.sim
 import scala.math._
 
 /**
-  * Kullback–Leibler divergence
-  * https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence
+  * Kullback–Leibler divergence.
+  *
+  * @see <a href="https://en.wikipedia.org/wiki/Kullback-Leibler_divergence">
+  *        Kullback–Leibler divergence - Wikipedia</a>
   */
 object KLD extends DensitySim {
 

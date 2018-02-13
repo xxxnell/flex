@@ -6,6 +6,16 @@ import flip.plot.CountPlot
 
 import scala.language.higherKinds
 
+/**
+  * Adaptive Sketch has its own queue to hold recent input streams temporarily.
+  * This queue retains its maximum length.
+  * This queue acts as a reference data stream ξ for deepUpdate when Adaptive
+  * Sketch has to rearrange. So, even if the concept drift occurs, rearranging
+  * can constitute the correct strueture of Sketch.
+  *
+  * rearrange(S) = deepUpdate(S, ξ)
+  *  where S is sketch and ξ is data stream in the queue of Adaptive Sketch.
+  * */
 trait AdaptiveSketch[A] extends Sketch[A] {
 
   val queue: List[(A, Count)]

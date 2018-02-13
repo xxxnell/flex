@@ -4,7 +4,8 @@ import flip.pdf.Prim
 import scala.reflect.runtime.universe.{typeOf, TypeTag}
 
 /**
-  * Measure of A provides bijective map between A and Prim.
+  * Measure is a bijective map between primitive type of Sketch and arbitrary
+  * type.
   * */
 trait Measure[A] {
 

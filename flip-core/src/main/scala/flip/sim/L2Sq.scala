@@ -4,8 +4,10 @@ import flip.pdf.{Dist, SamplingDist}
 
 /**
   * Squared Eucledian Distance, or Minkowski L2 Distance between two pdfs.
-  * https://en.wikipedia.org/wiki/Euclidean_distance#Squared_Euclidean_distance
-  * https://en.wikipedia.org/wiki/Hilbert_space
+  *
+  * @see <a href="https://en.wikipedia.org/wiki/Euclidean_distance#Squared_Euclidean_distance">
+  *        Squared Euclidean distance - Wikipedia</a>
+  * @see <a href="https://en.wikipedia.org/wiki/Hilbert_space">Hilbert space - Wikipedia</a>
   * */
 trait L2Sq extends DensitySim {
 

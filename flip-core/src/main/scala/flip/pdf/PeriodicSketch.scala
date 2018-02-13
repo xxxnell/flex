@@ -7,6 +7,11 @@ import flip.measure.Measure
 
 import scala.language.higherKinds
 
+/**
+  * PeroidicSketch, or Peroidic Sketch provides a concrete way to set
+  * thresholds for RecurSketch. It finds infinite thresholds at regular
+  * intervals for a given period.
+  * */
 trait PeriodicSketch[A] extends RecurSketch[A] {
 
   def conf: PeriodicSketchConf

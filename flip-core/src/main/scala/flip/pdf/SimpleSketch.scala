@@ -3,6 +3,11 @@ package flip.pdf
 import flip.conf.SketchConf
 import flip.measure.Measure
 
+/**
+  * SimpleSketch, or Simple Sketch does not update any structures once after it
+  * is initialized. It can also be used as an improved histogram that uses
+  * Sketch's algorithm without deepUpdate.
+  * */
 case class SimpleSketch[A](measure: Measure[A], conf: SketchConf, structures: Structures) extends Sketch[A]
 
 trait SimpleSketchOps extends SketchPrimPropOps[SimpleSketch] {
