@@ -1,13 +1,23 @@
 language: scala
 
 scala:
-  - 2.12.1
+  - 2.12.4
 
 jdk:
   - oraclejdk8
 
+env:
+  global:
+    - secure: "O/uKUTxKKhnX9GS/8tBuWgqnXWnhD1jnpts3ew/U24RvsW9u/asKaB8FvoQuJ6LR3EGmO2xwF/XmOYqdFuPgo5Tsyh27FpoXTAMeRVOlYcqvy57lFIlJJ4jWTgkLZnDU/T4VtdSHnuNr/XAnj0pAJQ+AEa9f+18EVlRcpCO438DxWO8Wqlmp3CH/6imzcqZGwM2iFf0NHJ/dh35sQSA8vxTTIf/GMAT9PvxVyZcvLbHOu7Tvu2Pc5xTAC0HdKRH8ntc9j95t92mAzlsD8qT3k+c/n1SXFnUqn7g8seXg0NQZgZgbndoapDKy/Gu1Y+AsR78CBqVmj4X6Scu0aSZM2C0BsbmM1Epf/jLOr36yOwF73aD+cvnJZ/qF8cs8vOiYerijkNfMuk+LtgzvMkfhqpcrX/KwnuPfeWPBpLjQvFXiwNaxwLxvGRm8b+UosTr1V4Waw+/Hv5xo+OXX517MFvCEfyaK28n2Rjs25SKDrwnFrjaobKQ17vR/vfv6EekU8Z80HM/VdIWbIlPIh99OhBP/03VFrOPpK+NIqGq7DVGzcuHjqebvwcb+aY9HQpRFg4GWMsoN2I9mIgaq2GlKIS/3UeGQRPLMtKPaDYpVTJuv8nG0vtTg9F6hagf6q9ZWToRioBR7FyL9gJ1cIZ53m0mD45vLSw01jCFQqu+KIIQ="
+    - secure: "kzyTNR87aR5LF9Hm+kmd7PHrFlduaV3oOj/YwWyOWYAOWYUp5dB/xEYfkjTTWTOwMKFVgWZp5XU8KkJMOv7K3NPvXdlPCno2/r3Puj2nRsI96dVrtYevVmkwmRqfcl/xUGIgN5F0B/I0NjhmR6aolVhnnZofQNaOzsRcJzMe+6rhMoghoomFtPNqLPUIvdZlLTYscDkyrLUXW2QnuO14uK1bZK3cYb44Y5dAXEFy/YiIMjbpn0swOYh7JVl9L2JvRCAmPCMJkKbvTDzwIxBh09Lbneo/ydbIsfuRvL+1Gu/56XKjnFl83sgLBjEaHzccoYyKkdYY2xX4ukTM79PqMQb8HOpZYRgcy8oF2Lx5Q5V0VhM6ug1CZ2tmE2+Fv9N0BSb/X3ZgKEXyCBkdGV3I3Azh/1M321vxZmEJYwd1PDHje3lIpXTBPxhx/DlBc/V6/eGTORCH1V+BkgxttQUxCMuDQ4xxtZLEpyjJDxYVJ8M2iEhBlllvHkPnLiqjkvWxpKUp/J+2tTxKCSSe9i+M0PzVvRc65jEHVdTszJU4KF4orH9i+JgO1LAqikIJrb6Hq9g10zZWC3WUNGuLaSK6tZaYT5PvqCuyDxKLJR8kPNfcKzAcF8rk0ugGewOWt4x1B7JKcRKiJCckbuvULLFdVbdlxo5r5aS69ZTi+Yz2lME="
+    - secure: "Lo5QtRkrqEkhQyHy82pr904jrWZsUHg8H+BCFNEr53Dc3gyl2G0pyPUOB7jEisLCtt7Zc47VjUMY08Fzt295PVzqFPt7wTNR59NimMihSzpe7jsARAQRQ42u8KSfW/0mm9dux89haEYxNhDL9K4tau9pzYB2ad2zQlyNF0z/+HCa0yoDxWncFHqU9tE1mwxlnwncmYm3FA4v+m67q60lIf9fDJT2Han3gWclPihgwg8tQKHhcgmjAEA3EwNl6fB+y1RnZ7mbfgyiXDzjk2R5P6zfHD9SOZfgqne3dUgYUI1rvAyD2sGtId3QPjTWuEeoALK5JWSML4iHbNZzz04ioI7LwMJjRGq4zyX3StpERjwkKziILSltM0qjlEGgVy4umr3THLLZBLOO/I7t2H++6UnwISh/xTaCXgrgpwn7MDgu80pWhq6ED4W3sFdqIpZwFd3fWjXaf/j37SwtDFUcxSBFsYP/d8NqrMUfMcH7X3HQ8Qf8nZtSY6m7KxnDuRL87BCF0xgLBWiGeTNEv7Kl7FPlBSmr6vf1FLZtENFis/ZHcO2/hP35LxkeWRhya3KP8ms+sxdLc2ehZkCvrAdeoAFBFA3QggRYZAtpVfsSc4a/30Sshf/m8tgkaZeEYbw6TIrtOlAErxkcdE3soupTPzBoDhj/KwCvJQSA7mLEdbY="
+
+before_script:
+  - bash scripts/travis-git-setup.sh
+
 script:
-  - travis_wait 30 sbt ++$TRAVIS_SCALA_VERSION clean coverage test coverageReport
+  - travis_wait 30 sleep 1800 &
+  - bash scripts/build.sh
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
