@@ -13,13 +13,9 @@ trait SmoothDist[A] extends Dist[A] {
 
 }
 
-trait SmoothDistPropOps[D[_]<:SmoothDist[_]]
-  extends DistPropOps[D]
-    with SmoothDistPropLaws[D] {
+trait SmoothDistPropOps[D[_] <: SmoothDist[_]] extends DistPropOps[D] with SmoothDistPropLaws[D] {}
 
-}
-
-trait SmoothDistPropLaws[D[_]<:SmoothDist[_]] { self: SmoothDistPropOps[D] =>
+trait SmoothDistPropLaws[D[_] <: SmoothDist[_]] { self: SmoothDistPropOps[D] =>
 
 }
 

@@ -29,10 +29,11 @@ object ExpOutOps {
 
   // ops
 
-  def clear(path: String, name: String): Unit = Try {
-    new File(s"$path/$name").listFiles.foreach(file => file.delete())
-    new File(s"$path/$name").delete()
-  }.getOrElse(())
+  def clear(path: String, name: String): Unit =
+    Try {
+      new File(s"$path/$name").listFiles.foreach(file => file.delete())
+      new File(s"$path/$name").delete()
+    }.getOrElse(())
 
   def writeStr(path: String, name: String, affix: String, c: String): Unit = {
     val f = new File(s"$path/$name/$name-$affix.out")

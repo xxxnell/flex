@@ -10,10 +10,7 @@ import flip.range.RangeM
 
 import scala.language.higherKinds
 
-trait DistSyntax
-  extends DistPropSyntax
-    with DistMonadSyntax
-    with DistArthmeticSyntax
+trait DistSyntax extends DistPropSyntax with DistMonadSyntax with DistArthmeticSyntax
 
 // props
 
@@ -40,23 +37,21 @@ trait DistPropSyntax {
 
 // monad
 
-trait DistBindAux[InD[_]<:Dist[_], OutD[_]<:Dist[_]] {
+trait DistBindAux[InD[_] <: Dist[_], OutD[_] <: Dist[_]] {
   type Out[A] = OutD[A]
 }
 
 trait DistMonadSyntax extends DistMonadSyntax1 {
 
   implicit class DistMonadSyntaxImpl0[A](dist: Dist[A]) {
-    def map[B](f: A => B)
-              (implicit
-               functor: DistFunctor[Dist],
-               measureB: Measure[B]): Dist[B] =
+    def map[B](f: A => B)(implicit
+                          functor: DistFunctor[Dist],
+                          measureB: Measure[B]): Dist[B] =
       functor.map(dist, f, measureB)
-    def flatMap[B, D1[_]<:Dist[_], D2[_]<:Dist[_]](f: A => D1[B])
-                                                  (implicit
-                                                   aux1: DistBindAux[D1, D2],
-                                                   monad: DistMonad[Dist, D1, D2],
-                                                   measureB: Measure[B]): aux1.Out[B] =
+    def flatMap[B, D1[_] <: Dist[_], D2[_] <: Dist[_]](f: A => D1[B])(implicit
+                                                                      aux1: DistBindAux[D1, D2],
+                                                                      monad: DistMonad[Dist, D1, D2],
+                                                                      measureB: Measure[B]): aux1.Out[B] =
       monad.bind(dist, f, measureB)
   }
 

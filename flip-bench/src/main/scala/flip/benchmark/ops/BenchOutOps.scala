@@ -22,7 +22,9 @@ object BenchOutOps {
       def records2b(records: List[String]): Array[Byte] = (records.mkString(", ") + "\n").getBytes("UTF-8")
 
       fs.write(records2b(RecordOps.recordLabels))
-      results.foreach { result: RunResult => fs.write(records2b(RecordOps.records(result))) }
+      results.foreach { result: RunResult =>
+        fs.write(records2b(RecordOps.records(result)))
+      }
     }
 
     val fs = createFs
@@ -49,9 +51,11 @@ object BenchOutOps {
     }
 
     def metadata2Params(params: BenchmarkParams): Map[String, String] = {
-      params.getParamsKeys.asScala.toList.map(key => {
-        (key, params.getParam(key))
-      }).toMap
+      params.getParamsKeys.asScala.toList
+        .map(key => {
+          (key, params.getParam(key))
+        })
+        .toMap
     }
 
     def paramLabels: List[String] = {

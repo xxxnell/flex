@@ -1,7 +1,6 @@
 package flip.conf
 
-trait DefaultSketchConf
-  extends AdaPerSketchConf {
+trait DefaultSketchConf extends AdaPerSketchConf {
 
   val delta: Double = 1e-5
 

@@ -10,9 +10,6 @@ package object plot {
     * */
   type Block = ((Prim, Double), (Prim, Double))
 
-  object syntax
-    extends PlotSyntax
-      with DensityPlotSyntax
-      with CountPlotSyntax
+  object syntax extends PlotSyntax with DensityPlotSyntax with CountPlotSyntax
 
 }

@@ -15,7 +15,7 @@ trait PredefinedDist[A] extends SmoothDist[A] {
 
 }
 
-trait PredefinedDistOps[D[_]<:PredefinedDist[_]] extends SmoothDistPropOps[D] {
+trait PredefinedDistOps[D[_] <: PredefinedDist[_]] extends SmoothDistPropOps[D] {
 
   def probability[A](dist: D[A], from: A, to: A): Option[Double] =
     dist.asInstanceOf[PredefinedDist[A]].probability(from, to)
@@ -24,9 +24,8 @@ trait PredefinedDistOps[D[_]<:PredefinedDist[_]] extends SmoothDistPropOps[D] {
 
 object PredefinedDist extends PredefinedDistOps[PredefinedDist] {
 
-  case class PredefinedDistImpl[A](measure: Measure[A],
-                                   conf: SmoothDistConf,
-                                   probabilityF: (A, A) => Option[Double]) extends PredefinedDist[A] {
+  case class PredefinedDistImpl[A](measure: Measure[A], conf: SmoothDistConf, probabilityF: (A, A) => Option[Double])
+      extends PredefinedDist[A] {
     def probability(from: A, to: A): Option[Prim] = probabilityF(from, to)
   }
 
@@ -36,5 +35,3 @@ object PredefinedDist extends PredefinedDistOps[PredefinedDist] {
   def sample[A](dist: PredefinedDist[A]): (PredefinedDist[A], A) = ???
 
 }
-
-

@@ -14,7 +14,7 @@ object EqualSpaceSmoothingPs extends SmoothingPs {
     lazy val cdf = plot.cumulative
     def probability(start: Prim, end: Prim): Double = cdf.interpolation(end) - cdf.interpolation(start)
 
-    if(ps.nonEmpty) {
+    if (ps.nonEmpty) {
       PredefinedDist.bare(doubleMeasure, conf, (start: Prim, end: Prim) => Some(probability(start, end)))
     } else NumericDist.uniform(0.0, Double.PositiveInfinity)(doubleMeasure, conf)
   }
@@ -33,13 +33,15 @@ object EqualSpaceSmoothingPs extends SmoothingPs {
     }
 
     val densityRecords = (headAppendingO.toList ::: sorted ::: lastAppendingO.toList)
-      .sliding(2).toList
+      .sliding(2)
+      .toList
       .flatMap {
         case (p1, count1) :: (p2, count2) :: Nil if !p1.isInfinity && !p2.isInfinity =>
           val range = RangeP(p1, p2)
-          if(!range.isPoint) Some((range, (count1 + count2) / (2 * range.length).toDouble)) else None
+          if (!range.isPoint) Some((range, (count1 + count2) / (2 * range.length).toDouble)) else None
         case _ => None
-      }.map { case (range, count) => (range, count / sum) }
+      }
+      .map { case (range, count) => (range, count / sum) }
 
     DensityPlot.disjoint(densityRecords)
   }

@@ -1,8 +1,6 @@
 package flip.conf
 
-trait SamplingDistConf extends DistConf {
-
-}
+trait SamplingDistConf extends DistConf {}
 
 object SamplingDistConf {
 

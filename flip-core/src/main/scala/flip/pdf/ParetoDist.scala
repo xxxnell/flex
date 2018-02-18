@@ -45,7 +45,7 @@ trait ParetoDistOps extends NumericDistOps[ParetoDist] {
 object ParetoDist extends ParetoDistOps {
 
   private case class ParetoDistImpl[A](measure: Measure[A], conf: SmoothDistConf, scale: A, shape: Prim, rng: IRng)
-    extends ParetoDist[A]
+      extends ParetoDist[A]
 
   def apply[A](scale: A, shape: Double)(implicit measure: Measure[A], conf: SmoothDistConf): ParetoDist[A] =
     bare(measure, conf, scale, shape, IRng(scale.hashCode() + shape.hashCode))
@@ -60,5 +60,3 @@ object ParetoDist extends ParetoDistOps {
     bare(dist.measure, dist.conf, dist.scale, dist.shape, f(dist.rng))
 
 }
-
-

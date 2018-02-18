@@ -25,7 +25,7 @@ object PeriodicSketchConf {
                                             bindSampling: Int,
                                             cmap: CmapConf,
                                             counter: CounterConf)
-    extends CustomPeriodicSketchConf
+      extends CustomPeriodicSketchConf
 
   def custom(delta: Double,
              mixingRatio: Double,

@@ -1,8 +1,6 @@
 package flip.conf
 
-trait SmoothDistConf extends DistConf {
-
-}
+trait SmoothDistConf extends DistConf {}
 
 object DefaultSmoothDistConf extends SmoothDistConf {
 

@@ -19,9 +19,7 @@ trait Measure[A] {
 
 }
 
-trait MeasureSyntax {
-
-}
+trait MeasureSyntax {}
 
 object Measure {
 

@@ -40,7 +40,7 @@ trait Plot {
 
 }
 
-trait PlotOps[P<:Plot] extends PlotLaws[P] {
+trait PlotOps[P <: Plot] extends PlotLaws[P] {
 
   def modifyRecords(plot: P, f: List[Record] => List[Record]): P
 
@@ -59,14 +59,16 @@ trait PlotOps[P<:Plot] extends PlotLaws[P] {
 
 }
 
-trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
+trait PlotLaws[P <: Plot] { self: PlotOps[P] =>
 
-  def inverse(plot: P): P = modifyRecords(plot, records => {
-    records.map { case (range, value) => (RangeP.point(value), range.middle) }
-  })
+  def inverse(plot: P): P =
+    modifyRecords(plot, records => {
+      records.map { case (range, value) => (RangeP.point(value), range.middle) }
+    })
 
   def image(plot: P, argument: Double): Option[Double] = {
-    plot.records.find { case (range, value) => range.contains(argument) }
+    plot.records
+      .find { case (range, value) => range.contains(argument) }
       .map { case (range, value) => value }
   }
 
@@ -76,19 +78,23 @@ trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
     val midInterp = for {
       toIndexBlocks <- plot.middleIndex.to(x).lastOption
       fromIndexBlocks <- plot.middleIndex.from(x).headOption
-      (toPoint, toBlocks) =  toIndexBlocks
-      (fromPoint, fromBlocks) =  fromIndexBlocks
-      toP = toBlocks.map { case ((x1, y1), (x2, y2)) => (x1 / 2 + x2 / 2, y1 / 2 + y2 / 2) }
+      (toPoint, toBlocks) = toIndexBlocks
+      (fromPoint, fromBlocks) = fromIndexBlocks
+      toP = toBlocks
+        .map { case ((x1, y1), (x2, y2)) => (x1 / 2 + x2 / 2, y1 / 2 + y2 / 2) }
         .maxBy { case (_, y) => y }
-      fromP = fromBlocks.map { case ((x1, y1), (x2, y2)) => (x1 / 2 + x2 / 2, y1 / 2 + y2 / 2) }
+      fromP = fromBlocks
+        .map { case ((x1, y1), (x2, y2)) => (x1 / 2 + x2 / 2, y1 / 2 + y2 / 2) }
         .minBy { case (_, y) => y }
       fitting <- dataFitting(toP :: fromP :: Nil, x)
     } yield fitting
 
-    val headExt = plot.records.headOption.filter { case (range, _) => range.start >= x }
+    val headExt = plot.records.headOption
+      .filter { case (range, _) => range.start >= x }
       .map { case (_, value) => value }
 
-    val tailExt = plot.records.lastOption.filter { case (range, _) => range.end <= x }
+    val tailExt = plot.records.lastOption
+      .filter { case (range, _) => range.end <= x }
       .map { case (_, value) => value }
 
     (midInterp orElse headExt orElse tailExt).getOrElse(0)
@@ -101,18 +107,20 @@ trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
     val largeCutoff = 1e300
     val smallCutoff = -1e300
 
-    val polyValid = as.forall { case (_x, _y) =>
-      _x < largeCutoff && _y < largeCutoff && _x > smallCutoff && _y > smallCutoff
+    val polyValid = as.forall {
+      case (_x, _y) =>
+        _x < largeCutoff && _y < largeCutoff && _x > smallCutoff && _y > smallCutoff
     }
 
     (as.size, polyValid) match {
       case (size, true) if size > 2 =>
         polynomialFitting(as, x)
-      case _ => for {
-        start <- as.find(_._1 <= x)
-        end <- as.find(_._1 >= x)
-        fitting <- linearFitting(start, end, x)
-      } yield fitting
+      case _ =>
+        for {
+          start <- as.find(_._1 <= x)
+          end <- as.find(_._1 >= x)
+          fitting <- linearFitting(start, end, x)
+        } yield fitting
     }
   }
 
@@ -121,25 +129,27 @@ trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
     val (x2, y2) = a2
     lazy val p = linearFittingDouble(a1, a2, x)
 
-    if(!p.isNaN) Some(p)
-    else try {
-      Some(linearFittingBigDecimal(
-        (BigDecimal(x1), BigDecimal(y1)),
-        (BigDecimal(x2), BigDecimal(y2)),
-        BigDecimal(x)
-      ).toDouble)
-    } catch {
-      case _: Exception => None
-    }
+    if (!p.isNaN) Some(p)
+    else
+      try {
+        Some(
+          linearFittingBigDecimal(
+            (BigDecimal(x1), BigDecimal(y1)),
+            (BigDecimal(x2), BigDecimal(y2)),
+            BigDecimal(x)
+          ).toDouble)
+      } catch {
+        case _: Exception => None
+      }
   }
 
   def linearFittingDouble(a1: (Double, Double), a2: (Double, Double), x: Double): Double = {
     val (x1, y1) = a1
     val (x2, y2) = a2
 
-    if(y1 == y2) y1
-    else if(x1 == x2) y1 + (y2 - y1) / 2
-    else if(!x1.isInfinity && !x2.isInfinity) {
+    if (y1 == y2) y1
+    else if (x1 == x2) y1 + (y2 - y1) / 2
+    else if (!x1.isInfinity && !x2.isInfinity) {
       lazy val slope1 = (y2 - y1) / (x2 - x1)
       lazy val slope2 = y2 * ((1 - y1 / y2) / (1 - x1 / x2)) / x2
       lazy val slope3 = y1 * ((1 - y2 / y1) / (1 - x2 / x1)) / x1
@@ -147,29 +157,27 @@ trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
       lazy val slope5 = y1 / ((x1 / x2 - 1) * x2)
 
       val slope =
-        if(!slope1.isNaN && !slope1.isInfinity) slope1
-        else if(!slope2.isNaN && !slope2.isInfinity) slope2
-        else if(!slope3.isNaN && !slope3.isInfinity) slope3
-        else if(!slope4.isNaN && !slope4.isInfinity && math.abs(y2 / y1) < 1 && x1 != 0) slope4
-        else if(!slope5.isNaN && !slope5.isInfinity && math.abs(y2 / y1) < 1 && x2 != 0) slope5
+        if (!slope1.isNaN && !slope1.isInfinity) slope1
+        else if (!slope2.isNaN && !slope2.isInfinity) slope2
+        else if (!slope3.isNaN && !slope3.isInfinity) slope3
+        else if (!slope4.isNaN && !slope4.isInfinity && math.abs(y2 / y1) < 1 && x1 != 0) slope4
+        else if (!slope5.isNaN && !slope5.isInfinity && math.abs(y2 / y1) < 1 && x2 != 0) slope5
         else Double.NaN
       val c = y1 - slope * x1
 
       val interp = slope * x + c
 
-      if(!interp.isNaN && !interp.isInfinity) interp else Double.NaN
+      if (!interp.isNaN && !interp.isInfinity) interp else Double.NaN
       // todo throw an exception when x is not sim to x1B
     } else Double.NaN
   }
 
-  def linearFittingBigDecimal(a1: (BigDecimal, BigDecimal),
-                              a2: (BigDecimal, BigDecimal),
-                              x: BigDecimal): BigDecimal = {
+  def linearFittingBigDecimal(a1: (BigDecimal, BigDecimal), a2: (BigDecimal, BigDecimal), x: BigDecimal): BigDecimal = {
     val (x1, y1) = a1
     val (x2, y2) = a2
 
-    if(y1 == y2) y1
-    else if(x1 == x2) y1 + (y2 - y1) / 2
+    if (y1 == y2) y1
+    else if (x1 == x2) y1 + (y2 - y1) / 2
     else {
       val slope = (y2 - y1) / (x2 - x1)
       val c = y1 - slope * x1
@@ -178,15 +186,16 @@ trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
     }
   }
 
-  def polynomialFitting(as: List[(Double, Double)], x: Double): Option[Double] = Try {
-    val xB = BigDecimal(x)
+  def polynomialFitting(as: List[(Double, Double)], x: Double): Option[Double] =
+    Try {
+      val xB = BigDecimal(x)
 
-    val obs = as.foldLeft(new WeightedObservedPoints){ case (_obs, (_x, _y)) => _obs.add(_x, _y); _obs }
-    val fitter = PolynomialCurveFitter.create(2)
-    val coeff = fitter.fit(obs.toList)
+      val obs = as.foldLeft(new WeightedObservedPoints) { case (_obs, (_x, _y)) => _obs.add(_x, _y); _obs }
+      val fitter = PolynomialCurveFitter.create(2)
+      val coeff = fitter.fit(obs.toList)
 
-    (coeff(0) * xB * xB + coeff(1) * xB + coeff(2)).toDouble
-  }.toOption
+      (coeff(0) * xB * xB + coeff(1) * xB + coeff(2)).toDouble
+    }.toOption
 
   /**
     * Plalarize records that is transforming overlapped records to disjointed records.
@@ -206,14 +215,15 @@ trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
 
   def planarizeRecord(record: Record, boundaries: TreeSet[Double]): List[Record] = {
     val (_, planarized) = boundaries
-      .from(record._1.start).to(record._1.end)
-      .foldRight((record, List.empty[Record])){ case (b, (rem @ (range, _), acc)) =>
-        if(range.start != b && range.end != b)
-          split(rem, b).fold((rem, acc)){ case (rec1, rec2) => (rec1, rec2 :: acc) }
-        else (rem, acc)
+      .from(record._1.start)
+      .to(record._1.end)
+      .foldRight((record, List.empty[Record])) {
+        case (b, (rem @ (range, _), acc)) =>
+          if (range.start != b && range.end != b)
+            split(rem, b).fold((rem, acc)) { case (rec1, rec2) => (rec1, rec2 :: acc) } else (rem, acc)
       }
 
-    if(planarized.nonEmpty) planarized else List(record)
+    if (planarized.nonEmpty) planarized else List(record)
   }
 
   def domain(plot: P): Option[RangeP] = {
@@ -241,50 +251,55 @@ trait PlotLaws[P<:Plot] { self: PlotOps[P] =>
       idxBlocks <- plot.startIndexedBlocks.to(start).lastOption
       (_, blocks) = idxBlocks
       ((x1, y1), (x2, y2)) = blocks
-        .groupBy { case (_, (_x2, _)) => _x2 }.maxBy { case (_x2, _) => _x2 }._2
+        .groupBy { case (_, (_x2, _)) => _x2 }
+        .maxBy { case (_x2, _) => _x2 }
+        ._2
         .maxBy { case ((_, _y1), (_, _y2)) => _y1 / 2 + _y2 / 2 }
       yi = CountPlot.disjoint((RangeP(x1), y1) :: (RangeP(x2), y2) :: Nil).interpolation(start)
-    } yield if(start != x1) areaPoint(start, yi, x2, y2) else 0)
-      .sum
+    } yield if (start != x1) areaPoint(start, yi, x2, y2) else 0).sum
 
     lazy val endBoundary: Double = (for {
       idxBlocks <- plot.startIndexedBlocks.to(end).lastOption
       (_, blocks) = idxBlocks
       ((x1, y1), (x2, y2)) = blocks
-        .groupBy { case (_, (_x2, _)) => _x2 }.maxBy { case (_x2, _) => _x2 }._2
+        .groupBy { case (_, (_x2, _)) => _x2 }
+        .maxBy { case (_x2, _) => _x2 }
+        ._2
         .maxBy { case ((_, _y1), (_, _y2)) => _y1 / 2 + _y2 / 2 }
       yi = CountPlot.disjoint((RangeP(x1), y1) :: (RangeP(x2), y2) :: Nil).interpolation(end)
-    } yield areaPoint(x1, y1, end, yi))
-      .sum
+    } yield areaPoint(x1, y1, end, yi)).sum
 
-    lazy val mid: Double = (if(startIndexedBlocksFromTo.nonEmpty) {
-      val endBlock = (for {
-        idxBlocks <- startIndexedBlocksFromTo.lastOption
-        (_, blocks) = idxBlocks
-        block = blocks
-          .groupBy { case (_, (_x2, _)) => _x2 }.maxBy { case (_x2, _) => _x2 }._2
-          .maxBy { case ((_, _y1), (_, _y2)) => _y1 / 2 + _y2 / 2 }
-      } yield areaBlock(block))
-        .getOrElse(0.0)
+    lazy val mid: Double = (if (startIndexedBlocksFromTo.nonEmpty) {
+                              val endBlock = (for {
+                                idxBlocks <- startIndexedBlocksFromTo.lastOption
+                                (_, blocks) = idxBlocks
+                                block = blocks
+                                  .groupBy { case (_, (_x2, _)) => _x2 }
+                                  .maxBy { case (_x2, _) => _x2 }
+                                  ._2
+                                  .maxBy { case ((_, _y1), (_, _y2)) => _y1 / 2 + _y2 / 2 }
+                              } yield areaBlock(block))
+                                .getOrElse(0.0)
 
-      Some(startIndexedBlocksFromTo.values.toList.map(blocks => areaBlocks(blocks)).sum - endBlock)
-    } else None)
-      .sum
+                              Some(
+                                startIndexedBlocksFromTo.values.toList.map(blocks => areaBlocks(blocks)).sum - endBlock)
+                            } else None).sum
 
-    lazy val startEndBoundary: Double = (if(startIndexedBlocksFromTo.isEmpty) {
-      for {
-        idxBlocks <- plot.startIndexedBlocks.to(end).lastOption
-        (_, blocks) = idxBlocks
-        block <-  blocks.find { case ((x1, _), (x2, _)) => x1 <= start && x2 >= end }
-        ((x1, y1), (x2, y2)) = block
-        plot = CountPlot.disjoint((RangeP(x1), y1) :: (RangeP(x2), y2) :: Nil)
-        yi1 = plot.interpolation(start)
-        yi2 = plot.interpolation(end)
-      } yield areaPoint(start, yi1, end, yi2)
-    } else None)
-    .sum
+    lazy val startEndBoundary: Double = (if (startIndexedBlocksFromTo.isEmpty) {
+                                           for {
+                                             idxBlocks <- plot.startIndexedBlocks.to(end).lastOption
+                                             (_, blocks) = idxBlocks
+                                             block <- blocks.find {
+                                               case ((x1, _), (x2, _)) => x1 <= start && x2 >= end
+                                             }
+                                             ((x1, y1), (x2, y2)) = block
+                                             plot = CountPlot.disjoint((RangeP(x1), y1) :: (RangeP(x2), y2) :: Nil)
+                                             yi1 = plot.interpolation(start)
+                                             yi2 = plot.interpolation(end)
+                                           } yield areaPoint(start, yi1, end, yi2)
+                                         } else None).sum
 
-    if(startIndexedBlocksFromTo.nonEmpty) mid + startBoundary + endBoundary else startEndBoundary
+    if (startIndexedBlocksFromTo.nonEmpty) mid + startBoundary + endBoundary else startEndBoundary
   }
 
   def integralAll(plot: P): Double = domain(plot).map(range => integral(plot, range.start, range.end)).getOrElse(0.0)

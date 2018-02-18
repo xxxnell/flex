@@ -4,7 +4,7 @@ trait CustomSketchConf extends SketchConf
 
 object CustomSketchConf {
 
-  def apply(// dist
+  def apply( // dist
             delta: Double = DefaultSketchConf.delta,
             // sketch
             mixingRatio: Double = DefaultSketchConf.mixingRatio,
@@ -28,22 +28,32 @@ object CustomSketchConf {
             counterNo: Int = DefaultSketchConf.counter.no): CustomAdaPerSketchConf = {
     AdaPerSketchConf.custom(
       delta,
-      mixingRatio, dataKernelWindow, boundaryCorr, decayFactor,
+      mixingRatio,
+      dataKernelWindow,
+      boundaryCorr,
+      decayFactor,
       queueSize,
-      startThreshold, thresholdPeriod,
+      startThreshold,
+      thresholdPeriod,
       bindSampling,
       CmapConf.uniform(cmapSize, cmapNo, cmapStart, cmapEnd),
       CounterConf(counterSize, counterNo)
     )
   }
 
-  def periodic(// sketch
-               mixingRatio: Double, dataKernelWindow: Double,
+  def periodic( // sketch
+               mixingRatio: Double,
+               dataKernelWindow: Double,
                // periodic
-               startThreshold: Double, thresholdPeriod: Double,
+               startThreshold: Double,
+               thresholdPeriod: Double,
                // cmap
-               cmapSize: Int, cmapNo: Int, cmapStart: Option[Double], cmapEnd: Option[Double],
+               cmapSize: Int,
+               cmapNo: Int,
+               cmapStart: Option[Double],
+               cmapEnd: Option[Double],
                // counter
-               counterSize: Int, counterNo: Int): CustomPeriodicSketchConf = ???
+               counterSize: Int,
+               counterNo: Int): CustomPeriodicSketchConf = ???
 
 }

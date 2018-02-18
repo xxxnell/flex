@@ -8,7 +8,7 @@ import flip.range.RangeSyntax
 import flip.sim.SimSyntax
 
 package object flip
-  extends ConfPkgSyntax
+    extends ConfPkgSyntax
     with MeasurePkgSyntax
     with PdfPkgSyntax
     with PlotPkgSyntax
@@ -20,14 +20,14 @@ package object flip
   type Epi[A, B] = Kleisli[Option, A, B]
 
   def time[R](block: => R, tag: String = "", display: Boolean = true): R =
-    timePrint(block, if(tag.isEmpty) None else Some(tag), display)
+    timePrint(block, if (tag.isEmpty) None else Some(tag), display)
 
   def timePrint[R](block: => R, tag: Option[String], display: Boolean): R = {
     val t0 = System.nanoTime()
     val result = block
     val t1 = System.nanoTime()
     val tagPrefixed = tag.map(s => s" $s")
-    if(display) println(s"Elapsed time${tagPrefixed.getOrElse("")}: " + (t1 - t0) + " ns")
+    if (display) println(s"Elapsed time${tagPrefixed.getOrElse("")}: " + (t1 - t0) + " ns")
     result
   }
 
@@ -64,11 +64,10 @@ trait ConfPkgSyntax2 {
 
 }
 
-trait MeasurePkgSyntax
-  extends TrivialMeasures
+trait MeasurePkgSyntax extends TrivialMeasures
 
 trait PdfPkgSyntax
-  extends DistSyntax
+    extends DistSyntax
     with SamplingDistSyntax
     with SmoothDistSyntax
     with SketchSyntax
@@ -92,10 +91,7 @@ trait PdfPkgSyntax
 
 }
 
-trait PlotPkgSyntax
-  extends PlotSyntax
-    with DensityPlotSyntax
-    with CountPlotSyntax {
+trait PlotPkgSyntax extends PlotSyntax with DensityPlotSyntax with CountPlotSyntax {
 
   type CountPlot = flip.plot.CountPlot
 
@@ -103,8 +99,6 @@ trait PlotPkgSyntax
 
 }
 
-trait RangePkgSyntax
-  extends RangeSyntax
+trait RangePkgSyntax extends RangeSyntax
 
-trait SimPkgSyntax
-  extends SimSyntax
+trait SimPkgSyntax extends SimSyntax

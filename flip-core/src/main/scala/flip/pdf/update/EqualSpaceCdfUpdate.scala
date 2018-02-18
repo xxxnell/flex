@@ -8,17 +8,22 @@ import flip.range.RangeP
 
 trait EqualSpaceCdfUpdate {
 
-  def updateCmapForSketch(sketch: Sketch[_], ps: List[(Prim, Count)]): Option[Cmap] = for {
-    sketchSamples <- sketch.sampling
-    mixingRatio = sketch.conf.mixingRatio
-    window = sketch.conf.dataKernelWindow
-    corr = sketch.conf.boundaryCorrection
-    cmapSize = sketch.conf.cmap.size
-  } yield updateCmap(sketchSamples, ps, mixingRatio, window, corr, cmapSize)
+  def updateCmapForSketch(sketch: Sketch[_], ps: List[(Prim, Count)]): Option[Cmap] =
+    for {
+      sketchSamples <- sketch.sampling
+      mixingRatio = sketch.conf.mixingRatio
+      window = sketch.conf.dataKernelWindow
+      corr = sketch.conf.boundaryCorrection
+      cmapSize = sketch.conf.cmap.size
+    } yield updateCmap(sketchSamples, ps, mixingRatio, window, corr, cmapSize)
 
-  def updateCmap(sketchSamples: DensityPlot, ps: List[(Prim, Count)],
-                 mixingRatio: Double, window: Double, corr: Double, cmapSize: Int): Cmap = {
-    val mergedPlot = if(ps.nonEmpty) {
+  def updateCmap(sketchSamples: DensityPlot,
+                 ps: List[(Prim, Count)],
+                 mixingRatio: Double,
+                 window: Double,
+                 corr: Double,
+                 cmapSize: Int): Cmap = {
+    val mergedPlot = if (ps.nonEmpty) {
       val c1 = 1 / (mixingRatio + 1)
       val c2 = mixingRatio / (mixingRatio + 1)
       (c1, sketchSamples) + (c2, DensityPlot.squareKernel(ps, window))
@@ -35,9 +40,9 @@ trait EqualSpaceCdfUpdate {
   def cmapForEqualSpaceCumCorr(plot: DensityPlot, corr: Double, cmapSize: Int): Cmap = {
     lazy val invCdf = plot.inverseCumulative
 
-    val cdfDivider = if(cmapSize < 2) {
+    val cdfDivider = if (cmapSize < 2) {
       Nil
-    } else if(cmapSize == 2) {
+    } else if (cmapSize == 2) {
       0.5 :: Nil
     } else {
       val maxAccumulative = invCdf.domain.map(_.end).getOrElse(1.0)
