@@ -8,6 +8,7 @@ name := "flip"
 lazy val root = project
   .in(file("."))
   .settings(moduleName := "root")
+  .settings(Releases.publishSettings)
   .settings(Releases.noPublishSettings)
   .aggregate(flipCore, flipBench)
 
