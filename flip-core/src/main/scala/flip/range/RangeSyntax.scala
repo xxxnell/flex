@@ -5,23 +5,22 @@ import flip.pdf.Prim
 
 import scala.collection.immutable.NumericRange
 
-trait RangeSyntax
-  extends RangeMSyntax
-    with RangePSyntax
+trait RangeSyntax extends RangeMSyntax with RangePSyntax
 
 trait RangeMSyntax {
 
   implicit def scalaRange2RangeMs(range: Range): List[RangeM[Int]] =
     scalaNumericRange2RangeMs(NumericRange(range.start, range.end, range.step))
 
-  implicit def scalaNumericRange2RangeMs[A](range: NumericRange[A])
-                                           (implicit measure: Measure[A]): List[RangeM[A]] =
+  implicit def scalaNumericRange2RangeMs[A](range: NumericRange[A])(implicit measure: Measure[A]): List[RangeM[A]] =
     range.toList
-      .sliding(2).toList
+      .sliding(2)
+      .toList
       .flatMap {
         case a1 :: a2 :: Nil => Some((a1, a2))
         case _ => None
-      }.map { case (start, end) => RangeM(start, end) }
+      }
+      .map { case (start, end) => RangeM(start, end) }
 
   implicit class RangeMSyntaxImpl[A](range: RangeM[A]) {
     def modifyMeasure[B](measure: Measure[B]): RangeM[B] = RangeM.modifyMeasure(range, measure)

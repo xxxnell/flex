@@ -22,8 +22,7 @@ object SimpleSketch extends SimpleSketchOps {
   def empty[A](implicit measure: Measure[A], conf: SketchConf): SimpleSketch[A] =
     SimpleSketch(measure, conf, structures(conf))
 
-  def concat[A](as: List[(A, Count)])
-               (implicit measure: Measure[A], conf: SketchConf): SimpleSketch[A] =
+  def concat[A](as: List[(A, Count)])(implicit measure: Measure[A], conf: SketchConf): SimpleSketch[A] =
     narrowUpdate(SimpleSketch(measure, conf, concatStructures(as, measure, conf)), as).get
 
   def modifyStructure[A](sketch: SimpleSketch[A], f: Structures => Option[Structures]): Option[SimpleSketch[A]] =

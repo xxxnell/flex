@@ -4,7 +4,7 @@ import cats.data.State
 
 import scala.util.Random
 
-trait GenericIRng[S<:Seed, A<:Out] extends Rng[S, A]
+trait GenericIRng[S <: Seed, A <: Out] extends Rng[S, A]
 
 trait IRngOps extends RngOps[Seed, Out, GenericIRng] {
 

@@ -1,5 +1,3 @@
 package flip
 
-package object conf {
-
-}
+package object conf {}

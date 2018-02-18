@@ -31,16 +31,21 @@ class SketchOpsBench { self =>
 
   // variables
 
-  implicit var conf: SketchConf =  _
+  implicit var conf: SketchConf = _
 
   var sketch: Sketch[Double] = _
 
   @Setup
   def setupSketch(): Unit = {
     implicit val conf: SketchConf = SketchConf(
-      startThreshold = 50, thresholdPeriod = 100,
-      cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = Some(-10d), cmapEnd = Some(10d),
-      counterSize = counterSize, counterNo = counterNo
+      startThreshold = 50,
+      thresholdPeriod = 100,
+      cmapSize = cmapSize,
+      cmapNo = cmapNo,
+      cmapStart = Some(-10d),
+      cmapEnd = Some(10d),
+      counterSize = counterSize,
+      counterNo = counterNo
     )
     val (_, samples) = NumericDist.normal(0.0, 1).samples(queueSize)
     val sketch0 = Sketch.empty[Double]
@@ -52,10 +57,15 @@ class SketchOpsBench { self =>
   @Benchmark
   def construct: Sketch[Double] = {
     implicit val conf: SketchConf = SketchConf(
-      startThreshold = 50, thresholdPeriod = 100,
+      startThreshold = 50,
+      thresholdPeriod = 100,
       queueSize = queueSize,
-      cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = Some(-10d), cmapEnd = Some(10d),
-      counterSize = counterSize, counterNo = counterNo
+      cmapSize = cmapSize,
+      cmapNo = cmapNo,
+      cmapStart = Some(-10d),
+      cmapEnd = Some(10d),
+      counterSize = counterSize,
+      counterNo = counterNo
     )
 
     Sketch.empty[Double]

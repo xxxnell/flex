@@ -22,7 +22,7 @@ trait PlotSyntax {
 
 }
 
-trait PolyPlotSyntax[P<:Plot] {
+trait PolyPlotSyntax[P <: Plot] {
   // context
   def plot: P
   def ops: PlotOps[P]
@@ -60,4 +60,3 @@ trait DensityPlotSyntax {
   }
 
 }
-

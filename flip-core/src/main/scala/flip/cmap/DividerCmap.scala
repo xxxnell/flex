@@ -18,10 +18,11 @@ trait DividerCmap extends Cmap {
   /**
     * @return [x_1, x_2)
     * */
-  def apply(a: Double): HDim = index.to(a).lastOption.fold(0){ case (_, idx) => idx + 1 }
+  def apply(a: Double): HDim = index.to(a).lastOption.fold(0) { case (_, idx) => idx + 1 }
 
-  override def equals(other: Any): Boolean = other.isInstanceOf[DividerCmap] &&
-    (divider == other.asInstanceOf[DividerCmap].divider)
+  override def equals(other: Any): Boolean =
+    other.isInstanceOf[DividerCmap] &&
+      (divider == other.asInstanceOf[DividerCmap].divider)
 
   override def toString: String = {
     def divider2Str(divider: List[Prim]): String =
@@ -30,18 +31,21 @@ trait DividerCmap extends Cmap {
         .flatMap {
           case a1 :: a2 :: _ => Some(RangeP(a1, a2))
           case _ => None
-        }.mkString(", ")
+        }
+        .mkString(", ")
 
     val sizeLimit = 100
-    val dividerStr = if(divider.size <= sizeLimit) divider2Str(divider) else
-      s"${divider2Str(divider.take(sizeLimit / 2))}, ......, ${divider2Str(divider.takeRight(sizeLimit / 2))}"
+    val dividerStr =
+      if (divider.size <= sizeLimit) divider2Str(divider)
+      else
+        s"${divider2Str(divider.take(sizeLimit / 2))}, ......, ${divider2Str(divider.takeRight(sizeLimit / 2))}"
 
     s"DividerCmap($dividerStr)"
   }
 
 }
 
-trait DividerCmapOps[DC<:DividerCmap] extends CmapOps[DC] {
+trait DividerCmapOps[DC <: DividerCmap] extends CmapOps[DC] {
 
   def divider2IndexingMap(divider: List[Double]): TreeMap[Double, HDim] =
     TreeMap.apply(divider.sorted.zipWithIndex: _*)

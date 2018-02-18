@@ -2,8 +2,6 @@ package flip
 
 package object measure {
 
-  object syntax
-    extends TrivialMeasures
-      with PrimSyntax
+  object syntax extends TrivialMeasures with PrimSyntax
 
 }

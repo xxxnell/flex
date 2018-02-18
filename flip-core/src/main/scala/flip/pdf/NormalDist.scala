@@ -41,11 +41,8 @@ trait NormalDistOps extends NumericDistOps[NormalDist] {
 
 object NormalDist extends NormalDistOps {
 
-  private case class NormalDistImpl[A](measure: Measure[A],
-                                       conf: SmoothDistConf,
-                                       mean: Prim,
-                                       variance: Prim,
-                                       rng: IRng) extends NormalDist[A]
+  private case class NormalDistImpl[A](measure: Measure[A], conf: SmoothDistConf, mean: Prim, variance: Prim, rng: IRng)
+      extends NormalDist[A]
 
   def apply[A](measure: Measure[A], conf: SmoothDistConf, mean: Prim, variance: Prim): NormalDist[A] =
     bare(measure, conf, mean, variance, IRng(mean.hashCode() + variance.hashCode()))

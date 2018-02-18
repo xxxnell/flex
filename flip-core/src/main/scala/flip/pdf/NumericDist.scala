@@ -16,16 +16,17 @@ trait NumericDist[A] extends SmoothDist[A] {
 
 }
 
-trait NumericDistOps[D[_]<:NumericDist[_]] extends SmoothDistPropOps[D] { self =>
+trait NumericDistOps[D[_] <: NumericDist[_]] extends SmoothDistPropOps[D] { self =>
 
   def modifyRng[A](dist: D[A], f: IRng => IRng): D[A]
 
   def icdf[A](dist: D[A], a: Double): A
 
-  def probability[A](dist: D[A], start: A, end: A): Option[Double] = for {
-    cdfStart <- cdf(dist, start)
-    cdfEnd <- cdf(dist, end)
-  } yield cdfEnd - cdfStart
+  def probability[A](dist: D[A], start: A, end: A): Option[Double] =
+    for {
+      cdfStart <- cdf(dist, start)
+      cdfEnd <- cdf(dist, end)
+    } yield cdfEnd - cdfStart
 
   def sample[A](dist: D[A]): (D[A], A) = {
     val (rng, rand) = dist.rng.next
@@ -39,44 +40,37 @@ object NumericDist extends NumericDistOps[NumericDist] {
 
   // constructor
 
-  def delta[A](pole: A)
-              (implicit measure: Measure[A], conf: SmoothDistConf): DeltaDist[A] =
+  def delta[A](pole: A)(implicit measure: Measure[A], conf: SmoothDistConf): DeltaDist[A] =
     DeltaDist(measure, conf, pole)
 
-  def delta[A](pole: A, rng: IRng)
-              (implicit measure: Measure[A], conf: SmoothDistConf): DeltaDist[A] =
+  def delta[A](pole: A, rng: IRng)(implicit measure: Measure[A], conf: SmoothDistConf): DeltaDist[A] =
     DeltaDist(measure, conf, pole, rng)
 
-  def normal[A](mean: A, variance: Double)
-               (implicit measure: Measure[A], conf: SmoothDistConf): NormalDist[A] =
+  def normal[A](mean: A, variance: Double)(implicit measure: Measure[A], conf: SmoothDistConf): NormalDist[A] =
     NormalDist(mean, variance)
 
-  def normal[A](mean: A, variance: Double, rng: IRng)
-               (implicit measure: Measure[A], conf: SmoothDistConf): NormalDist[A] =
+  def normal[A](mean: A, variance: Double, rng: IRng)(implicit measure: Measure[A],
+                                                      conf: SmoothDistConf): NormalDist[A] =
     NormalDist(mean, variance, rng)
 
-  def logNormal[A](scale: A, shape: Double)
-                  (implicit measure: Measure[A], conf: SmoothDistConf): LogNormalDist[A] =
+  def logNormal[A](scale: A, shape: Double)(implicit measure: Measure[A], conf: SmoothDistConf): LogNormalDist[A] =
     LogNormalDist(scale, shape)
 
-  def logNormal[A](scale: A, shape: Double, rng: IRng)
-                  (implicit measure: Measure[A], conf: SmoothDistConf): LogNormalDist[A] =
+  def logNormal[A](scale: A, shape: Double, rng: IRng)(implicit measure: Measure[A],
+                                                       conf: SmoothDistConf): LogNormalDist[A] =
     LogNormalDist(scale, shape, rng)
 
-  def pareto[A](scale: A, shape: Double)
-               (implicit measure: Measure[A], conf: SmoothDistConf): ParetoDist[A] =
+  def pareto[A](scale: A, shape: Double)(implicit measure: Measure[A], conf: SmoothDistConf): ParetoDist[A] =
     ParetoDist(scale, shape)
 
-  def pareto[A](scale: A, shape: Double, rng: IRng)
-               (implicit measure: Measure[A], conf: SmoothDistConf): ParetoDist[A] =
+  def pareto[A](scale: A, shape: Double, rng: IRng)(implicit measure: Measure[A], conf: SmoothDistConf): ParetoDist[A] =
     ParetoDist(scale, shape, rng)
 
-  def uniform[A](scale: A, width: Double)
-                (implicit measure: Measure[A], conf: SmoothDistConf): UniformDist[A] =
+  def uniform[A](scale: A, width: Double)(implicit measure: Measure[A], conf: SmoothDistConf): UniformDist[A] =
     UniformDist(scale, width)
 
-  def uniform[A](scale: A, width: Double, rng: IRng)
-                (implicit measure: Measure[A], conf: SmoothDistConf): UniformDist[A] =
+  def uniform[A](scale: A, width: Double, rng: IRng)(implicit measure: Measure[A],
+                                                     conf: SmoothDistConf): UniformDist[A] =
     UniformDist(scale, width, rng)
 
   // pipelining

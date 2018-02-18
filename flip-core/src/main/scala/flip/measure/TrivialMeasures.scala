@@ -9,8 +9,8 @@ trait TrivialMeasures {
   implicit val doubleMeasure: Measure[Double] = Measure(identity, identity)
 
   implicit val booleanMeasure: Measure[Boolean] = Measure(
-    (x: Boolean) => if(x) 1 else 0,
-    (y: Double) => if(y > 0.5) true else false
+    (x: Boolean) => if (x) 1 else 0,
+    (y: Double) => if (y > 0.5) true else false
   )
 
 }

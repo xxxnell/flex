@@ -32,9 +32,7 @@ trait Sketch[A] extends DataBinningDist[A] {
 
 }
 
-trait SketchPropOps[S[_]<:Sketch[_]]
-  extends DataBinningDistOps[S]
-    with SketchPropLaws[S] {
+trait SketchPropOps[S[_] <: Sketch[_]] extends DataBinningDistOps[S] with SketchPropLaws[S] {
 
   // create ops
 
@@ -61,29 +59,32 @@ trait SketchPropOps[S[_]<:Sketch[_]]
 
 }
 
-trait SketchPropLaws[S[_]<:Sketch[_]] { self: SketchPropOps[S] =>
+trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
 
   def flatDensity: Double = (1 / Cmap.max) * (1 / (1 - Cmap.min / Cmap.max))
 
-  def probability[A](sketch: S[A], start: A, end: A): Option[Double] = for {
-    count <- count(sketch, start, end)
-    sum = self.sum(sketch)
-    measure = sketch.measure.asInstanceOf[Measure[A]]
-  } yield if(sum > 0) count / sum else flatDensity * RangeM.bare(start, end, measure).roughLength
+  def probability[A](sketch: S[A], start: A, end: A): Option[Double] =
+    for {
+      count <- count(sketch, start, end)
+      sum = self.sum(sketch)
+      measure = sketch.measure.asInstanceOf[Measure[A]]
+    } yield if (sum > 0) count / sum else flatDensity * RangeM.bare(start, end, measure).roughLength
 
   def rearrange[A](sketch: S[A]): Option[S[A]] = deepUpdate(sketch, Nil).map(_._1)
 
-  def sampling[A](sketch: S[A]): Option[DensityPlot] = for {
-    sps <- samplingPoints(sketch)
-    sampling <- samplingForRanges(sketch, sps)
-  } yield sampling
+  def sampling[A](sketch: S[A]): Option[DensityPlot] =
+    for {
+      sps <- samplingPoints(sketch)
+      sampling <- samplingForRanges(sketch, sps)
+    } yield sampling
 
-  def samplingPoints[A](sketch: S[A]): Option[List[RangeM[A]]] = for {
-    cmap <- youngCmap(sketch)
-    rangePs = cmap.bin
-    measure = sketch.measure.asInstanceOf[Measure[A]]
-    rangeMs = rangePs.map(rangeP => rangeP.modifyMeasure(measure))
-  } yield rangeMs
+  def samplingPoints[A](sketch: S[A]): Option[List[RangeM[A]]] =
+    for {
+      cmap <- youngCmap(sketch)
+      rangePs = cmap.bin
+      measure = sketch.measure.asInstanceOf[Measure[A]]
+      rangeMs = rangePs.map(rangeP => rangeP.modifyMeasure(measure))
+    } yield rangeMs
 
   def samplingForRanges[A](sketch: S[A], ranges: List[RangeM[A]]): Option[DensityPlot] = {
     for {
@@ -94,62 +95,71 @@ trait SketchPropLaws[S[_]<:Sketch[_]] { self: SketchPropOps[S] =>
     } yield DensityPlot.disjoint(rangeDensities)
   }
 
-  def fastPdf[A](sketch: S[A], a: A): Option[Double] = for {
-    cmap <- youngCmap(sketch)
-    p = sketch.measure.asInstanceOf[Measure[A]].to(a)
-    idx = cmap(p)
-    rangePs = cmap.range(idx - 1) :: cmap.range(idx) :: cmap.range(idx + 1) :: Nil
-    rangeMs = rangePs.map(rangeP => rangeP.modifyMeasure(sketch.measure.asInstanceOf[Measure[A]]))
-    sampling <- samplingForRanges(sketch, rangeMs)
-  } yield sampling.interpolation(p)
+  def fastPdf[A](sketch: S[A], a: A): Option[Double] =
+    for {
+      cmap <- youngCmap(sketch)
+      p = sketch.measure.asInstanceOf[Measure[A]].to(a)
+      idx = cmap(p)
+      rangePs = cmap.range(idx - 1) :: cmap.range(idx) :: cmap.range(idx + 1) :: Nil
+      rangeMs = rangePs.map(rangeP => rangeP.modifyMeasure(sketch.measure.asInstanceOf[Measure[A]]))
+      sampling <- samplingForRanges(sketch, rangeMs)
+    } yield sampling.interpolation(p)
 
-  override def cdf[A](sketch: S[A], a: A): Option[Double] = for {
-    cdf <- cdfPlot(sketch)
-    p = sketch.measure.asInstanceOf[Measure[A]].to(a)
-  } yield cdf.interpolation(p)
+  override def cdf[A](sketch: S[A], a: A): Option[Double] =
+    for {
+      cdf <- cdfPlot(sketch)
+      p = sketch.measure.asInstanceOf[Measure[A]].to(a)
+    } yield cdf.interpolation(p)
 
-  def cdfPlot[A](sketch: S[A]): Option[DensityPlot] = for {
-    pdf <- sampling(sketch)
-    cdf = pdf.cumulative
-  } yield cdf
+  def cdfPlot[A](sketch: S[A]): Option[DensityPlot] =
+    for {
+      pdf <- sampling(sketch)
+      cdf = pdf.cumulative
+    } yield cdf
 
-  def median[A](sketch: S[A]): Option[Double] = for {
-    cdf <- cdfPlot(sketch)
-    icdf = cdf.inverse
-  } yield icdf.interpolation(0.5)
+  def median[A](sketch: S[A]): Option[Double] =
+    for {
+      cdf <- cdfPlot(sketch)
+      icdf = cdf.inverse
+    } yield icdf.interpolation(0.5)
 
   def cmapNo(sketch: S[_]): Int = sketch.structures.size
 
-  def cmapSize(sketch: S[_]): Int = (for {
-    structure <- sketch.structures.headOption
-    (cmap, _) = structure
-  } yield cmap.size).getOrElse(0)
+  def cmapSize(sketch: S[_]): Int =
+    (for {
+      structure <- sketch.structures.headOption
+      (cmap, _) = structure
+    } yield cmap.size).getOrElse(0)
 
-  def counterNo(sketch: S[_]): Int = (for {
-    structure <- sketch.structures.headOption
-    (_, hcounter) = structure
-  } yield hcounter.depth).getOrElse(0)
+  def counterNo(sketch: S[_]): Int =
+    (for {
+      structure <- sketch.structures.headOption
+      (_, hcounter) = structure
+    } yield hcounter.depth).getOrElse(0)
 
-  def counterSize(sketch: S[_]): Int = (for {
-    structure <- sketch.structures.headOption
-    (_, hcounter) = structure
-  } yield hcounter.width).getOrElse(0)
+  def counterSize(sketch: S[_]): Int =
+    (for {
+      structure <- sketch.structures.headOption
+      (_, hcounter) = structure
+    } yield hcounter.width).getOrElse(0)
 
-  def youngCmap(sketch: S[_]): Option[Cmap] = for {
-    structure <- sketch.structures.headOption
-    cmap = structure._1
-  } yield cmap
+  def youngCmap(sketch: S[_]): Option[Cmap] =
+    for {
+      structure <- sketch.structures.headOption
+      cmap = structure._1
+    } yield cmap
 
-  def domain[A](sketch: S[A]): Option[RangeM[A]] = for {
-    youngCmap <- youngCmap(sketch)
-    head = youngCmap.headRange.start
-    last = youngCmap.lastRange.end
-    measure = sketch.measure.asInstanceOf[Measure[A]]
-  } yield RangeM(measure.from(head), measure.from(last))(measure)
+  def domain[A](sketch: S[A]): Option[RangeM[A]] =
+    for {
+      youngCmap <- youngCmap(sketch)
+      head = youngCmap.headRange.start
+      last = youngCmap.lastRange.end
+      measure = sketch.measure.asInstanceOf[Measure[A]]
+    } yield RangeM(measure.from(head), measure.from(last))(measure)
 
   def structures(conf: SketchConf): Structures = {
     val counter =
-      if(conf.cmap.size > conf.counter.size) HCounter(conf.counter, -1)
+      if (conf.cmap.size > conf.counter.size) HCounter(conf.counter, -1)
       else HCounter.emptyUncompressed(conf.cmap.size)
 
     (Cmap(conf.cmap), counter) :: Nil
@@ -158,10 +168,15 @@ trait SketchPropLaws[S[_]<:Sketch[_]] { self: SketchPropOps[S] =>
   def concatStructures[A](as: List[(A, Count)], measure: Measure[A], conf: SketchConf): Structures = {
     val ps = as.map { case (a, c) => (measure.to(a), c) }
     val cmap = EqualSpaceCdfUpdate.updateCmap(
-      DensityPlot.empty, ps, 1000, conf.dataKernelWindow, conf.boundaryCorrection, conf.cmap.size
+      DensityPlot.empty,
+      ps,
+      1000,
+      conf.dataKernelWindow,
+      conf.boundaryCorrection,
+      conf.cmap.size
     )
     val counter =
-      if(conf.cmap.size > conf.counter.size) HCounter(conf.counter, -1)
+      if (conf.cmap.size > conf.counter.size) HCounter(conf.counter, -1)
       else HCounter.emptyUncompressed(conf.cmap.size)
 
     (cmap, counter) :: Nil
@@ -182,8 +197,7 @@ object Sketch extends SketchPrimPropOps[Sketch] { self =>
     case _ => SimpleSketch.empty(measure, conf)
   }
 
-  def concat[A](ps: List[(A, Count)])
-               (implicit measure: Measure[A], conf: SketchConf): Sketch[A] = conf match {
+  def concat[A](ps: List[(A, Count)])(implicit measure: Measure[A], conf: SketchConf): Sketch[A] = conf match {
     case conf: PeriodicSketchConf => PeriodicSketch.concat(ps)(measure, conf)
     case _ => SimpleSketch.concat(ps)(measure, conf)
   }
@@ -217,8 +231,7 @@ object Sketch extends SketchPrimPropOps[Sketch] { self =>
     case _ => super.sum(sketch)
   }
 
-  override def narrowUpdate[A](sketch: Sketch[A],
-                               as: List[(A, Count)]): Option[Sketch[A]] = sketch match {
+  override def narrowUpdate[A](sketch: Sketch[A], as: List[(A, Count)]): Option[Sketch[A]] = sketch match {
     case (sketch: AdaptiveSketch[A]) => AdaptiveSketch.narrowUpdate(sketch, as)
     case _ => super.narrowUpdate(sketch, as)
   }

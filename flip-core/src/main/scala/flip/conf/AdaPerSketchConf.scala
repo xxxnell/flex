@@ -3,11 +3,7 @@ package flip.conf
 /**
   * A configuration for AdaPerSketch.
   * */
-trait AdaPerSketchConf
-  extends AdaptiveSketchConf
-    with PeriodicSketchConf {
-
-}
+trait AdaPerSketchConf extends AdaptiveSketchConf with PeriodicSketchConf {}
 
 trait CustomAdaPerSketchConf extends AdaPerSketchConf with CustomSketchConf
 
@@ -24,7 +20,7 @@ object AdaPerSketchConf {
                                           bindSampling: Int,
                                           cmap: CmapConf,
                                           counter: CounterConf)
-    extends CustomAdaPerSketchConf
+      extends CustomAdaPerSketchConf
 
   def custom(delta: Double,
              mixingRatio: Double,

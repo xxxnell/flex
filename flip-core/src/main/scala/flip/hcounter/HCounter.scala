@@ -28,16 +28,18 @@ trait HCounter {
 
 }
 
-trait HCounterOps[HC<:HCounter] {
+trait HCounterOps[HC <: HCounter] {
 
-  def update(hc: HCounter, hdim: HDim, count: Double): Option[HCounter] = for {
-    updated <- hc.structures.traverse { case (hmap, counter) =>
-      for {
-        cdim <- hmap.apply(hdim, counter.size)
-        utdCounter <- counter.update(cdim, count)
-      } yield (hmap, utdCounter)
-    }
-  } yield HCounter(updated, hc.sum + count)
+  def update(hc: HCounter, hdim: HDim, count: Double): Option[HCounter] =
+    for {
+      updated <- hc.structures.traverse {
+        case (hmap, counter) =>
+          for {
+            cdim <- hmap.apply(hdim, counter.size)
+            utdCounter <- counter.update(cdim, count)
+          } yield (hmap, utdCounter)
+      }
+    } yield HCounter(updated, hc.sum + count)
 
   def updates(hc: HCounter, as: List[(HDim, Count)]): Option[HCounter] =
     as.foldLeft(Option(hc)) { case (hcO, (hdim, count)) => hcO.flatMap(hc => hc.update(hdim, count)) }
@@ -53,7 +55,7 @@ trait HCounterOps[HC<:HCounter] {
       i += 1
     }
 
-    if(!count.isPosInfinity) Some(count) else None
+    if (!count.isPosInfinity) Some(count) else None
   }
 
   def sum(hc: HCounter): Double = hc.sum
@@ -61,7 +63,7 @@ trait HCounterOps[HC<:HCounter] {
   def count(hc: HCounter, start: HDim, end: HDim): Option[Double] = {
     var hdim = start
     var sum = 0.0
-    while(hdim <= end) {
+    while (hdim <= end) {
       sum += get(hc, hdim).getOrElse(0.0)
       hdim += 1
     }
@@ -70,7 +72,7 @@ trait HCounterOps[HC<:HCounter] {
 
   def depth(hc: HCounter): Int = hc.structures.size
 
-  def width(hc: HCounter): Int = hc.structures.headOption.fold(0){ case (_, counter) => counter.size }
+  def width(hc: HCounter): Int = hc.structures.headOption.fold(0) { case (_, counter) => counter.size }
 
 }
 

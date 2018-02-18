@@ -49,8 +49,7 @@ trait SketchMonadSyntax {
   implicit class SketchMonadSyntaxImpl[A](sketch: Sketch[A]) {
     def map[B](f: A => B)(implicit measureB: Measure[B]): Sketch[B] =
       sketchMonad.map(sketch, f, measureB)
-    def flatMap[B, S1<:Sketch[_], S2<:Sketch[_]](f: A => Dist[B])
-                                                (implicit measureB: Measure[B]): Sketch[B] =
+    def flatMap[B, S1 <: Sketch[_], S2 <: Sketch[_]](f: A => Dist[B])(implicit measureB: Measure[B]): Sketch[B] =
       sketchMonad.bind(sketch, f, measureB)
   }
 

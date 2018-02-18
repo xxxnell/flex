@@ -1,5 +1,3 @@
 package flip
 
-package object hcounter extends HCounterSyntax {
-
-}
+package object hcounter extends HCounterSyntax {}

@@ -7,7 +7,7 @@ trait ListCounter extends Counter {
 trait ListCounterOp extends CounterOps[ListCounter] {
 
   def update(counter: ListCounter, cdim: CDim, count: Double): Option[ListCounter] = {
-    if(cdim >=0 && cdim < size(counter)) {
+    if (cdim >= 0 && cdim < size(counter)) {
       Some(ListCounter(counter.counts.updated(cdim, counter.counts.apply(cdim) + count)))
     } else None
   }

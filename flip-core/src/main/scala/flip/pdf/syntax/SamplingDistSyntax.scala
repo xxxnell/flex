@@ -6,9 +6,7 @@ import flip.pdf.monad.SamplingDistMonad
 import flip.pdf.{Dist, SamplingDist}
 import flip.plot.DensityPlot
 
-trait SamplingDistSyntax
-  extends SamplingDistPropSyntax
-    with SamplingDistMonadSyntax
+trait SamplingDistSyntax extends SamplingDistPropSyntax with SamplingDistMonadSyntax
 
 trait SamplingDistPropSyntax {
 

@@ -17,7 +17,7 @@ trait PlottedDist[A] extends SamplingDist[A] {
 
 }
 
-trait PlottedDistPropOps[D[_]<:PlottedDist[_]] extends SamplingDistPropOps[D] {
+trait PlottedDistPropOps[D[_] <: PlottedDist[_]] extends SamplingDistPropOps[D] {
 
   def sampling[A](dist: D[A]): Option[DensityPlot] = Some(dist.sampling)
 
@@ -37,9 +37,8 @@ trait PlottedDistPropOps[D[_]<:PlottedDist[_]] extends SamplingDistPropOps[D] {
 
 object PlottedDist extends PlottedDistPropOps[PlottedDist] {
 
-  case class PlottedDistImpl[A](measure: Measure[A],
-                                sampling: DensityPlot,
-                                conf: SamplingDistConf) extends PlottedDist[A]
+  case class PlottedDistImpl[A](measure: Measure[A], sampling: DensityPlot, conf: SamplingDistConf)
+      extends PlottedDist[A]
 
   def bare[A](measure: Measure[A], densityPlot: DensityPlot, conf: SamplingDistConf): PlottedDist[A] =
     PlottedDistImpl(measure, densityPlot, conf)

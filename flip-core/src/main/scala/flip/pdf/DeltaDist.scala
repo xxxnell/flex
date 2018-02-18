@@ -10,22 +10,21 @@ import flip.range._
   *
   * @see <a href="https://en.wikipedia.org/wiki/Dirac_delta_function">Dirac delta function - Wikipedia</a>
   */
-case class DeltaDist[A](measure: Measure[A], conf: SmoothDistConf, pole: A, rng: IRng = IRng(0))
-  extends NumericDist[A]
+case class DeltaDist[A](measure: Measure[A], conf: SmoothDistConf, pole: A, rng: IRng = IRng(0)) extends NumericDist[A]
 
 trait DeltaDistOps extends NumericDistOps[DeltaDist] {
 
   override def pdf[A](dist: DeltaDist[A], a: A): Option[Double] = {
     val pole = dist.measure.to(dist.pole)
 
-    if(a != pole) Some(0) else Some(Double.PositiveInfinity)
+    if (a != pole) Some(0) else Some(Double.PositiveInfinity)
   }
 
   override def cdf[A](dist: DeltaDist[A], a: A): Option[Double] = {
     val p = dist.measure.to(a)
     val pole = dist.measure.to(dist.pole)
 
-    if(p >= pole) Some(1) else Some(0)
+    if (p >= pole) Some(1) else Some(0)
   }
 
   def icdf[A](dist: DeltaDist[A], p: Double): A = dist.pole

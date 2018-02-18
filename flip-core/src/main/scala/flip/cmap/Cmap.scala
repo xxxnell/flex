@@ -19,7 +19,7 @@ trait Cmap {
 
 }
 
-trait CmapOps[C<:Cmap] extends CmapLaws[C] {
+trait CmapOps[C <: Cmap] extends CmapLaws[C] {
 
   val min: Prim = Double.MinValue
 
@@ -33,7 +33,7 @@ trait CmapOps[C<:Cmap] extends CmapLaws[C] {
 
 }
 
-trait CmapLaws[C<:Cmap] { self: CmapOps[C] =>
+trait CmapLaws[C <: Cmap] { self: CmapOps[C] =>
 
   def kleisli(cmap: Cmap): Kleisli[Option, Prim, HDim] = Kleisli[Option, Double, HDim](a => Some(cmap.apply(a)))
 
@@ -44,7 +44,7 @@ trait CmapLaws[C<:Cmap] { self: CmapOps[C] =>
   def lastRange(cmap: C): RangeP = {
     val size = self.size(cmap)
 
-    range(cmap, if(size > 0) size - 1 else 0)
+    range(cmap, if (size > 0) size - 1 else 0)
   }
 
 }

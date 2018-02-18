@@ -14,9 +14,9 @@ object SimpleSketchConf {
                                           bindSampling: Int,
                                           cmap: CmapConf,
                                           counter: CounterConf)
-    extends CustomSimpleSketchConf
+      extends CustomSimpleSketchConf
 
-  def apply(// dist
+  def apply( // dist
             delta: Double = DefaultSketchConf.delta,
             // deepUpdate
             mixingRatio: Double = DefaultSketchConf.mixingRatio,
@@ -36,9 +36,13 @@ object SimpleSketchConf {
     val counterConf = CounterConf(counterSize, counterNo)
     SimpleSketchConf.custom(
       delta,
-      mixingRatio, dataKernelWindow, decayFactor, boundaryCorr,
+      mixingRatio,
+      dataKernelWindow,
+      decayFactor,
+      boundaryCorr,
       bindSampling,
-      cmapConf, counterConf
+      cmapConf,
+      counterConf
     )
   }
 
@@ -52,9 +56,13 @@ object SimpleSketchConf {
              counterConf: CounterConf): CustomSimpleSketchConf =
     SimpleSketchConfImpl(
       delta,
-      mixingRatio, dataKernelWindow, decayFactor, boundaryCorr,
+      mixingRatio,
+      dataKernelWindow,
+      decayFactor,
+      boundaryCorr,
       bindSampling,
-      cmapConf, counterConf
+      cmapConf,
+      counterConf
     )
 
 }

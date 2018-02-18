@@ -19,8 +19,9 @@ trait Hmap {
 
 trait HmapOps {
 
-  def kleisli(hmap: Hmap): Epi[(HDim, Int), CDim] = Kleisli[Option, (HDim, Int), CDim]{ case (hdim, size) =>
-    hmap.apply(hdim, size)
+  def kleisli(hmap: Hmap): Epi[(HDim, Int), CDim] = Kleisli[Option, (HDim, Int), CDim] {
+    case (hdim, size) =>
+      hmap.apply(hdim, size)
   }
 
 }
@@ -42,4 +43,3 @@ object Hmap extends HmapOps {
   def identity: IdentityHmap = IdentityHmap()
 
 }
-

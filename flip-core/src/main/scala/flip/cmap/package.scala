@@ -1,5 +1,3 @@
 package flip
 
-package object cmap extends CmapSyntax {
-
-}
+package object cmap extends CmapSyntax {}

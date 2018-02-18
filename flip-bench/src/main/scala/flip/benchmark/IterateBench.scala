@@ -41,10 +41,15 @@ class IterateBench {
   @Setup
   def setupSketch(): Unit = {
     implicit val conf: SketchConf = SketchConf(
-      startThreshold = 100, thresholdPeriod = 100,
+      startThreshold = 100,
+      thresholdPeriod = 100,
       queueSize = queueSize,
-      cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = Some(-10d), cmapEnd = Some(10d),
-      counterSize = counterSize, counterNo = counterNo
+      cmapSize = cmapSize,
+      cmapNo = cmapNo,
+      cmapStart = Some(-10d),
+      cmapEnd = Some(10d),
+      counterSize = counterSize,
+      counterNo = counterNo
     )
 
     signals = SignalOps.normalSignals(iterateBenchSize)

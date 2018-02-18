@@ -6,8 +6,8 @@ import flip.pdf.{DeltaDist, Dist, Prim, SamplingDist, Sketch}
 
 import scala.language.higherKinds
 
-trait DistMonad[D1[_]<:Dist[_], D2[_]<:Dist[_], D3[_]<:Dist[_]]
-  extends DistMonadLaws[D1, D2, D3]
+trait DistMonad[D1[_] <: Dist[_], D2[_] <: Dist[_], D3[_] <: Dist[_]]
+    extends DistMonadLaws[D1, D2, D3]
     with DistFunctor[D1] {
 
   def pure[A](a: A, measure: Measure[A]): Dist[A] = {
@@ -19,7 +19,7 @@ trait DistMonad[D1[_]<:Dist[_], D2[_]<:Dist[_], D3[_]<:Dist[_]]
 
 }
 
-trait DistMonadLaws[D1[_]<:Dist[_], D2[_]<:Dist[_], D3[_]<:Dist[_]] { self: DistMonad[D1, D2, D3] =>
+trait DistMonadLaws[D1[_] <: Dist[_], D2[_] <: Dist[_], D3[_] <: Dist[_]] { self: DistMonad[D1, D2, D3] =>
 
 //  def map[A, B](dist: D1[A], f: A => B, measureB: Measure[B]): D1[B] =
 //    bind(dist, (a: A) => pure(f(a), measureB), measureB)

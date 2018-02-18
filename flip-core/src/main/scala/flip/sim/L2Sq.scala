@@ -25,10 +25,10 @@ object L2Sq {
 
   private case class L2SqImpl(norm1: Double, norm2: Double) extends L2Sq
 
-  def apply[A](d1: SamplingDist[A],
-               d2: Dist[A]): L2Sq = {
+  def apply[A](d1: SamplingDist[A], d2: Dist[A]): L2Sq = {
     val norm1 = Hilbert.normForSamplingDist(d1)
-    val norm2 = d2.sampling(d1)
+    val norm2 = d2
+      .sampling(d1)
       .map(plottedD2 => Hilbert.normForSamplingDist(plottedD2))
       .getOrElse(Double.PositiveInfinity)
 

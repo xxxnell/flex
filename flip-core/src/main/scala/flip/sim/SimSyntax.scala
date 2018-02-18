@@ -3,10 +3,7 @@ package flip.sim
 import flip.pdf.{Dist, SamplingDist}
 import flip.plot.DensityPlot
 
-trait SimSyntax
-  extends ConsineSyntax
-    with KLDSyntax
-    with L2SqSyntax
+trait SimSyntax extends ConsineSyntax with KLDSyntax with L2SqSyntax
 
 trait ConsineSyntax {
 

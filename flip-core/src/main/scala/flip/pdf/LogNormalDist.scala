@@ -45,7 +45,7 @@ trait LogNormalDistOps extends NumericDistOps[LogNormalDist] {
 object LogNormalDist extends LogNormalDistOps {
 
   private case class LogNormalDistImpl[A](measure: Measure[A], conf: SmoothDistConf, scale: A, shape: Prim, rng: IRng)
-    extends LogNormalDist[A]
+      extends LogNormalDist[A]
 
   def apply[A](scale: A, shape: Prim)(implicit measure: Measure[A], conf: SmoothDistConf): LogNormalDist[A] =
     bare(measure, conf, scale, shape, IRng(scale.hashCode() + shape.toInt))

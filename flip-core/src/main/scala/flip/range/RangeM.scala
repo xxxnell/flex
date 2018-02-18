@@ -26,67 +26,68 @@ trait RangeM[A] {
   override def toString: String = s"[$start..$end]"
 }
 
-trait RangeMOps[Γ, R[_]<:RangeM[_]] {
+trait RangeMOps[Γ, R[_] <: RangeM[_]] {
 
-  def modifyRange[A<:Γ](range: R[A], f: (A, A) => (A, A)): R[A]
+  def modifyRange[A <: Γ](range: R[A], f: (A, A) => (A, A)): R[A]
 
-  def modifyMeasure[A<:Γ, B](range: R[A], measure: Measure[B]): R[B]
+  def modifyMeasure[A <: Γ, B](range: R[A], measure: Measure[B]): R[B]
 
-  def setRange[A<:Γ](range: R[A], start: A, end: A): R[A] =
+  def setRange[A <: Γ](range: R[A], start: A, end: A): R[A] =
     modifyRange(range, (_: A, _: A) => (start, end))
 
-  def startP[A<:Γ](range: R[A]): Prim = range.measure.asInstanceOf[Measure[A]].to(range.start.asInstanceOf[A])
+  def startP[A <: Γ](range: R[A]): Prim = range.measure.asInstanceOf[Measure[A]].to(range.start.asInstanceOf[A])
 
-  def endP[A<:Γ](range: R[A]): Prim = range.measure.asInstanceOf[Measure[A]].to(range.end.asInstanceOf[A])
+  def endP[A <: Γ](range: R[A]): Prim = range.measure.asInstanceOf[Measure[A]].to(range.end.asInstanceOf[A])
 
-  def rangeP[A<:Γ](range: R[A]): (Prim, Prim) = (startP(range), endP(range))
+  def rangeP[A <: Γ](range: R[A]): (Prim, Prim) = (startP(range), endP(range))
 
   def containsP(start: Prim, end: Prim, p: Prim): Boolean = {
     ((start >= p) && (end <= p)) ||
-      ((start <= p) && (end >= p))
+    ((start <= p) && (end >= p))
   }
 
-  def contains[A<:Γ](range: R[A], a: A): Boolean = {
+  def contains[A <: Γ](range: R[A], a: A): Boolean = {
     containsP(startP(range), endP(range), range.measure.asInstanceOf[Measure[A]].to(a))
   }
 
-  def greater[A<:Γ](range: R[A], a: A): Boolean = startP(range) > range.measure.asInstanceOf[Measure[A]].to(a)
+  def greater[A <: Γ](range: R[A], a: A): Boolean = startP(range) > range.measure.asInstanceOf[Measure[A]].to(a)
 
-  def less[A<:Γ](range: R[A], a: A): Boolean = endP(range) < range.measure.asInstanceOf[Measure[A]].to(a)
+  def less[A <: Γ](range: R[A], a: A): Boolean = endP(range) < range.measure.asInstanceOf[Measure[A]].to(a)
 
   def middleP(start: Prim, end: Prim): Prim = {
-    if(start == Double.NegativeInfinity && end == Double.NegativeInfinity) Double.NegativeInfinity
-    else if(start == Double.PositiveInfinity && end == Double.PositiveInfinity) Double.PositiveInfinity
+    if (start == Double.NegativeInfinity && end == Double.NegativeInfinity) Double.NegativeInfinity
+    else if (start == Double.PositiveInfinity && end == Double.PositiveInfinity) Double.PositiveInfinity
     else start + ((end - start) / 2)
   }
 
-  def middle[A<:Γ](range: R[A]): A =
+  def middle[A <: Γ](range: R[A]): A =
     range.measure.asInstanceOf[Measure[A]].from(middleP(startP(range), endP(range)))
 
-  def isForward[A<:Γ](range: R[A]): Boolean = if(endP(range) - startP(range) >= 0) true else false
+  def isForward[A <: Γ](range: R[A]): Boolean = if (endP(range) - startP(range) >= 0) true else false
 
-  def isPoint(range: R[_]): Boolean = if(range.start == range.end) true else false
+  def isPoint(range: R[_]): Boolean = if (range.start == range.end) true else false
 
-  def length[A<:Γ](range: R[A]): BigDecimal = {
+  def length[A <: Γ](range: R[A]): BigDecimal = {
     BigDecimal(endP(range)) - BigDecimal(startP(range))
   }
 
-  def roughLength[A<:Γ](range: R[A]): Double = {
+  def roughLength[A <: Γ](range: R[A]): Double = {
     val roughLength = endP(range) - startP(range)
-    if(roughLength.isPosInfinity) Double.MaxValue
-    else if(roughLength.isNegInfinity) Double.MinValue
+    if (roughLength.isPosInfinity) Double.MaxValue
+    else if (roughLength.isNegInfinity) Double.MinValue
     else roughLength
   }
 
-  def uniformSplit[A<:Γ](range: R[A], size: Int): List[R[A]] = {
+  def uniformSplit[A <: Γ](range: R[A], size: Int): List[R[A]] = {
     val measure = range.measure.asInstanceOf[Measure[A]]
     val (startP, endP) = rangeP(range)
     val unit = (endP - startP) / size
     lazy val unitB = (BigDecimal(endP) - BigDecimal(startP)) / size
 
     (0 until size).toList
-      .map(i => if(!unit.isNaN && !unit.isInfinity) startP + i * unit else (startP + i * unitB).toDouble)
-      .sliding(2).toList
+      .map(i => if (!unit.isNaN && !unit.isInfinity) startP + i * unit else (startP + i * unitB).toDouble)
+      .sliding(2)
+      .toList
       .flatMap {
         case p1 :: p2 :: Nil => Some(setRange(range, measure.from(p1), measure.from(p2)))
         case _ => None
@@ -102,7 +103,7 @@ object RangeM extends RangeMOps[Any, RangeM] {
   def apply[A](start: A, end: A)(implicit measure: Measure[A]): RangeM[A] = bare(start, end, measure)
 
   def bare[A](start: A, end: A, measure: Measure[A]): RangeM[A] = {
-    if(measure(start) < measure(end)) RangeMImpl(start, end, measure) else RangeMImpl(end, start, measure)
+    if (measure(start) < measure(end)) RangeMImpl(start, end, measure) else RangeMImpl(end, start, measure)
   }
 
   def modifyRange[A](range: RangeM[A], f: (A, A) => (A, A)): RangeM[A] = {

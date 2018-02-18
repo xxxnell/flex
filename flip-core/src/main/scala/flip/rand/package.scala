@@ -1,6 +1,3 @@
 package flip
 
-package object rand
-  extends IRngSyntax {
-
-}
+package object rand extends IRngSyntax {}

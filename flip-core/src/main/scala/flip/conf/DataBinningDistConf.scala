@@ -1,5 +1,3 @@
 package flip.conf
 
-trait DataBinningDistConf extends SamplingDistConf {
-
-}
+trait DataBinningDistConf extends SamplingDistConf {}
