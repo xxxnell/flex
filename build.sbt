@@ -1,22 +1,25 @@
-import Dependencies._
-import Resolvers._
 import sbt.Keys._
+import flip.Dependencies._
+import flip.FlipBuilds
+import flip.Releases
 
-name := "scope-sketch"
+name := "flip"
 
-version := s"1.0$snapshot"
+lazy val root = project
+  .in(file("."))
+  .settings(moduleName := "root")
+  .settings(Releases.noPublishSettings)
+  .aggregate(flipCore, flipBench)
 
-scalaVersion := "2.11.8"
+lazy val flipCore = flipModule("flip-core")
+  .settings(moduleName := "flip", name := "Flip core")
+  .settings(Releases.publishSettings)
 
-val commonSettings = Seq(
+lazy val flipBench = flipModule("flip-bench")
+  .settings(moduleName := "flip-bench", name := "Flip benchmarks")
+  .settings(Releases.noPublishSettings)
+  .dependsOn(flipCore)
 
-  libraryDependencies ++= (cats ++ monixs),
-
-  resolvers ++= typesafeRepo
-
-)
-
-lazy val scope_sketch = (project in file("."))
-  .settings(
-    libraryDependencies ++= (cats ++ monixs ++ specs)
-  )
+def flipModule(name: String): Project =
+  Project(id = name, base = file(name))
+    .settings(FlipBuilds.buildSettings)

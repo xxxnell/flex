@@ -1,23 +1,42 @@
+package flip
+
 import sbt._
+import sbt.Keys.libraryDependencies
 
 object Dependencies {
 
-  val snapshot = "-SNAPSHOT"
-
   val cats = Seq(
-    "org.typelevel" %% "cats" % "0.9.0"
+    "org.typelevel" %% "cats" % Versions.cats
   )
 
   val monixs = Seq(
-    "io.monix" %% "monix" % "2.2.2"
+    "io.monix" %% "monix" % Versions.monix
   )
 
-  val specs2Version = "3.7"
-  val specs = Seq(
-    "org.specs2" % "specs2-core_2.11" % specs2Version % "test",
-    "org.specs2" % "specs2-mock_2.11" % specs2Version % "test",
-    "org.specs2" % "specs2-junit_2.11" % specs2Version % "test",
-    "org.specs2" % "specs2-scalacheck_2.11" % specs2Version % "test"
+  val tics = Seq(
+    "org.scalactic" %% "scalactic" % Versions.scalactic
   )
+
+  val datetime = Seq(
+    "com.github.nscala-time" %% "nscala-time" % Versions.nscalaTime
+  )
+
+  val specs2Version = Versions.specs2
+  val specs = Seq(
+    "org.specs2" %% "specs2-core",
+    "org.specs2" %% "specs2-mock",
+    "org.specs2" %% "specs2-junit",
+    "org.specs2" %% "specs2-scalacheck"
+  ).map(_ % specs2Version % Test)
+
+  val math = Seq(
+    "org.apache.commons" % "commons-math3" % Versions.commonsMath3
+  )
+
+  // project dependencies
+
+  val core = libraryDependencies ++= (cats ++ monixs ++ specs ++ tics ++ math)
+
+  val bench = libraryDependencies ++= (specs ++ tics ++ datetime)
 
 }

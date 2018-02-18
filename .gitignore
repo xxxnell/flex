@@ -1,2 +1,5 @@
 .idea
 target
+benchmarks
+experiments
+flip-docs/resources/__pycache__
