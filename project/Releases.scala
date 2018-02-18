@@ -14,11 +14,7 @@ trait ReleaseProcess {
   def developBranch = "develop"
 
   def mainBranch: String = {
-    val mainBranch: String = sys.env.getOrElse("TRAVIS_BRANCH", currentBranch)
-
-    { s"echo 'main branch: $mainBranch'" ! }
-
-    mainBranch
+    sys.env.getOrElse("TRAVIS_BRANCH", currentBranch)
   }
 
   def currentBranch: String = {
@@ -27,50 +23,53 @@ trait ReleaseProcess {
     parsed
   }
 
-  def checkout(name: String) = ReleaseStep(action = state => {
-    { s"echo checkout to $name" ! }
-    val res = { s"git checkout $name" ! }
+  def checkout(name: String) =
+    ReleaseStep(action = state => {
+      { s"echo checkout to $name" ! }
+      val res = { s"git checkout $name" ! }
 
-    if(res != 0) {
-      sys.error(s"Checkout error occurs.")
-    }
+      if (res != 0) {
+        sys.error(s"Checkout error occurs.")
+      }
 
-    state
-  })
+      state
+    })
 
-  // merge master into develop
-  def merge(name: String) = ReleaseStep(action = state => {
-    { s"echo Merging $name" ! }
-    val res = { s"git merge $name" ! }
+  def merge(name: String) =
+    ReleaseStep(action = state => {
+      { s"echo Merging $name" ! }
+      val res = { s"git merge $name" ! }
 
-    if(res != 0) {
-      sys.error(s"Conflict occurs: -> $name")
-    }
+      if (res != 0) {
+        sys.error(s"Conflict occurs: -> $name")
+      }
 
-    state
-  })
+      state
+    })
 
-  def push(name: String) = ReleaseStep(action = state => {
-    { s"echo Pushing $name branch." ! }
-    val res = { s"git push origin $name" ! }
+  def push(name: String) =
+    ReleaseStep(action = state => {
+      { s"echo Pushing $name branch." ! }
+      val res = { s"git push origin $name" ! }
 
-    if(res != 0) {
-      sys.error(s"Push error occurs: branch $name")
-    }
+      if (res != 0) {
+        sys.error(s"Push error occurs: branch $name")
+      }
 
-    state
-  })
+      state
+    })
 
-  def pushTags = ReleaseStep(action = state => {
-    { "echo Pushing tags." ! }
-    val res = { "git push --tags" ! }
+  def pushTags =
+    ReleaseStep(action = state => {
+      { "echo Pushing tags." ! }
+      val res = { "git push --tags" ! }
 
-    if(res != 0) {
-      sys.error("Push Tag error occurs.")
-    }
+      if (res != 0) {
+        sys.error("Push Tag error occurs.")
+      }
 
-    state
-  })
+      state
+    })
 
 }
 
