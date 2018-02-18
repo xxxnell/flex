@@ -7,7 +7,7 @@ import Resolvers._
 object FlipBuilds {
 
   val buildSettings = Seq(
-    version := s"1.0$snapshot",
+    version := s"1.0${Versions.snapshot}",
     scalaVersion := "2.12.1"
   )
 

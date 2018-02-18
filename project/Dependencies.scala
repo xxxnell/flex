@@ -1,29 +1,27 @@
 package flip
 
-import sbt.Keys.libraryDependencies
 import sbt._
+import sbt.Keys.libraryDependencies
 
 object Dependencies {
 
-  val snapshot = "-SNAPSHOT"
-
   val cats = Seq(
-    "org.typelevel" %% "cats" % "0.9.0"
+    "org.typelevel" %% "cats" % Versions.cats
   )
 
   val monixs = Seq(
-    "io.monix" %% "monix" % "2.2.2"
+    "io.monix" %% "monix" % Versions.monix
   )
 
   val tics = Seq(
-    "org.scalactic" %% "scalactic" % "3.0.3"
+    "org.scalactic" %% "scalactic" % Versions.scalactic
   )
 
   val datetime = Seq(
-    "com.github.nscala-time" %% "nscala-time" % "2.16.0"
+    "com.github.nscala-time" %% "nscala-time" % Versions.nscalaTime
   )
 
-  val specs2Version = "3.9.1"
+  val specs2Version = Versions.specs2
   val specs = Seq(
     "org.specs2" %% "specs2-core",
     "org.specs2" %% "specs2-mock",
@@ -31,9 +29,8 @@ object Dependencies {
     "org.specs2" %% "specs2-scalacheck"
   ).map(_ % specs2Version % Test)
 
-
   val math = Seq(
-    "org.apache.commons" % "commons-math3" % "3.6.1"
+    "org.apache.commons" % "commons-math3" % Versions.commonsMath3
   )
 
   // project dependencies
