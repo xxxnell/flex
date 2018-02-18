@@ -11,6 +11,22 @@ import language.postfixOps
 
 trait ReleaseProcess {
 
+  // test
+
+  def syntheticTest =
+    ReleaseStep(action = state => {
+      { s"echo Testing." ! }
+      val res = { "bash scripts/test.sh" } !
+
+      if (res != 0) {
+        sys.error(s"Test error occurs. code: $res.")
+      }
+
+      state
+    })
+
+  // git processes
+
   def developBranch = "develop"
 
   def mainBranch: String = {
@@ -29,7 +45,7 @@ trait ReleaseProcess {
       val res = { s"git checkout $name" ! }
 
       if (res != 0) {
-        sys.error(s"Checkout error occurs.")
+        sys.error(s"Checkout error occurs. code: $res.")
       }
 
       state
@@ -37,11 +53,11 @@ trait ReleaseProcess {
 
   def merge(name: String) =
     ReleaseStep(action = state => {
-      { s"echo Merging $name" ! }
+      { s"echo Merging $name." ! }
       val res = { s"git merge $name" ! }
 
       if (res != 0) {
-        sys.error(s"Conflict occurs: -> $name")
+        sys.error(s"Conflict occurs. code: $res. : -> $name")
       }
 
       state
@@ -53,7 +69,7 @@ trait ReleaseProcess {
       val res = { s"git push origin $name" ! }
 
       if (res != 0) {
-        sys.error(s"Push error occurs: branch $name")
+        sys.error(s"Push error occurs. code: $res. branch: $name")
       }
 
       state
@@ -65,7 +81,7 @@ trait ReleaseProcess {
       val res = { "git push --tags" ! }
 
       if (res != 0) {
-        sys.error("Push Tag error occurs.")
+        sys.error(s"Push Tag error occurs. code: $res.")
       }
 
       state
@@ -96,8 +112,7 @@ object Releases extends ReleaseProcess {
   lazy val releaseSteps: Seq[ReleaseStep] = Seq[ReleaseStep](
     checkSnapshotDependencies,
     inquireVersions,
-    runClean,
-    runTest,
+    syntheticTest,
     checkout(mainBranch),
     setReleaseVersion,
     commitReleaseVersion,
