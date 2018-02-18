@@ -2,4 +2,5 @@
 target
 benchmarks
 experiments
-flip-docs/resources/__pycache__
+__pycache__
+*.log
