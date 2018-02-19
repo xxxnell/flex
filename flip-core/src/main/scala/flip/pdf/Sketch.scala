@@ -157,13 +157,14 @@ trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
       measure = sketch.measure.asInstanceOf[Measure[A]]
     } yield RangeM(measure.from(head), measure.from(last))(measure)
 
-  def structures(conf: SketchConf): Structures = {
-    val counter =
-      if (conf.cmap.size > conf.counter.size) HCounter(conf.counter, -1)
-      else HCounter.emptyUncompressed(conf.cmap.size)
+  // construct
 
-    (Cmap(conf.cmap), counter) :: Nil
-  }
+  def counter(conf: SketchConf, seed: Int): HCounter =
+    if (conf.cmap.size > conf.counter.size) HCounter(conf.counter, -1)
+    else HCounter.emptyUncompressed(conf.cmap.size)
+
+  def structures(conf: SketchConf): Structures =
+    (Cmap(conf.cmap), counter(conf, -1)) :: Nil
 
   def concatStructures[A](as: List[(A, Count)], measure: Measure[A], conf: SketchConf): Structures = {
     val ps = as.map { case (a, c) => (measure.to(a), c) }
@@ -175,11 +176,8 @@ trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
       conf.boundaryCorrection,
       conf.cmap.size
     )
-    val counter =
-      if (conf.cmap.size > conf.counter.size) HCounter(conf.counter, -1)
-      else HCounter.emptyUncompressed(conf.cmap.size)
 
-    (cmap, counter) :: Nil
+    (cmap, counter(conf, -1)) :: Nil
   }
 
 }

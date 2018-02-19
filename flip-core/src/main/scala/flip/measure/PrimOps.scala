@@ -30,4 +30,6 @@ trait PrimSyntax {
     def ~=(primTol: (Prim, Prim)): Boolean = PrimOps.similarForTolerance(prim, primTol._1, primTol._2)
   }
 
+  def similar(prim1: Prim, prim2: Prim, error: Double): Boolean = PrimOps.similarForError(prim1, prim2, error)
+
 }

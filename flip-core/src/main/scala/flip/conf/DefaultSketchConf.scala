@@ -22,7 +22,7 @@ trait DefaultSketchConf extends AdaPerSketchConf {
 
   val cmap: UniformCmapConf = CmapConf.uniform(20, 3, Some(-1000d), Some(1000d))
 
-  val counter: CounterConf = CounterConf.apply(70, 2)
+  val counter: CounterConf = CounterConf.apply(Int.MaxValue, 1)
 
 }
 

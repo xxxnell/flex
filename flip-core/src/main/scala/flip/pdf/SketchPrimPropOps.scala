@@ -46,7 +46,7 @@ trait SketchPrimPropOps[S[_] <: Sketch[_]] extends SketchPrimPropLaws[S] with Sk
     for {
       utdCmap <- EqualSpaceCdfUpdate.updateCmapForSketch(sketch, ps)
       seed = ((sum(sketch) + ps.headOption.map(_._1).getOrElse(-1d)) * 1000).toInt
-      emptyCounter = HCounter.emptyForConf(sketch.conf.counter, seed)
+      emptyCounter = counter(sketch.conf, seed)
       (utdStrs, oldStrs) = ((utdCmap, emptyCounter) :: sketch.structures).splitAt(sketch.conf.cmap.no)
       utdSketch1 <- modifyStructure(sketch, _ => Some(utdStrs))
       utdSketch2 <- if (ps.nonEmpty) {

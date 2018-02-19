@@ -165,6 +165,30 @@ class SketchPropSpec extends Specification with ScalaCheck {
           }
       }
 
+      "for normal distribution" in {
+        val error = 0.2
+        val (start, end) = (0.0, 1.0)
+        val dist = NumericDist.normal(0.0, 1.0)
+        val expected = dist.probability(start, end).get
+        val sampleNo = 3000
+        val (cmapSize, cmapNo, cmapStart, cmapEnd) = (1000, 2, Some(-10.0), Some(10.0))
+
+        implicit val conf: CustomSketchConf = CustomSketchConf(
+          cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd
+        )
+        val (_, samples) = dist.samples(sampleNo)
+        val sketch0 = Sketch.empty[Double]
+
+        val utdSketch = samples.foldLeft(sketch0){ case (sketch, sample) =>
+          sketch.update(sample).getOrElse(sketch)
+        }
+
+        utdSketch.probability(start, end).fold(ko("Exception occurs."))(prob =>
+          if(similar(prob, expected, error)) ok
+          else ko(s"Estimated probability for [$start, $end]: $prob. expected: $expected")
+        )
+      }
+
     }
 
     "sampling" in {
