@@ -4,3 +4,4 @@ benchmarks
 experiments
 __pycache__
 *.log
+*.plist
