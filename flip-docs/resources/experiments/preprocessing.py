@@ -13,6 +13,7 @@ def data(name, i):
         data[j] = acc_data
     return data
 
+
 def transform(raws, xmin, xmax):
     raws = list(filter(lambda d: (d[0] >= xmin) & (d[0] <= xmax), raws))
     raws = list(filter(lambda d: (d[1] >= xmin) & (d[1] <= xmax), raws))
@@ -25,8 +26,15 @@ def transform(raws, xmin, xmax):
         data[i] = [x, xerr, y]
     return data
 
+
 def unzip(data):
     x1 = list(map(lambda d: d[0], data))
     x2 = list(map(lambda d: d[1], data))
     x3 = list(map(lambda d: d[2], data))
     return (x1, x2, x3)
+
+
+def data_loc_to_data(data_loc, xmin, xmax, margin = 10):
+    raw_dat = data(data_loc, 3)
+    dat = transform(raw_dat, xmin - margin, xmax + margin)
+    return unzip(dat)
