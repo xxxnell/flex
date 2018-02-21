@@ -64,7 +64,7 @@ In all of these experiments, I did not give any prior knowledge to predict the u
 
 ## Contributing
 
-Contributions are always welcome. Any kind of contribution, such as writing a unit test, documentation, bug fix, or implementing [this algorithm](./flip-docs/algorithm.md) in another language, is helpful. If you need some help, please contact me via [email](mailto:xxxxxnell@gmail.com) or [twitter](https://twitter.com/xxxnell).
+Contributions are always welcome. Any kind of contribution, such as writing a unit test, documentation, bug fix, or implementing [the algorithm of `Sketch`](./flip-docs/algorithm.md) in another language, is helpful. If you need some help, please contact me via [email](mailto:xxxxxnell@gmail.com) or [twitter](https://twitter.com/xxxnell).
 
 Fo more detail, see the [contributing](./CONTRIBUTING.md) document.
 

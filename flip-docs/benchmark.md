@@ -27,11 +27,11 @@ The table below shows the result of execution time benchmark for the primary fun
 
 To evaluate the performance of *Flip*, I compare it with nonparametric density estimation algorithms such as the conventional histogram and [online kernel density estimation](https://github.com/joluet/okde-java).
 
-The extensible histogram, or xHistogram for short, to be used as the histogram here, is a special case of `Sketch` of *Flip*. Update process of `Sketch` internally divides into two types: `narrowUpdate` and `deepUpdate`. `narrowUpdate` changes count only, not bin, while `deepUpdate` changes both bin and count. After all, the `Sketch` initialized with same width bins and `narrowUpdate`d is essentially the same as a conventional histogram. Of course, its performance is better than the conventional histogram due to the performance enhancements algorithms of `Sketch`.
+The extensible histogram, or xHistogram for short, to be used as the histogram here, is a special case of `Sketch` of *Flip*. Update process of `Sketch` internally divides into two types: `narrowUpdate` and `deepUpdate`. `narrowUpdate` changes count only, not bin, while `deepUpdate` changes both bin and count. After all, the `Sketch` initialized with same width bins and `narrowUpdate`d is essentially the same as a conventional histogram. Of course, its performance is better than the conventional histogram due to the performance enhancements algorithms of `Sketch`. In this comparison, the xHistogram has an invariant optimal bins which are pre-adjusted from the prior knowledge of data stream. Therefore, the performance of xHistogram is the upper limit of the performance of *Flip*.
 
 Online kernel density estimation, or oKDE for short, is an improvement for kernel density estimation to handle data streams with high performance. This algorithm is one of the best performance algorithms among density estimation.
 
-I measure *Flip* in two environments: `rearrange` to adjust bin periodically, and `rearrange` only once when I know that the statistical property of the data stream is stationary. In this comparison, xHistogram initially sets the optimal bin with prior knowledge of the data stream. Therefore, the performance of xHistogram is the upper limit of the performance of *Flip*.
+I measure *Flip* in two environments: first, the case that `rearrange` to adjust bin periodically, and second, the case that `rearrange` only once when I know that the statistical property of the data stream is stationary. 
 
 The benchmark environment is the Macbook Pro 2016 with 2.9 GHz Intel Core i5 and 16 GB Memory. The forgetting factor of oKDE is set to 0.9.
 
