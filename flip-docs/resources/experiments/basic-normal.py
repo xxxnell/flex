@@ -14,7 +14,7 @@ fig = plt.figure(figsize=(20, 5))
 def data_loc(i):
     return dir + "basic-normal-pdf-" + str(i) + ".out"
 
-def expected(x):
+def expected(x, i = -1):
     return norm.pdf(x)
 
 

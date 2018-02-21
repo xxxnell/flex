@@ -1,20 +1,38 @@
 import numpy as np
-from scipy.stats import pareto
+from scipy.stats import norm
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import preprocessing as prep
+import pdfplot as pdfplt
+import kldplot as kldplt
 
 name = "gradual-cd-normal"
-dir = "../../flip-bench/experiments/gradual-cd-normal/"
+dir = "../../../flip-bench/experiments/gradual-cd-normal/"
 
 fig = plt.figure(figsize=(10, 5))
 
 nrows = 1
 ncols = 2
-xmin = 10
-xmax = 1000
+countmin = 40
+countmax = 1000
+
+moving_start = 300
+velocity = 0.01
+
+def data_loc(i):
+    return dir + "gradual-cd-normal-pdf-" + str(i) + ".out"
+
+def expected(x, start, i):
+    if i < start:
+        return norm.pdf(x)
+    else:
+        return norm.pdf(np.array(x) - (i - start) * velocity)
+
 
 # Median
+
+medianmin = -0.5
+medianmax = 8
 
 median_data_loc = dir + "gradual-cd-normal-median.out"
 
@@ -24,34 +42,46 @@ x1 = list(map(lambda d: d[0], median_data))
 y1 = list(map(lambda d: d[1], median_data))
 y2 = list(map(lambda d: d[2], median_data))
 
-sp1 = plt.subplot(nrows, ncols, 1)
-sp1.plot(x1, y2)
-sp1.plot(x1, y1, '--')
-sp1.axvline(300, color='r', linestyle=':', linewidth=1)
-sp1.set_ylabel("median")
-sp1.set_xlabel("update count")
-sp1.set_xlim(xmin, xmax)
-# sp1.set_ylim(0.0, 20.0)
-sp1.set_ylim(0.0, 8.0)
+ax1 = plt.subplot(nrows, ncols, 1)
+ax1.plot(x1, y2)
+ax1.plot(x1, y1, '--')
+ax1.axvline(moving_start, color='r', linestyle=':', linewidth=1)
+ax1.set_ylabel("median")
+ax1.set_xlabel("update count")
+ax1.set_xlim(countmin, countmax)
+ax1.set_ylim(medianmin, medianmax)
+
 
 # KLD
 
+rearr_start = 50
+rearr_period = 100
+kld_max = 0.8
+
 kld_data_loc = dir + "gradual-cd-normal-kld.out"
 
-kld_data = prep.data(kld_data_loc, 2)
+ax2 = plt.subplot(nrows, ncols, 2)
+kldplt.kldplot(ax2, kld_data_loc, kld_max, countmin, countmax, rearr_start, rearr_period, False)
+ax2.axvline(moving_start, color='r', linestyle=':', linewidth=1)
 
-x3 = list(map(lambda d: d[0], kld_data))
-y3 = list(map(lambda d: abs(d[1]), kld_data))
-sp2 = plt.subplot(nrows, ncols, 2)
-sp2.plot(x3, y3)
-sp2.axvline(300, color='r', linestyle=':', linewidth=1)
-sp2.set_ylabel("divergence")
-sp2.set_xlabel("update count")
-sp2.set_xlim(xmin, xmax)
-# sp2.set_ylim(0.0, 1.5)
-sp2.set_ylim(0.0, 0.8)
+
+# Save
 
 plt.legend()
 plt.savefig(name + '.pdf')
 plt.savefig(name + '.png')
 plt.show()
+
+
+# Animated PDF
+
+step = 10
+fps = 4
+xmin = -1
+xmax = 8
+ymin = 0
+ymax = 1
+
+utd_animation2 = pdfplt.animated_pdfplot_bar(
+  data_loc, countmin, countmax, step, lambda x, i: expected(x, moving_start, i), xmin, xmax, ymin, ymax)
+utd_animation2.save(name + '-histo.gif', writer='imagemagick', fps=fps)

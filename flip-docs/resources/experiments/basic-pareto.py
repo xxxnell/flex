@@ -12,7 +12,7 @@ dir = "../../../flip-bench/experiments/basic-pareto/"
 def data_loc(i):
     return dir + "basic-pareto-pdf-" + str(i) + ".out"
 
-def expected(x):
+def expected(x, i = -1):
     return pareto.pdf(x, 1)
 
 

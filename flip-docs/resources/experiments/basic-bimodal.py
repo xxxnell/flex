@@ -15,7 +15,7 @@ def data_loc(i):
     return dir + "basic-bimodal-pdf-" + str(i) + ".out"
 
 
-def expected(x):
+def expected(x, i = -1):
     return 0.5 * norm.pdf(x - 2) + 0.5 * norm.pdf(x + 2)
 
 

@@ -7,17 +7,30 @@ from scipy.stats import norm
 
 # basic frame
 
-def pdfframe(ax, expected, xmin, xmax, ymin, ymax):
-    margin = 10
-
-    x2 = np.arange(xmin - margin, xmax + margin, 0.1)
-    y2 = expected(x2)
-
-    ax.plot(x2, y2, '--', color='orange')
+def pdfframe(ax, xmin, xmax, ymin, ymax):
     ax.set_xlim(xmin, xmax)
     ax.set_ylim(ymin, ymax)
     ax.set_ylabel("probability density")
     ax.set_xlabel("x")
+
+
+# dashed
+
+def empty_pdf_dashed_dataframe(ax):
+    return ax.plot([], [], '--', color='orange')
+
+def setline_for_expected(lines, expected, xmin, xmax):
+    margin = 10
+    line, = lines
+    x2 = np.arange(xmin - margin, xmax + margin, 0.1)
+    y2 = expected(x2)
+
+    line.set_data(x2, y2)
+
+def pdfframe_with_expected(ax, expected, xmin, xmax, ymin, ymax):
+    pdfframe(ax, xmin, xmax, ymin, ymax)
+    line = empty_pdf_dashed_dataframe(ax)
+    setline_for_expected(line, expected, xmin, xmax)
 
 
 # errorbar
@@ -51,7 +64,7 @@ def seterr_for_loc(err, data_loc, xmin, xmax):
 
 
 def pdfplot_errorbar(ax, expected, data_loc, xmin, xmax, ymin, ymax, notation = None):
-    pdfframe(ax, expected, xmin, xmax, ymin, ymax)
+    pdfframe_with_expected(ax, expected, xmin, xmax, ymin, ymax)
     err = empty_pdf_errorbar_dataframe(ax, notation)
     seterr_for_loc(err, data_loc, xmin, xmax)
 
@@ -59,10 +72,12 @@ def pdfplot_errorbar(ax, expected, data_loc, xmin, xmax, ymin, ymax, notation = 
 def animated_pdfplot_errorbar(data_loc, start, end, step, expected, xmin, xmax, ymin, ymax):
     fig, ax = plt.subplots()
 
-    pdfframe(ax, expected, xmin, xmax, ymin, ymax)
+    pdfframe(ax, xmin, xmax, ymin, ymax)
+    lines = empty_pdf_dashed_dataframe(ax)
     err = empty_pdf_errorbar_dataframe(ax)
 
     def animate(i):
+        setline_for_expected(lines, lambda x: expected(x, i), xmin, xmax)
         seterr_for_loc(err, data_loc(i), xmin, xmax)
         ax.set_title("estimated pdf for update count: " + str(i))
         return err,
@@ -114,7 +129,7 @@ def setbar_for_loc(bars, data_loc, xmin, xmax):
 
 
 def pdfplot_bar(ax, expected, data_loc, xmin, xmax, ymin, ymax, annotation = None):
-    pdfframe(ax, expected, xmin, xmax, ymin, ymax)
+    pdfframe_with_expected(ax, expected, xmin, xmax, ymin, ymax)
     bars = init_pdf_bar_dataframe_for_loc(ax, data_loc, xmin, xmax, annotation)
     setbar_for_loc(bars, data_loc, xmin, xmax)
 
@@ -123,13 +138,15 @@ def animated_pdfplot_bar(data_loc, start, end, step, expected, xmin, xmax, ymin,
     fig, ax = plt.subplots()
 
     init_data_loc = data_loc(start)
-    pdfframe(ax, expected, xmin, xmax, ymin, ymax)
+    pdfframe(ax, xmin, xmax, ymin, ymax)
+    lines = empty_pdf_dashed_dataframe(ax)
     bars = init_pdf_bar_dataframe_for_loc(ax, init_data_loc, xmin, xmax)
 
     def animate(i):
+        setline_for_expected(lines, lambda x: expected(x, i), xmin, xmax)
         setbar_for_loc(bars, data_loc(i), xmin, xmax)
         ax.set_title("estimated pdf for update count: " + str(i))
-        return bars,
+        return bars, lines
 
     idxs = np.arange(start, end, step)
     return animation.FuncAnimation(fig, animate, idxs, repeat=False, blit=False)

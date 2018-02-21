@@ -12,7 +12,7 @@ dir = "../../../flip-bench/experiments/basic-lognormal/"
 def data_loc(i):
     return dir + "basic-lognormal-pdf-" + str(i) + ".out"
 
-def expected(x):
+def expected(x, i = -1):
     return lognorm.pdf(x, 1)
 
 
