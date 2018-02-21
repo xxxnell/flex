@@ -1,6 +1,7 @@
 .idea
-target
-benchmarks
-experiments
 __pycache__
 *.log
+*.plist
+target
+flip-bench/benchmarks
+flip-bench/experiments
