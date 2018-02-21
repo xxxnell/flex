@@ -60,7 +60,7 @@ Sketch also adapts well to any type of concept drift. Here is a experimental res
 
 ![animated gradual concept drift](./flip-docs/resources/experiments/gradual-cd-normal-histo.gif)
 
-In all of these experiments, I did not give any prior knowledge to predict the underlying distirbution well. It just works. For more example, see the [experiments](./flip-docs/experiment.md) document.
+In all of these experiments, I did not give any prior knowledge to predict the underlying distirbution well. It just works. For more example, see the [experiment](./flip-docs/experiment.md) document.
 
 ## Contributing
 
