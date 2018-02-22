@@ -33,7 +33,7 @@ Online kernel density estimation, or oKDE for short, is an improvement for kerne
 
 I measure *Flip* in two environments: first, the case that `rearrange` to adjust bin periodically, and second, the case that `rearrange` only once when I know that the statistical property of the data stream is stationary. 
 
-The benchmark environment is the Macbook Pro 2016 with 2.9 GHz Intel Core i5 and 16 GB Memory. The forgetting factor of oKDE is set to 0.9.
+The benchmark environment is the Macbook Pro 2016 with 2.9 GHz Intel Core i5 and 16 GB Memory. The forgetting factor of oKDE is set to 0.9. The result is obtained by updating 1000 data streams sampled from bimodal probability density function with a standard normal distribution centered at -2 and 2.
 
 | | *Flip* (periodic) | *Flip* (once) | xHistogram | oKDE |
 | --- | --- | --- | --- | --- |

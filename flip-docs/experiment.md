@@ -1,6 +1,6 @@
 # Experiment
 
-`Sketch` of *Flip* estimates density from data stream under various conditions. When the data follows stationary statistical properties such as normal, bimodal, log-normal, and pareto, it can be reasonably estimated. Even if the concept drift that is varying statistical properties of the underlying distribution of the data stream occurs in a various ways, `Sketch` can successfully estimate the probability density.
+`Sketch` of *Flip* estimates density from data stream under various conditions. When the data follows stationary statistical properties such as normal, bimodal, log-normal, and pareto, it can be reasonably estimated. Even if the concept drift that is varying statistical properties of the data stream occurs suddenly or gradually, `Sketch` can successfully estimate the probability density. 
 
 
 ## Standard normal distribution
