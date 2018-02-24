@@ -1,4 +1,4 @@
-# Flip 
+# Flip 🎲
 
 [![Build Status](https://travis-ci.org/xxxnell/flip.svg?branch=master)](https://travis-ci.org/xxxnell/flip)
 [![codecov](https://codecov.io/gh/xxxnell/flip/branch/master/graph/badge.svg)](https://codecov.io/gh/xxxnell/flip)
@@ -8,7 +8,7 @@
 
 *Flip* is *F*ast, *L*ightweight pure-functional library for *I*nformation theory and *P*robability distribution. *Flip* aims to extract and process statistical features of the input data stream in a short time using only small memory. It has the following features:
 
-* Quicly summarize probability distribution for random variable stream using `Sketch`
+* Quicly estimate and summarize probability distribution for random variable stream using `Sketch`
 * Combine several probability distributions by probability monad
 * Generate random variables from many predefined and estimated probability disributions 
 * Measure similarity between two probability distribution using Kullback–Leibler divergence
@@ -61,12 +61,12 @@ Sketch also adapts well to any type of concept drift. Here is an experimental re
 
 ![animated gradual concept drift](./flip-docs/resources/experiments/gradual-cd-normal-histo.gif)
 
-In all of these experiments, I did not give any prior knowledge to predict the underlying distirbution well. It works well with the default configuration. For more example, see the [experiment](./flip-docs/experiment.md) document.
+In all of these experiments, I did not give any prior knowledge to predict the underlying distirbution well. It works well with the default configuration. For more example, see the [experiment](./flip-docs/experiment.md) document. If you want to learn how to use `Sketch` in a real world, see the [codes for these experiments](./flip-bench/src/main/scala/flip/experiment).
 
 
 ## Contributing
 
-Contributions are always welcome. Any kind of contribution, such as writing a unit test, documentation, bug fix, or implementing [the algorithm of `Sketch`](./flip-docs/algorithm.md) in another language, is helpful. If you need some help, please contact me via [email](mailto:xxxxxnell@gmail.com) or [twitter](https://twitter.com/xxxnell).
+Contributions are always welcome. Any kind of contribution, such as writing a unit test, documentation, bug fix, or implementing [the density estimation algorithm of `Sketch`](./flip-docs/algorithm.md) in another language, is helpful. If you need some help, please contact me via [email](mailto:xxxxxnell@gmail.com) or [twitter](https://twitter.com/xxxnell).
 
 Fo more detail, see the [contributing](./CONTRIBUTING.md) document.
 

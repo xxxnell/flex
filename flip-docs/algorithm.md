@@ -5,7 +5,7 @@ Update process of `Sketch` of *Flip* internally divides into two types: `narrowU
 The algorithm of `narrowUpdate` is intuitive. The algorithm of `deepUpdate` matters. Here I propose an algorithm that equally divides the domain of the inverse cumulative density function, also called the quantile function, and then uses the range as a new quantization point. This algorithm is not actually an optimal value for KL-divergence. However, this method is very simple, easy to understand, and requires only a small amount of computation. And above all, it yields a sufficiently small KL-divergence.
 
 
-## Equal space split algorithm for  `deepUpdate`
+## Cumulative-equal split algorithm for  `deepUpdate`
 
 The following figure shows the difference between conventional and `Sketch`'s method to determine quantization points. (left) The conventional method simply divides the domain equally. (right) `Sketch` method finds points on domain that equally divides the cumulative density.
 

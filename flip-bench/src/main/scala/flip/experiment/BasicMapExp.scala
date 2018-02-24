@@ -8,7 +8,7 @@ object BasicMapExp {
   def main(args: Array[String]): Unit = {
     val expName = "basic-map"
     val dataNo = 300
-    val samplingNo = 200
+    val samplingNo = 20
 
     implicit val conf: SketchConf = SketchConf(
       startThreshold = 50,

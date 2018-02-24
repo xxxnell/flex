@@ -134,6 +134,12 @@ def pdfplot_bar(ax, expected, data_loc, xmin, xmax, ymin, ymax, annotation = Non
     setbar_for_loc(bars, data_loc, xmin, xmax)
 
 
+def pdfplot_bar_wo_expected(ax, data_loc, xmin, xmax, ymin, ymax, annotation = None):
+    pdfframe(ax, xmin, xmax, ymin, ymax)
+    bars = init_pdf_bar_dataframe_for_loc(ax, data_loc, xmin, xmax, annotation)
+    setbar_for_loc(bars, data_loc, xmin, xmax)
+
+
 def animated_pdfplot_bar(data_loc, start, end, step, expected, xmin, xmax, ymin, ymax):
     fig, ax = plt.subplots()
 

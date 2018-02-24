@@ -50,3 +50,14 @@ Here is a experimental result under the situation where the distribution that `S
 ![estimated median and KLD for standard normal distribution with sudden concept drift](resources/experiments/sudden-cd-normal.png)
 
 This figure shows the estimated median and KL-divergence by using `Sketch`.
+
+
+## `map`
+
+The following figure is the result of an experiment that estimates the standard normal distribution using `Sketch` and then transform the domain to the log-normal distribution using the `map` operation. 
+
+By definition, the [log-normal distribution](https://en.wikipedia.org/wiki/Log-normal_distribution#Characterization) is a distribution that takes the log of domain X for a normal distribution. Therefore, if `Sketch` which is learned by normal distribution executes `map` operation, that is `stdSketch.map(x => math.exp(x))`, the log-normal distribution should be obtained as a result.
+
+![before and after of `map` operation](resources/experiments/basic-map.png)
+
+
