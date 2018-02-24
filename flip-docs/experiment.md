@@ -32,7 +32,7 @@ Here is a result for a bimodal probabability density function consisting of two 
 
 ## Gradual concept drift
 
-Here is a experimental result under the situation where the distribution that `Sketch` should estimate is gradually changing over time. The underlying distribution starts to change when the update count is 300 and moves by +0.01 per update count. Sketch is predicting this moving distribution well including some lag.
+Here is a experiment result under the situation where the distribution that `Sketch` should estimate is gradually changing over time. The underlying distribution starts to change when the update count is 300 and moves by +0.01 per update count. Sketch is predicting this moving distribution well including some lag.
 
 ![animated estimation for standard normal distribution with gradual concept drift](resources/experiments/gradual-cd-normal-histo.gif)
 
@@ -43,7 +43,7 @@ This figure shows the estimated median and KL-divergence by using `Sketch`.
 
 ## Sudden concept drift
 
-Here is a experimental result under the situation where the distribution that `Sketch` should estimate is changing suddenly. When the update count is 300, the underlying standard normal distribution suddenly moves its center to the point at 5.
+Here is a experiment result under the situation where the distribution that `Sketch` should estimate is changing suddenly. When the update count is 300, the underlying standard normal distribution suddenly moves its center to the point at 5.
 
 ![animated estimation for standard normal distribution with sudden concept drift](resources/experiments/sudden-cd-normal-histo.gif) 
 

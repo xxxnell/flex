@@ -51,24 +51,30 @@ println("expected: " + underlying.probability(0.0, 1.0))
 // expected: Some(0.34134474606854304)
 ```
 
-Here is an experimental result for a bimodal probabability density function consisting of two standard normal distributions centered at -2 and 2.
+
+### The case of bimodal distribution
+
+Here is an experiment result for a bimodal probabability density function consisting of two standard normal distributions centered at -2 and 2.
 
 ![animated bimodal](./flip-docs/resources/experiments/basic-bimodal-histo.gif)
 
 In this figure, the dashed orange line is the expected underlying probability distribution, and the blue bar is the probability distribution which `Sketch` estimates. `Sketch` assumes an initial bin with a uniform width, and estimates the first optimal bin at the update count of 50. Then `Sketch` estimates new bins every 100 data updates, for example, 50, 150, 250, and so on.
 
-Sketch also adapts well to any type of concept drift. Here is an experimental result under the situation where the distribution that `Sketch` should estimate is gradually changing over time. The underlying distribution starts to change when the update count is 300 and moves by +0.01 per update count. `Sketch` is predicting this moving distribution well, although ther is some lag. And this lag can be reduced by adjusting the sensitivity to new data.
+
+### The case of concept drift
+
+Sketch also adapts well to any type of concept drift. Here is an experiment result under the situation where the distribution that `Sketch` should estimate is gradually changing over time. The underlying distribution starts to change when the update count is 300 and moves by +0.01 per update count. `Sketch` is predicting this moving distribution well, although ther is some lag. And this lag can be reduced by adjusting the sensitivity to new data.
 
 ![animated gradual concept drift](./flip-docs/resources/experiments/gradual-cd-normal-histo.gif)
 
-In all of these experiments, I did not give any prior knowledge to predict the underlying distirbution well. It works well with the default configuration. For more example, see the [experiment](./flip-docs/experiment.md) document. If you want to learn how to use `Sketch` in a real world, see the [codes for these experiments](./flip-bench/src/main/scala/flip/experiment).
+In all of these experiments, I did not give any prior knowledge to predict the underlying distirbution well. It works well with the default configuration. For more example, see the [experiment](./flip-docs/experiment.md) documentation. If you want to learn how to use `Sketch` in a real world, see the [codes for these experiments](./flip-bench/src/main/scala/flip/experiment).
 
 
 ## Contributing
 
 Contributions are always welcome. Any kind of contribution, such as writing a unit test, documentation, bug fix, or implementing [the density estimation algorithm of `Sketch`](./flip-docs/algorithm.md) in another language, is helpful. If you need some help, please contact me via [email](mailto:xxxxxnell@gmail.com) or [twitter](https://twitter.com/xxxnell).
 
-Fo more detail, see the [contributing](./CONTRIBUTING.md) document.
+Fo more detail, see the [contributing](./CONTRIBUTING.md) documentation.
 
 
 ## License
