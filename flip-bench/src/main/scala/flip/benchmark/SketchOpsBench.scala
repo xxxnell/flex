@@ -17,16 +17,16 @@ class SketchOpsBench { self =>
   @Param(Array("0", "50"))
   var queueSize: Int = _
 
-  @Param(Array("5", "20"))
+  @Param(Array("2", "20"))
   var cmapNo: Int = _
 
-  @Param(Array("200", "2000"))
+  @Param(Array("20", "200"))
   var cmapSize: Int = _
 
-  @Param(Array("2", "10"))
+  @Param(Array("2"))
   var counterNo: Int = _
 
-  @Param(Array("40", "1000"))
+  @Param(Array("100000"))
   var counterSize: Int = _
 
   // variables
@@ -104,6 +104,16 @@ class SketchOpsBench { self =>
   @Benchmark
   def count: Option[Double] = {
     sketch.count(1, 2)
+  }
+
+  @Benchmark
+  def median: Option[Double] = {
+    sketch.median
+  }
+
+  @Benchmark
+  def sample: (Sketch[Double], Double) = {
+    sketch.sample
   }
 
 }
