@@ -13,7 +13,7 @@ object BenchApp {
 
     // confs
     val opts = BenchAppConfs.envOptions
-      .param("iterateBenchSize", (0 to 550 by 10).map(_.toString).toArray: _*)
+      .param("iterateBenchSize", (1 to 1000 by 10).map(_.toString).toArray: _*)
       .build()
 
     // run

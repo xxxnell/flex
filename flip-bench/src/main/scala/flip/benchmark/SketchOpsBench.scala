@@ -14,7 +14,7 @@ class SketchOpsBench { self =>
 
   // parameters
 
-  @Param(Array("0", "50"))
+  @Param(Array("0", "30"))
   var queueSize: Int = _
 
   @Param(Array("2", "20"))

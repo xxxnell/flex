@@ -14,22 +14,22 @@ class IterateBench {
 
   // params
 
-  @Param(Array("0"))
+  @Param(Array("30"))
   var queueSize: Int = _
 
   @Param(Array("50", "100", "150", "200"))
   var iterateBenchSize: Int = _
 
-  @Param(Array("5"))
+  @Param(Array("2"))
   var cmapNo: Int = _
 
-  @Param(Array("200"))
+  @Param(Array("20"))
   var cmapSize: Int = _
 
-  @Param(Array("3"))
+  @Param(Array("2"))
   var counterNo: Int = _
 
-  @Param(Array("70"))
+  @Param(Array("100000"))
   var counterSize: Int = _
 
   // variables
