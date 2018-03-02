@@ -25,17 +25,14 @@ ymax = 1
 
 fig = plt.figure(figsize=(20, 5))
 
-data_locs = [
-    data_loc(40),
-    data_loc(60),
-    data_loc(220)
-]
+data_counts = [40, 60, 220]
 
-i = 1
-for _data_loc in data_locs:
-    ax = plt.subplot(1, len(data_locs) + 1, i)
-    # pdfplt.pdfplot_errorbar(ax, expected, _data_loc, xmin, xmax, ymin, ymax)
-    pdfplt.pdfplot_bar(ax, expected, _data_loc, xmin, xmax, ymin, ymax)
+i = 0
+for data_count in data_counts:
+    ax = plt.subplot(1, len(data_counts) + 1, i + 1)
+    annotation = "(" + chr(ord('a') + i) + ")" + " pdf at update count: " + str(data_count)
+    ax.set_title(annotation)
+    pdfplt.pdfplot_bar(ax, expected, data_loc(data_count), xmin, xmax, ymin, ymax)
     i = i + 1
 
 
@@ -49,7 +46,8 @@ kld_max = 0.15
 
 kld_data_loc = dir + "basic-pareto-kld.out"
 
-ax = plt.subplot(1, len(data_locs) + 1, len(data_locs) + 1)
+ax = plt.subplot(1, len(data_counts) + 1, len(data_counts) + 1)
+ax.set_title("(d) KL-divergence")
 kldplt.kldplot(ax, kld_data_loc, kld_max, countmin, countmax, rearr_start, rearr_period)
 
 
