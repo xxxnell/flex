@@ -32,7 +32,7 @@ libraryDependencies += "com.xxxnell" %% "flip" % "0.0.2"
 Here is an example of how `Sketch` estimates the density using the dataset sampled from the standard normal distribution.
 
 ``` scala 
-import flip._
+import flip.implicits._
 
 // get 100 random variables from standard normal distribution
 val underlying = NumericDist.normal(0.0, 1.0)

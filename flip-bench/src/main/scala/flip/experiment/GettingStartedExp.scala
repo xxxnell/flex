@@ -3,7 +3,7 @@ package flip.experiment
 object GettingStartedExp {
 
   def main(args: Array[String]): Unit = {
-    import flip._
+    import flip.implicits._
 
     // get 100 random variables from standard normal distribution
     val underlying = NumericDist.normal(0.0, 1.0)
