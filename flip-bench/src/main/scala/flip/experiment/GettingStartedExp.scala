@@ -11,7 +11,7 @@ object GettingStartedExp {
 
     // update samples to sketch
     val sketch0 = Sketch.empty[Double]
-    val utdSketch = samples.foldLeft(sketch0){
+    val utdSketch = samples.foldLeft(sketch0) {
       case (sketch, sample) => sketch.update(sample)
     }
 
