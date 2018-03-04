@@ -23,7 +23,7 @@ object AdaPerSketch extends AdaPerSketchOps[AdaPerSketch] {
 
   private case class AdaPerSketchImpl[A](measure: Measure[A],
                                          conf: AdaPerSketchConf,
-                                         structures: List[(Cmap, HCounter)],
+                                         structures: Structures,
                                          queue: List[(A, Count)],
                                          thresholds: Stream[Count],
                                          count: Count)
@@ -31,7 +31,7 @@ object AdaPerSketch extends AdaPerSketchOps[AdaPerSketch] {
 
   def bare[A](measure: Measure[A],
               conf: AdaPerSketchConf,
-              structures: List[(Cmap, HCounter)],
+              structures: Structures,
               queue: List[(A, Count)],
               thresholds: Stream[Count],
               count: Count): AdaPerSketch[A] =
@@ -55,20 +55,17 @@ object AdaPerSketch extends AdaPerSketchOps[AdaPerSketch] {
       thresholds(conf.startThreshold, conf.thresholdPeriod),
       0)
 
-    narrowUpdate(emptySketch, as).get
+    narrowUpdate(emptySketch, as)
   }
 
   def modifyQueue[A](sketch: AdaPerSketch[A], f: List[(A, Count)] => List[(A, Count)]): AdaPerSketch[A] =
     AdaPerSketchImpl(sketch.measure, sketch.conf, sketch.structures, f(sketch.queue), sketch.thresholds, sketch.count)
 
-  def modifyStructure[A](sketch: AdaPerSketch[A], f: Structures => Option[Structures]): Option[AdaPerSketch[A]] =
-    f(sketch.structures)
-      .map(utdStr =>
-        AdaPerSketchImpl(sketch.measure, sketch.conf, utdStr, sketch.queue, sketch.thresholds, sketch.count))
+  def modifyStructure[A](sketch: AdaPerSketch[A], f: Structures => Structures): AdaPerSketch[A] =
+    AdaPerSketchImpl(sketch.measure, sketch.conf, f(sketch.structures), sketch.queue, sketch.thresholds, sketch.count)
 
-  def modifyThresholds[A](sketch: AdaPerSketch[A], f: Stream[Count] => Option[Stream[Count]]): Option[AdaPerSketch[A]] =
-    f(sketch.thresholds)
-      .map(thr => AdaPerSketchImpl(sketch.measure, sketch.conf, sketch.structures, sketch.queue, thr, sketch.count))
+  def modifyThresholds[A](sketch: AdaPerSketch[A], f: Stream[Count] => Stream[Count]): AdaPerSketch[A] =
+    AdaPerSketchImpl(sketch.measure, sketch.conf, sketch.structures, sketch.queue, f(sketch.thresholds), sketch.count)
 
   def modifyCount[A](sketch: AdaPerSketch[A], f: Count => Count): AdaPerSketch[A] =
     AdaPerSketchImpl(sketch.measure, sketch.conf, sketch.structures, sketch.queue, sketch.thresholds, f(sketch.count))

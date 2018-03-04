@@ -13,9 +13,8 @@ class HmapSpec extends Specification with ScalaCheck {
       implicit val nontrivialSizeA: Arbitrary[HDim] = HmapGen.nontrivialSizeA
 
       prop { (hmap: Hmap, hdim: HDim, size: Int) =>
-        hmap.apply(hdim, size).fold(ko)(cdim =>
-          if(cdim < size && cdim >= 0) ok else ko
-        )
+        val cdim = hmap.apply(hdim, size)
+        if(cdim < size && cdim >= 0) ok else ko
       }.setArbitrary1(hmapA).setArbitrary3(nontrivialSizeA)
     }
 

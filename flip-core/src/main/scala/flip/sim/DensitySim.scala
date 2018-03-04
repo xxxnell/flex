@@ -7,21 +7,16 @@ trait DensitySim {
 
   def point(value1: Double, value2: Double): Double
 
-  def sim(sampling: Option[DensityPlot], pdf: Prim => Double): Option[Double] =
-    for {
-      density <- simDensity(sampling, pdf)
-    } yield density.integralAll
+  def sim(sampling: DensityPlot, pdf: Prim => Double): Double =
+    simDensity(sampling, pdf).integralAll
 
-  def simDensity[A](sampling: Option[DensityPlot], pdf: Prim => Double): Option[DensityPlot] =
-    for {
-      plot1 <- sampling
-      densityPlot = plot1.modify { case (range, value) => point(value, pdf(range.middle)) }
-    } yield densityPlot
+  def simDensity[A](sampling: DensityPlot, pdf: Prim => Double): DensityPlot =
+    sampling.modify { case (range, value) => point(value, pdf(range.middle)) }
 
-  def simForSampling[A](d1: SamplingDist[A], d2: Dist[A]): Option[Double] =
-    sim(d1.sampling, p => d2.pdf(d2.measure.from(p)).getOrElse(0.0))
+  def simForSampling[A](d1: SamplingDist[A], d2: Dist[A]): Double =
+    sim(d1.sampling, p => d2.pdf(d2.measure.from(p)))
 
-  def simDensityForSampling[A](d1: SamplingDist[A], d2: Dist[A]): Option[DensityPlot] =
-    simDensity(d1.sampling, p => d2.pdf(d2.measure.from(p)).getOrElse(0.0))
+  def simDensityForSampling[A](d1: SamplingDist[A], d2: Dist[A]): DensityPlot =
+    simDensity(d1.sampling, p => d2.pdf(d2.measure.from(p)))
 
 }

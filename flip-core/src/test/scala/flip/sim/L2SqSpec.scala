@@ -16,16 +16,13 @@ class L2SqSpec extends Specification with ScalaCheck {
       val expect = 0.0
       val error = 1E-3
 
-      (for {
-        sampling <- normal1.uniformSampling(-3.0, 3.0, 100)
-        euclidean <- Euclidean(sampling, normal2)
-      } yield euclidean)
-        .fold(ko("Exception occurs."))(euclidean => {
-          val cond1 = euclidean ~= (expect, error)
+      val sampling = normal1.uniformSampling(-3.0, 3.0, 100)
+      val euclidean = Euclidean(sampling, normal2)
 
-          if(!cond1) ko(s"Euclidean distance $euclidean is not $expect. ")
-          else ok
-        })
+      val cond1 = euclidean ~= (expect, error)
+
+      if(!cond1) ko(s"Euclidean distance $euclidean is not $expect. ")
+      else ok
     }
 
     "euclidean basic 2" in {
@@ -33,16 +30,13 @@ class L2SqSpec extends Specification with ScalaCheck {
       val normal2 = Dist.normal(10.0, 1)
       val lowerBound = 1.0
 
-      (for {
-        sampling <- normal1.uniformSampling(-3.0, 3.0, 100)
-        euclidean <- Euclidean(sampling, normal2)
-      } yield euclidean)
-        .fold(ko("Exception occurs."))(euclidean => {
-          val cond1 = euclidean > lowerBound
+      val sampling = normal1.uniformSampling(-3.0, 3.0, 100)
+      val euclidean = Euclidean(sampling, normal2)
 
-          if(!cond1) ko(s"Euclidean distance $euclidean is smaller then $lowerBound.")
-          else ok
-        })
+      val cond1 = euclidean > lowerBound
+
+      if(!cond1) ko(s"Euclidean distance $euclidean is smaller then $lowerBound.")
+      else ok
     }
 
   }

@@ -12,11 +12,11 @@ trait SamplingDistPropSyntax {
 
   implicit class SamplingDistPropSyntaxImpl[A](dist: SamplingDist[A]) {
     def sample: (SamplingDist[A], A) = SamplingDist.sample(dist)
-    def pdf(a: A): Option[Double] = SamplingDist.pdf(dist, a)
+    def pdf(a: A): Double = SamplingDist.pdf(dist, a)
     def samples(n: Int): (SamplingDist[A], List[A]) = SamplingDist.samples(dist, n)
-    def sampling: Option[DensityPlot] = SamplingDist.sampling(dist)
-    def densityPlot: Option[DensityPlot] = SamplingDist.sampling(dist)
-    def pdfPlot: Option[DensityPlot] = SamplingDist.sampling(dist)
+    def sampling: DensityPlot = SamplingDist.sampling(dist)
+    def densityPlot: DensityPlot = SamplingDist.sampling(dist)
+    def pdfPlot: DensityPlot = SamplingDist.sampling(dist)
   }
 
 }

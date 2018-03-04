@@ -11,9 +11,9 @@ class ListCounterSpec extends Specification with ScalaCheck {
       "update" in {
         (for {
             listcounter <- ListCounterGen.listCounterSample
-            updated <- ListCounter.update(listcounter, 10, 20.0)
+            updated = ListCounter.update(listcounter, 10, 20.0)
         } yield updated)
-          .fold(ko)( listcounter => ok )
+          .fold(ko)( _ => ok )
       }
 
     }

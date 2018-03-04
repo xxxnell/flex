@@ -8,30 +8,27 @@ object ComparisonOps {
 
   val defaultMaxCutoff: Double = 10e10
 
-  def identicalDomain[A, B](dist: Dist[A],
-                            sketch: Sketch[A],
-                            compare: (SamplingDist[A], Sketch[A]) => Option[B]): Option[B] =
+  def identicalDomain[A, B](dist: Dist[A], sketch: Sketch[A], compare: (SamplingDist[A], Sketch[A]) => B): B =
     identicalDomainForCutoff(dist, defaultMinCutoff, defaultMaxCutoff, sketch, compare)
 
   def identicalDomainForCutoff[A, B](dist: Dist[A],
                                      minCutoff: Double,
                                      maxCutoff: Double,
                                      sketch: Sketch[A],
-                                     compare: (SamplingDist[A], Sketch[A]) => Option[B]): Option[B] =
-    for {
-      sampling <- dist.sampling(sketch)
-      filtered = sampling.filter { range =>
-        range > minCutoff && range < maxCutoff
-      }
-      ff <- compare(filtered, sketch)
-    } yield ff
+                                     compare: (SamplingDist[A], Sketch[A]) => B): B = {
+    val sampling = dist.sampling(sketch)
+    val filtered = sampling.filter { range =>
+      range > minCutoff && range < maxCutoff
+    }
+    compare(filtered, sketch)
+  }
 
   def uniformDomain[A, B](dist: Dist[A],
                           start: A,
                           end: A,
                           no: Int,
                           sketch: Sketch[A],
-                          compare: (SamplingDist[A], Sketch[A]) => Option[B]): Option[B] =
+                          compare: (SamplingDist[A], Sketch[A]) => B): B =
     uniformDomainForCutoff(dist, start, end, no, defaultMinCutoff, defaultMaxCutoff, sketch, compare)
 
   def uniformDomainForCutoff[A, B](dist: Dist[A],
@@ -41,13 +38,12 @@ object ComparisonOps {
                                    minCutoff: Double,
                                    maxCutoff: Double,
                                    sketch: Sketch[A],
-                                   compare: (SamplingDist[A], Sketch[A]) => Option[B]): Option[B] =
-    for {
-      sampling <- dist.uniformSampling(start, end, no)
-      filtered = sampling.filter { range =>
-        range > minCutoff && range < maxCutoff
-      }
-      compare <- compare(filtered, sketch)
-    } yield compare
+                                   compare: (SamplingDist[A], Sketch[A]) => B): B = {
+    val sampling = dist.uniformSampling(start, end, no)
+    val filtered = sampling.filter { range =>
+      range > minCutoff && range < maxCutoff
+    }
+    compare(filtered, sketch)
+  }
 
 }

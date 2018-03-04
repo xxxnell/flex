@@ -1,7 +1,7 @@
 package flip.experiment
 
 import flip._
-import flip.experiment.ops.{ComparisonOps, DataOps, ExpOutOps}
+import flip.experiment.ops.{ComparisonOps, ExpOutOps}
 import flip.rand.IRng
 
 /**
@@ -28,12 +28,12 @@ object GradualConceptDriftExp {
     def underlying(idx: Int, rng: IRng = rng): NumericDist[Double] =
       if (draftStart > idx) NumericDist.normal(draftStartingPoint, 1.0, rng)
       else NumericDist.normal(center(idx), 1.0, rng)
-    val dataIdx: List[(Int, Double)] = {
+    val datas: List[Double] = {
       var tempRng = rng
       (0 to dataNo).toList.map(idx => {
         val (utdDist, sample) = underlying(idx, tempRng).sample
         tempRng = utdDist.asInstanceOf[NumericDist[Double]].rng
-        (idx, sample)
+        sample
       })
     }
 
@@ -49,47 +49,29 @@ object GradualConceptDriftExp {
       cmapEnd = Some(10),
       counterSize = samplingNo
     )
-    val sketch = Sketch.empty[Double]
-
-    val idxUtdSketches = DataOps.update(sketch, dataIdx).filter { case (idx, _) => idx % 10 == 0 }
-    val idxPdf = idxUtdSketches.flatMap { case (idx, skt) => skt.sampling.map((idx, _)) }
-    val idxKld = idxUtdSketches.flatMap {
+    val sketch0 = Sketch.empty[Double]
+    val sketchTraces = sketch0 :: sketch0.updateTrace(datas)
+    val idxSketches = sketchTraces.indices.zip(sketchTraces).toList.filter { case (idx, _) => idx % 10 == 0 }
+    val idxPdf = idxSketches.map { case (idx, skt) => (idx, skt.sampling) }
+    val idxKld = idxSketches.map {
       case (idx, skt) =>
-        ComparisonOps
-          .uniformDomain(
-            underlying(idx),
-            draftStartingPoint - domainWidth,
-            center(idx) + domainWidth,
-            samplingNo * 3,
-            skt,
-            KLD[Double])
-          .map((idx, _))
+        val start = draftStartingPoint - domainWidth
+        val end = center(idx) + domainWidth
+        (idx, ComparisonOps.uniformDomain(underlying(idx), start, end, samplingNo * 3, skt, KLD[Double]))
     }
-    val idxCos = idxUtdSketches.flatMap {
+    val idxCos = idxSketches.map {
       case (idx, skt) =>
-        ComparisonOps
-          .uniformDomain(
-            underlying(idx),
-            draftStartingPoint - domainWidth,
-            center(idx) + domainWidth,
-            samplingNo * 3,
-            skt,
-            Cosine[Double])
-          .map((idx, _))
+        val start = draftStartingPoint - domainWidth
+        val end = center(idx) + domainWidth
+        (idx, ComparisonOps.uniformDomain(underlying(idx), start, end, samplingNo * 3, skt, Cosine[Double]))
     }
-    val idxEuc = idxUtdSketches.flatMap {
+    val idxEuc = idxSketches.map {
       case (idx, skt) =>
-        ComparisonOps
-          .uniformDomain(
-            underlying(idx),
-            draftStartingPoint - domainWidth,
-            center(idx) + domainWidth,
-            samplingNo * 3,
-            skt,
-            Euclidean[Double])
-          .map((idx, _))
+        val start = draftStartingPoint - domainWidth
+        val end = center(idx) + domainWidth
+        (idx, ComparisonOps.uniformDomain(underlying(idx), start, end, samplingNo * 3, skt, Euclidean[Double]))
     }
-    val idxSktMedian = idxUtdSketches.flatMap { case (idx, skt) => skt.median.map((idx, _)) }
+    val idxSktMedian = idxSketches.map { case (idx, skt) => (idx, skt.median) }
 
     // out
 

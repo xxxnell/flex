@@ -17,18 +17,18 @@ trait NormalDist[A] extends NumericDist[A] {
 
 trait NormalDistOps extends NumericDistOps[NormalDist] {
 
-  override def pdf[A](dist: NormalDist[A], a: A): Option[Prim] = {
+  override def pdf[A](dist: NormalDist[A], a: A): Prim = {
     val numericDist = new NormalDistribution(dist.mean, dist.variance)
     val prim = dist.measure.to(a)
 
-    Some(numericDist.density(prim))
+    numericDist.density(prim)
   }
 
-  override def cdf[A](dist: NormalDist[A], a: A): Option[Double] = {
+  override def cdf[A](dist: NormalDist[A], a: A): Double = {
     val p = dist.measure.to(a)
     val numericDist = new NormalDistribution(dist.mean, dist.variance)
 
-    Some(numericDist.cumulativeProbability(p))
+    numericDist.cumulativeProbability(p)
   }
 
   def icdf[A](dist: NormalDist[A], p: Double): A = {

@@ -10,7 +10,7 @@ import org.openjdk.jmh.infra.Blackhole
 @BenchmarkMode(Array(Mode.AverageTime))
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @State(Scope.Thread)
-class IterateBench {
+class IterateBench { self =>
 
   // params
 
@@ -61,9 +61,9 @@ class IterateBench {
     val n = iterateBenchSize
 
     var i = 0
-    var sketchO: Option[Sketch[Double]] = Some(sketch)
+    var sketch: Sketch[Double] = self.sketch
     while (i < n) {
-      sketchO = sketchO.flatMap(sketch => sketch.update(signals(i)))
+      sketch = sketch.update(signals(i))
       i += 1
     }
   }

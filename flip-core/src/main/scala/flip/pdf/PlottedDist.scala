@@ -19,7 +19,7 @@ trait PlottedDist[A] extends SamplingDist[A] {
 
 trait PlottedDistPropOps[D[_] <: PlottedDist[_]] extends SamplingDistPropOps[D] {
 
-  def sampling[A](dist: D[A]): Option[DensityPlot] = Some(dist.sampling)
+  def sampling[A](dist: D[A]): DensityPlot = dist.sampling
 
   def filter[A](dist: PlottedDist[A], f: RangeP => Boolean): PlottedDist[A] =
     PlottedDist.bare(
@@ -28,9 +28,9 @@ trait PlottedDistPropOps[D[_] <: PlottedDist[_]] extends SamplingDistPropOps[D] 
       dist.conf
     )
 
-  def probability[A](dist: D[A], start: A, end: A): Option[Double] = {
+  def probability[A](dist: D[A], start: A, end: A): Double = {
     val measure = dist.measure.asInstanceOf[Measure[A]]
-    Some(dist.sampling.integral(measure.to(start), measure.to(end)))
+    dist.sampling.integral(measure.to(start), measure.to(end))
   }
 
 }

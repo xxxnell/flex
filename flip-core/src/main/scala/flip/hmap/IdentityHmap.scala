@@ -4,8 +4,8 @@ import flip.counter.CDim
 
 trait IdentityHmap extends Hmap {
 
-  def apply(hdim: HDim, size: Int): Option[CDim] = {
-    if (hdim < 0 || hdim > size) None else Some(hdim)
+  def apply(hdim: HDim, size: Int): CDim = {
+    if (hdim >= 0 && hdim < size) hdim else throw new IndexOutOfBoundsException
   }
 
   override def equals(other: Any): Boolean = other.isInstanceOf[IdentityHmap]

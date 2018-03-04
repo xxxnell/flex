@@ -11,16 +11,12 @@ class UncompressedHCounterSpec extends Specification with ScalaCheck {
 
       "basic" in {
         val emptyCounter = HCounter.emptyUncompressed(100)
-        val utdCounterO = (0 until 100).map(i => (i, i * i))
-          .foldLeft(Option(emptyCounter)) { case (accCounterO, (idx, count)) =>
-            accCounterO.flatMap(counter => counter.update(idx, count))
-          }
-        val cond = (0 until 100).forall(i => (for {
-          utdCounter <- utdCounterO
-          count <- utdCounter.get(i)
-        } yield count == i * i).getOrElse(false))
+        val datas = (0 until 100).map(i => (i, i * i)).toList
+        val utdCounter = datas
+          .foldLeft(emptyCounter) { case (accCounter, (idx, count)) => accCounter.update(idx, count)}
+        val cond = datas.forall { case (idx, count) => utdCounter.get(idx) == count }
 
-        if(!cond) ko("Somewhere HCounter collides")
+        if(!cond) ko("Somewhere HCounter collides.")
         else ok
       }
 

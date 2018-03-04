@@ -19,32 +19,32 @@ trait SamplingDist[A] extends Dist[A] {
 
 trait SamplingDistPropOps[D[_] <: SamplingDist[_]] extends DistPropOps[D] with SamplingDistPropLaws[D] {
 
-  def sampling[A](dist: D[A]): Option[DensityPlot]
+  def sampling[A](dist: D[A]): DensityPlot
 
 }
 
 trait SamplingDistPropLaws[D[_] <: SamplingDist[_]] { self: SamplingDistPropOps[D] =>
 
-  def interpolationPdf[A](dist: D[A], a: A): Option[Double] =
-    for {
-      plot <- sampling(dist)
-      density = DensityPlot.interpolation(plot, dist.measure.asInstanceOf[Measure[A]].to(a))
-    } yield density
+  def interpolationPdf[A](dist: D[A], a: A): Double = {
+    val plot = sampling(dist)
+
+    DensityPlot.interpolation(plot, dist.measure.asInstanceOf[Measure[A]].to(a))
+  }
 
 }
 
 object SamplingDist extends SamplingDistPropOps[SamplingDist] {
 
-  def forSmoothDist[A](dist: SmoothDist[A], domains: List[RangeM[A]]): Option[SamplingDist[A]] =
+  def forSmoothDist[A](dist: SmoothDist[A], domains: List[RangeM[A]]): SamplingDist[A] =
     SmoothDist.samplingDist(dist, domains)
 
-  def probability[A](dist: SamplingDist[A], start: A, end: A): Option[Double] = dist match {
+  def probability[A](dist: SamplingDist[A], start: A, end: A): Double = dist match {
     case (sketch: Sketch[A]) => Sketch.probability(sketch, start, end)
     case (plotted: PlottedDist[A]) => PlottedDist.probability(plotted, start, end)
     case _ => ???
   }
 
-  def sampling[A](dist: SamplingDist[A]): Option[DensityPlot] = dist match {
+  def sampling[A](dist: SamplingDist[A]): DensityPlot = dist match {
     case (sketch: Sketch[A]) => Sketch.sampling(sketch)
     case (plotted: PlottedDist[A]) => PlottedDist.sampling(plotted)
     case _ => ???
@@ -55,7 +55,7 @@ object SamplingDist extends SamplingDistPropOps[SamplingDist] {
     case plotted: PlottedDist[_] => PlottedDist.sample(plotted)
   }
 
-  override def pdf[A](dist: SamplingDist[A], a: A): Option[Prim] = dist match {
+  override def pdf[A](dist: SamplingDist[A], a: A): Prim = dist match {
     case (sketch: Sketch[_]) => Sketch.fastPdf(sketch, a)
     case _ => super.interpolationPdf(dist, a)
   }

@@ -1,7 +1,7 @@
 package flip.experiment
 
 import flip._
-import flip.experiment.ops.{ComparisonOps, DataOps, ExpOutOps}
+import flip.experiment.ops.{ComparisonOps, ExpOutOps}
 
 object BasicUniformDistExp {
 
@@ -24,26 +24,23 @@ object BasicUniformDistExp {
       cmapEnd = Some(10),
       counterSize = samplingNo
     )
-    val sketch = Sketch.empty[Double]
+    val sketch0 = Sketch.empty[Double]
     val underlying = NumericDist.uniform(0.0, 1.0)
     val (_, datas) = underlying.samples(dataNo)
-    val dataIdxs = (datas.indices zip datas).toList
-
-    val idxUtdSketches: List[(Int, Sketch[Double])] = DataOps
-      .update(sketch, dataIdxs)
-      .filter { case (idx, _) => idx % 10 == 0 }
-    val idxDensityPlots = idxUtdSketches.flatMap { case (idx, utdSkt) => utdSkt.densityPlot.map(plot => (idx, plot)) }
-    val idxKld = idxUtdSketches.flatMap {
+    val sketchTraces = sketch0 :: sketch0.updateTrace(datas)
+    val idxSketches = sketchTraces.indices.zip(sketchTraces).toList.filter { case (idx, _) => idx % 10 == 0 }
+    val idxDensityPlots = idxSketches.map { case (idx, utdSkt) => (idx, utdSkt.densityPlot) }
+    val idxKld = idxSketches.map {
       case (idx, utdSkt) =>
-        ComparisonOps.identicalDomain(underlying, utdSkt, KLD[Double]).map((idx, _))
+        (idx, ComparisonOps.identicalDomain(underlying, utdSkt, KLD[Double]))
     }
-    val idxCosine = idxUtdSketches.flatMap {
+    val idxCosine = idxSketches.map {
       case (idx, utdSkt) =>
-        ComparisonOps.uniformDomain(underlying, 0.0, 10.0, samplingNo * 3, utdSkt, CosineDensity[Double]).map((idx, _))
+        (idx, ComparisonOps.uniformDomain(underlying, 0.0, 10.0, samplingNo * 3, utdSkt, CosineDensity[Double]))
     }
-    val idxEuclidean = idxUtdSketches.flatMap {
+    val idxEuclidean = idxSketches.map {
       case (idx, utdSkt) =>
-        ComparisonOps.uniformDomain(underlying, 0.0, 10.0, samplingNo * 3, utdSkt, Euclidean[Double]).map((idx, _))
+        (idx, ComparisonOps.uniformDomain(underlying, 0.0, 10.0, samplingNo * 3, utdSkt, Euclidean[Double]))
     }
 
     ExpOutOps.clear(expName1)

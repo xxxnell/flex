@@ -1,7 +1,7 @@
 package flip.experiment
 
 import flip._
-import flip.experiment.ops.{ComparisonOps, DataOps, ExpOutOps}
+import flip.experiment.ops.{ComparisonOps, ExpOutOps}
 
 /**
   * A experiment to compare with sketch and histogram.
@@ -29,23 +29,22 @@ object HistogramBimodalDistExp { self =>
     }
 
     // update datas
-    val utdHistos = DataOps
-      .update(emptyHisto, idxDatas)
-      .filter { case (idx, _) => idx % 10 == 0 }
+    val histoTraces = emptyHisto :: emptyHisto.updateTrace(datas)
+    val idxHistos = histoTraces.indices.zip(histoTraces).toList.filter { case (idx, _) => idx % 10 == 0 }
 
     // histogram results
-    val histoPdf = utdHistos.flatMap { case (idx, histo) => histo.sampling.map((idx, _)) }
-    val histoKld = utdHistos.flatMap {
+    val histoPdf = idxHistos.map { case (idx, histo) => (idx, histo.sampling) }
+    val histoKld = idxHistos.map {
       case (idx, histo) =>
-        ComparisonOps.uniformDomain(underlying, start, end, samplingNo * 3, histo, KLD[Double]).map((idx, _))
+        (idx, ComparisonOps.uniformDomain(underlying, start, end, samplingNo * 3, histo, KLD[Double]))
     }
-    val histoCos = utdHistos.flatMap {
+    val histoCos = idxHistos.map {
       case (idx, histo) =>
-        ComparisonOps.uniformDomain(underlying, start, end, samplingNo * 3, histo, Cosine[Double]).map((idx, _))
+        (idx, ComparisonOps.uniformDomain(underlying, start, end, samplingNo * 3, histo, Cosine[Double]))
     }
-    val histoEuc = utdHistos.flatMap {
+    val histoEuc = idxHistos.map {
       case (idx, histo) =>
-        ComparisonOps.uniformDomain(underlying, start, end, samplingNo * 3, histo, Euclidean[Double]).map((idx, _))
+        (idx, ComparisonOps.uniformDomain(underlying, start, end, samplingNo * 3, histo, Euclidean[Double]))
     }
 
     ExpOutOps.clear(expName)

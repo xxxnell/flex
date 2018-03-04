@@ -14,14 +14,15 @@ class SketchPropSpec extends Specification with ScalaCheck {
     "construct" in {
 
       "structure size" in {
+        val cmapSize = 10
         implicit val conf: CustomSketchConf = CustomSketchConf(
-          cmapSize = 10, cmapNo = 2, cmapStart = Some(0d), cmapEnd = Some(10d),
+          cmapSize = cmapSize, cmapNo = 2, cmapStart = Some(0d), cmapEnd = Some(10d),
           counterSize = 10, counterNo = 2
         )
         val sketch0 = Sketch.empty[Double]
 
-        if(sketch0.structures.size != 1)
-          ko(s"Initialized size of sketch structure is not1: size = ${sketch0.structures.size}")
+        if(sketch0.cmapSize != cmapSize)
+          ko(s"Initialized size of sketch structure is not 1: size = ${sketch0.cmapSize}, expected: $cmapSize")
         else ok
       }
 
@@ -48,11 +49,11 @@ class SketchPropSpec extends Specification with ScalaCheck {
         )
         val sketch0 = Sketch.empty[Double]
 
-        (for {
-          sketch1 <- sketch0.update(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-          count <- sketch1.count(1, 5)
-        } yield count)
-          .fold(ko)(count => if(count < 10) ok else ko(s"count: $count, expected: 5"))
+        val sketch1 = sketch0.update(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+        val count = sketch1.count(1, 5)
+
+        if(count < 10) ok
+        else ko(s"count: $count, expected: 5")
       }
 
       "basic 2" in {
@@ -64,11 +65,11 @@ class SketchPropSpec extends Specification with ScalaCheck {
         )
         val sketch0 = Sketch.empty[Double]
 
-        (for {
-          sketch1 <- sketch0.update(1, 2, 3, 4, 5, 6, 7, 8, 9)
-          count <- sketch1.count(0, 10)
-        } yield count)
-          .fold(ko)(count => if(count ~= 9) ok else ko(s"count: $count, expected: 9"))
+        val sketch1 = sketch0.update(1, 2, 3, 4, 5, 6, 7, 8, 9)
+        val count = sketch1.count(0, 10)
+
+        if(count ~= 9) ok
+        else ko(s"count: $count, expected: 9")
       }
 
       "count smaller space then cmap bound" in {
@@ -80,11 +81,10 @@ class SketchPropSpec extends Specification with ScalaCheck {
         )
         val sketch0 = Sketch.empty[Double]
 
-        (for {
-          sketch1 <- sketch0.update(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-          count <- sketch1.count(1.1, 1.2)
-        } yield count)
-          .fold(ko)(count => if(count < 1) ok else ko(s"count: $count, expected: <1"))
+        val sketch1 = sketch0.update(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+        val count = sketch1.count(1.1, 1.2)
+
+        if(count < 1) ok else ko(s"count: $count, expected: <1")
       }
 
     }
@@ -94,7 +94,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
       "update int" in {
         (for {
           sketch <- SketchGen.intSketchSample
-          updated <- sketch.update(1)
+          updated = sketch.update(1)
         } yield updated)
           .fold(ko)(sketch => ok)
       }
@@ -102,7 +102,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
       "update boolean" in {
         (for {
           sketch <- SketchGen.booleanSketchSample
-          updated <- sketch.update(true)
+          updated = sketch.update(true)
         } yield updated)
           .fold(ko)(sketch => ok)
       }
@@ -118,11 +118,11 @@ class SketchPropSpec extends Specification with ScalaCheck {
         )
         val sketch0 = Sketch.empty[Double]
 
-        (for {
-          sketch <- sketch0.narrowUpdate(0)
-          count <- sketch.count(-1, 1)
-        } yield count)
-          .fold(ko("Exception occurs."))(count => if(count > 0) ok else ko(s"count: $count, expected: 0<x<1"))
+        val sketch = sketch0.narrowUpdate(0)
+        val count = sketch.count(-1, 1)
+
+        if(count > 0) ok
+        else ko(s"count: $count, expected: 0<x<1")
       }
 
     }
@@ -138,8 +138,10 @@ class SketchPropSpec extends Specification with ScalaCheck {
         )
         val sketch0 = Sketch.empty[Double]
 
-        sketch0.probability(0, 1)
-          .fold(ko)(prob => if(prob > 0) ok else ko(s"probability: $prob"))
+        val prob = sketch0.probability(0, 1)
+
+        if(prob > 0) ok
+        else ko(s"probability: $prob")
       }
 
       "from min to 0 after updated" in {
@@ -151,25 +153,23 @@ class SketchPropSpec extends Specification with ScalaCheck {
         )
         val sketch0 = Sketch.empty[Double]
 
-        (for {
-          sketch1 <- sketch0.update(-1)
-          prob1 <- sketch1.probability(Double.MinValue, 0)
-          prob2 <- sketch1.probability(0, Double.MaxValue)
-        } yield (prob1, prob2))
-          .fold(ko){ case (prob1, prob2) =>
-            val cond1 = prob1 ~= 1d
-            val cond2 = prob2 ~= 0d
+        val sketch1 = sketch0.update(-1)
+        val prob1 = sketch1.probability(Double.MinValue, 0)
+        val prob2 = sketch1.probability(0, Double.MaxValue)
 
-            if(cond1 && cond2) ok
-            else ko(s"probability for [-∞, 0]: $prob1, probability for [0, +∞]: $prob2")
-          }
+        val expectedProb1 = 1d
+        val expectedProb2 = 0d
+
+        if(!(prob1 ~= expectedProb1)) ko(s"probability for [-∞, 0]: $prob1, expected: $expectedProb1")
+        else if(!(prob2 ~= expectedProb2)) ko(s"probability for [0, +∞]: $prob2, expected: $expectedProb2")
+        else ok
       }
 
       "for normal distribution" in {
         val error = 0.2
         val (start, end) = (0.0, 1.0)
         val dist = NumericDist.normal(0.0, 1.0)
-        val expected = dist.probability(start, end).get
+        val expected = dist.probability(start, end)
         val sampleNo = 3000
         val (cmapSize, cmapNo, cmapStart, cmapEnd) = (1000, 2, Some(-10.0), Some(10.0))
 
@@ -179,14 +179,11 @@ class SketchPropSpec extends Specification with ScalaCheck {
         val (_, samples) = dist.samples(sampleNo)
         val sketch0 = Sketch.empty[Double]
 
-        val utdSketch = samples.foldLeft(sketch0){ case (sketch, sample) =>
-          sketch.update(sample).getOrElse(sketch)
-        }
+        val utdSketch = samples.foldLeft(sketch0){ case (sketch, sample) => sketch.update(sample) }
+        val prob = utdSketch.probability(start, end)
 
-        utdSketch.probability(start, end).fold(ko("Exception occurs."))(prob =>
-          if(similar(prob, expected, error)) ok
-          else ko(s"Estimated probability for [$start, $end]: $prob. expected: $expected")
-        )
+        if(similar(prob, expected, error)) ok
+        else ko(s"Estimated probability for [$start, $end]: $prob. expected: $expected")
       }
 
     }
@@ -202,18 +199,18 @@ class SketchPropSpec extends Specification with ScalaCheck {
         )
         val sketch0 = Sketch.empty[Double]
 
-        sketch0.sampling.fold(ko("Fail to call the sampling."))(plot => {
-          val cond1 = plot.records.nonEmpty
-          val cond2 = plot.records.forall { case (_, value) => !value.isNaN }
-          val cond3 = plot.records.headOption.forall { case (range, _) => range.end ~= cmapStart.value }
-          val cond4 = plot.records.lastOption.forall { case (range, _) => range.start ~= cmapEnd.value }
+        val plot = sketch0.sampling
 
-          if(!cond1) ko("Plot record is empty.")
-          else if(!cond2) ko("Some value is NaN")
-          else if(!cond3) ko(s"${plot.records.headOption} is first range. cmapStart: $cmapStart")
-          else if(!cond4) ko(s"${plot.records.lastOption} is last range. cmapEnd: $cmapEnd")
-          else ok
-        })
+        val cond1 = plot.records.nonEmpty
+        val cond2 = plot.records.forall { case (_, value) => !value.isNaN }
+        val cond3 = plot.records.headOption.forall { case (range, _) => range.end ~= cmapStart.value }
+        val cond4 = plot.records.lastOption.forall { case (range, _) => range.start ~= cmapEnd.value }
+
+        if(!cond1) ko("Plot record is empty.")
+        else if(!cond2) ko("Some value is NaN")
+        else if(!cond3) ko(s"${plot.records.headOption} is first range. cmapStart: $cmapStart")
+        else if(!cond4) ko(s"${plot.records.lastOption} is last range. cmapEnd: $cmapEnd")
+        else ok
       }
 
     }
@@ -230,15 +227,15 @@ class SketchPropSpec extends Specification with ScalaCheck {
             counterSize = counterSize, counterNo = counterNo
           )
           val sketch0 = Sketch.empty[Double]
-          val sketch1O = sketch0.deepUpdate(1).map(_._1)
+          val sketch1 = sketch0.deepUpdate(1)._1
 
-          val cond1 = sketch0.youngCmap != sketch1O.flatMap(_.youngCmap)
-          val cond2 = sketch0.youngCmap.map(_.size) == sketch1O.flatMap(_.youngCmap).map(_.size)
+          val cond1 = sketch0.youngCmap != sketch1.youngCmap
+          val cond2 = sketch0.youngCmap.size == sketch1.youngCmap.size
 
           if(cond1 && cond2) ok
           else ko(
-            s"cmap1(${sketch0.youngCmap.map(_.size).getOrElse(0)}): ${sketch0.youngCmap}, " +
-              s"cmap2(${sketch1O.flatMap(_.youngCmap).map(_.size).getOrElse(0)}): ${sketch1O.flatMap(_.youngCmap)}"
+            s"cmap1(${sketch0.youngCmap.size}): ${sketch0.youngCmap}, " +
+              s"cmap2(${sketch1.youngCmap.size}): ${sketch1.youngCmap}"
           )
         }
 
@@ -248,18 +245,14 @@ class SketchPropSpec extends Specification with ScalaCheck {
             counterSize = 8, counterNo = 2
           )
           val sketch0 = Sketch.empty[Double]
+          val sketch1 = sketch0.deepUpdate(1)._1
+          val sketch2 = sketch1.deepUpdate(1)._1
+          val cmap0 = sketch0.youngCmap
+          val cmap1 = sketch1.youngCmap
+          val cmap2 = sketch2.youngCmap
 
-          (for {
-            sketch1 <- sketch0.deepUpdate(1).map(_._1)
-            sketch2 <- sketch1.deepUpdate(1).map(_._1)
-            cmap0 <- sketch0.youngCmap
-            cmap1 <- sketch1.youngCmap
-            cmap2 <- sketch2.youngCmap
-          } yield (cmap0, cmap1, cmap2))
-            .fold(ko("Exception occurs.")){ case (cmap0, cmap1, cmap2) =>
-              if(cmap0 != cmap1 && cmap1 != cmap2) ok
-              else ko(s"cmap0: $cmap0, cmap1: $cmap1, cmap2: $cmap2")
-            }
+          if(cmap0 != cmap1 && cmap1 != cmap2) ok
+          else ko(s"cmap0: $cmap0, cmap1: $cmap1, cmap2: $cmap2")
         }
 
       }
@@ -272,19 +265,16 @@ class SketchPropSpec extends Specification with ScalaCheck {
             counterSize = 8, counterNo = 2
           )
           val sketch0 = Sketch.empty[Double]
-          val strSize0 = sketch0.structures.size
+          val cmapNo0 = sketch0.cmapNo
 
-          (for {
-            sketch1OldStr <- sketch0.deepUpdate(1)
-            (sketch1, oldStrO) = sketch1OldStr
-          } yield (sketch1.structures.size, oldStrO))
-            .fold(ko("Exception occurs")) { case (strSize, oldStrO) =>
-              if (strSize != strSize0 + 1)
-                ko(s"Updated structure size is not ${strSize0 + 1}: size = $strSize")
-              else if(oldStrO.isDefined)
-                ko("deepUpdate returns old structure.")
-              else ok
-            }
+          val (sketch1, oldStrO) = sketch0.deepUpdate(1)
+          val cmapNo1 = sketch1.cmapNo
+
+          if (cmapNo1 != cmapNo0 + 1)
+            ko(s"Updated structure size is not ${cmapNo0 + 1}: size = $cmapNo1")
+          else if(oldStrO.isDefined)
+            ko("deepUpdate returns old structure.")
+          else ok
         }
 
         "bounded" in {
@@ -293,21 +283,17 @@ class SketchPropSpec extends Specification with ScalaCheck {
             counterSize = 8, counterNo = 2
           )
           val sketch0 = Sketch.empty[Double]
-          val strSize0 = sketch0.structures.size
+          val cmapNo0 = sketch0.cmapNo
+          val (sketch1, oldStr1) = sketch0.deepUpdate(1)
+          val cmapNo1 = sketch1.cmapNo
+          val (sketch2, oldStr2) = sketch1.deepUpdate(1)
+          val cmapNo2 = sketch2.cmapNo
 
-          (for {
-            sketch1OldStr <- sketch0.deepUpdate(1)
-            (sketch1, oldStr1) = sketch1OldStr
-            sketch2OldStr <- sketch1.deepUpdate(1)
-            (sketch2, oldStr2) = sketch2OldStr
-          } yield (sketch1.structures.size, sketch2.structures.size))
-            .fold(ko("Exception occurs")) { case (strSize1, strSize2) =>
-              if (strSize1 != strSize0 + 1)
-                ko(s"Updated structure size is not ${strSize0 + 1}: size = $strSize1")
-              else if(strSize1 != strSize2)
-                ko(s"Sketch structure size is not bounded: before = $strSize1, after = $strSize2")
-              else ok
-            }
+          if (cmapNo1 != cmapNo0 + 1)
+            ko(s"Updated structure size is not ${cmapNo0 + 1}: size = $cmapNo1")
+          else if(cmapNo1 != cmapNo2)
+            ko(s"Sketch structure size is not bounded: before = $cmapNo1, after = $cmapNo2")
+          else ok
         }
 
       }
@@ -323,11 +309,10 @@ class SketchPropSpec extends Specification with ScalaCheck {
         )
         val sketch0 = Sketch.empty[Double]
 
-        (for {
-          sketch1 <- sketch0.narrowUpdate(0.0 to 100.0 by 0.1: _*)
-          sketch2 <- sketch1.rearrange
-        } yield sketch2)
-          .fold(ko)(_ => ok)
+        val sketch1 = sketch0.narrowUpdate(0.0 to 100.0 by 0.1: _*)
+        val sketch2 = sketch1.rearrange
+
+        ok
       }
 
     }
@@ -341,11 +326,10 @@ class SketchPropSpec extends Specification with ScalaCheck {
         )
         val sketch0 = Sketch.empty[Double]
 
-        (for {
-          sketch1 <- sketch0.update(1)
-          count <- sketch1.count(0, 10)
-        } yield count)
-          .fold(ko)(count => if(count > 0) ok else ko(s"count: $count"))
+        val sketch1 = sketch0.update(1)
+        val count = sketch1.count(0, 10)
+
+        if(count > 0) ok else ko(s"count: $count")
       }
 
       "empty" in {
@@ -357,10 +341,9 @@ class SketchPropSpec extends Specification with ScalaCheck {
         )
         val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
 
-        (for {
-          count <- sketch0.count(0, 10)
-        } yield count)
-          .fold(ko)(count => if(count == 0) ok else ko(s"count: $count"))
+        val count = sketch0.count(0, 10)
+
+        if(count == 0) ok else ko(s"count: $count")
       }
 
     }
@@ -374,11 +357,10 @@ class SketchPropSpec extends Specification with ScalaCheck {
         )
         val sketch0 = Sketch.empty[Double]
 
-        (for {
-          sketch1 <- sketch0.update(1)
-          sum = sketch1.sum
-        } yield sum)
-          .fold(ko)(sum => if(sum > 0 && sum <= 1) ok else ko(s"sum: $sum"))
+        val sketch1 = sketch0.update(1)
+        val sum = sketch1.sum
+
+        if(sum > 0 && sum <= 1) ok else ko(s"sum: $sum")
       }
 
       "after updated" in {
@@ -388,11 +370,10 @@ class SketchPropSpec extends Specification with ScalaCheck {
         )
         val sketch0 = Sketch.empty[Double]
 
-        (for {
-          sketch1 <- sketch0.update(1, 2, 3, 4, 5)
-          sum = sketch1.sum
-        } yield sum)
-          .fold(ko)(sum => if(sum ~= 5) ok else ko(s"sum: $sum, expected: 5"))
+        val sketch1 = sketch0.update(1, 2, 3, 4, 5)
+        val sum = sketch1.sum
+
+        if(sum ~= 5) ok else ko(s"sum: $sum, expected: 5")
       }
 
       "after rearrange with 2 cmap" in {
@@ -403,12 +384,11 @@ class SketchPropSpec extends Specification with ScalaCheck {
         val sketch0 = Sketch.empty[Double]
         val expected = 5 / (1 + math.exp(-1))
 
-        (for {
-          sketch1 <- sketch0.update(1, 2, 3, 4, 5)
-          sketch2 <- sketch1.rearrange
-          sum = sketch2.sum
-        } yield sum)
-          .fold(ko)(sum => if(sum ~= expected) ok else ko(s"sum: $sum, expected: $expected"))
+        val sketch1 = sketch0.update(1, 2, 3, 4, 5)
+        val sketch2 = sketch1.rearrange
+        val sum = sketch2.sum
+
+        if(sum ~= expected) ok else ko(s"sum: $sum, expected: $expected")
       }
 
       "after rearrange update" in {
@@ -419,13 +399,12 @@ class SketchPropSpec extends Specification with ScalaCheck {
         val sketch0 = Sketch.empty[Double]
         val expected = 10 / (1 + math.exp(-1))
 
-        (for {
-          sketch1 <- sketch0.update(1, 2, 3, 4, 5)
-          sketch2 <- sketch1.rearrange
-          sketch3 <- sketch2.update(1, 2, 3, 4, 5)
-          sum = sketch3.sum
-        } yield sum)
-          .fold(ko)(sum => if(sum ~= expected) ok else ko(s"sum: $sum, expected: $expected"))
+        val sketch1 = sketch0.update(1, 2, 3, 4, 5)
+        val sketch2 = sketch1.rearrange
+        val sketch3 = sketch2.update(1, 2, 3, 4, 5)
+        val sum = sketch3.sum
+
+        if(sum ~= expected) ok else ko(s"sum: $sum, expected: $expected")
       }
 
       "after 2 rearrange and update with 3 cmap" in {
@@ -436,14 +415,13 @@ class SketchPropSpec extends Specification with ScalaCheck {
         val sketch0 = Sketch.empty[Double]
         val expected = (10 * math.exp(-1) + 5) / (1 + math.exp(-1))
 
-        (for {
-          sketch1 <- sketch0.update(1, 2, 3, 4, 5)
-          sketch2 <- sketch1.rearrange
-          sketch3 <- sketch2.rearrange
-          sketch4 <- sketch3.update(1, 2, 3, 4, 5)
-          sum = sketch4.sum
-        } yield sum)
-          .fold(ko)(sum => if(sum ~= expected) ok else ko(s"sum: $sum, expected: $expected"))
+        val sketch1 = sketch0.update(1, 2, 3, 4, 5)
+        val sketch2 = sketch1.rearrange
+        val sketch3 = sketch2.rearrange
+        val sketch4 = sketch3.update(1, 2, 3, 4, 5)
+        val sum = sketch4.sum
+
+        if(sum ~= expected) ok else ko(s"sum: $sum, expected: $expected")
       }
 
     }
@@ -456,16 +434,12 @@ class SketchPropSpec extends Specification with ScalaCheck {
           counterSize = 10, counterNo = 2
         )
         val sketch0 = Sketch.empty[Double]
-        val sketch1O = sketch0.update(0, 1, 1, 2, 3)
+        val sketch1 = sketch0.update(0, 1, 1, 2, 3)
 
-        (for {
-          sketch1 <- sketch1O
-          interpPdf <- SamplingDist.interpolationPdf(sketch1, 1d)
-          fastPdf <- Sketch.fastPdf(sketch1, 1d)
-        } yield (interpPdf, fastPdf))
-          .fold(ko("Exception occurs")){ case (interpPdf, fastPdf) =>
-            if(interpPdf ~= fastPdf) ok else ko(s"interpPdf: $interpPdf, fastPdf: $fastPdf")
-          }
+        val interpPdf = SamplingDist.interpolationPdf(sketch1, 1d)
+        val fastPdf = Sketch.fastPdf(sketch1, 1d)
+
+        if(interpPdf ~= fastPdf) ok else ko(s"interpPdf: $interpPdf, fastPdf: $fastPdf")
       }
 
       "boundary" in {
@@ -476,13 +450,10 @@ class SketchPropSpec extends Specification with ScalaCheck {
             counterSize = 10, counterNo = 2
           )
           val sketch0 = Sketch.empty[Double]
-          val sketch1O = sketch0.update(0, 1, 1, 2, 3)
+          val sketch1 = sketch0.update(0, 1, 1, 2, 3)
+          val fastPdf = Sketch.fastPdf(sketch1, Double.MinValue)
 
-          (for {
-            sketch1 <- sketch1O
-            fastPdf <- Sketch.fastPdf(sketch1, Double.MinValue)
-          } yield fastPdf)
-            .fold(ko("Exception occurs")){ _ => ok }
+          ok
         }
 
         "largest" in {
@@ -493,11 +464,10 @@ class SketchPropSpec extends Specification with ScalaCheck {
           val sketch0 = Sketch.empty[Double]
           val sketch1O = sketch0.update(0, 1, 1, 2, 3)
 
-          (for {
-            sketch1 <- sketch1O
-            fastPdf <- Sketch.fastPdf(sketch1, Double.MaxValue)
-          } yield fastPdf)
-            .fold(ko("Exception occurs")){ _ => ok }
+          val sketch1 = sketch1O
+          val fastPdf = Sketch.fastPdf(sketch1, Double.MaxValue)
+
+          ok
         }
 
       }

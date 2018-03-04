@@ -17,25 +17,23 @@ trait UniformDist[A] extends NumericDist[A] {
 
 trait UniformDistOps extends NumericDistOps[UniformDist] {
 
-  override def pdf[A](dist: UniformDist[A], a: A): Option[Prim] = {
+  override def pdf[A](dist: UniformDist[A], a: A): Prim = {
     val measure = dist.measure
     val p = measure.to(a)
     val pScale = measure.to(dist.scale)
 
     if ((pScale - dist.width / 2) < p && (pScale + dist.width / 2) > p) {
-      Some(1 / dist.width)
-    } else {
-      Some(0)
-    }
+      1.0 / dist.width
+    } else 0.0
   }
 
-  override def cdf[A](dist: UniformDist[A], a: A): Option[Double] = {
+  override def cdf[A](dist: UniformDist[A], a: A): Double = {
     val measure = dist.measure
     val p = measure.to(a)
     val pScale = measure.to(dist.scale)
     val q = p - pScale + (dist.width / 2)
 
-    if (q > 1) Some(1) else if (q < 0) Some(0) else Some(q)
+    if (q > 1) 1.0 else if (q < 0) 0.0 else q
   }
 
   def icdf[A](dist: UniformDist[A], p: Double): A = {

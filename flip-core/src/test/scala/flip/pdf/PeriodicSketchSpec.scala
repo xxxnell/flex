@@ -102,33 +102,19 @@ class PeriodicSketchSpec extends Specification with ScalaCheck {
           counterSize = counterSize, counterNo = counterNo
         )
         val sketch0: Sketch[Double] = PeriodicSketch.empty[Double]
-        val datas = Stream.from(1, 1).take(3)
+        val datas = Stream.from(1, 1).take(3).toList
 
-        val sequencialSketchsO: Option[List[Sketch[Double]]] = datas
-          .foldLeft(Option(List(sketch0))){ case (accO, data) => for {
-            acc <- accO
-            sketch <- acc.lastOption
-            utdSketch <- sketch.update(data)
-          } yield acc :+ utdSketch }
+        var sketch = sketch0
+        val seqSketches = datas.map { data => sketch = sketch.update(data); sketch }
+        val seqCmaps = seqSketches.map(sketch => sketch.youngCmap)
 
-        val sequencialCmapsO: Option[List[Cmap]] = sequencialSketchsO.flatMap(sketches =>
-          sketches.traverse(sketch => sketch.youngCmap)
-        )
-
-        val cond = sequencialCmapsO.exists(cmaps => cmaps.sliding(2)
-          .map {
-            case cmap1 :: cmap2 :: Nil => Some((cmap1, cmap2))
-            case _ => None
-          }.forall {
-            case Some((cmap1: DividerCmap, cmap2: DividerCmap)) => cmap1 != cmap2
-            case _ => false
-          }
-        )
+        val cond = seqCmaps.sliding(2).forall {
+          case cmap1 :: cmap2 :: Nil => cmap1 != cmap2
+          case _ => false
+        }
 
         if(cond) ok else ko(
-          sequencialCmapsO.map(cmaps =>
-            cmaps.zipWithIndex.map { case (cmap, idx) => s"cmap ${idx+1}: $cmap"}.mkString("\n")
-          ).getOrElse("empty cmap")
+          seqCmaps.zipWithIndex.map { case (cmap, idx) => s"cmap ${idx+1}: $cmap"}.mkString("\n")
         )
       }
 

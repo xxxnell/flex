@@ -17,20 +17,20 @@ trait ParetoDist[A] extends NumericDist[A] {
 
 trait ParetoDistOps extends NumericDistOps[ParetoDist] {
 
-  override def pdf[A](dist: ParetoDist[A], a: A): Option[Prim] = {
+  override def pdf[A](dist: ParetoDist[A], a: A): Prim = {
     val scale = dist.measure.to(dist.scale)
     val p = dist.measure.to(a)
     val numeric = new ParetoDistribution(scale, dist.shape)
 
-    Some(numeric.density(p))
+    numeric.density(p)
   }
 
-  override def cdf[A](dist: ParetoDist[A], a: A): Option[Prim] = {
+  override def cdf[A](dist: ParetoDist[A], a: A): Prim = {
     val scale = dist.measure.to(dist.scale)
     val p = dist.measure.to(a)
     val numeric = new ParetoDistribution(scale, dist.shape)
 
-    Some(numeric.cumulativeProbability(p))
+    numeric.cumulativeProbability(p)
   }
 
   def icdf[A](dist: ParetoDist[A], p: Double): A = {

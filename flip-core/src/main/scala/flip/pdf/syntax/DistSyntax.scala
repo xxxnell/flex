@@ -17,18 +17,18 @@ trait DistSyntax extends DistPropSyntax with DistMonadSyntax with DistArthmeticS
 trait DistPropSyntax {
 
   implicit class DistPropSyntaxImpl[A](dist: Dist[A]) {
-    def probability(from: A, to: A): Option[Double] = Dist.probability(dist, from, to)
-    def pdf(a: A): Option[Double] = Dist.pdf(dist, a)
-    def cdf(a: A): Option[Double] = Dist.cdf(dist, a)
+    def probability(from: A, to: A): Double = Dist.probability(dist, from, to)
+    def pdf(a: A): Double = Dist.pdf(dist, a)
+    def cdf(a: A): Double = Dist.cdf(dist, a)
     def sample: (Dist[A], A) = Dist.sample(dist)
     def samples(n: Int): (Dist[A], List[A]) = Dist.samples(dist, n)
-    def sampling(ranges: List[RangeM[A]]): Option[PlottedDist[A]] =
+    def sampling(ranges: List[RangeM[A]]): PlottedDist[A] =
       Dist.samplingDist(dist, ranges)
-    def sampling(pltDist: PlottedDist[A]): Option[PlottedDist[A]] =
+    def sampling(pltDist: PlottedDist[A]): PlottedDist[A] =
       Dist.samplingDistForPlottedDist(dist, pltDist)
-    def sampling(smplDist: SamplingDist[A]): Option[PlottedDist[A]] =
+    def sampling(smplDist: SamplingDist[A]): PlottedDist[A] =
       Dist.samplingDistForSamplingDist(dist, smplDist)
-    def uniformSampling(start: A, end: A, size: Int): Option[PlottedDist[A]] =
+    def uniformSampling(start: A, end: A, size: Int): PlottedDist[A] =
       Dist.uniformSampling(dist, start, end, size)
     def histogram(ranges: List[RangeM[A]]): String = AsciiArtPlot.histogram(dist, ranges)
   }

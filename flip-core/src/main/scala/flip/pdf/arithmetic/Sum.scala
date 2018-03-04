@@ -15,14 +15,8 @@ object Sum {
     PredefinedDist.bare[A](measureB, conf, (from: A, to: A) => probabilityForWeightDists(from, to, weightDists))
   }
 
-  def probabilityForWeightDists[A](from: A, to: A, weightDists: List[(Double, Dist[A])]): Option[Double] =
+  def probabilityForWeightDists[A](from: A, to: A, weightDists: List[(Double, Dist[A])]): Double =
     // todo normalize the weights
-    weightDists.foldLeft(Option(0d)) {
-      case (accProbO, (weight, distB)) =>
-        for {
-          accProb <- accProbO
-          probB <- distB.probability(from, to)
-        } yield accProb + weight * probB
-    }
+    weightDists.foldLeft(0.0) { case (accProb, (weight, distB)) => accProb + weight * distB.probability(from, to) }
 
 }

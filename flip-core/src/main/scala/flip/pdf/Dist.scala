@@ -23,7 +23,7 @@ trait Dist[A] {
 
 trait DistPropOps[D[_] <: Dist[_]] extends DistPropLaws[D] {
 
-  def probability[A](dist: D[A], start: A, end: A): Option[Double]
+  def probability[A](dist: D[A], start: A, end: A): Double
 
   def sample[A](dist: D[A]): (D[A], A)
 
@@ -31,17 +31,17 @@ trait DistPropOps[D[_] <: Dist[_]] extends DistPropLaws[D] {
 
 trait DistPropLaws[D[_] <: Dist[_]] { self: DistPropOps[D] =>
 
-  def numericPdf[A](dist: D[A], a: A): Option[Double] = {
+  def numericPdf[A](dist: D[A], a: A): Double = {
     val measure = dist.measure.asInstanceOf[Measure[A]]
     val delta = dist.conf.delta
     val ap = measure.from(measure.to(a) + delta)
 
-    probability(dist, a, ap).map(prob => prob / delta)
+    probability(dist, a, ap) / delta
   }
 
-  def pdf[A](dist: D[A], a: A): Option[Double] = ???
+  def pdf[A](dist: D[A], a: A): Double = ???
 
-  def cdf[A](sketch: D[A], a: A): Option[Double] = ???
+  def cdf[A](sketch: D[A], a: A): Double = ???
 
   def samples[A](dist: D[A], n: Int): (D[A], List[A]) = {
     (0 until n).foldLeft[(D[A], List[A])]((dist, Nil)) {
@@ -51,46 +51,42 @@ trait DistPropLaws[D[_] <: Dist[_]] { self: DistPropOps[D] =>
     }
   }
 
-  def sampling[A](probability: (A, A) => Option[Double], domains: List[RangeM[A]]): Option[DensityPlot] = {
-    val recordsO = domains
+  def sampling[A](probability: (A, A) => Double, domains: List[RangeM[A]]): DensityPlot = {
+    val records = domains
       .filter(range => !range.isPoint)
-      .traverse(range =>
-        probability(range.start, range.end).map { prob =>
-          (RangeP.forRangeM(range), (prob / range.length).toDouble)
-      })
+      .map(range => (RangeP.forRangeM(range), (probability(range.start, range.end) / range.length).toDouble))
 
-    for {
-      records <- recordsO
-    } yield DensityPlot.disjoint(records)
+    DensityPlot.disjoint(records)
   }
 
-  def samplingForDomain[A](dist: D[A], domains: List[RangeM[A]]): Option[DensityPlot] = {
+  def samplingForDomain[A](dist: D[A], domains: List[RangeM[A]]): DensityPlot = {
     sampling((start: A, end: A) => probability(dist, start, end), domains)
   }
 
-  def samplingDist[A](dist: D[A], domains: List[RangeM[A]]): Option[PlottedDist[A]] =
-    for {
-      plot <- samplingForDomain(dist, domains)
-      conf = SamplingDistConf.forDistConf(dist.conf)
-    } yield PlottedDist.bare(dist.measure.asInstanceOf[Measure[A]], plot, conf)
+  def samplingDist[A](dist: D[A], domains: List[RangeM[A]]): PlottedDist[A] = {
+    val plot = samplingForDomain(dist, domains)
+    val conf = SamplingDistConf.forDistConf(dist.conf)
 
-  def samplingDistForPlottedDist[A](dist: D[A], pltDist: PlottedDist[A]): Option[PlottedDist[A]] =
-    for {
-      densityPlot <- Option(pltDist.sampling)
-      domainsP = densityPlot.records.map(_._1)
-      domainsM = domainsP.map(rangeP => rangeP.modifyMeasure(pltDist.measure))
-      dist <- samplingDist(dist, domainsM)
-    } yield dist
+    PlottedDist.bare(dist.measure.asInstanceOf[Measure[A]], plot, conf)
+  }
 
-  def samplingDistForSamplingDist[A](dist: D[A], smplDist: SamplingDist[A]): Option[PlottedDist[A]] =
-    for {
-      densityPlot <- smplDist.sampling
-      domainsP = densityPlot.records.map(_._1)
-      domainsM = domainsP.map(rangeP => rangeP.modifyMeasure(smplDist.measure))
-      dist <- samplingDist(dist, domainsM)
-    } yield dist
+  def samplingDistForPlottedDist[A](dist: D[A], pltDist: PlottedDist[A]): PlottedDist[A] = {
+    val densityPlot = pltDist.sampling
+    val domainsP = densityPlot.records.map(_._1)
+    val domainsM = domainsP.map(rangeP => rangeP.modifyMeasure(pltDist.measure))
 
-  def uniformSampling[A](dist: D[A], start: A, end: A, size: Int): Option[PlottedDist[A]] = {
+    samplingDist(dist, domainsM)
+  }
+
+  def samplingDistForSamplingDist[A](dist: D[A], smplDist: SamplingDist[A]): PlottedDist[A] = {
+    val densityPlot = smplDist.sampling
+    val domainsP = densityPlot.records.map(_._1)
+    val domainsM = domainsP.map(rangeP => rangeP.modifyMeasure(smplDist.measure))
+
+    samplingDist(dist, domainsM)
+  }
+
+  def uniformSampling[A](dist: D[A], start: A, end: A, size: Int): PlottedDist[A] = {
     val domains = RangeM(start, end)(dist.measure.asInstanceOf[Measure[A]]).uniformSplit(size)
 
     samplingDist(dist, domains)
@@ -108,7 +104,7 @@ object Dist extends DistPropOps[Dist] { self =>
 
   // pipelining
 
-  def probability[A](dist: Dist[A], start: A, end: A): Option[Double] = dist match {
+  def probability[A](dist: Dist[A], start: A, end: A): Double = dist match {
     case smooth: SmoothDist[A] => SmoothDist.probability(smooth, start, end)
     case sampling: SamplingDist[A] => SamplingDist.probability(sampling, start, end)
     case combination: CombinationDist[A] => CombinationDist.probability(combination, start, end)
@@ -120,14 +116,14 @@ object Dist extends DistPropOps[Dist] { self =>
     case combination: CombinationDist[A] => CombinationDist.sample(combination)
   }
 
-  override def pdf[A](dist: Dist[A], a: A): Option[Double] = dist match {
+  override def pdf[A](dist: Dist[A], a: A): Double = dist match {
     case smooth: SmoothDist[A] => SmoothDist.pdf(smooth, a)
     case sampling: SamplingDist[A] => SamplingDist.pdf(sampling, a)
     case combination: CombinationDist[A] => CombinationDist.pdf(combination, a)
     case _ => super.pdf(dist, a)
   }
 
-  override def cdf[A](dist: Dist[A], a: A): Option[Prim] = dist match {
+  override def cdf[A](dist: Dist[A], a: A): Double = dist match {
     case smooth: SmoothDist[A] => SmoothDist.cdf(smooth, a)
     case sampling: SamplingDist[A] => SamplingDist.cdf(sampling, a)
     case combination: CombinationDist[A] => CombinationDist.cdf(combination, a)

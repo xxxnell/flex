@@ -8,14 +8,15 @@ import flip.range.RangeP
 
 trait EqualSpaceCdfUpdate {
 
-  def updateCmapForSketch(sketch: Sketch[_], ps: List[(Prim, Count)]): Option[Cmap] =
-    for {
-      sketchSamples <- sketch.sampling
-      mixingRatio = sketch.conf.mixingRatio
-      window = sketch.conf.dataKernelWindow
-      corr = sketch.conf.boundaryCorrection
-      cmapSize = sketch.conf.cmap.size
-    } yield updateCmap(sketchSamples, ps, mixingRatio, window, corr, cmapSize)
+  def updateCmapForSketch(sketch: Sketch[_], ps: List[(Prim, Count)]): Cmap = {
+    val sketchSamples = sketch.sampling
+    val mixingRatio = sketch.conf.mixingRatio
+    val window = sketch.conf.dataKernelWindow
+    val corr = sketch.conf.boundaryCorrection
+    val cmapSize = sketch.conf.cmap.size
+
+    updateCmap(sketchSamples, ps, mixingRatio, window, corr, cmapSize)
+  }
 
   def updateCmap(sketchSamples: DensityPlot,
                  ps: List[(Prim, Count)],

@@ -14,17 +14,17 @@ case class DeltaDist[A](measure: Measure[A], conf: SmoothDistConf, pole: A, rng:
 
 trait DeltaDistOps extends NumericDistOps[DeltaDist] {
 
-  override def pdf[A](dist: DeltaDist[A], a: A): Option[Double] = {
+  override def pdf[A](dist: DeltaDist[A], a: A): Double = {
     val pole = dist.measure.to(dist.pole)
 
-    if (a != pole) Some(0) else Some(Double.PositiveInfinity)
+    if (a != pole) 0.0 else Double.PositiveInfinity
   }
 
-  override def cdf[A](dist: DeltaDist[A], a: A): Option[Double] = {
+  override def cdf[A](dist: DeltaDist[A], a: A): Double = {
     val p = dist.measure.to(a)
     val pole = dist.measure.to(dist.pole)
 
-    if (p >= pole) Some(1) else Some(0)
+    if (p >= pole) 1.0 else 0.0
   }
 
   def icdf[A](dist: DeltaDist[A], p: Double): A = dist.pole

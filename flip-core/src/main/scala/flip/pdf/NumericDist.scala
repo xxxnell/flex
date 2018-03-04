@@ -22,11 +22,12 @@ trait NumericDistOps[D[_] <: NumericDist[_]] extends SmoothDistPropOps[D] { self
 
   def icdf[A](dist: D[A], a: Double): A
 
-  def probability[A](dist: D[A], start: A, end: A): Option[Double] =
-    for {
-      cdfStart <- cdf(dist, start)
-      cdfEnd <- cdf(dist, end)
-    } yield cdfEnd - cdfStart
+  def probability[A](dist: D[A], start: A, end: A): Double = {
+    val cdfStart = cdf(dist, start)
+    val cdfEnd = cdf(dist, end)
+
+    cdfEnd - cdfStart
+  }
 
   def sample[A](dist: D[A]): (D[A], A) = {
     val (rng, rand) = dist.rng.next
@@ -75,7 +76,7 @@ object NumericDist extends NumericDistOps[NumericDist] {
 
   // pipelining
 
-  override def pdf[A](dist: NumericDist[A], a: A): Option[Prim] = dist match {
+  override def pdf[A](dist: NumericDist[A], a: A): Prim = dist match {
     case dist: ParetoDist[A] => ParetoDist.pdf(dist, a)
     case dist: LogNormalDist[A] => LogNormalDist.pdf(dist, a)
     case dist: NormalDist[A] => NormalDist.pdf(dist, a)
@@ -84,7 +85,7 @@ object NumericDist extends NumericDistOps[NumericDist] {
     case _ => super.pdf(dist, a)
   }
 
-  override def cdf[A](dist: NumericDist[A], a: A): Option[Double] = dist match {
+  override def cdf[A](dist: NumericDist[A], a: A): Double = dist match {
     case dist: ParetoDist[A] => ParetoDist.cdf(dist, a)
     case dist: LogNormalDist[A] => LogNormalDist.cdf(dist, a)
     case dist: NormalDist[A] => NormalDist.cdf(dist, a)

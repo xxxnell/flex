@@ -39,14 +39,14 @@ trait CombinationDistOps[D[_] <: CombinationDist[_]] extends DistPropOps[D] {
       components => NonEmptyList.fromList(components.toList.updated(idx, f(utdWeight, utdDist))).get)
   }
 
-  def probability[A](combi: D[A], start: A, end: A): Option[Double] = {
+  def probability[A](combi: D[A], start: A, end: A): Double = {
     val components = combi.normalized
     val probs = components.map {
       case (weight, dist) =>
-        (weight, dist.asInstanceOf[Dist[A]].probability(start, end).get)
+        (weight, dist.asInstanceOf[Dist[A]].probability(start, end))
     }
 
-    Some(probs.map { case (weight, prob) => weight * prob }.toList.sum)
+    probs.map { case (weight, prob) => weight * prob }.toList.sum
   }
 
   def sample[A](combi: D[A]): (D[A], A) = {
@@ -73,24 +73,24 @@ trait CombinationDistOps[D[_] <: CombinationDist[_]] extends DistPropOps[D] {
     (utdCombi2, sample)
   }
 
-  override def pdf[A](combi: D[A], a: A): Option[Double] = {
+  override def pdf[A](combi: D[A], a: A): Double = {
     val components = combi.normalized
     val pdfs = components.map {
       case (weight, dist) =>
-        (weight, dist.asInstanceOf[Dist[A]].pdf(a).get)
+        (weight, dist.asInstanceOf[Dist[A]].pdf(a))
     }
 
-    Some(pdfs.map { case (weight, prob) => weight * prob }.toList.sum)
+    pdfs.map { case (weight, prob) => weight * prob }.toList.sum
   }
 
-  override def cdf[A](combi: D[A], a: A): Option[Double] = {
+  override def cdf[A](combi: D[A], a: A): Double = {
     val components = combi.normalized
     val cdfs = components.map {
       case (weight, dist) =>
-        (weight, dist.asInstanceOf[Dist[A]].cdf(a).get)
+        (weight, dist.asInstanceOf[Dist[A]].cdf(a))
     }
 
-    Some(cdfs.map { case (weight, prob) => weight * prob }.toList.sum)
+    cdfs.map { case (weight, prob) => weight * prob }.toList.sum
   }
 
   def normalizingConstant(weights: NonEmptyList[Double]): Double = 1 / weights.toList.sum

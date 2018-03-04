@@ -8,11 +8,7 @@ import flip.plot.DensityPlot
   * */
 object Hilbert {
 
-  def normForSamplingDist[A](d1: SamplingDist[A]): Double =
-    (for {
-      sampling <- d1.sampling
-    } yield normForPlot(sampling))
-      .getOrElse(Double.PositiveInfinity)
+  def normForSamplingDist[A](d1: SamplingDist[A]): Double = normForPlot(d1.sampling)
 
   def normForPlot(pdf: DensityPlot): Double =
     (for {

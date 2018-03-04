@@ -20,13 +20,10 @@ class KLDSpec extends Specification with ScalaCheck {
       }.toList
       val expected = 0.1234
 
-      (for {
-        sampling <- normal1.sampling(samples)
-        kld <- KLD.simForSampling(sampling, normal2)
-      } yield kld)
-        .fold(ko("Error occurs.")){ kld =>
-          if(kld ~= expected) ok else ko(s"kld: $kld, expected: $expected")
-        }
+      val sampling = normal1.sampling(samples)
+      val kld = KLD.simForSampling(sampling, normal2)
+
+      if(kld ~= expected) ok else ko(s"kld: $kld, expected: $expected")
     }
 
   }

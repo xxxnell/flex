@@ -51,7 +51,7 @@ class SketchOpsBench { self =>
     val sketch0 = Sketch.empty[Double]
 
     self.conf = conf
-    self.sketch = sketch0.narrowUpdate(samples: _*).getOrElse(sketch0)
+    self.sketch = sketch0.narrowUpdate(samples: _*)
   }
 
   @Benchmark
@@ -72,17 +72,17 @@ class SketchOpsBench { self =>
   }
 
   @Benchmark
-  def sampling: Option[DensityPlot] = {
+  def sampling: DensityPlot = {
     sketch.sampling
   }
 
   @Benchmark
-  def narrowUpdate: Option[Sketch[Double]] = {
+  def narrowUpdate: Sketch[Double] = {
     sketch.narrowUpdate(1)
   }
 
   @Benchmark
-  def deepUpdate: Option[(Sketch[Double], Option[(Cmap, HCounter)])] = {
+  def deepUpdate: (Sketch[Double], Option[(Cmap, HCounter)]) = {
     sketch.deepUpdate(1.0 to 10.0 by 1.0: _*)
   }
 
@@ -92,22 +92,22 @@ class SketchOpsBench { self =>
   }
 
   @Benchmark
-  def rearrange: Option[Sketch[Double]] = {
+  def rearrange: Sketch[Double] = {
     sketch.rearrange
   }
 
   @Benchmark
-  def probability: Option[Double] = {
+  def probability: Double = {
     sketch.probability(1, 2)
   }
 
   @Benchmark
-  def count: Option[Double] = {
+  def count: Double = {
     sketch.count(1, 2)
   }
 
   @Benchmark
-  def median: Option[Double] = {
+  def median: Double = {
     sketch.median
   }
 
