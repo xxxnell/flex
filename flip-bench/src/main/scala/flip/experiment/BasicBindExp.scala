@@ -1,7 +1,7 @@
 package flip.experiment
 
 import flip.experiment.ops.ExpOutOps
-import flip._
+import flip.implicits._
 
 /**
   * A basic experiment to bind lognormal with normal distribution.
@@ -28,11 +28,9 @@ object BasicBindExp {
     val sketch0 = Sketch.empty[Double]
     val underlying = NumericDist.logNormal(0.0, 1)
     val (_, datas) = underlying.samples(dataNo)
-    val sketchTraces = sketch0 :: sketch0.updateTrace(datas)
-    val idxSketches = sketchTraces.indices.zip(sketchTraces).toList
-    val (_, sketch1) = idxSketches.lastOption.getOrElse((0, sketch0))
+    val sketch1 = sketch0.updateInOrder(datas)
 
-    val bindingSketch = sketch1.flatMap(x => NumericDist.normal(x, 2))
+    val bindingSketch = sketch1.flatMap(x => NumericDist.normal(x, 1.5))
     val prevSketchPdf = sketch1.pdfPlot
     val bindingSketchPdf = bindingSketch.pdfPlot
 

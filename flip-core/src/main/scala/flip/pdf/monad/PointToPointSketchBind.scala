@@ -38,6 +38,7 @@ object PointToPointSketchBind extends SketchBind[Sketch, Dist, Sketch] {
           Some((domainB.middle, sum * prob))
         case _ => None
       }
+      .filter { case (mid, _) => !measureB.to(mid).isNaN && !measureB.to(mid).isInfinity }
       .filter { case (_, count) => !count.isNaN }
 
     Sketch.concat(samplesB)(measureB, sketch.conf)

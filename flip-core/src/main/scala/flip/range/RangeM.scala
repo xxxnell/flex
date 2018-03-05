@@ -57,7 +57,7 @@ trait RangeMOps[Γ, R[_] <: RangeM[_]] {
   def middleP(start: Prim, end: Prim): Prim = {
     if (start == Double.NegativeInfinity && end == Double.NegativeInfinity) Double.NegativeInfinity
     else if (start == Double.PositiveInfinity && end == Double.PositiveInfinity) Double.PositiveInfinity
-    else start + ((end - start) / 2)
+    else start + (end / 2 - start / 2)
   }
 
   def middle[A <: Γ](range: R[A]): A =
