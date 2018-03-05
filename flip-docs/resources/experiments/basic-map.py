@@ -36,9 +36,11 @@ prev_data_loc = dir + "basic-map-prev-pdf.out"
 post_data_loc = dir + "basic-map-post-pdf.out"
 
 ax = plt.subplot(1, 2, 1)
-pdfplt.pdfplot_bar(ax, prev_expected, prev_data_loc, prev_xmin, prev_xmax, prev_ymin, prev_ymax, "PDF before map")
+pdfplt.pdfplot_bar(ax, prev_expected, prev_data_loc, prev_xmin, prev_xmax, prev_ymin, prev_ymax)
+ax.set_title("PDF before map")
 ax = plt.subplot(1, 2, 2)
-pdfplt.pdfplot_bar(ax, post_expected, post_data_loc, post_xmin, post_xmax, post_ymin, post_ymax, "PDF after map")
+pdfplt.pdfplot_bar(ax, post_expected, post_data_loc, post_xmin, post_xmax, post_ymin, post_ymax)
+ax.set_title("PDF after map")
 
 
 # Save Plot

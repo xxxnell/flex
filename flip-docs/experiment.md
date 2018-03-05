@@ -52,6 +52,15 @@ Here is a experiment result under the situation where the distribution that `Ske
 This figure shows the estimated median and KL-divergence by using `Sketch`.
 
 
+## `flatMap`
+
+If you choose a first order function `A ⇒ Kernel` from value `A` to kernel function `Kernel` centered on the given value `A` as a parameter of `flatMap`, this operation is a probability distribution smoothing method, often called kernel density estimation, or KDE for short. 
+
+The following figure shows the result of implementing KDE as a simple example of `flatMap`. At first, log-normal distribution is estimated by `Sketch`. Then, KDE with normal distribution with deviation 1.5 as kernel function executes.
+
+![before and after of `flatMap` operation](resources/experiments/basic-bind.png)
+
+
 ## `map`
 
 The following figure is the result of an experiment that estimates the standard normal distribution using `Sketch` and then transform the domain to the log-normal distribution using the `map` operation. 
@@ -59,5 +68,7 @@ The following figure is the result of an experiment that estimates the standard 
 By definition, the [log-normal distribution](https://en.wikipedia.org/wiki/Log-normal_distribution#Characterization) is a distribution that takes the log of domain X for a normal distribution. Therefore, if `Sketch` which is learned by normal distribution executes `map` operation, that is `stdSketch.map(x => math.exp(x))`, the log-normal distribution should be obtained as a result.
 
 ![before and after of `map` operation](resources/experiments/basic-map.png)
+
+
 
 
