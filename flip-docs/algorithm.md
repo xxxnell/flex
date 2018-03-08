@@ -9,5 +9,9 @@ The algorithm of `narrowUpdate` is intuitive. The algorithm of `deepUpdate` matt
 
 The following figure shows the difference between conventional and `Sketch`'s method to determine quantization points. (left) The conventional method simply divides the domain equally. (right) `Sketch` method finds points on domain that equally divides the cumulative density.
 
+https://en.wikipedia.org/wiki/Histogram_equalization
+
 ![equal space split algorithm](resources/diagrams/equal-space-split-algorithm.png)
+
+For those who study image processing, this algorithm can be compared to the [Histogram Equalization](https://en.wikipedia.org/wiki/Histogram_equalization) algorithm.
 
