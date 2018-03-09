@@ -22,6 +22,7 @@ The table below shows the result of execution time benchmark for the primary fun
 | `map` | | |
 | `flatMap` | 1,564,522 | 1,409,802 |
 | `median` | 208,418 | 308,059 |
+| `sample` | 159,117 | 155,688 |
 
 
 ## Comparison of several density estimation algorithms

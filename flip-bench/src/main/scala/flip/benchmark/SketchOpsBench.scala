@@ -14,19 +14,19 @@ class SketchOpsBench { self =>
 
   // parameters
 
-  @Param(Array("0", "30"))
+  @Param(Array("0", "50"))
   var queueSize: Int = _
 
-  @Param(Array("2", "20"))
+  @Param(Array("3", "30"))
   var cmapNo: Int = _
 
   @Param(Array("20", "200"))
   var cmapSize: Int = _
 
-  @Param(Array("2"))
+  @Param(Array("1"))
   var counterNo: Int = _
 
-  @Param(Array("100000"))
+  @Param(Array("2147483647"))
   var counterSize: Int = _
 
   // variables
