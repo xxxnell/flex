@@ -8,9 +8,9 @@ import flip.plot.{CountPlotSyntax, DensityPlotSyntax, PlotSyntax}
 import flip.range.RangeSyntax
 import flip.sim.SimSyntax
 
-object implicits extends SyntaxComplex
+object implicits extends AllSyntax
 
-trait SyntaxComplex
+trait AllSyntax
     extends ConfPkgSyntax
     with MeasurePkgSyntax
     with PdfPkgSyntax

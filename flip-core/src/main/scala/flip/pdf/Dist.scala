@@ -6,6 +6,7 @@ import flip.measure.Measure
 import flip.pdf.arithmetic.CombinationDist
 import flip.plot.DensityPlot
 import flip.range.{RangeM, RangeP}
+import flip.rand.IRng
 
 import scala.language.higherKinds
 
@@ -17,6 +18,8 @@ trait Dist[A] {
 
   def measure: Measure[A]
 
+  def rng: IRng
+
   def conf: DistConf
 
 }
@@ -26,6 +29,8 @@ trait DistPropOps[D[_] <: Dist[_]] extends DistPropLaws[D] {
   def probability[A](dist: D[A], start: A, end: A): Double
 
   def sample[A](dist: D[A]): (D[A], A)
+
+  def modifyRng[A](dist: D[A], f: IRng => IRng): D[A]
 
 }
 
@@ -64,10 +69,11 @@ trait DistPropLaws[D[_] <: Dist[_]] { self: DistPropOps[D] =>
   }
 
   def samplingDist[A](dist: D[A], domains: List[RangeM[A]]): PlottedDist[A] = {
+    val measure = dist.measure.asInstanceOf[Measure[A]]
     val plot = samplingForDomain(dist, domains)
     val conf = SamplingDistConf.forDistConf(dist.conf)
 
-    PlottedDist.bare(dist.measure.asInstanceOf[Measure[A]], plot, conf)
+    PlottedDist.bare(measure, dist.rng, plot, conf)
   }
 
   def samplingDistForPlottedDist[A](dist: D[A], pltDist: PlottedDist[A]): PlottedDist[A] = {
@@ -128,6 +134,12 @@ object Dist extends DistPropOps[Dist] { self =>
     case sampling: SamplingDist[A] => SamplingDist.cdf(sampling, a)
     case combination: CombinationDist[A] => CombinationDist.cdf(combination, a)
     case _ => super.cdf(dist, a)
+  }
+
+  override def modifyRng[A](dist: Dist[A], f: IRng => IRng): Dist[A] = dist match {
+    case smooth: SmoothDist[A] => SmoothDist.modifyRng(smooth, f)
+    case sampling: SamplingDist[A] => SamplingDist.modifyRng(sampling, f)
+    case combination: CombinationDist[A] => CombinationDist.modifyRng(combination, f)
   }
 
 }

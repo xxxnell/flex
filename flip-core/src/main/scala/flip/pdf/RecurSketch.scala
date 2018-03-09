@@ -2,6 +2,7 @@ package flip.pdf
 
 import flip.conf.SketchConf
 import flip.measure.Measure
+import flip.rand.IRng
 
 import scala.language.higherKinds
 
@@ -43,6 +44,7 @@ trait RecurSketchLaws[S[_] <: RecurSketch[_]] { self: RecurSketchOps[S] =>
 object RecurSketch extends RecurSketchOps[RecurSketch] {
 
   private case class RecurSketchImpl[A](measure: Measure[A],
+                                        rng: IRng,
                                         conf: SketchConf,
                                         structures: Structures,
                                         thresholds: Stream[Double],
@@ -50,30 +52,37 @@ object RecurSketch extends RecurSketchOps[RecurSketch] {
       extends RecurSketch[A]
 
   def bare[A](measure: Measure[A],
+              rng: IRng,
               conf: SketchConf,
               structure: Structures,
               thresholds: Stream[Double],
               count: Count): RecurSketch[A] =
-    RecurSketchImpl(measure, conf, structure, thresholds, count)
+    RecurSketchImpl(measure, rng, conf, structure, thresholds, count)
+
+  def modifyRng[A](sketch: RecurSketch[A], f: IRng => IRng): RecurSketch[A] =
+    sketch match {
+      case periodic: PeriodicSketch[A] => PeriodicSketch.modifyRng(periodic, f)
+      case _ => bare(sketch.measure, f(sketch.rng), sketch.conf, sketch.structures, sketch.thresholds, sketch.count)
+    }
 
   def modifyStructure[A](sketch: RecurSketch[A], f: Structures => Structures): RecurSketch[A] =
     sketch match {
       case periodic: PeriodicSketch[A] => PeriodicSketch.modifyStructure(periodic, f)
-      case _ =>
-        val utdStructure = f(sketch.structures)
-        bare(sketch.measure, sketch.conf, utdStructure, sketch.thresholds, sketch.count)
+      case _ => bare(sketch.measure, sketch.rng, sketch.conf, f(sketch.structures), sketch.thresholds, sketch.count)
     }
 
   def modifyThresholds[A](sketch: RecurSketch[A], f: Stream[Double] => Stream[Double]): RecurSketch[A] =
     sketch match {
       case periodic: PeriodicSketch[A] => PeriodicSketch.modifyThresholds(periodic, f)
-      case _ => bare(sketch.measure, sketch.conf, sketch.structures, f(sketch.thresholds), sketch.count)
+      case _ => bare(sketch.measure, sketch.rng, sketch.conf, sketch.structures, f(sketch.thresholds), sketch.count)
     }
 
   def modifyCount[A](sketch: RecurSketch[A], f: Count => Count): RecurSketch[A] = sketch match {
     case periodic: PeriodicSketch[A] => PeriodicSketch.modifyCount(periodic, f)
-    case _ => bare(sketch.measure, sketch.conf, sketch.structures, sketch.thresholds, f(sketch.count))
+    case _ => bare(sketch.measure, sketch.rng, sketch.conf, sketch.structures, sketch.thresholds, f(sketch.count))
   }
+
+  // overrides
 
   override def update[A](sketch: RecurSketch[A], as: List[(A, Count)]): RecurSketch[A] = sketch match {
     case (sketch: PeriodicSketch[A]) => PeriodicSketch.update(sketch, as)

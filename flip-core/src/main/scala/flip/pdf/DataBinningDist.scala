@@ -2,6 +2,7 @@ package flip.pdf
 
 import flip.conf.DataBinningDistConf
 import flip.plot.DensityPlot
+import flip.rand.IRng
 
 import scala.language.higherKinds
 
@@ -41,6 +42,10 @@ object DataBinningDist extends DataBinningDistOps[DataBinningDist] {
 
   def update[A](dist: DataBinningDist[A], as: List[(A, Count)]): DataBinningDist[A] = dist match {
     case sketch: Sketch[A] => Sketch.update(sketch, as)
+  }
+
+  def modifyRng[A](dist: DataBinningDist[A], f: IRng => IRng): DataBinningDist[A] = dist match {
+    case sketch: Sketch[A] => Sketch.modifyRng(sketch, f)
   }
 
 }

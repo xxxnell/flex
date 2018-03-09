@@ -1,6 +1,7 @@
 package flip.pdf
 
 import flip.conf.SmoothDistConf
+import flip.rand.IRng
 
 import scala.language.higherKinds
 
@@ -21,6 +22,11 @@ trait SmoothDistPropLaws[D[_] <: SmoothDist[_]] { self: SmoothDistPropOps[D] =>
 
 object SmoothDist extends SmoothDistPropOps[SmoothDist] {
 
+  def modifyRng[A](dist: SmoothDist[A], f: IRng => IRng): SmoothDist[A] = dist match {
+    case predefined: PredefinedDist[A] => PredefinedDist.modifyRng(predefined, f)
+    case numeric: NumericDist[A] => NumericDist.modifyRng(numeric, f)
+  }
+
   def probability[A](dist: SmoothDist[A], start: A, end: A): Prim = dist match {
     case predefined: PredefinedDist[A] => PredefinedDist.probability(predefined, start, end)
     case numeric: NumericDist[A] => NumericDist.probability(numeric, start, end)
@@ -30,6 +36,8 @@ object SmoothDist extends SmoothDistPropOps[SmoothDist] {
     case predefined: PredefinedDist[A] => PredefinedDist.sample(predefined)
     case numeric: NumericDist[A] => NumericDist.sample(numeric)
   }
+
+  // overrides
 
   override def pdf[A](dist: SmoothDist[A], a: A): Double = dist match {
     case predefined: PredefinedDist[A] => PredefinedDist.pdf(predefined, a)

@@ -4,6 +4,7 @@ import flip.conf.SamplingDistConf
 import flip.measure.Measure
 import flip.plot.DensityPlot
 import flip.range.RangeM
+import flip.rand.IRng
 
 import scala.language.higherKinds
 
@@ -37,6 +38,12 @@ object SamplingDist extends SamplingDistPropOps[SamplingDist] {
 
   def forSmoothDist[A](dist: SmoothDist[A], domains: List[RangeM[A]]): SamplingDist[A] =
     SmoothDist.samplingDist(dist, domains)
+
+  def modifyRng[A](dist: SamplingDist[A], f: IRng => IRng): SamplingDist[A] = dist match {
+    case (sketch: Sketch[A]) => Sketch.modifyRng(sketch, f)
+    case (plotted: PlottedDist[A]) => PlottedDist.modifyRng(plotted, f)
+    case _ => ???
+  }
 
   def probability[A](dist: SamplingDist[A], start: A, end: A): Double = dist match {
     case (sketch: Sketch[A]) => Sketch.probability(sketch, start, end)

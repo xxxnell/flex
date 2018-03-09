@@ -474,6 +474,25 @@ class SketchPropSpec extends Specification with ScalaCheck {
 
     }
 
+    "sample" in {
+
+      "basic" in {
+        val (_, samples) = NumericDist.normal(0.0, 1).samples(100)
+        val sketch0 = Sketch.empty[Double].updateInOrder(samples)
+        val (sketch1, sample) = sketch0.sample
+
+        if(sample.isNaN || sample.isInfinite) ko(s"sample: $sample") else ok
+      }
+
+      "empty" in {
+        val sketch0 = Sketch.empty[Double]
+        val (sketch1, sample) = sketch0.sample
+
+        if(sample.isNaN || sample.isInfinite) ko(s"sample: $sample") else ok
+      }
+
+    }
+
     /** End **/
 
   }

@@ -1,6 +1,6 @@
 import cats.data.Kleisli
 
-package object flip extends SyntaxComplex {
+package object flip extends AllSyntax {
 
   type Mon[A, B] = Kleisli[Some, A, B]
 

@@ -45,7 +45,7 @@ trait SketchPropSyntax {
     def youngCmap: Cmap = Sketch.youngCmap(sketch)
     def domain: RangeM[A] = Sketch.domain(sketch)
     def cdfPlot: DensityPlot = Sketch.cdfPlot(sketch)
-    def median: Double = Sketch.median(sketch)
+    def median: A = Sketch.median(sketch)
   }
 
 }

@@ -10,6 +10,7 @@ import flip.measure.Measure
 import flip.pdf.update.EqualSpaceCdfUpdate
 import flip.plot.DensityPlot
 import flip.range.{RangeM, RangeP}
+import flip.rand.IRng
 
 import scala.language.higherKinds
 import scala.util.Try
@@ -100,6 +101,7 @@ trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
     val rangePs = cmap.range(idx - 1) :: cmap.range(idx) :: cmap.range(idx + 1) :: Nil
     val rangeMs = rangePs.map(rangeP => rangeP.modifyMeasure(sketch.measure.asInstanceOf[Measure[A]]))
     val sampling = samplingForRanges(sketch, rangeMs)
+
     sampling.interpolation(p)
   }
 
@@ -110,14 +112,17 @@ trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
   }
 
   def cdfPlot[A](sketch: S[A]): DensityPlot = {
-    val pdf = sampling(sketch)
-    pdf.cumulative
+    sampling(sketch).cumulative
   }
 
-  def median[A](sketch: S[A]): Double = {
-    val cdf = cdfPlot(sketch)
-    val icdf = cdf.inverse
-    icdf.interpolation(0.5)
+  def icdfPlot[A](sketch: S[A]): DensityPlot = {
+    cdfPlot(sketch).inverse
+  }
+
+  def median[A](sketch: S[A]): A = {
+    val measure = sketch.measure.asInstanceOf[Measure[A]]
+
+    measure.from(icdfPlot(sketch).interpolation(0.5))
   }
 
   def cmapNo(sketch: S[_]): Int = sketch.structures.size.toInt
@@ -141,6 +146,14 @@ trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
     val measure = sketch.measure.asInstanceOf[Measure[A]]
 
     RangeM(measure.from(head), measure.from(last))(measure)
+  }
+
+  def sample[A](sketch: S[A]): (S[A], A) = {
+    val icdf = icdfPlot(sketch)
+    val (rng, rand) = sketch.rng.next
+    val measure = sketch.measure.asInstanceOf[Measure[A]]
+
+    (modifyRng(sketch, _ => rng), measure.from(icdf.interpolation(rand)))
   }
 
   // construct
@@ -170,9 +183,6 @@ trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
 
 object Sketch extends SketchPrimPropOps[Sketch] { self =>
 
-  def apply[A](measure: Measure[A], structure: Structures)(implicit conf: SketchConf): Sketch[A] =
-    SimpleSketch(measure, conf, structure)
-
   /**
     * @param measure  measure of Sketch
     * */
@@ -192,6 +202,13 @@ object Sketch extends SketchPrimPropOps[Sketch] { self =>
     case sketch: RecurSketch[_] => RecurSketch.modifyStructure(sketch, f)
     case sketch: AdaptiveSketch[_] => AdaptiveSketch.modifyStructure(sketch, f)
     case _ => SimpleSketch.modifyStructure(sketch, f)
+  }
+
+  def modifyRng[A](sketch: Sketch[A], f: IRng => IRng): Sketch[A] = sketch match {
+    case sketch: RecurSketch[_] => RecurSketch.modifyRng(sketch, f)
+    case sketch: AdaptiveSketch[_] => AdaptiveSketch.modifyRng(sketch, f)
+    case _ => SimpleSketch.modifyRng(sketch, f)
+
   }
 
   // syntatic sugars

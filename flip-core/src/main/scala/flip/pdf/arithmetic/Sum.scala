@@ -12,7 +12,8 @@ object Sum {
       .headOption
       .map(distConf => SmoothDistConf.forDistConf(distConf))
       .getOrElse(SmoothDistConf())
-    PredefinedDist.bare[A](measureB, conf, (from: A, to: A) => probabilityForWeightDists(from, to, weightDists))
+
+    PredefinedDist.probability((from: A, to: A) => probabilityForWeightDists(from, to, weightDists))(measureB, conf)
   }
 
   def probabilityForWeightDists[A](from: A, to: A, weightDists: List[(Double, Dist[A])]): Double =

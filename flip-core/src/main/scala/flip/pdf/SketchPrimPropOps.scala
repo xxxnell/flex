@@ -158,6 +158,4 @@ trait SketchPrimPropLaws[S[_] <: Sketch[_]] { self: SketchPrimPropOps[S] =>
     primDeepUpdate(sketch, ps)
   }
 
-  def sample[A](dist: S[A]): (S[A], A) = ???
-
 }

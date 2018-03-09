@@ -3,6 +3,7 @@ package flip.pdf
 import flip.conf.{AdaPerSketchConf, AdaptiveSketchConf}
 import flip.measure.Measure
 import flip.plot.CountPlot
+import flip.rand.IRng
 
 import scala.language.higherKinds
 import cats.implicits._
@@ -121,6 +122,8 @@ trait AdaptiveSketchLaws[S[_] <: AdaptiveSketch[_]] { self: AdaptiveSketchOps[S]
 }
 
 object AdaptiveSketch extends AdaptiveSketchOps[AdaptiveSketch] {
+
+  def modifyRng[A](dist: AdaptiveSketch[A], f: IRng => IRng): AdaptiveSketch[A] = ???
 
   def modifyQueue[A](sketch: AdaptiveSketch[A], f: List[(A, Count)] => List[(A, Count)]): AdaptiveSketch[A] =
     sketch match {

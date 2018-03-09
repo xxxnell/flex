@@ -15,7 +15,7 @@ object EqualSpaceSmoothingPs extends SmoothingPs {
     def probability(start: Prim, end: Prim): Double = cdf.interpolation(end) - cdf.interpolation(start)
 
     if (ps.nonEmpty) {
-      PredefinedDist.bare(doubleMeasure, conf, (start: Prim, end: Prim) => probability(start, end))
+      PredefinedDist.probability((start: Prim, end: Prim) => probability(start, end))
     } else NumericDist.uniform(0.0, Double.PositiveInfinity)(doubleMeasure, conf)
   }
 

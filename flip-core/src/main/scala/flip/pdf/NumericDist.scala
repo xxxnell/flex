@@ -10,11 +10,7 @@ import scala.language.higherKinds
   * NumericDist, or Numeric distribution means that the shape of the
   * distribution - pdf, cdf, and icdf - is defined numerically.
   * */
-trait NumericDist[A] extends SmoothDist[A] {
-
-  def rng: IRng
-
-}
+trait NumericDist[A] extends SmoothDist[A]
 
 trait NumericDistOps[D[_] <: NumericDist[_]] extends SmoothDistPropOps[D] { self =>
 
