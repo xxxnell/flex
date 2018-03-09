@@ -33,8 +33,8 @@ object PredefinedDist extends PredefinedDistOps[PredefinedDist] {
   def bare[A](measure: Measure[A], rng: IRng, conf: SmoothDistConf, probability: (A, A) => Double): PredefinedDist[A] =
     PredefinedDistImpl(measure, rng, conf, probability)
 
-  def probability[A](probability: (A, A) => Double)
-                    (implicit measure: Measure[A], conf: SmoothDistConf): PredefinedDist[A] =
+  def probability[A](probability: (A, A) => Double)(implicit measure: Measure[A],
+                                                    conf: SmoothDistConf): PredefinedDist[A] =
     bare(measure, IRng(-1), conf, probability)
 
   def sample[A](dist: PredefinedDist[A]): (PredefinedDist[A], A) = ???
