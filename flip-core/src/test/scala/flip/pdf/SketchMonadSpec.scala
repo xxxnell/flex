@@ -79,6 +79,33 @@ class SketchMonadSpec extends Specification with ScalaCheck {
 
       }
 
+      "for comprehension" in {
+
+        "1-elem" in {
+          val (_, samples) = NumericDist.normal(0.0, 1.0).samples(100)
+          val sketch0 = Sketch.empty[Double].updateInOrder(samples)
+
+          for {
+            x <- sketch0
+          } yield math.exp(x)
+
+          ok
+        }
+
+        "2-elem" in {
+          val (_, samples) = NumericDist.normal(0.0, 1.0).samples(100)
+          val sketch0 = Sketch.empty[Double].updateInOrder(samples)
+
+          for {
+            x <- sketch0
+            y <- NumericDist.normal(x, 1.0)
+          } yield y
+
+          ok
+        }
+
+      }
+
     }
 
   }
