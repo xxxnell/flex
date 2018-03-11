@@ -11,7 +11,7 @@ object Sum {
       .map { case (_, dist) => dist.conf }
       .headOption
       .map(distConf => SmoothDistConf.forDistConf(distConf))
-      .getOrElse(SmoothDistConf())
+      .getOrElse(SmoothDistConf.default)
 
     PredefinedDist.probability((from: A, to: A) => probabilityForWeightDists(from, to, weightDists))(measureB, conf)
   }

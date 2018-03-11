@@ -15,12 +15,12 @@ object PointToPointSketchBind extends SketchBind[Sketch, Dist, Sketch] {
       case (range, value) =>
         (range.roughLength * value, f(sketch.measure.from(range.middle)) match {
           case dist: DeltaDist[B] =>
-            val conf = SmoothDistConf(delta = sketch.conf.delta)
+            val conf = SmoothDistConf.default
             UniformDist.apply(dist.pole, range.roughLength)(measureB, conf)
           case dist => dist
         })
     }
-    val bindedDist = Sum.weightedSum(weightDists, measureB)
+    val bindedDist = PointToPointBind.bind(sketch, f, measureB)
 
     // find sampling points
     val smplPointBs = weightDists
@@ -56,8 +56,5 @@ object PointToPointSketchBind extends SketchBind[Sketch, Dist, Sketch] {
       val unit = 1 / (samplingNo.toDouble + 1)
       (0 to samplingNo).toList.map(i => numeric.icdf(i * unit))
   }
-
-//  def discretizeRecords[A](records: List[((A, A), Count)]): List[(A, Count)] =
-//    records.flatMap { case (range, count) => (range._1, count / 2) :: (range._2, count / 2) :: Nil }
 
 }

@@ -11,7 +11,7 @@ trait DistMonad[D1[_] <: Dist[_], D2[_] <: Dist[_], D3[_] <: Dist[_]]
     with DistFunctor[D1] {
 
   def pure[A](a: A, measure: Measure[A]): Dist[A] = {
-    val conf = SmoothDistConf(delta = 1e-10)
+    val conf = SmoothDistConf.default
     DeltaDist(measure, conf, a)
   }
 
@@ -27,8 +27,6 @@ trait DistMonadLaws[D1[_] <: Dist[_], D2[_] <: Dist[_], D3[_] <: Dist[_]] { self
 }
 
 object DistMonad {
-
-  def apply: DistMonad[Dist, Dist, Dist] = dist
 
   def dist: DistMonad[Dist, Dist, Dist] = ???
 
