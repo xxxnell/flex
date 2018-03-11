@@ -1,8 +1,9 @@
 package flip.pdf.monad
 
+import flip.conf.SketchConfB
 import flip.pdf.{Dist, Sketch}
 
 import scala.language.higherKinds
 
-trait SketchBind[Sketch1[_] <: Sketch[_], D[_] <: Dist[_], Sketch2[_] <: Sketch[_]]
-    extends SamplingDistBind[Sketch1, D, Sketch2] {}
+trait SketchBind[D1[_] <: Sketch[_], D2[_] <: Dist[_], D3[_] <: Sketch[_], C <: SketchConfB[D3[_]]]
+    extends SamplingDistBind[D1, D2, D3, C] {}

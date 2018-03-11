@@ -1,9 +1,11 @@
 package flip.conf
 
+import flip.pdf.AdaPerSketch
+
 /**
   * A configuration for AdaPerSketch.
   * */
-trait AdaPerSketchConf extends AdaptiveSketchConf with PeriodicSketchConf {}
+trait AdaPerSketchConfB[+D <: AdaPerSketch[_]] extends AdaptiveSketchConfB[D] with PeriodicSketchConfB[D] {}
 
 trait CustomAdaPerSketchConf extends AdaPerSketchConf with CustomSketchConf
 

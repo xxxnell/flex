@@ -1,9 +1,11 @@
 package flip.conf
 
+import flip.pdf.PeriodicSketch
+
 /**
   * A configuration for PeroidicSketch.
   * */
-trait PeriodicSketchConf extends SketchConf {
+trait PeriodicSketchConfB[+D <: PeriodicSketch[_]] extends SketchConfB[D] {
 
   val startThreshold: Double
 

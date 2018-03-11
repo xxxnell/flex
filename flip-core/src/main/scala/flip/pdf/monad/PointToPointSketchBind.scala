@@ -1,14 +1,14 @@
 package flip.pdf.monad
 
-import flip.conf.SmoothDistConf
+import flip.conf.{SketchConf, SmoothDistConf}
 import flip.measure.Measure
 import flip.pdf._
 import flip.pdf.arithmetic._
 import flip.range.RangeM
 
-object PointToPointSketchBind extends SketchBind[Sketch, Dist, Sketch] {
+object PointToPointSketchBind extends SketchBind[Sketch, Dist, Sketch, SketchConf] {
 
-  def bind[A, B](sketch: Sketch[A], f: A => Dist[B], measureB: Measure[B]): Sketch[B] = {
+  def bind[A, B](sketch: Sketch[A], f: A => Dist[B], measureB: Measure[B], conf: SketchConf): Sketch[B] = {
     // bindToDist
     val sampling = sketch.sampling
     val weightDists = sampling.records.map {
@@ -20,12 +20,12 @@ object PointToPointSketchBind extends SketchBind[Sketch, Dist, Sketch] {
           case dist => dist
         })
     }
-    val bindedDist = PointToPointBind.bind(sketch, f, measureB)
+    val bindedDist = PointToPointBind.bind(sketch, f, measureB, conf)
 
     // find sampling points
     val smplPointBs = weightDists
       .map(_._2)
-      .flatMap(dist => samplingPoints(dist, sketch.conf.bindSampling))
+      .flatMap(dist => samplingPoints(dist, conf.bindSampling))
       .sortBy(smpl => measureB.to(smpl))
     val sum = sketch.sum
     val samplesB = smplPointBs
@@ -41,7 +41,7 @@ object PointToPointSketchBind extends SketchBind[Sketch, Dist, Sketch] {
       .filter { case (mid, _) => !measureB.to(mid).isNaN && !measureB.to(mid).isInfinity }
       .filter { case (_, count) => !count.isNaN }
 
-    Sketch.concat(samplesB)(measureB, sketch.conf)
+    Sketch.concat(samplesB)(measureB, conf)
   }
 
   def samplingPoints[A](dist: Dist[A], samplingNo: Int): List[A] = dist match {

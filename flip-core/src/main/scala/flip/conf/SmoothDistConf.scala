@@ -1,6 +1,8 @@
 package flip.conf
 
-trait SmoothDistConf extends DistConf {}
+import flip.pdf.SmoothDist
+
+trait SmoothDistConfB[D <: SmoothDist[_]] extends DistConfB[D] {}
 
 object DefaultSmoothDistConf extends SmoothDistConf {
 

@@ -23,13 +23,13 @@ trait SamplingDistPropSyntax {
 
 trait SamplingDistMonadSyntax {
 
-  lazy val distMonad: SamplingDistMonad[SamplingDist, Dist, SamplingDist] = SamplingDistMonad()
+  lazy val samplingDistMonad: SamplingDistMonad[SamplingDist, Dist, SamplingDist, SamplingDistConf] = ???
 
   implicit class SamplingDistMonadSyntaxImpl[A](dist: SamplingDist[A]) {
-    def map[B](f: A => B)(implicit measureB: Measure[B]): SamplingDist[B] =
-      distMonad.map(dist, f, measureB)
-    def flatMap[B](f: A => Dist[B])(implicit measureB: Measure[B]): SamplingDist[B] =
-      distMonad.bind(dist, f, measureB)
+    def map[B](f: A => B)(implicit measureB: Measure[B], conf: SamplingDistConf): SamplingDist[B] =
+      samplingDistMonad.map(dist, f, measureB, conf)
+    def flatMap[B](f: A => Dist[B])(implicit measureB: Measure[B], conf: SamplingDistConf): SamplingDist[B] =
+      samplingDistMonad.bind(dist, f, measureB, conf)
   }
 
 }
