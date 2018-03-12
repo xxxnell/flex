@@ -9,3 +9,9 @@ import scala.language.higherKinds
 trait SamplingDistBind[
     D1[_] <: SamplingDist[_], D2[_] <: Dist[_], D3[_] <: SamplingDist[_], C <: SamplingDistConfB[D3[_]]]
     extends DistBind[D1, D2, D3, C] {}
+
+object SamplingDistBind {
+
+  def apply(): SamplingDistBind[SamplingDist, Dist, SamplingDist, SamplingDistConf] = ???
+
+}

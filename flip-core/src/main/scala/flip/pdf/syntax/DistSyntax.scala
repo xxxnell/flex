@@ -1,9 +1,9 @@
 package flip.pdf.syntax
 
-import flip.conf.{DistConf, DistConfB, SamplingDistConf, SketchConf}
+import flip.conf._
 import flip.measure.Measure
 import flip.pdf.arithmetic.CombinationDist
-import flip.pdf.monad.{DistFunctor, DistMonad}
+import flip.pdf.monad.{DistBind, DistFunctor}
 import flip.pdf.{Dist, PlottedDist, SamplingDist, Sketch}
 import flip.plot.AsciiArtPlot
 import flip.range.RangeM
@@ -49,13 +49,13 @@ trait DistMonadSyntax extends DistMonadSyntax1 {
                           measureB: Measure[B],
                           conf: DistConf): Dist[B] =
       functor.map(dist, f, measureB, conf)
-    def flatMap[B, D1[_] <: Dist[_], D2[_] <: Dist[_], C <: DistConfB[D2[_]]](f: A => D1[B])(
+    def flatMap[B, D1[_] <: Dist[_], D2[_] <: SamplingDist[_], C <: SamplingDistConfB[D2[_]]](f: A => D1[B])(
         implicit
         aux1: DistBindAux[D1, D2],
-        monad: DistMonad[Dist, D1, D2, C],
+        bind: DistBind[Dist, D1, D2, C],
         measureB: Measure[B],
         conf: C): aux1.Out[B] =
-      monad.bind(dist, f, measureB, conf)
+      bind.bind(dist, f, measureB, conf)
   }
 
 }
@@ -63,21 +63,21 @@ trait DistMonadSyntax extends DistMonadSyntax1 {
 trait DistMonadSyntax1 extends DistMonadSyntax2 {
 
   implicit def bindAux1: DistBindAux[Sketch, Sketch] = new DistBindAux[Sketch, Sketch] {}
-  implicit def distMonad1: DistMonad[Dist, Sketch, Sketch, SketchConf] = DistMonad.sketch
+  implicit def distBind1: DistBind[Dist, Sketch, Sketch, SketchConf] = DistBind.sketch
 
 }
 
 trait DistMonadSyntax2 extends DistMonadSyntax3 {
 
   implicit def bindAux2: DistBindAux[SamplingDist, SamplingDist] = new DistBindAux[SamplingDist, SamplingDist] {}
-  implicit def distMonad2: DistMonad[Dist, SamplingDist, SamplingDist, SamplingDistConf] = DistMonad.samplingDist
+  implicit def distBind2: DistBind[Dist, SamplingDist, SamplingDist, SamplingDistConf] = DistBind.samplingDist
 
 }
 
 trait DistMonadSyntax3 {
 
-  implicit def bindAux3: DistBindAux[Dist, Dist] = new DistBindAux[Dist, Dist] {}
-  implicit def distMonad3: DistMonad[Dist, Dist, Dist, DistConf] = DistMonad.dist
+  implicit def bindAux3: DistBindAux[Dist, SamplingDist] = new DistBindAux[Dist, SamplingDist] {}
+  implicit def distBind3: DistBind[Dist, Dist, SamplingDist, SamplingDistConf] = DistBind.dist
 
 }
 

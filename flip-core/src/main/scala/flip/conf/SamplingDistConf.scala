@@ -2,7 +2,7 @@ package flip.conf
 
 import flip.pdf.SamplingDist
 
-trait SamplingDistConfB[+D <: SamplingDist[_]] extends DistConfB[D]
+trait SamplingDistConfB[+D <: SamplingDist[_]] extends DistConfB[D] {}
 
 object SamplingDistConf {
 

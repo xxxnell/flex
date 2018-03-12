@@ -10,22 +10,12 @@ object PointToPointSketchBind extends SketchBind[Sketch, Dist, Sketch, SketchCon
 
   def bind[A, B](sketch: Sketch[A], f: A => Dist[B], measureB: Measure[B], conf: SketchConf): Sketch[B] = {
     // bindToDist
-    val sampling = sketch.sampling
-    val weightDists = sampling.records.map {
-      case (range, value) =>
-        (range.roughLength * value, f(sketch.measure.from(range.middle)) match {
-          case dist: DeltaDist[B] =>
-            val conf = SmoothDistConf.default
-            UniformDist.apply(dist.pole, range.roughLength)(measureB, conf)
-          case dist => dist
-        })
-    }
     val bindedDist = PointToPointBind.bind(sketch, f, measureB, conf)
+    val dists = PointToPointBind.weightDists(sketch, f, measureB, conf).map(_._2)
 
     // find sampling points
-    val smplPointBs = weightDists
-      .map(_._2)
-      .flatMap(dist => samplingPoints(dist, conf.bindSampling))
+    val smplPointBs = dists
+      .flatMap(dist => PointToPointBind.samplingPoints(dist, conf.bindSampling))
       .sortBy(smpl => measureB.to(smpl))
     val sum = sketch.sum
     val samplesB = smplPointBs
@@ -42,19 +32,6 @@ object PointToPointSketchBind extends SketchBind[Sketch, Dist, Sketch, SketchCon
       .filter { case (_, count) => !count.isNaN }
 
     Sketch.concat(samplesB)(measureB, conf)
-  }
-
-  def samplingPoints[A](dist: Dist[A], samplingNo: Int): List[A] = dist match {
-    case sketch: Sketch[A] =>
-      sketch.samplingPoints.flatMap(ps => ps.start :: ps.end :: Nil).distinct
-    case delta: DeltaDist[A] =>
-      val measure = delta.measure
-      val poleP = measure.to(delta.pole)
-      val width = delta.conf.delta
-      measure.from(poleP - width) :: measure.from(poleP + width) :: Nil
-    case numeric: NumericDist[A] =>
-      val unit = 1 / (samplingNo.toDouble + 1)
-      (0 to samplingNo).toList.map(i => numeric.icdf(i * unit))
   }
 
 }

@@ -3,7 +3,7 @@ package flip.pdf.syntax
 import flip.cmap.Cmap
 import flip.conf.SketchConf
 import flip.measure.Measure
-import flip.pdf.monad.SketchMonad
+import flip.pdf.monad.{SketchBind, SketchFunctor}
 import flip.pdf.{Count, Dist, Sketch, Structure}
 import flip.plot.DensityPlot
 import flip.range.RangeM
@@ -53,14 +53,12 @@ trait SketchPropSyntax {
 
 trait SketchMonadSyntax {
 
-  lazy val sketchMonad: SketchMonad[Sketch, Dist, Sketch, SketchConf] = SketchMonad.pointToPoint
-
   implicit class SketchMonadSyntaxImpl[A](sketch: Sketch[A]) {
     def map[B](f: A => B)(implicit measureB: Measure[B], conf: SketchConf): Sketch[B] =
-      sketchMonad.map(sketch, f, measureB, conf)
+      SketchFunctor().map(sketch, f, measureB, conf)
     def flatMap[B, S1 <: Sketch[_], S2 <: Sketch[_]](f: A => Dist[B])(implicit measureB: Measure[B],
                                                                       conf: SketchConf): Sketch[B] =
-      sketchMonad.bind(sketch, f, measureB, conf)
+      SketchBind().bind(sketch, f, measureB, conf)
   }
 
 }

@@ -10,6 +10,10 @@ object PointToPointSamplingDistBind extends SamplingDistBind[SamplingDist, Dist,
   def bind[A, B](dist: SamplingDist[A],
                  f: A => Dist[B],
                  measureB: Measure[B],
-                 conf: SamplingDistConf): SamplingDist[B] = ???
+                 conf: SamplingDistConf): SamplingDist[B] = {
+    val dists = PointToPointBind.weightDists(dist, f, measureB, conf).map(_._2)
+
+    ???
+  }
 
 }

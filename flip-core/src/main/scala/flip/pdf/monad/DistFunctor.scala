@@ -6,8 +6,8 @@ import flip.pdf.Dist
 
 import scala.language.higherKinds
 
-trait DistFunctor[D1[_] <: Dist[_], C <: DistConfB[D1[_]]] {
+trait DistFunctor[D[_] <: Dist[_], C <: DistConfB[D[_]]] {
 
-  def map[A, B](dist: D1[A], f: A => B, measureB: Measure[B], conf: C): D1[B]
+  def map[A, B](dist: D[A], f: A => B, measureB: Measure[B], conf: C): D[B]
 
 }
