@@ -32,23 +32,21 @@ object SmoothDist extends SmoothDistPropOps[SmoothDist] {
     case numeric: NumericDist[A] => NumericDist.probability(numeric, start, end)
   }
 
-  def sample[A](dist: SmoothDist[A]): (SmoothDist[A], A) = dist match {
-    case predefined: PredefinedDist[A] => PredefinedDist.sample(predefined)
-    case numeric: NumericDist[A] => NumericDist.sample(numeric)
-  }
-
   // overrides
 
-  override def pdf[A](dist: SmoothDist[A], a: A): Double = dist match {
+  def pdf[A](dist: SmoothDist[A], a: A): Double = dist match {
     case predefined: PredefinedDist[A] => PredefinedDist.pdf(predefined, a)
     case numeric: NumericDist[A] => NumericDist.pdf(numeric, a)
-    case _ => super.pdf(dist, a)
   }
 
-  override def cdf[A](dist: SmoothDist[A], a: A): Double = dist match {
+  def cdf[A](dist: SmoothDist[A], a: A): Double = dist match {
     case predefined: PredefinedDist[A] => PredefinedDist.cdf(predefined, a)
     case numeric: NumericDist[A] => NumericDist.cdf(numeric, a)
-    case _ => super.pdf(dist, a)
+  }
+
+  override def icdf[A](dist: SmoothDist[A], p: Double): A = dist match {
+    case predefined: PredefinedDist[A] => PredefinedDist.icdf(predefined, p)
+    case numeric: NumericDist[A] => NumericDist.icdf(numeric, p)
   }
 
 }

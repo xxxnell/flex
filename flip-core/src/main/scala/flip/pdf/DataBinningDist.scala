@@ -26,6 +26,10 @@ trait DataBinningDistLaws[D[_] <: DataBinningDist[_]]
 
 object DataBinningDist extends DataBinningDistOps[DataBinningDist] {
 
+  def modifyRng[A](dist: DataBinningDist[A], f: IRng => IRng): DataBinningDist[A] = dist match {
+    case sketch: Sketch[A] => Sketch.modifyRng(sketch, f)
+  }
+
   def probability[A](dist: DataBinningDist[A], start: A, end: A): Double = dist match {
     case (sketch: Sketch[A]) => Sketch.probability(sketch, start, end)
     case _ => ???
@@ -36,16 +40,12 @@ object DataBinningDist extends DataBinningDistOps[DataBinningDist] {
     case _ => ???
   }
 
-  def sample[A](dist: DataBinningDist[A]): (DataBinningDist[A], A) = dist match {
-    case sketch: Sketch[_] => Sketch.sample(sketch)
-  }
-
   def update[A](dist: DataBinningDist[A], as: List[(A, Count)]): DataBinningDist[A] = dist match {
     case sketch: Sketch[A] => Sketch.update(sketch, as)
   }
 
-  def modifyRng[A](dist: DataBinningDist[A], f: IRng => IRng): DataBinningDist[A] = dist match {
-    case sketch: Sketch[A] => Sketch.modifyRng(sketch, f)
+  override def pdf[A](dist: DataBinningDist[A], a: A): Double = dist match {
+    case sketch: Sketch[A] => Sketch.pdf(sketch, a)
   }
 
 }

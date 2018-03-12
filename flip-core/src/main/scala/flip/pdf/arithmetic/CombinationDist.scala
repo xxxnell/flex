@@ -10,7 +10,7 @@ import scala.language.higherKinds
 
 trait CombinationDist[A] extends Dist[A] {
 
-  lazy val normalized: NonEmptyList[(Out, Dist[A])] = CombinationDist.normalizing(components)
+  lazy val normalizedComponents: NonEmptyList[(Double, Dist[A])] = CombinationDist.normalizing(components)
 
   /**
     * @return list of (weight, distribution)
@@ -40,7 +40,7 @@ trait CombinationDistOps[D[_] <: CombinationDist[_]] extends DistPropOps[D] {
   }
 
   def probability[A](combi: D[A], start: A, end: A): Double = {
-    val components = combi.normalized
+    val components = combi.normalizedComponents
     val probs = components.map {
       case (weight, dist) =>
         (weight, dist.asInstanceOf[Dist[A]].probability(start, end))
@@ -49,8 +49,8 @@ trait CombinationDistOps[D[_] <: CombinationDist[_]] extends DistPropOps[D] {
     probs.map { case (weight, prob) => weight * prob }.toList.sum
   }
 
-  def sample[A](combi: D[A]): (D[A], A) = {
-    val components = combi.normalized
+  override def sample[A](combi: D[A]): (D[A], A) = {
+    val components = combi.normalizedComponents
     val (utdRng, rnd) = combi.rng.next
 
     val cumWeightDist = {
@@ -74,7 +74,7 @@ trait CombinationDistOps[D[_] <: CombinationDist[_]] extends DistPropOps[D] {
   }
 
   override def pdf[A](combi: D[A], a: A): Double = {
-    val components = combi.normalized
+    val components = combi.normalizedComponents
     val pdfs = components.map {
       case (weight, dist) =>
         (weight, dist.asInstanceOf[Dist[A]].pdf(a))
@@ -84,7 +84,7 @@ trait CombinationDistOps[D[_] <: CombinationDist[_]] extends DistPropOps[D] {
   }
 
   override def cdf[A](combi: D[A], a: A): Double = {
-    val components = combi.normalized
+    val components = combi.normalizedComponents
     val cdfs = components.map {
       case (weight, dist) =>
         (weight, dist.asInstanceOf[Dist[A]].cdf(a))
@@ -92,6 +92,8 @@ trait CombinationDistOps[D[_] <: CombinationDist[_]] extends DistPropOps[D] {
 
     cdfs.map { case (weight, prob) => weight * prob }.toList.sum
   }
+
+  def icdf[A](dist: D[A], p: Out): A = ???
 
   def normalizingConstant(weights: NonEmptyList[Double]): Double = 1 / weights.toList.sum
 

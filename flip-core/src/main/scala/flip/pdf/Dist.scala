@@ -44,9 +44,16 @@ trait DistPropLaws[D[_] <: Dist[_]] { self: DistPropOps[D] =>
     probability(dist, a, ap) / delta
   }
 
-  def pdf[A](dist: D[A], a: A): Double = ???
+  def pdf[A](dist: D[A], a: A): Double
 
-  def cdf[A](sketch: D[A], a: A): Double = ???
+  def cdf[A](dist: D[A], a: A): Double
+
+  def icdf[A](dist: D[A], p: Double): A
+
+  def sample[A](dist: D[A]): (D[A], A) = {
+    val (rng, rand) = dist.rng.next
+    (modifyRng(dist, _ => rng), icdf(dist, rand))
+  }
 
   def samples[A](dist: D[A], n: Int): (D[A], List[A]) = {
     (0 until n).foldLeft[(D[A], List[A])]((dist, Nil)) {
@@ -116,30 +123,33 @@ object Dist extends DistPropOps[Dist] { self =>
     case combination: CombinationDist[A] => CombinationDist.probability(combination, start, end)
   }
 
-  def sample[A](dist: Dist[A]): (Dist[A], A) = dist match {
-    case smooth: SmoothDist[A] => SmoothDist.sample(smooth)
-    case sampling: SamplingDist[A] => SamplingDist.sample(sampling)
-    case combination: CombinationDist[A] => CombinationDist.sample(combination)
-  }
-
-  override def pdf[A](dist: Dist[A], a: A): Double = dist match {
+  def pdf[A](dist: Dist[A], a: A): Double = dist match {
     case smooth: SmoothDist[A] => SmoothDist.pdf(smooth, a)
     case sampling: SamplingDist[A] => SamplingDist.pdf(sampling, a)
     case combination: CombinationDist[A] => CombinationDist.pdf(combination, a)
-    case _ => super.pdf(dist, a)
   }
 
-  override def cdf[A](dist: Dist[A], a: A): Double = dist match {
+  def cdf[A](dist: Dist[A], a: A): Double = dist match {
     case smooth: SmoothDist[A] => SmoothDist.cdf(smooth, a)
     case sampling: SamplingDist[A] => SamplingDist.cdf(sampling, a)
     case combination: CombinationDist[A] => CombinationDist.cdf(combination, a)
-    case _ => super.cdf(dist, a)
   }
 
-  override def modifyRng[A](dist: Dist[A], f: IRng => IRng): Dist[A] = dist match {
+  override def icdf[A](dist: Dist[A], p: Prim): A = dist match {
+    case smooth: SmoothDist[A] => SmoothDist.icdf(smooth, p)
+    case sampling: SamplingDist[A] => SamplingDist.icdf(sampling, p)
+    case combination: CombinationDist[A] => CombinationDist.icdf(combination, p)
+  }
+
+  def modifyRng[A](dist: Dist[A], f: IRng => IRng): Dist[A] = dist match {
     case smooth: SmoothDist[A] => SmoothDist.modifyRng(smooth, f)
     case sampling: SamplingDist[A] => SamplingDist.modifyRng(sampling, f)
     case combination: CombinationDist[A] => CombinationDist.modifyRng(combination, f)
+  }
+
+  override def sample[A](dist: Dist[A]): (Dist[A], A) = dist match {
+    case combi: CombinationDist[A] => CombinationDist.sample(combi)
+    case _ => super.sample(dist)
   }
 
 }

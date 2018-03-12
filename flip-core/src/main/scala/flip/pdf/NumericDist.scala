@@ -14,21 +14,11 @@ trait NumericDist[A] extends SmoothDist[A]
 
 trait NumericDistOps[D[_] <: NumericDist[_]] extends SmoothDistPropOps[D] { self =>
 
-  def modifyRng[A](dist: D[A], f: IRng => IRng): D[A]
-
-  def icdf[A](dist: D[A], a: Double): A
-
   def probability[A](dist: D[A], start: A, end: A): Double = {
     val cdfStart = cdf(dist, start)
     val cdfEnd = cdf(dist, end)
 
     cdfEnd - cdfStart
-  }
-
-  def sample[A](dist: D[A]): (D[A], A) = {
-    val (rng, rand) = dist.rng.next
-
-    (modifyRng(dist, _ => rng), icdf(dist, rand))
   }
 
 }
@@ -78,7 +68,6 @@ object NumericDist extends NumericDistOps[NumericDist] {
     case dist: NormalDist[A] => NormalDist.pdf(dist, a)
     case dist: DeltaDist[A] => DeltaDist.pdf(dist, a)
     case dist: UniformDist[A] => UniformDist.pdf(dist, a)
-    case _ => super.pdf(dist, a)
   }
 
   override def cdf[A](dist: NumericDist[A], a: A): Double = dist match {
