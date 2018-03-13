@@ -31,7 +31,7 @@ trait NormalDistOps extends NumericDistOps[NormalDist] {
     numericDist.cumulativeProbability(p)
   }
 
-  def icdf[A](dist: NormalDist[A], p: Double): A = {
+  override def icdf[A](dist: NormalDist[A], p: Double): A = {
     val numericDist = new NormalDistribution(dist.mean, dist.variance)
 
     dist.measure.from(numericDist.inverseCumulativeProbability(p))

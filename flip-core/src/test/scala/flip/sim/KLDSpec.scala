@@ -3,7 +3,7 @@ package flip.sim
 import org.specs2.mutable._
 import org.specs2.ScalaCheck
 import flip.conf.DistConf
-import flip.pdf.Dist
+import flip.pdf.{Dist, PlottedDist}
 import flip.range.RangeP
 import flip.measure.syntax._
 
@@ -20,8 +20,8 @@ class KLDSpec extends Specification with ScalaCheck {
       }.toList
       val expected = 0.1234
 
-      val sampling = normal1.sampling(samples)
-      val kld = KLD.simForSampling(sampling, normal2)
+      val sampling = PlottedDist.densityPlot[Double](normal1.sampling)
+      val kld = KLD.simForDist(sampling, normal2)
 
       if(kld ~= expected) ok else ko(s"kld: $kld, expected: $expected")
     }

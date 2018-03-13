@@ -27,7 +27,7 @@ trait DeltaDistOps extends NumericDistOps[DeltaDist] {
     if (p >= pole) 1.0 else 0.0
   }
 
-  def icdf[A](dist: DeltaDist[A], p: Double): A = dist.pole
+  override def icdf[A](dist: DeltaDist[A], p: Double): A = dist.pole
 
 }
 

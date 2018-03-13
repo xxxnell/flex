@@ -40,12 +40,12 @@ object PredefinedDist extends PredefinedDistOps[PredefinedDist] {
   def modifyRng[A](dist: PredefinedDist[A], f: IRng => IRng): PredefinedDist[A] =
     bare(dist.measure, f(dist.rng), dist.conf, dist.probability)
 
-  def pdf[A](dist: PredefinedDist[A], a: A): Prim = ???
+  override def pdf[A](dist: PredefinedDist[A], a: A): Prim = ???
 
-  def cdf[A](dist: PredefinedDist[A], a: A): Prim =
+  override def cdf[A](dist: PredefinedDist[A], a: A): Prim =
     throw new IllegalArgumentException("PredefinedDist can't execute cdf")
 
-  def icdf[A](dist: PredefinedDist[A], p: Prim): A =
+  override def icdf[A](dist: PredefinedDist[A], p: Prim): A =
     throw new IllegalArgumentException("PredefinedDist can't execute icdf")
 
 }

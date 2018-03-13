@@ -1,6 +1,6 @@
 package flip.sim
 
-import flip.pdf.{PlottedDist, SamplingDist}
+import flip.pdf.Dist
 import flip.plot.DensityPlot
 
 /**
@@ -8,7 +8,7 @@ import flip.plot.DensityPlot
   * */
 object Hilbert {
 
-  def normForSamplingDist[A](d1: SamplingDist[A]): Double = normForPlot(d1.sampling)
+  def normForSamplingDist[A](d1: Dist[A]): Double = normForPlot(d1.sampling)
 
   def normForPlot(pdf: DensityPlot): Double =
     (for {

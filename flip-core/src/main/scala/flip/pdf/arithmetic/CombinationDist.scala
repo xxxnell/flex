@@ -4,6 +4,8 @@ import cats.data.NonEmptyList
 import flip.conf.DistConf
 import flip.measure.Measure
 import flip.pdf.{Dist, DistPropOps}
+import flip.plot.DensityPlot
+import flip.plot.syntax._
 import flip.rand._
 
 import scala.language.higherKinds
@@ -73,6 +75,14 @@ trait CombinationDistOps[D[_] <: CombinationDist[_]] extends DistPropOps[D] {
     (utdCombi2, sample)
   }
 
+  def sampling[A](combi: D[A]): DensityPlot = {
+    val components = combi.normalizedComponents
+
+    components
+      .map { case (weight, dist) => dist.sampling * weight }
+      .foldLeft(DensityPlot.empty) { case (acc, plot) => acc + plot }
+  }
+
   override def pdf[A](combi: D[A], a: A): Double = {
     val components = combi.normalizedComponents
     val pdfs = components.map {
@@ -92,8 +102,6 @@ trait CombinationDistOps[D[_] <: CombinationDist[_]] extends DistPropOps[D] {
 
     cdfs.map { case (weight, prob) => weight * prob }.toList.sum
   }
-
-  def icdf[A](dist: D[A], p: Out): A = ???
 
   def normalizingConstant(weights: NonEmptyList[Double]): Double = 1 / weights.toList.sum
 

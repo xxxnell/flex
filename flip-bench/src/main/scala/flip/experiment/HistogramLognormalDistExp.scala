@@ -1,7 +1,7 @@
 package flip.experiment
 
 import flip._
-import flip.experiment.ops.{ComparisonOps, ExpOutOps}
+import flip.experiment.ops.ExpOutOps
 
 /**
   * A experiment to compare with sketch and histogram.
@@ -31,27 +31,18 @@ object HistogramLognormalDistExp { self =>
     val idxHistos = histoTraces.indices.zip(histoTraces).toList.filter { case (idx, _) => idx % 10 == 0 }
 
     // histogram results
-    val histoPdf = idxHistos.map { case (idx, histo) => (idx, histo.sampling) }
-    val histoKld = idxHistos.map {
-      case (idx, histo) =>
-        (idx, ComparisonOps.uniformDomain(underlying, smplStart, smplEnd, samplingNo * 3, histo, KLD[Double]))
-    }
-    val histoCos = idxHistos.map {
-      case (idx, histo) =>
-        (idx, ComparisonOps.uniformDomain(underlying, smplStart, smplEnd, samplingNo * 3, histo, Cosine[Double]))
-    }
-    val histoEuc = idxHistos.map {
-      case (idx, histo) =>
-        (idx, ComparisonOps.uniformDomain(underlying, smplStart, smplEnd, samplingNo * 3, histo, Euclidean[Double]))
-    }
+    val idxPdf = idxHistos.map { case (idx, histo) => (idx, histo.sampling) }
+    val idxKld = idxHistos.map { case (idx, utdSkt) => (idx, KLD(underlying, utdSkt)) }
+    val idxCos = idxHistos.map { case (idx, utdSkt) => (idx, Cosine(underlying, utdSkt)) }
+    val idxEuc = idxHistos.map { case (idx, utdSkt) => (idx, Euclidean(underlying, utdSkt)) }
 
     ExpOutOps.clear(expName)
 
     // write histo results
-    ExpOutOps.writePlots(expName, "histo-pdf", histoPdf)
-    ExpOutOps.writeStr(expName, "histo-kld", histoKld.map { case (idx, kld) => s"$idx, $kld" }.mkString("\n"))
-    ExpOutOps.writeStr(expName, "histo-cos", histoCos.map { case (idx, cos) => s"$idx, $cos" }.mkString("\n"))
-    ExpOutOps.writeStr(expName, "histo-euclidean", histoEuc.map { case (idx, cos) => s"$idx, $cos" }.mkString("\n"))
+    ExpOutOps.writePlots(expName, "histo-pdf", idxPdf)
+    ExpOutOps.writeStr(expName, "histo-kld", idxKld.map { case (idx, kld) => s"$idx, $kld" }.mkString("\n"))
+    ExpOutOps.writeStr(expName, "histo-cos", idxCos.map { case (idx, cos) => s"$idx, $cos" }.mkString("\n"))
+    ExpOutOps.writeStr(expName, "histo-euclidean", idxEuc.map { case (idx, cos) => s"$idx, $cos" }.mkString("\n"))
   }
 
 }

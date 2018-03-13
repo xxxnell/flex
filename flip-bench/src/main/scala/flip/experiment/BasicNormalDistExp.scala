@@ -1,8 +1,7 @@
 package flip.experiment
 
-import flip.experiment.ops.ExpOutOps
 import flip._
-import flip.experiment.ops._
+import flip.experiment.ops.ExpOutOps
 
 object BasicNormalDistExp {
 
@@ -31,24 +30,15 @@ object BasicNormalDistExp {
     val sketchTraces = sketch0 :: sketch0.updateTrace(datas)
     val idxSketches = sketchTraces.indices.zip(sketchTraces).toList.filter { case (idx, _) => idx % 10 == 0 }
     val idxDensityPlots = idxSketches.map { case (idx, utdSkt) => (idx, utdSkt.densityPlot) }
-    val idxKld = idxSketches.map {
-      case (idx, utdSkt) =>
-        (idx, ComparisonOps.identicalDomain(underlying, utdSkt, KLD[Double]))
-    }
-    val idxCosine = idxSketches.map {
-      case (idx, utdSkt) =>
-        (idx, ComparisonOps.uniformDomain(underlying, -2.5, 2.5, samplingNo * 3, utdSkt, Cosine[Double]))
-    }
-    val idxEuclidean = idxSketches.map {
-      case (idx, utdSkt) =>
-        (idx, ComparisonOps.uniformDomain(underlying, -2.5, 2.5, samplingNo * 3, utdSkt, Euclidean[Double]))
-    }
+    val idxKld = idxSketches.map { case (idx, utdSkt) => (idx, KLD(underlying, utdSkt)) }
+    val idxCos = idxSketches.map { case (idx, utdSkt) => (idx, Cosine(underlying, utdSkt)) }
+    val idxEuc = idxSketches.map { case (idx, utdSkt) => (idx, Euclidean(underlying, utdSkt)) }
 
     ExpOutOps.clear(expName1)
     ExpOutOps.writePlots(expName1, "pdf", idxDensityPlots)
     ExpOutOps.writeStr(expName1, "kld", idxKld.map { case (idx, kld) => s"$idx, $kld" }.mkString("\n"))
-    ExpOutOps.writeStr(expName1, "cosine", idxCosine.map { case (idx, cosine) => s"$idx, $cosine" }.mkString("\n"))
-    ExpOutOps.writeStr(expName1, "euclidean", idxEuclidean.map { case (idx, euc) => s"$idx, $euc" }.mkString("\n"))
+    ExpOutOps.writeStr(expName1, "cosine", idxCos.map { case (idx, cosine) => s"$idx, $cosine" }.mkString("\n"))
+    ExpOutOps.writeStr(expName1, "euclidean", idxEuc.map { case (idx, euc) => s"$idx, $euc" }.mkString("\n"))
   }
 
 }

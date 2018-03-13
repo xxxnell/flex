@@ -1,13 +1,15 @@
 package flip.range
 
 import flip.measure.Measure
+import flip.measure.syntax.doubleMeasure
 import flip.pdf.Prim
 
 import scala.collection.immutable.NumericRange
+import scala.language.implicitConversions
 
-trait RangeSyntax extends RangeMSyntax with RangePSyntax
+trait RangeSyntax {
 
-trait RangeMSyntax {
+  type RangeP = RangeM[Prim]
 
   implicit def scalaRange2RangeMs(range: Range): List[RangeM[Int]] =
     scalaNumericRange2RangeMs(NumericRange(range.start, range.end, range.step))
@@ -24,6 +26,7 @@ trait RangeMSyntax {
 
   implicit class RangeMSyntaxImpl[A](range: RangeM[A]) {
     def modifyMeasure[B](measure: Measure[B]): RangeM[B] = RangeM.modifyMeasure(range, measure)
+    def primitivize: RangeP = RangeM.modifyMeasure(range, doubleMeasure)
     def contains(a: A): Boolean = RangeM.contains(range, a)
     def greater(a: A): Boolean = RangeM.greater(range, a)
     def >(a: A): Boolean = RangeM.greater(range, a)
@@ -37,12 +40,6 @@ trait RangeMSyntax {
     def roughLength: Double = RangeM.roughLength(range)
     def uniformSplit(size: Int): List[RangeM[A]] = RangeM.uniformSplit(range, size)
   }
-
-}
-
-trait RangePSyntax {
-
-  type RangeP = RangeM[Prim]
 
   implicit class RangeImpl(range: RangeP) {
     def overlapPercent(range2: RangeP): Double = RangeP.overlapPercent(range, range2)

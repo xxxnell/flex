@@ -78,7 +78,7 @@ object NumericDist extends NumericDistOps[NumericDist] {
     case dist: UniformDist[A] => UniformDist.cdf(dist, a)
   }
 
-  def icdf[A](dist: NumericDist[A], p: Double): A = dist match {
+  override def icdf[A](dist: NumericDist[A], p: Double): A = dist match {
     case dist: ParetoDist[A] => ParetoDist.icdf(dist, p)
     case dist: LogNormalDist[A] => LogNormalDist.icdf(dist, p)
     case dist: NormalDist[A] => NormalDist.icdf(dist, p)

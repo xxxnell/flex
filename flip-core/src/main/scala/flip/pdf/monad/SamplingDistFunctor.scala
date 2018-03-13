@@ -5,10 +5,11 @@ import flip.pdf.{Dist, SamplingDist}
 
 import scala.language.higherKinds
 
-trait SamplingDistFunctor[D[_] <: SamplingDist[_], C <: SamplingDistConfB[D[_]]] extends DistFunctor[D, C]
+trait SamplingDistFunctor[D1[_] <: SamplingDist[_], D2[_] <: SamplingDist[_], C <: SamplingDistConfB[D2[_]]]
+    extends DistFunctor[D1, D2, C]
 
 object SamplingDistFunctor {
 
-  def apply(): SamplingDistFunctor[SamplingDist, SamplingDistConf] = ???
+  def default: SamplingDistFunctor[SamplingDist, SamplingDist, SamplingDistConf] = CombinatorialSamplingDistFunctor
 
 }

@@ -36,7 +36,7 @@ trait UniformDistOps extends NumericDistOps[UniformDist] {
     if (q > 1) 1.0 else if (q < 0) 0.0 else q
   }
 
-  def icdf[A](dist: UniformDist[A], p: Double): A = {
+  override def icdf[A](dist: UniformDist[A], p: Double): A = {
     if (p >= 0 && p <= 1) {
       val measure = dist.measure
       val pScale = measure.to(dist.scale)

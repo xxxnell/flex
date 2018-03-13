@@ -1,13 +1,35 @@
 package flip.pdf
 
-import org.specs2.mutable._
+import flip.implicits._
 import org.specs2.ScalaCheck
-import flip.measure._
-import flip.conf._
+import org.specs2.mutable._
 
 class DistSpec extends Specification with ScalaCheck {
 
   "Dist" should {
+
+    "prop ops" in {
+
+      "sampling" in {
+
+        "NumericDist" in {
+          NumericDist.normal(0.0, 1.0).sampling
+          ok
+        }
+
+        "CombinationDist" in {
+          ((0.5, NumericDist.normal(-2.0, 1)) + (0.5, NumericDist.normal(2.0, 1))).sampling
+          ok
+        }
+
+        "Sketch" in {
+          Sketch.empty[Double].sampling
+          ok
+        }
+
+      }
+
+    }
 
     "monad ops" in {
 

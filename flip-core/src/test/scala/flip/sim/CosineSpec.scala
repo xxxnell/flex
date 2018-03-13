@@ -1,7 +1,7 @@
 package flip.sim
 
 import flip.{Histogram, HistogramConf, NumericDist}
-import flip.pdf.Dist
+import flip.pdf.{Dist, PlottedDist}
 import org.specs2.mutable._
 import org.specs2.ScalaCheck
 import flip.measure.syntax._
@@ -15,10 +15,10 @@ class CosineSpec extends Specification with ScalaCheck {
       val normal2 = Dist.normal(0.0, 1)
       val expect = 1.0
 
-      val sampling = normal1.uniformSampling(-3.0, 3.0, 100)
+      val sampling = PlottedDist.densityPlot[Double](normal1.sampling)
       val cosineSim = Cosine(sampling, normal2)
-      val cosine = cosineSim.simForSampling(sampling, normal2)
-      val cosineDensity = cosineSim.simDensityForSampling(sampling, normal2)
+      val cosine = cosineSim.simForDist(sampling, normal2)
+      val cosineDensity = cosineSim.simDensityForDist(sampling, normal2)
 
       if(cosine ~= expect) ok
       else ko(s"Cosine similarity $cosine is not $expect. ")
@@ -34,7 +34,7 @@ class CosineSpec extends Specification with ScalaCheck {
       val histo = Histogram.empty[Double]
       val utdHisto = histo.update(datas: _*)
 
-      val underlyingSmp = underlying.uniformSampling(-3.0, 3.0, 1000)
+      val underlyingSmp = PlottedDist.densityPlot[Double](underlying.sampling)
       val cos = flip.sim.syntax.Cosine(underlyingSmp, utdHisto)
 
       if(cos > 1) ko(s"Theoretically, cosine similarity cannot be greater then 1. cos: $cos")

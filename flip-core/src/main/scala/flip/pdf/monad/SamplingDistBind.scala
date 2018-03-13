@@ -1,8 +1,8 @@
 package flip.pdf.monad
 
-import flip.conf.{DistConf, SamplingDistConf, SamplingDistConfB}
+import flip.conf.{DistConf, SamplingDistConf, SamplingDistConfB, SketchConf}
 import flip.measure.Measure
-import flip.pdf.{Dist, SamplingDist}
+import flip.pdf.{Dist, SamplingDist, Sketch}
 
 import scala.language.higherKinds
 
@@ -12,6 +12,10 @@ trait SamplingDistBind[
 
 object SamplingDistBind {
 
-  def apply(): SamplingDistBind[SamplingDist, Dist, SamplingDist, SamplingDistConf] = ???
+  def dist: SamplingDistBind[SamplingDist, Dist, SamplingDist, SamplingDistConf] = ???
+
+  def samplingDist: SamplingDistBind[SamplingDist, SamplingDist, SamplingDist, SamplingDistConf] = ???
+
+  def sketch: SamplingDistBind[SamplingDist, Sketch, Sketch, SketchConf] = ???
 
 }

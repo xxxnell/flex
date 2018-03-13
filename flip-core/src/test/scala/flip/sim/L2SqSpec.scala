@@ -1,7 +1,7 @@
 package flip.sim
 
 import flip.measure.syntax._
-import flip.pdf.Dist
+import flip.pdf.{Dist, PlottedDist}
 import flip.sim.syntax._
 import org.specs2.ScalaCheck
 import org.specs2.mutable._
@@ -16,7 +16,7 @@ class L2SqSpec extends Specification with ScalaCheck {
       val expect = 0.0
       val error = 1E-3
 
-      val sampling = normal1.uniformSampling(-3.0, 3.0, 100)
+      val sampling = PlottedDist.densityPlot[Double](normal1.sampling)
       val euclidean = Euclidean(sampling, normal2)
 
       val cond1 = euclidean ~= (expect, error)
@@ -30,7 +30,7 @@ class L2SqSpec extends Specification with ScalaCheck {
       val normal2 = Dist.normal(10.0, 1)
       val lowerBound = 1.0
 
-      val sampling = normal1.uniformSampling(-3.0, 3.0, 100)
+      val sampling = PlottedDist.densityPlot[Double](normal1.sampling)
       val euclidean = Euclidean(sampling, normal2)
 
       val cond1 = euclidean > lowerBound

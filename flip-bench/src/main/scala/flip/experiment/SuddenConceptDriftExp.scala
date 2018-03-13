@@ -1,7 +1,7 @@
 package flip.experiment
 
 import flip._
-import flip.experiment.ops.{ComparisonOps, ExpOutOps}
+import flip.experiment.ops.ExpOutOps
 
 /**
   * A experiment for sudden concept drift.
@@ -41,15 +41,9 @@ object SuddenConceptDriftExp {
     val sketchTraces = sketch0 :: sketch0.updateTrace(datas)
     val idxSketches = sketchTraces.indices.zip(sketchTraces).toList
     val idxDensityPlots = idxSketches.map { case (idx, utdSkt) => (idx, utdSkt.pdfPlot) }
-    val idxKld = idxSketches.map {
-      case (idx, utdSkt) => (idx, ComparisonOps.identicalDomain(underlying(idx), utdSkt, KLD[Double]))
-    }
-    val idxCos = idxSketches.map {
-      case (idx, utdSkt) => (idx, ComparisonOps.identicalDomain(underlying(idx), utdSkt, Cosine[Double]))
-    }
-    val idxEuc = idxSketches.map {
-      case (idx, utdSkt) => (idx, ComparisonOps.identicalDomain(underlying(idx), utdSkt, Euclidean[Double]))
-    }
+    val idxKld = idxSketches.map { case (idx, utdSkt) => (idx, KLD(underlying(idx), utdSkt)) }
+    val idxCos = idxSketches.map { case (idx, utdSkt) => (idx, Cosine(underlying(idx), utdSkt)) }
+    val idxEuc = idxSketches.map { case (idx, utdSkt) => (idx, Euclidean(underlying(idx), utdSkt)) }
     val idxSktMedian = idxSketches.map { case (idx, skt) => (idx, skt.median) }
 
     ExpOutOps.clear(expName)

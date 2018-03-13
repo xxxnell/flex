@@ -10,6 +10,6 @@ trait SketchBind[D1[_] <: Sketch[_], D2[_] <: Dist[_], D3[_] <: Sketch[_], C <: 
 
 object SketchBind {
 
-  def apply(): SketchBind[Sketch, Dist, Sketch, SketchConf] = ???
+  def default: SketchBind[Sketch, Dist, Sketch, SketchConf] = PointToPointSketchBind
 
 }

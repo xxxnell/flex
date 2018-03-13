@@ -13,10 +13,10 @@ trait DensitySim {
   def simDensity[A](sampling: DensityPlot, pdf: Prim => Double): DensityPlot =
     sampling.modify { case (range, value) => point(value, pdf(range.middle)) }
 
-  def simForSampling[A](d1: SamplingDist[A], d2: Dist[A]): Double =
+  def simForDist[A](d1: Dist[A], d2: Dist[A]): Double =
     sim(d1.sampling, p => d2.pdf(d2.measure.from(p)))
 
-  def simDensityForSampling[A](d1: SamplingDist[A], d2: Dist[A]): DensityPlot =
+  def simDensityForDist[A](d1: Dist[A], d2: Dist[A]): DensityPlot =
     simDensity(d1.sampling, p => d2.pdf(d2.measure.from(p)))
 
 }

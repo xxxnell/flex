@@ -33,7 +33,7 @@ trait LogNormalDistOps extends NumericDistOps[LogNormalDist] {
     numeric.cumulativeProbability(p)
   }
 
-  def icdf[A](dist: LogNormalDist[A], p: Double): A = {
+  override def icdf[A](dist: LogNormalDist[A], p: Double): A = {
     val scale = dist.measure.to(dist.scale)
     val numeric = new LogNormalDistribution(scale, dist.shape)
 

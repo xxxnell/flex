@@ -7,11 +7,11 @@ import flip.pdf.{DeltaDist, Dist, NumericDist, SamplingDist, Sketch, UniformDist
 
 object PointToPointBind { self =>
 
-  def bind[A, B](dist: SamplingDist[A], f: A => Dist[B], measureB: Measure[B], conf: DistConf): Dist[B] = {
+  def bind[A, B](dist: Dist[A], f: A => Dist[B], measureB: Measure[B], conf: DistConf): Dist[B] = {
     Sum.weightedSum(self.weightDists(dist, f, measureB, conf), measureB, conf)
   }
 
-  def weightDists[A, B](dist: SamplingDist[A],
+  def weightDists[A, B](dist: Dist[A],
                         f: A => Dist[B],
                         measureB: Measure[B],
                         conf: DistConf): List[(Double, Dist[B])] = {

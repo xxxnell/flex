@@ -1,7 +1,7 @@
 package flip.experiment
 
 import flip._
-import flip.experiment.ops.{ComparisonOps, ExpOutOps}
+import flip.experiment.ops.ExpOutOps
 
 object BasicBimodalDistExp {
 
@@ -32,18 +32,9 @@ object BasicBimodalDistExp {
     val sketchTraces = sketch0 :: sketch0.updateTrace(datas)
     val idxSketches = sketchTraces.indices.zip(sketchTraces).toList.filter { case (idx, _) => idx % 10 == 0 }
     val idxDensityPlots = idxSketches.map { case (idx, utdSkt) => (idx, utdSkt.densityPlot) }
-    val idxKld = idxSketches.map {
-      case (idx, utdSkt) =>
-        (idx, ComparisonOps.identicalDomain(underlying, utdSkt, KLD[Double]))
-    }
-    val idxCosine = idxSketches.map {
-      case (idx, utdSkt) =>
-        (idx, ComparisonOps.identicalDomain(underlying, utdSkt, Cosine[Double]))
-    }
-    val idxEuclidean = idxSketches.map {
-      case (idx, utdSkt) =>
-        (idx, ComparisonOps.identicalDomain(underlying, utdSkt, Euclidean[Double]))
-    }
+    val idxKld = idxSketches.map { case (idx, utdSkt) => (idx, KLD(underlying, utdSkt)) }
+    val idxCosine = idxSketches.map { case (idx, utdSkt) => (idx, Cosine(underlying, utdSkt)) }
+    val idxEuclidean = idxSketches.map { case (idx, utdSkt) => (idx, Euclidean(underlying, utdSkt)) }
 
     ExpOutOps.clear(expName1)
     ExpOutOps.writePlots(expName1, "pdf", idxDensityPlots)
