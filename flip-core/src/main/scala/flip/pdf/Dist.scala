@@ -88,48 +88,6 @@ trait DistPropLaws[D[_] <: Dist[_]] { self: DistPropOps[D] =>
 
   def icdf[A](dist: D[A], p: Double): A = interpolationIcdf(dist, p)
 
-  //  def sampling[A](probability: (A, A) => Double, domains: List[RangeM[A]]): DensityPlot = {
-//    val records = domains
-//      .filter(range => !range.isPoint)
-//      .map(range => (RangeP.forRangeM(range), (probability(range.start, range.end) / range.length).toDouble))
-//
-//    DensityPlot.disjoint(records)
-//  }
-//
-//  def samplingForDomain[A](dist: D[A], domains: List[RangeM[A]]): DensityPlot = {
-//    sampling((start: A, end: A) => probability(dist, start, end), domains)
-//  }
-//
-//  def samplingDist[A](dist: D[A], domains: List[RangeM[A]]): PlottedDist[A] = {
-//    val measure = dist.measure.asInstanceOf[Measure[A]]
-//    val plot = samplingForDomain(dist, domains)
-//    val conf = SamplingDistConf.forDistConf(dist.conf)
-//
-//    PlottedDist.bare(measure, dist.rng, plot, conf)
-//  }
-//
-//  def samplingDistForPlottedDist[A](dist: D[A], pltDist: PlottedDist[A]): PlottedDist[A] = {
-//    val densityPlot = pltDist.sampling
-//    val domainsP = densityPlot.records.map(_._1)
-//    val domainsM = domainsP.map(rangeP => rangeP.modifyMeasure(pltDist.measure))
-//
-//    samplingDist(dist, domainsM)
-//  }
-//
-//  def samplingDistForSamplingDist[A](dist: D[A], smplDist: SamplingDist[A]): PlottedDist[A] = {
-//    val densityPlot = smplDist.sampling
-//    val domainsP = densityPlot.records.map(_._1)
-//    val domainsM = domainsP.map(rangeP => rangeP.modifyMeasure(smplDist.measure))
-//
-//    samplingDist(dist, domainsM)
-//  }
-//
-//  def uniformSampling[A](dist: D[A], start: A, end: A, size: Int): PlottedDist[A] = {
-//    val domains = RangeM(start, end)(dist.measure.asInstanceOf[Measure[A]]).uniformSplit(size)
-//
-//    samplingDist(dist, domains)
-//  }
-
 }
 
 object Dist extends DistPropOps[Dist] { self =>

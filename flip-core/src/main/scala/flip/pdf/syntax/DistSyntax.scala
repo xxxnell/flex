@@ -23,15 +23,6 @@ trait DistPropSyntax {
     def sample: (Dist[A], A) = Dist.sample(dist)
     def samples(n: Int): (Dist[A], List[A]) = Dist.samples(dist, n)
     def sampling: DensityPlot = Dist.sampling(dist)
-//    def sampling(ranges: List[RangeM[A]]): PlottedDist[A] =
-//      Dist.samplingDist(dist, ranges)
-//    def sampling(pltDist: PlottedDist[A]): PlottedDist[A] =
-//      Dist.samplingDistForPlottedDist(dist, pltDist)
-//    def sampling(smplDist: SamplingDist[A]): PlottedDist[A] =
-//      Dist.samplingDistForSamplingDist(dist, smplDist)
-//    def uniformSampling(start: A, end: A, size: Int): PlottedDist[A] =
-//      Dist.uniformSampling(dist, start, end, size)
-//    def histogram(ranges: List[RangeM[A]]): String = AsciiArtPlot.histogram(dist, ranges)
   }
 
 }

@@ -26,9 +26,6 @@ trait SamplingDistPropLaws[D[_] <: SamplingDist[_]] { self: SamplingDistPropOps[
 
 object SamplingDist extends SamplingDistPropOps[SamplingDist] {
 
-//  def forSmoothDist[A](dist: SmoothDist[A], domains: List[RangeM[A]]): SamplingDist[A] =
-//    SmoothDist.samplingDist(dist, domains)
-
   def modifyRng[A](dist: SamplingDist[A], f: IRng => IRng): SamplingDist[A] = dist match {
     case dataBinning: DataBinningDist[A] => DataBinningDist.modifyRng(dataBinning, f)
     case (plotted: PlottedDist[A]) => PlottedDist.modifyRng(plotted, f)
