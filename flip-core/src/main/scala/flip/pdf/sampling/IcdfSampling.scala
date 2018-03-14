@@ -1,6 +1,6 @@
 package flip.pdf.sampling
 
-import flip.conf.{IcdfSamplingConf, SmoothDistConf}
+import flip.conf.{EqualizedIcdfSamplingConf, IcdfSamplingConf, SmoothDistConf}
 import flip.measure.Measure
 import flip.range.RangeM
 
@@ -15,6 +15,8 @@ trait IcdfSampling[C <: IcdfSamplingConf] {
 
 object IcdfSampling {
 
-  def apply[A](icdf: Double => A, measure: Measure[A], conf: SmoothDistConf): List[RangeM[A]] = ???
+  def apply[A](icdf: Double => A, measure: Measure[A], conf: SmoothDistConf): List[RangeM[A]] = conf.sampling match {
+    case conf: EqualizedIcdfSamplingConf => EqualizeIcdfSampling.sampling(icdf, measure, conf)
+  }
 
 }

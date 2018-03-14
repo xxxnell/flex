@@ -19,6 +19,9 @@ object PrimOps {
     prim1 === (prim2 +- tol)
   }
 
+  def floor(prim: Prim): Prim =
+    if (prim.isNegInfinity) Double.MinValue else if (prim.isPosInfinity) Double.MaxValue else prim
+
 }
 
 trait PrimSyntax {
@@ -28,6 +31,7 @@ trait PrimSyntax {
   implicit class PrimSyntaxImpl(prim: Prim) {
     def ~=(prim2: Prim)(implicit error: Double): Boolean = PrimOps.similarForError(prim, prim2, error)
     def ~=(primTol: (Prim, Prim)): Boolean = PrimOps.similarForTolerance(prim, primTol._1, primTol._2)
+    def floor: Prim = PrimOps.floor(prim)
   }
 
   def similar(prim1: Prim, prim2: Prim, error: Double): Boolean = PrimOps.similarForError(prim1, prim2, error)

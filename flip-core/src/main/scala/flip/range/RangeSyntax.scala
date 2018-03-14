@@ -34,10 +34,14 @@ trait RangeSyntax {
     def less(a: A): Boolean = RangeM.less(range, a)
     def <(a: A): Boolean = RangeM.less(range, a)
     def <=(a: A): Boolean = RangeM.less(range, a) || RangeM.contains(range, a)
-    def middle: A = RangeM.middle(range)
+    def middle: A = RangeM.ceilMiddle(range)
+    def ceilMiddle: A = RangeM.ceilMiddle(range)
+    def floorMiddle: A = RangeM.floorMiddle(range)
     def isPoint: Boolean = RangeM.isPoint(range)
     def length: BigDecimal = RangeM.length(range)
-    def roughLength: Double = RangeM.roughLength(range)
+    def roughLength: Double = RangeM.floorLength(range)
+    def floorLength: Double = RangeM.floorLength(range)
+    def ceilLength: Double = RangeM.ceilLength(range)
     def uniformSplit(size: Int): List[RangeM[A]] = RangeM.uniformSplit(range, size)
   }
 

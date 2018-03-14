@@ -10,10 +10,12 @@ import scala.math._
   */
 object KLD extends DensitySim {
 
-  def point(value1: Double, value2: Double): Double = (value1, value2) match {
-    case (0, _) => 0
-    case (_, 0) => Double.PositiveInfinity
-    case (_, _) => value1 * log(value1 / value2)
+  val cutoff = 1E-300
+
+  def point(value1: Double, value2: Double): Double = {
+    if (Math.abs(value1) < cutoff) 0
+    else if (Math.abs(value2) < cutoff) Double.PositiveInfinity
+    else value1 * log(value1 / value2)
   }
 
 }

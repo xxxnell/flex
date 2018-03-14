@@ -54,14 +54,25 @@ trait RangeMOps[Γ, R[_] <: RangeM[_]] {
 
   def less[A <: Γ](range: R[A], a: A): Boolean = endP(range) < range.measure.asInstanceOf[Measure[A]].to(a)
 
-  def middleP(start: Prim, end: Prim): Prim = {
-    if (start == Double.NegativeInfinity && end == Double.NegativeInfinity) Double.NegativeInfinity
-    else if (start == Double.PositiveInfinity && end == Double.PositiveInfinity) Double.PositiveInfinity
+  def ceilMiddleP(start: Prim, end: Prim): Prim = {
+    if (start.isNegInfinity && end.isNegInfinity) Double.NegativeInfinity
+    else if (start.isPosInfinity && end.isPosInfinity) Double.PositiveInfinity
+    else if (start.isNegInfinity && end.isPosInfinity) Double.NaN
     else start + (end / 2 - start / 2)
   }
 
-  def middle[A <: Γ](range: R[A]): A =
-    range.measure.asInstanceOf[Measure[A]].from(middleP(startP(range), endP(range)))
+  def floorMiddleP(start: Prim, end: Prim): Prim = {
+    if (start.isNegInfinity && end.isNegInfinity) Double.NegativeInfinity
+    else if (start.isPosInfinity && end.isPosInfinity) Double.PositiveInfinity
+    else if (start.isNegInfinity && end.isPosInfinity) Double.NaN
+    else start.floor + (end.floor / 2 - start.floor / 2)
+  }
+
+  def ceilMiddle[A <: Γ](range: R[A]): A =
+    range.measure.asInstanceOf[Measure[A]].from(ceilMiddleP(startP(range), endP(range)))
+
+  def floorMiddle[A <: Γ](range: R[A]): A =
+    range.measure.asInstanceOf[Measure[A]].from(floorMiddleP(startP(range), endP(range)))
 
   def isForward[A <: Γ](range: R[A]): Boolean = if (endP(range) - startP(range) >= 0) true else false
 
@@ -71,7 +82,11 @@ trait RangeMOps[Γ, R[_] <: RangeM[_]] {
     BigDecimal(endP(range)) - BigDecimal(startP(range))
   }
 
-  def roughLength[A <: Γ](range: R[A]): Double = {
+  def ceilLength[A <: Γ](range: R[A]): Double = {
+    endP(range) - startP(range)
+  }
+
+  def floorLength[A <: Γ](range: R[A]): Double = {
     val roughLength = endP(range) - startP(range)
     if (roughLength.isPosInfinity) Double.MaxValue
     else if (roughLength.isNegInfinity) Double.MinValue

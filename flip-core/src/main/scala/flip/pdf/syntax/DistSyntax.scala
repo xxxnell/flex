@@ -20,6 +20,7 @@ trait DistPropSyntax {
     def probability(from: A, to: A): Double = Dist.probability(dist, from, to)
     def pdf(a: A): Double = Dist.pdf(dist, a)
     def cdf(a: A): Double = Dist.cdf(dist, a)
+    def icdf(p: Double): A = Dist.icdf(dist, p)
     def sample: (Dist[A], A) = Dist.sample(dist)
     def samples(n: Int): (Dist[A], List[A]) = Dist.samples(dist, n)
     def sampling: DensityPlot = Dist.sampling(dist)

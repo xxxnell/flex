@@ -14,10 +14,9 @@ class L2SqSpec extends Specification with ScalaCheck {
       val normal1 = Dist.normal(0.0, 1)
       val normal2 = Dist.normal(0.0, 1)
       val expect = 0.0
-      val error = 1E-3
+      val error = 5E-2
 
-      val sampling = PlottedDist.densityPlot[Double](normal1.sampling)
-      val euclidean = Euclidean(sampling, normal2)
+      val euclidean = Euclidean(normal1, normal2)
 
       val cond1 = euclidean ~= (expect, error)
 
@@ -30,8 +29,7 @@ class L2SqSpec extends Specification with ScalaCheck {
       val normal2 = Dist.normal(10.0, 1)
       val lowerBound = 1.0
 
-      val sampling = PlottedDist.densityPlot[Double](normal1.sampling)
-      val euclidean = Euclidean(sampling, normal2)
+      val euclidean = Euclidean(normal1, normal2)
 
       val cond1 = euclidean > lowerBound
 

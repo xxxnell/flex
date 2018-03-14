@@ -13,18 +13,27 @@ class DistSpec extends Specification with ScalaCheck {
       "sampling" in {
 
         "NumericDist" in {
-          NumericDist.normal(0.0, 1.0).sampling
-          ok
+          val sampling = NumericDist.normal(0.0, 1.0).sampling
+          val cond = sampling.records.map(_._2).forall(value => !value.isNaN && !value.isInfinity)
+
+          if(!cond) ko
+          else ok
         }
 
         "CombinationDist" in {
-          ((0.5, NumericDist.normal(-2.0, 1)) + (0.5, NumericDist.normal(2.0, 1))).sampling
-          ok
+          val sampling = ((0.5, NumericDist.normal(-2.0, 1)) + (0.5, NumericDist.normal(2.0, 1))).sampling
+          val cond = sampling.records.map(_._2).forall(value => !value.isNaN && !value.isInfinity)
+
+          if(!cond) ko
+          else ok
         }
 
         "Sketch" in {
-          Sketch.empty[Double].sampling
-          ok
+          val sampling = Sketch.empty[Double].sampling
+          val cond = sampling.records.map(_._2).forall(value => !value.isNaN && !value.isInfinity)
+
+          if(!cond) ko
+          else ok
         }
 
       }
