@@ -26,6 +26,14 @@ object PrimOps {
 
 trait PrimSyntax {
 
+  val PInf: Prim = Double.PositiveInfinity
+
+  val NInf: Prim = Double.NegativeInfinity
+
+  val ∞ : Prim = PInf
+
+  val -∞ : Prim = NInf
+
   implicit val defaultError: Double = 0.05
 
   implicit class PrimSyntaxImpl(prim: Prim) {

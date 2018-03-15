@@ -84,24 +84,28 @@ class SketchMonadSpec extends Specification with ScalaCheck {
         "1-elem" in {
           val (_, samples) = NumericDist.normal(0.0, 1.0).samples(100)
           val sketch0 = Sketch.empty[Double].updateInOrder(samples)
-
-          for {
+          val sketch1 = for {
             x <- sketch0
           } yield math.exp(x)
 
-          ok
+          val cond1 = sketch1.sum > 0
+
+          if(!cond1) ko("for comprehensed sketch is empty")
+          else ok
         }
 
         "2-elem" in {
           val (_, samples) = NumericDist.normal(0.0, 1.0).samples(100)
           val sketch0 = Sketch.empty[Double].updateInOrder(samples)
-
-          for {
+          val sketch1 = for {
             x <- sketch0
             y <- NumericDist.normal(x, 1.0)
           } yield y
 
-          ok
+          val cond1 = sketch1.sum > 0
+
+          if(!cond1) ko("for comprehensed sketch is empty")
+          else ok
         }
 
       }

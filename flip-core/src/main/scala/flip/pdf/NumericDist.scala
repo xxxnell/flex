@@ -2,6 +2,7 @@ package flip.pdf
 
 import flip.conf.SmoothDistConf
 import flip.measure.Measure
+import flip.plot.DensityPlot
 import flip.rand.IRng
 
 import scala.language.higherKinds
@@ -62,6 +63,14 @@ object NumericDist extends NumericDistOps[NumericDist] {
 
   // pipelining
 
+  def modifyRng[A](dist: NumericDist[A], f: IRng => IRng): NumericDist[A] = dist match {
+    case dist: ParetoDist[A] => ParetoDist.modifyRng(dist, f)
+    case dist: LogNormalDist[A] => LogNormalDist.modifyRng(dist, f)
+    case dist: NormalDist[A] => NormalDist.modifyRng(dist, f)
+    case dist: DeltaDist[A] => DeltaDist.modifyRng(dist, f)
+    case dist: UniformDist[A] => UniformDist.modifyRng(dist, f)
+  }
+
   override def pdf[A](dist: NumericDist[A], a: A): Prim = dist match {
     case dist: ParetoDist[A] => ParetoDist.pdf(dist, a)
     case dist: LogNormalDist[A] => LogNormalDist.pdf(dist, a)
@@ -86,12 +95,9 @@ object NumericDist extends NumericDistOps[NumericDist] {
     case dist: UniformDist[A] => UniformDist.icdf(dist, p)
   }
 
-  def modifyRng[A](dist: NumericDist[A], f: IRng => IRng): NumericDist[A] = dist match {
-    case dist: ParetoDist[A] => ParetoDist.modifyRng(dist, f)
-    case dist: LogNormalDist[A] => LogNormalDist.modifyRng(dist, f)
-    case dist: NormalDist[A] => NormalDist.modifyRng(dist, f)
-    case dist: DeltaDist[A] => DeltaDist.modifyRng(dist, f)
-    case dist: UniformDist[A] => UniformDist.modifyRng(dist, f)
+  override def sampling[A](dist: NumericDist[A]): DensityPlot = dist match {
+    case dist: DeltaDist[A] => DeltaDist.sampling(dist)
+    case _ => super.sampling(dist)
   }
 
 }

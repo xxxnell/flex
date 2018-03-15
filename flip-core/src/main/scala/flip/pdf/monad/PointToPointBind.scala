@@ -28,17 +28,4 @@ object PointToPointBind { self =>
     }
   }
 
-  def samplingPoints[A](dist: Dist[A], samplingNo: Int): List[A] = dist match {
-    case sketch: Sketch[A] =>
-      sketch.samplingPoints.flatMap(ps => ps.start :: ps.end :: Nil).distinct
-    case delta: DeltaDist[A] =>
-      val measure = delta.measure
-      val poleP = measure.to(delta.pole)
-      val width = delta.conf.delta
-      measure.from(poleP - width) :: measure.from(poleP + width) :: Nil
-    case numeric: NumericDist[A] =>
-      val unit = 1 / (samplingNo.toDouble + 1)
-      (0 to samplingNo).toList.map(i => numeric.icdf(i * unit))
-  }
-
 }

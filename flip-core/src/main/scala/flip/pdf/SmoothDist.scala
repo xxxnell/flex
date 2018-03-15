@@ -62,4 +62,9 @@ object SmoothDist extends SmoothDistPropOps[SmoothDist] {
     case numeric: NumericDist[A] => NumericDist.icdf(numeric, p)
   }
 
+  override def sampling[A](dist: SmoothDist[A]): DensityPlot = dist match {
+    case dist: NumericDist[A] => NumericDist.sampling(dist)
+    case _ => super.sampling(dist)
+  }
+
 }

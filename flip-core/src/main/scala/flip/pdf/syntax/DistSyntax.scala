@@ -61,7 +61,7 @@ trait DistMonadSyntax1 extends DistMonadSyntax2 {
 
   implicit def bindAux1: DistBindAux[Sketch, Sketch] = new DistBindAux[Sketch, Sketch] {}
   implicit def distBind1: DistBind[Dist, Sketch, Sketch, SketchConf] = DistBind.sketch
-  implicit def distFunctor1: DistFunctor[Dist, Sketch, SketchConf] = DistFunctor.sketch
+//  implicit def distFunctor1: DistFunctor[Dist, Sketch, SketchConf] = DistFunctor.sketch
 
 }
 
