@@ -3,6 +3,7 @@
 [![Build Status](https://travis-ci.org/xxxnell/flip.svg?branch=master)](https://travis-ci.org/xxxnell/flip)
 [![codecov](https://codecov.io/gh/xxxnell/flip/branch/master/graph/badge.svg)](https://codecov.io/gh/xxxnell/flip)
 [![Waffle.io - Columns and their card count](https://badge.waffle.io/xxxnell/flip.svg?columns=to%20do)](https://waffle.io/xxxnell/flip)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fxxxnell%2Fflip.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fxxxnell%2Fflip?ref=badge_shield)
 [ ![Download](https://api.bintray.com/packages/xxxnell/oss-maven/flip/images/download.svg) ](https://bintray.com/xxxnell/oss-maven/flip/_latestVersion)
 
 
@@ -74,3 +75,6 @@ All code of *Flip*  is available to you under the [MIT license](./LICENSE).
 
 Copyright the maintainers.
 
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fxxxnell%2Fflip.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fxxxnell%2Fflip?ref=badge_large)
