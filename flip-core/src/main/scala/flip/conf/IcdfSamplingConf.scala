@@ -4,6 +4,9 @@ trait IcdfSamplingConf
 
 object IcdfSamplingConf {
 
-  val default: IcdfSamplingConf = EqualizedIcdfSamplingConf(20, 0.05)
+  val default: EqualizedIcdfSamplingConf = EqualizedIcdfSamplingConf.default
+
+  def apply(size: Int = default.size, boundaryRatio: Double = default.boundaryRatio): EqualizedIcdfSamplingConf =
+    EqualizedIcdfSamplingConf(size, boundaryRatio)
 
 }

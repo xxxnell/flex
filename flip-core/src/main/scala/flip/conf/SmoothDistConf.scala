@@ -13,7 +13,7 @@ object DefaultSmoothDistConf extends SmoothDistConf {
 
   val delta: Double = DefaultSketchConf.delta
 
-  val sampling: IcdfSamplingConf = IcdfSamplingConf.default
+  val sampling: EqualizedIcdfSamplingConf = IcdfSamplingConf.default
 
 }
 
@@ -22,7 +22,9 @@ object SmoothDistConf {
   private case class SmoothDistConfImpl(delta: Double, sampling: IcdfSamplingConf) extends SmoothDistConf
 
   def apply(delta: Double = DefaultSmoothDistConf.delta,
-            sampling: IcdfSamplingConf = DefaultSmoothDistConf.sampling): SmoothDistConf = bare(delta, sampling)
+            samplingSize: Int = DefaultSmoothDistConf.sampling.size,
+            samplingBoundaryRatio: Double = DefaultSmoothDistConf.sampling.boundaryRatio): SmoothDistConf =
+    bare(delta, IcdfSamplingConf(samplingSize, samplingBoundaryRatio))
 
   def bare(delta: Double, sampling: IcdfSamplingConf): SmoothDistConf = SmoothDistConfImpl(delta, sampling)
 

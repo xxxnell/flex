@@ -242,6 +242,20 @@ trait PlotLaws[P <: Plot] { self: PlotOps[P] =>
       planarizeRecords(sumList).map { case (range, values) => (range, values.sum) }
     })
 
+  def concat(plot1: P, plot2: P): P =
+    unsafeModifyRecords(
+      plot1,
+      records => {
+        val sumList = records ++ plot2.records
+        planarizeRecords(sumList).map {
+          case (range, values) =>
+            val max = values.max
+            val min = values.min
+            (range, if (math.abs(max) > math.abs(min)) max else min)
+        }
+      }
+    )
+
   def multiplyConstant(plot: P, mag: Double): P = modifyValue(plot, { case (_, value) => value * mag })
 
   def integral(plot: P, start: Double, end: Double): Double = {

@@ -18,4 +18,6 @@ object EqualizedIcdfSamplingConf {
   def bare(size: Int, boundaryRatio: Double): EqualizedIcdfSamplingConf =
     EqualizedIcdfSamplingConfImpl(size, boundaryRatio)
 
+  val default: EqualizedIcdfSamplingConf = bare(20, 0.05)
+
 }
