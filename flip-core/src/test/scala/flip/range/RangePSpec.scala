@@ -27,6 +27,20 @@ class RangePSpec extends Specification with ScalaCheck {
 
     }
 
+    "floorMiddle" in {
+
+      "inf" in {
+        val p1 = Double.NegativeInfinity
+        val p2 = 10
+        val res = RangeP(p1, p2).cutoffMiddle
+
+        if(res.isNaN) ko("NaN")
+        else if(res.isInfinity) ko("Infinity")
+        else ok
+      }
+
+    }
+
   }
 
 }
