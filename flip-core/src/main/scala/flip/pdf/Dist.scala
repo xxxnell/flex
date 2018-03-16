@@ -28,9 +28,9 @@ trait DistPropOps[D[_] <: Dist[_]] extends DistPropLaws[D] {
 
   def probability[A](dist: D[A], start: A, end: A): Double
 
-  def sample[A](dist: D[A]): (D[A], A)
-
   def modifyRng[A](dist: D[A], f: IRng => IRng): D[A]
+
+  def sampling[A](dist: D[A]): DensityPlot
 
 }
 
@@ -44,9 +44,10 @@ trait DistPropLaws[D[_] <: Dist[_]] { self: DistPropOps[D] =>
     probability(dist, a, ap) / delta
   }
 
-  def pdf[A](dist: D[A], a: A): Double = ???
-
-  def cdf[A](sketch: D[A], a: A): Double = ???
+  def sample[A](dist: D[A]): (D[A], A) = {
+    val (rng, rand) = dist.rng.next
+    (modifyRng(dist, _ => rng), icdf(dist, rand))
+  }
 
   def samples[A](dist: D[A], n: Int): (D[A], List[A]) = {
     (0 until n).foldLeft[(D[A], List[A])]((dist, Nil)) {
@@ -56,47 +57,36 @@ trait DistPropLaws[D[_] <: Dist[_]] { self: DistPropOps[D] =>
     }
   }
 
-  def sampling[A](probability: (A, A) => Double, domains: List[RangeM[A]]): DensityPlot = {
-    val records = domains
-      .filter(range => !range.isPoint)
-      .map(range => (RangeP.forRangeM(range), (probability(range.start, range.end) / range.length).toDouble))
-
-    DensityPlot.disjoint(records)
+  def cdfPlot[A](dist: D[A]): DensityPlot = {
+    sampling(dist).cumulative
   }
 
-  def samplingForDomain[A](dist: D[A], domains: List[RangeM[A]]): DensityPlot = {
-    sampling((start: A, end: A) => probability(dist, start, end), domains)
+  def icdfPlot[A](dist: D[A]): DensityPlot = {
+    cdfPlot(dist).inverse
   }
 
-  def samplingDist[A](dist: D[A], domains: List[RangeM[A]]): PlottedDist[A] = {
+  def interpolationPdf[A](dist: D[A], a: A): Double = {
+    val plot = sampling(dist)
+    DensityPlot.interpolation(plot, dist.measure.asInstanceOf[Measure[A]].to(a))
+  }
+
+  def pdf[A](dist: D[A], a: A): Double = interpolationPdf(dist, a: A)
+
+  def interpolationCdf[A](dist: D[A], a: A): Double = {
+    val cdf = cdfPlot(dist)
+    val p = dist.measure.asInstanceOf[Measure[A]].to(a)
+    cdf.interpolation(p)
+  }
+
+  def cdf[A](dist: D[A], a: A): Double = interpolationCdf(dist, a)
+
+  def interpolationIcdf[A](dist: D[A], p: Double): A = {
+    val icdf = icdfPlot(dist)
     val measure = dist.measure.asInstanceOf[Measure[A]]
-    val plot = samplingForDomain(dist, domains)
-    val conf = SamplingDistConf.forDistConf(dist.conf)
-
-    PlottedDist.bare(measure, dist.rng, plot, conf)
+    measure.from(icdf.interpolation(p))
   }
 
-  def samplingDistForPlottedDist[A](dist: D[A], pltDist: PlottedDist[A]): PlottedDist[A] = {
-    val densityPlot = pltDist.sampling
-    val domainsP = densityPlot.records.map(_._1)
-    val domainsM = domainsP.map(rangeP => rangeP.modifyMeasure(pltDist.measure))
-
-    samplingDist(dist, domainsM)
-  }
-
-  def samplingDistForSamplingDist[A](dist: D[A], smplDist: SamplingDist[A]): PlottedDist[A] = {
-    val densityPlot = smplDist.sampling
-    val domainsP = densityPlot.records.map(_._1)
-    val domainsM = domainsP.map(rangeP => rangeP.modifyMeasure(smplDist.measure))
-
-    samplingDist(dist, domainsM)
-  }
-
-  def uniformSampling[A](dist: D[A], start: A, end: A, size: Int): PlottedDist[A] = {
-    val domains = RangeM(start, end)(dist.measure.asInstanceOf[Measure[A]]).uniformSplit(size)
-
-    samplingDist(dist, domains)
-  }
+  def icdf[A](dist: D[A], p: Double): A = interpolationIcdf(dist, p)
 
 }
 
@@ -116,12 +106,6 @@ object Dist extends DistPropOps[Dist] { self =>
     case combination: CombinationDist[A] => CombinationDist.probability(combination, start, end)
   }
 
-  def sample[A](dist: Dist[A]): (Dist[A], A) = dist match {
-    case smooth: SmoothDist[A] => SmoothDist.sample(smooth)
-    case sampling: SamplingDist[A] => SamplingDist.sample(sampling)
-    case combination: CombinationDist[A] => CombinationDist.sample(combination)
-  }
-
   override def pdf[A](dist: Dist[A], a: A): Double = dist match {
     case smooth: SmoothDist[A] => SmoothDist.pdf(smooth, a)
     case sampling: SamplingDist[A] => SamplingDist.pdf(sampling, a)
@@ -136,10 +120,28 @@ object Dist extends DistPropOps[Dist] { self =>
     case _ => super.cdf(dist, a)
   }
 
-  override def modifyRng[A](dist: Dist[A], f: IRng => IRng): Dist[A] = dist match {
+  override def icdf[A](dist: Dist[A], p: Prim): A = dist match {
+    case smooth: SmoothDist[A] => SmoothDist.icdf(smooth, p)
+    case sampling: SamplingDist[A] => SamplingDist.icdf(sampling, p)
+    case combination: CombinationDist[A] => CombinationDist.icdf(combination, p)
+    case _ => super.icdf(dist, p)
+  }
+
+  def modifyRng[A](dist: Dist[A], f: IRng => IRng): Dist[A] = dist match {
     case smooth: SmoothDist[A] => SmoothDist.modifyRng(smooth, f)
     case sampling: SamplingDist[A] => SamplingDist.modifyRng(sampling, f)
     case combination: CombinationDist[A] => CombinationDist.modifyRng(combination, f)
+  }
+
+  def sampling[A](dist: Dist[A]): DensityPlot = dist match {
+    case smooth: SmoothDist[A] => SmoothDist.sampling(smooth)
+    case sampling: SamplingDist[A] => SamplingDist.sampling(sampling)
+    case combination: CombinationDist[A] => CombinationDist.sampling(combination)
+  }
+
+  override def sample[A](dist: Dist[A]): (Dist[A], A) = dist match {
+    case combi: CombinationDist[A] => CombinationDist.sample(combi)
+    case _ => super.sample(dist)
   }
 
 }

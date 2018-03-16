@@ -7,6 +7,7 @@ import flip.cmap.Cmap
 import flip.conf.{PeriodicSketchConf, SketchConf}
 import flip.hcounter.HCounter
 import flip.measure.Measure
+import flip.pdf.Sketch.fastPdf
 import flip.pdf.update.EqualSpaceCdfUpdate
 import flip.plot.DensityPlot
 import flip.range.{RangeM, RangeP}
@@ -35,10 +36,6 @@ trait Sketch[A] extends DataBinningDist[A] {
 }
 
 trait SketchPropOps[S[_] <: Sketch[_]] extends DataBinningDistOps[S] with SketchPropLaws[S] {
-
-  // create ops
-
-  def sample[A](dist: S[A]): (S[A], A)
 
   // read ops
 
@@ -105,19 +102,7 @@ trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
     sampling.interpolation(p)
   }
 
-  override def cdf[A](sketch: S[A], a: A): Double = {
-    val cdf = cdfPlot(sketch)
-    val p = sketch.measure.asInstanceOf[Measure[A]].to(a)
-    cdf.interpolation(p)
-  }
-
-  def cdfPlot[A](sketch: S[A]): DensityPlot = {
-    sampling(sketch).cumulative
-  }
-
-  def icdfPlot[A](sketch: S[A]): DensityPlot = {
-    cdfPlot(sketch).inverse
-  }
+  override def pdf[A](dist: S[A], a: A): Count = fastPdf(dist, a)
 
   def median[A](sketch: S[A]): A = {
     val measure = sketch.measure.asInstanceOf[Measure[A]]
@@ -146,14 +131,6 @@ trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
     val measure = sketch.measure.asInstanceOf[Measure[A]]
 
     RangeM(measure.from(head), measure.from(last))(measure)
-  }
-
-  def sample[A](sketch: S[A]): (S[A], A) = {
-    val icdf = icdfPlot(sketch)
-    val (rng, rand) = sketch.rng.next
-    val measure = sketch.measure.asInstanceOf[Measure[A]]
-
-    (modifyRng(sketch, _ => rng), measure.from(icdf.interpolation(rand)))
   }
 
   // construct
@@ -241,7 +218,5 @@ object Sketch extends SketchPrimPropOps[Sketch] { self =>
     case (sketch: AdaptiveSketch[A]) => AdaptiveSketch.rearrange(sketch)
     case _ => super.rearrange(sketch)
   }
-
-  override def pdf[A](dist: Sketch[A], a: A): Count = fastPdf(dist, a)
 
 }

@@ -1,6 +1,8 @@
 package flip.conf
 
-trait SamplingDistConf extends DistConf {}
+import flip.pdf.SamplingDist
+
+trait SamplingDistConfB[+D <: SamplingDist[_]] extends DistConfB[D] {}
 
 object SamplingDistConf {
 

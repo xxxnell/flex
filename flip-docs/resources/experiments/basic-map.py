@@ -45,7 +45,6 @@ ax.set_title("PDF after map")
 
 # Save Plot
 
-plt.legend()
+# plt.legend()
 plt.savefig(name + '.pdf')
 plt.savefig(name + '.png')
-plt.show()

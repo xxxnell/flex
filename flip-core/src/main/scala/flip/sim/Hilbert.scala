@@ -1,6 +1,6 @@
 package flip.sim
 
-import flip.pdf.{PlottedDist, SamplingDist}
+import flip.pdf.Dist
 import flip.plot.DensityPlot
 
 /**
@@ -8,14 +8,12 @@ import flip.plot.DensityPlot
   * */
 object Hilbert {
 
-  def normForSamplingDist[A](d1: SamplingDist[A]): Double = normForPlot(d1.sampling)
+  def normForSamplingDist[A](d1: Dist[A]): Double = normForPlot(d1.sampling)
 
-  def normForPlot(pdf: DensityPlot): Double =
-    (for {
-      sqr <- Some(pdf.modify { case (_, value) => value * value })
-      domain <- sqr.domain
-      normsqr = sqr.integral(domain.start, domain.end)
-    } yield math.sqrt(normsqr))
-      .getOrElse(Double.PositiveInfinity)
+  def normForPlot(pdf: DensityPlot): Double = {
+    val sqr = pdf.modify { case (_, value) => value * value }
+    val normsqr = sqr.integralAll
+    math.sqrt(normsqr)
+  }
 
 }

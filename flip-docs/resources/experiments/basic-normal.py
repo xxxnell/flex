@@ -53,10 +53,9 @@ kldplt.kldplot(ax, kld_data_loc, kld_max, countmin, countmax, rearr_start, rearr
 
 # Save Plot
 
-plt.legend()
+# plt.legend()
 plt.savefig(name + '.pdf')
 plt.savefig(name + '.png')
-plt.show()
 
 
 # PDF: Animated

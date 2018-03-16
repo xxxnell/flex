@@ -209,7 +209,7 @@ class AdaPerSketchSpec extends Specification with ScalaCheck {
         val p = 0.5
 
         val sketch1 = sketch0.update(0, 0, 1, 2, 4, 5)
-        val interpPdf = SamplingDist.interpolationPdf(sketch1, p)
+        val interpPdf = Sketch.interpolationPdf(sketch1, p)
         val fastPdf = Sketch.fastPdf(sketch1, p)
 
         if(interpPdf ~= fastPdf) ok
@@ -227,7 +227,7 @@ class AdaPerSketchSpec extends Specification with ScalaCheck {
         val p = 0.5
 
         val sketch1 = sketch0.update(0, 0, 1, 2, 4, 5)
-        val interpPdf = SamplingDist.interpolationPdf(sketch1, p)
+        val interpPdf = Sketch.interpolationPdf(sketch1, p)
         val fastPdf = Sketch.fastPdf(sketch1, p)
 
         if(interpPdf ~= fastPdf) ok
@@ -245,7 +245,7 @@ class AdaPerSketchSpec extends Specification with ScalaCheck {
         val p = 0.5
 
         val sketch1 = sketch0.update(0, 1, 2, 4, 5, 0)
-        val interpPdf = SamplingDist.interpolationPdf(sketch1, p)
+        val interpPdf = Sketch.interpolationPdf(sketch1, p)
         val fastPdf = Sketch.fastPdf(sketch1, p)
 
         if(interpPdf ~= fastPdf) ok
@@ -263,7 +263,7 @@ class AdaPerSketchSpec extends Specification with ScalaCheck {
         val p = 2.2
 
         val sketch1 = sketch0.update(0, 1, 2, 4, 5, 0, 1, 2, 3, 4, 5, 2, 2)
-        val interpPdf = SamplingDist.interpolationPdf(sketch1, p)
+        val interpPdf = Sketch.interpolationPdf(sketch1, p)
         val fastPdf = Sketch.fastPdf(sketch1, p)
 
         if(interpPdf ~= fastPdf) ok

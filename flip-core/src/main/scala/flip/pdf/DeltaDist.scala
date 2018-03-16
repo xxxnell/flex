@@ -2,8 +2,10 @@ package flip.pdf
 
 import flip.conf.SmoothDistConf
 import flip.measure.Measure
+import flip.plot.DensityPlot
 import flip.rand._
 import flip.range._
+import flip.measure.syntax._
 
 /**
   * Dirac delta function.
@@ -27,7 +29,18 @@ trait DeltaDistOps extends NumericDistOps[DeltaDist] {
     if (p >= pole) 1.0 else 0.0
   }
 
-  def icdf[A](dist: DeltaDist[A], p: Double): A = dist.pole
+  override def icdf[A](dist: DeltaDist[A], p: Double): A = dist.pole
+
+  override def sampling[A](dist: DeltaDist[A]): DensityPlot = {
+    val measure = dist.measure
+    val poleP = measure.to(dist.pole)
+    val width = dist.conf.delta
+    val start = poleP - width
+    val end = poleP + width
+    val records = (RangeP(∞, start), 0.0) :: (RangeP(start, end), 1 / (2 * width)) :: (RangeP(end, -∞), 0.0) :: Nil
+
+    DensityPlot.disjoint(records)
+  }
 
 }
 

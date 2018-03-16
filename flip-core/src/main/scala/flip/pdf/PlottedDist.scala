@@ -42,7 +42,8 @@ object PlottedDist extends PlottedDistPropOps[PlottedDist] {
   def bare[A](measure: Measure[A], rng: IRng, densityPlot: DensityPlot, conf: SamplingDistConf): PlottedDist[A] =
     PlottedDistImpl(measure, rng, densityPlot, conf)
 
-  def sample[A](dist: PlottedDist[A]): (PlottedDist[A], A) = ???
+  def densityPlot[A](densityPlot: DensityPlot)(implicit measure: Measure[A], conf: SamplingDistConf): PlottedDist[A] =
+    bare(measure, IRng(densityPlot.hashCode()), densityPlot, conf)
 
   def modifyRng[A](dist: PlottedDist[A], f: IRng => IRng): PlottedDist[A] =
     bare(dist.measure, f(dist.rng), dist.sampling, dist.conf)

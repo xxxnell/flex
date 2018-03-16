@@ -1,6 +1,8 @@
 package flip.conf
 
-trait SketchConf extends DataBinningDistConf {
+import flip.pdf.Sketch
+
+trait SketchConfB[+D <: Sketch[_]] extends DataBinningDistConfB[D] {
   // deepUpdate
   val mixingRatio: Double
   val dataKernelWindow: Double

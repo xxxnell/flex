@@ -12,7 +12,7 @@ import flip.pdf.SmoothDist
 class NumericDistOpsBench {
 
   @Benchmark
-  def sample: (SmoothDist[Double], Double) = {
+  def sample: (Dist[Double], Double) = {
     NumericDist.normal(0.0, 1.0).sample
   }
 

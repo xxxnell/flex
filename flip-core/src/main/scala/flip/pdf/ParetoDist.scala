@@ -33,7 +33,7 @@ trait ParetoDistOps extends NumericDistOps[ParetoDist] {
     numeric.cumulativeProbability(p)
   }
 
-  def icdf[A](dist: ParetoDist[A], p: Double): A = {
+  override def icdf[A](dist: ParetoDist[A], p: Double): A = {
     val scale = dist.measure.to(dist.scale)
     val numeric = new ParetoDistribution(scale, dist.shape)
 

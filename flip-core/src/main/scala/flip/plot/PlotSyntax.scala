@@ -30,6 +30,7 @@ trait PolyPlotSyntax[P <: Plot] {
   def modify(f: Record => Double): P = ops.modifyValue(plot, f)
   def add(plot2: P): P = ops.add(plot, plot2)
   def +(plot2: P): P = ops.add(plot, plot2)
+  def ++(plot2: P): P = ops.concat(plot, plot2)
   def multiply(mag: Double): P = ops.multiplyConstant(plot, mag)
   def *(mag: Double): P = ops.multiplyConstant(plot, mag)
   def inverse: P = ops.inverse(plot)

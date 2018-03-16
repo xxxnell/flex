@@ -1,6 +1,9 @@
 package flip.pdf
 
 import flip.conf.SmoothDistConf
+import flip.measure.Measure
+import flip.pdf.sampling.IcdfSampling
+import flip.plot.DensityPlot
 import flip.rand.IRng
 
 import scala.language.higherKinds
@@ -18,6 +21,16 @@ trait SmoothDistPropOps[D[_] <: SmoothDist[_]] extends DistPropOps[D] with Smoot
 
 trait SmoothDistPropLaws[D[_] <: SmoothDist[_]] { self: SmoothDistPropOps[D] =>
 
+  def sampling[A](dist: D[A]): DensityPlot = {
+    val icdf: Double => A = p => self.icdf(dist, p)
+    val measure = dist.measure.asInstanceOf[Measure[A]]
+    val records = IcdfSampling(icdf, measure, dist.conf).flatMap { range =>
+      val length = range.roughLength
+      if (length > 0) Some((range.primitivize, probability(dist, range.start, range.end) / length)) else None
+    }
+    DensityPlot.disjoint(records)
+  }
+
 }
 
 object SmoothDist extends SmoothDistPropOps[SmoothDist] {
@@ -32,23 +45,26 @@ object SmoothDist extends SmoothDistPropOps[SmoothDist] {
     case numeric: NumericDist[A] => NumericDist.probability(numeric, start, end)
   }
 
-  def sample[A](dist: SmoothDist[A]): (SmoothDist[A], A) = dist match {
-    case predefined: PredefinedDist[A] => PredefinedDist.sample(predefined)
-    case numeric: NumericDist[A] => NumericDist.sample(numeric)
-  }
-
   // overrides
 
   override def pdf[A](dist: SmoothDist[A], a: A): Double = dist match {
     case predefined: PredefinedDist[A] => PredefinedDist.pdf(predefined, a)
     case numeric: NumericDist[A] => NumericDist.pdf(numeric, a)
-    case _ => super.pdf(dist, a)
   }
 
   override def cdf[A](dist: SmoothDist[A], a: A): Double = dist match {
     case predefined: PredefinedDist[A] => PredefinedDist.cdf(predefined, a)
     case numeric: NumericDist[A] => NumericDist.cdf(numeric, a)
-    case _ => super.pdf(dist, a)
+  }
+
+  override def icdf[A](dist: SmoothDist[A], p: Double): A = dist match {
+    case predefined: PredefinedDist[A] => PredefinedDist.icdf(predefined, p)
+    case numeric: NumericDist[A] => NumericDist.icdf(numeric, p)
+  }
+
+  override def sampling[A](dist: SmoothDist[A]): DensityPlot = dist match {
+    case dist: NumericDist[A] => NumericDist.sampling(dist)
+    case _ => super.sampling(dist)
   }
 
 }

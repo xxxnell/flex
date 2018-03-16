@@ -31,7 +31,7 @@ trait RangePOps[R[_] <: RangeM[_]] extends RangeMOps[Prim, R] {
 
     if (isPoint(inters)) 0
     else if (range1 == inters) 1
-    else if (roughLength(range1) != 0) {
+    else if (divLength(range1) != 0) {
       lazy val perc1 = (intersEnd - intersStart) / (range1End - range1Start)
       lazy val perc2 = (intersEnd / range1End) * (1 - intersStart / intersEnd) / (1 - range1Start / range1End)
       lazy val perc3 = (length(intersection(range1, range2)) / length(range1)).toDouble

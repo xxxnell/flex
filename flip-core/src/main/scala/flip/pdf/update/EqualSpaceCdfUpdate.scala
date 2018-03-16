@@ -39,21 +39,21 @@ trait EqualSpaceCdfUpdate {
     *             If corr=0, cmap has no margin.
     * */
   def cmapForEqualSpaceCumCorr(plot: DensityPlot, corr: Double, cmapSize: Int): Cmap = {
-    lazy val invCdf = plot.inverseCumulative
+    lazy val icdf = plot.inverseCumulative
 
     val cdfDivider = if (cmapSize < 2) {
       Nil
     } else if (cmapSize == 2) {
       0.5 :: Nil
     } else {
-      val maxAccumulative = invCdf.domain.map(_.end).getOrElse(1.0)
+      val maxAccumulative = icdf.domain.map(_.end).getOrElse(1.0)
       val unit = maxAccumulative / (cmapSize.toDouble - 2 + 2 * corr)
 
       (1 until cmapSize).toList
         .map(i => unit * corr + unit * (i - 1))
     }
 
-    val pDivider = cdfDivider.map(a => invCdf.interpolation(a))
+    val pDivider = cdfDivider.map(a => icdf.interpolation(a))
 
     Cmap.divider(pDivider)
   }
