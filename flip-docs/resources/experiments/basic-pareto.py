@@ -42,7 +42,7 @@ countmin = 40
 countmax = 500
 rearr_start = 50
 rearr_period = 100
-kld_max = 0.15
+kld_max = 0.25
 
 kld_data_loc = dir + "basic-pareto-kld.out"
 
@@ -53,10 +53,9 @@ kldplt.kldplot(ax, kld_data_loc, kld_max, countmin, countmax, rearr_start, rearr
 
 # Save Plot
 
-plt.legend()
+# plt.legend()
 plt.savefig(name + '.pdf')
 plt.savefig(name + '.png')
-plt.show()
 
 
 # PDF: Animated

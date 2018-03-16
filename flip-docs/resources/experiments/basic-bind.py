@@ -46,7 +46,6 @@ ax.set_title("PDF after flatMap")
 
 # Save Plot
 
-plt.legend()
+# plt.legend()
 plt.savefig(name + '.pdf')
 plt.savefig(name + '.png')
-plt.show()
