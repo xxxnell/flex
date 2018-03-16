@@ -39,7 +39,7 @@ object SuddenConceptDriftExp {
     def center(idx: Int) = if (idx < draftStart) mean1 else mean2
     val datas = datas1 ++ datas2
     val sketchTraces = sketch0 :: sketch0.updateTrace(datas)
-    val idxSketches = sketchTraces.indices.zip(sketchTraces).toList
+    val idxSketches = sketchTraces.indices.zip(sketchTraces).toList.filter { case (idx, _) => idx % 10 == 0 }
     val idxDensityPlots = idxSketches.map { case (idx, utdSkt) => (idx, utdSkt.pdfPlot) }
     val idxKld = idxSketches.map { case (idx, utdSkt) => (idx, KLD(underlying(idx), utdSkt)) }
     val idxCos = idxSketches.map { case (idx, utdSkt) => (idx, Cosine(underlying(idx), utdSkt)) }
