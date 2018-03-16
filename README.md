@@ -63,7 +63,7 @@ In this figure, the dashed orange line is the expected underlying probability di
 
 ### The case of concept drift
 
-Sketch also adapts to any types of concept drift successfully. Here is an experiment result under the situation where the distribution that `Sketch` is supposed to estimate is gradually changing over time. The underlying distribution starts to change when the update count come to 300 and moves by +0.01 per one update count. `Sketch` is good at predicting this moving distribution, although there is some lag. Also this lag can be reduced by adjusting the sensitivity to new data.
+`Sketch` also adapts to any types of concept drift successfully. Here is an experiment result under the situation where the distribution that `Sketch` is supposed to estimate is gradually changing over time. The underlying distribution starts to change when the update count come to 300 and moves by +0.01 per one update count. `Sketch` is good at predicting this moving distribution, although there is some lag. Also this lag can be reduced by adjusting the sensitivity to new data.
 
 ![animated gradual concept drift](./flip-docs/resources/experiments/gradual-cd-normal-histo.gif)
 
