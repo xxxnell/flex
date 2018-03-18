@@ -2,65 +2,52 @@ package flip.conf
 
 trait SimpleSketchConf extends SketchConf
 
-trait CustomSimpleSketchConf extends SimpleSketchConf with CustomSketchConf
-
 object SimpleSketchConf {
 
   private case class SimpleSketchConfImpl(delta: Double,
                                           mixingRatio: Double,
                                           dataKernelWindow: Double,
-                                          boundaryCorrection: Double,
                                           decayFactor: Double,
-                                          bindSampling: Int,
                                           cmap: CmapConf,
                                           counter: CounterConf)
-      extends CustomSimpleSketchConf
+      extends SimpleSketchConf
 
   def apply( // dist
             delta: Double = DefaultSketchConf.delta,
-            // deepUpdate
+            // sketch
             mixingRatio: Double = DefaultSketchConf.mixingRatio,
             dataKernelWindow: Double = DefaultSketchConf.dataKernelWindow,
-            boundaryCorr: Double = DefaultSketchConf.boundaryCorrection,
             decayFactor: Double = DefaultSketchConf.decayFactor,
-            // bind
-            bindSampling: Int = DefaultSketchConf.bindSampling,
-            // cmap
+            // sketch: cmap
             binNo: Int,
             start: Double,
             end: Double,
-            // counter
+            // sketch: counter
             counterSize: Int = DefaultSketchConf.counter.size,
-            counterNo: Int = DefaultSketchConf.counter.no): CustomSimpleSketchConf = {
-    val cmapConf = CmapConf.uniform(binNo, 1, start, end)
+            counterNo: Int = DefaultSketchConf.counter.no): SimpleSketchConf = {
+    val cmapConf = CmapConf.uniformEqualize(binNo, 1, Some(start), Some(end), 1)
     val counterConf = CounterConf(counterSize, counterNo)
-    SimpleSketchConf.custom(
+    bare(
       delta,
       mixingRatio,
       dataKernelWindow,
       decayFactor,
-      boundaryCorr,
-      bindSampling,
       cmapConf,
       counterConf
     )
   }
 
-  def custom(delta: Double,
+  def bare(delta: Double,
              mixingRatio: Double,
              dataKernelWindow: Double,
-             boundaryCorr: Double,
              decayFactor: Double,
-             bindSampling: Int,
              cmapConf: CmapConf,
-             counterConf: CounterConf): CustomSimpleSketchConf =
+             counterConf: CounterConf): SimpleSketchConf =
     SimpleSketchConfImpl(
       delta,
       mixingRatio,
       dataKernelWindow,
       decayFactor,
-      boundaryCorr,
-      bindSampling,
       cmapConf,
       counterConf
     )

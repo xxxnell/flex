@@ -1,15 +1,14 @@
 package flip.pdf.sampling
-import flip.conf.EqualizedIcdfSamplingConf
+import flip.conf.EqualizeIcdfSamplingConf
 import flip.measure.Measure
 import flip.range.RangeM
 
 /**
-  *
-  * c.f. Histogram equalization
+  * @see <a href="https://en.wikipedia.org/wiki/Histogram_equalization">Histogram equalization</a>
   * */
-object EqualizeIcdfSampling extends IcdfSampling[EqualizedIcdfSamplingConf] {
+object EqualizeIcdfSampling extends IcdfSampling[EqualizeIcdfSamplingConf] {
 
-  def sampling[A](icdf: Double => A, measure: Measure[A], conf: EqualizedIcdfSamplingConf): List[RangeM[A]] = {
+  def sampling[A](icdf: Double => A, measure: Measure[A], conf: EqualizeIcdfSamplingConf): List[RangeM[A]] = {
     val size = conf.size
     val corr = conf.boundaryRatio
     val unit = 1.0 / (size.toDouble - 2 + 2 * corr)

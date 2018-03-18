@@ -13,8 +13,6 @@ trait PeriodicSketchConfB[+D <: PeriodicSketch[_]] extends SketchConfB[D] {
 
 }
 
-trait CustomPeriodicSketchConf extends PeriodicSketchConf with CustomSketchConf
-
 object PeriodicSketchConf {
 
   private case class PeriodicSketchConfImpl(delta: Double,
@@ -27,7 +25,7 @@ object PeriodicSketchConf {
                                             bindSampling: Int,
                                             cmap: CmapConf,
                                             counter: CounterConf)
-      extends CustomPeriodicSketchConf
+      extends PeriodicSketchConf
 
   def custom(delta: Double,
              mixingRatio: Double,
@@ -38,7 +36,7 @@ object PeriodicSketchConf {
              thresholdPeriod: Double,
              bindSampling: Int,
              cmap: CmapConf,
-             counter: CounterConf): CustomPeriodicSketchConf =
+             counter: CounterConf): PeriodicSketchConf =
     PeriodicSketchConfImpl(
       delta,
       mixingRatio,

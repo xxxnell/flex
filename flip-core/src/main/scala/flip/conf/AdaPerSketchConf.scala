@@ -7,46 +7,42 @@ import flip.pdf.AdaPerSketch
   * */
 trait AdaPerSketchConfB[+D <: AdaPerSketch[_]] extends AdaptiveSketchConfB[D] with PeriodicSketchConfB[D] {}
 
-trait CustomAdaPerSketchConf extends AdaPerSketchConf with CustomSketchConf
-
 object AdaPerSketchConf {
 
-  private case class AdaPerSketchConfImpl(delta: Double,
+  private case class AdaPerSketchConfImpl( // dist
+                                          delta: Double,
+                                          // sketch
                                           mixingRatio: Double,
                                           dataKernelWindow: Double,
-                                          boundaryCorrection: Double,
                                           decayFactor: Double,
-                                          queueSize: Int,
-                                          startThreshold: Double,
-                                          thresholdPeriod: Double,
-                                          bindSampling: Int,
                                           cmap: CmapConf,
-                                          counter: CounterConf)
-      extends CustomAdaPerSketchConf
+                                          counter: CounterConf,
+                                          // sketch: adaptive
+                                          queueSize: Int,
+                                          // sketch: periodic
+                                          startThreshold: Double,
+                                          thresholdPeriod: Double)
+      extends AdaPerSketchConf
 
   def custom(delta: Double,
              mixingRatio: Double,
              dataKernelWindow: Double,
-             boundaryCorrection: Double,
              decayFactor: Double,
+             cmap: CmapConf,
+             counter: CounterConf,
              queueSize: Int,
              startThreshold: Double,
-             thresholdPeriod: Double,
-             bindSampling: Int,
-             cmap: CmapConf,
-             counter: CounterConf): CustomAdaPerSketchConf =
+             thresholdPeriod: Double): AdaPerSketchConf =
     AdaPerSketchConfImpl(
       delta,
       mixingRatio,
       dataKernelWindow,
-      boundaryCorrection,
       decayFactor,
+      cmap,
+      counter,
       queueSize,
       startThreshold,
-      thresholdPeriod,
-      bindSampling,
-      cmap,
-      counter
+      thresholdPeriod
     )
 
 }

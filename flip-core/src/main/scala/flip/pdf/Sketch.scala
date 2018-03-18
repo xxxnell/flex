@@ -8,6 +8,7 @@ import flip.conf.{PeriodicSketchConf, SketchConf}
 import flip.hcounter.HCounter
 import flip.measure.Measure
 import flip.pdf.Sketch.fastPdf
+import flip.pdf.sampling.IcdfSampling
 import flip.pdf.update.EqualSpaceCdfUpdate
 import flip.plot.DensityPlot
 import flip.range.{RangeM, RangeP}
@@ -149,8 +150,8 @@ trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
       ps,
       1000,
       conf.dataKernelWindow,
-      conf.boundaryCorrection,
-      conf.cmap.size
+      IcdfSampling.samplingF(measure, conf.cmap),
+      measure
     )
 
     NonEmptyList.of((cmap, counter(conf, -1)))

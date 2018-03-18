@@ -1,6 +1,6 @@
 package flip
 
-import flip.conf.{CustomSimpleSketchConf, CustomSketchConf, SimpleSketchConf, SmoothDistConf}
+import flip.conf.{CustomSketchConf, SimpleSketchConf, SmoothDistConf}
 import flip.measure.TrivialMeasures
 import flip.pdf.SimpleSketch
 import flip.pdf.syntax.{DistSyntax, NumericDistSyntax, SamplingDistSyntax, SketchSyntax, SmoothDistSyntax}
@@ -20,11 +20,11 @@ trait AllSyntax
 
 trait ConfPkgSyntax extends ConfPkgSyntax1 {
 
-  type SketchConf = CustomSketchConf
+  type SketchConf = flip.conf.SketchConf
 
-  val SketchConf: CustomSketchConf.type = CustomSketchConf
+  def SketchConf: CustomSketchConf.type = CustomSketchConf
 
-  type HistogramConf = CustomSimpleSketchConf
+  type HistogramConf = flip.conf.SimpleSketchConf
 
   def HistogramConf: SimpleSketchConf.type = SimpleSketchConf
 
