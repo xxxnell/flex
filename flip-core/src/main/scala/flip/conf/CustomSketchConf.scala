@@ -1,5 +1,7 @@
 package flip.conf
 
+trait CustomSketchConf extends CustomDataBinningDistConf with SketchConf
+
 object CustomSketchConf {
 
   def apply( // dist
@@ -21,8 +23,8 @@ object CustomSketchConf {
             queueSize: Int = DefaultSketchConf.queueSize,
             // sketch: periodic
             startThreshold: Double = DefaultSketchConf.startThreshold,
-            thresholdPeriod: Double = DefaultSketchConf.thresholdPeriod): AdaPerSketchConf = {
-    AdaPerSketchConf.custom(
+            thresholdPeriod: Double = DefaultSketchConf.thresholdPeriod): CustomSketchConf = {
+    CustomAdaPerSketchConf(
       delta,
       mixingRatio,
       dataKernelWindow,
@@ -34,20 +36,5 @@ object CustomSketchConf {
       thresholdPeriod
     )
   }
-
-  def periodic( // sketch
-               mixingRatio: Double,
-               dataKernelWindow: Double,
-               // periodic
-               startThreshold: Double,
-               thresholdPeriod: Double,
-               // cmap
-               cmapSize: Int,
-               cmapNo: Int,
-               cmapStart: Option[Double],
-               cmapEnd: Option[Double],
-               // counter
-               counterSize: Int,
-               counterNo: Int): PeriodicSketchConf = ???
 
 }

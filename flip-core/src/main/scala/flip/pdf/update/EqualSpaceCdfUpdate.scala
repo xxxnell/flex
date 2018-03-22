@@ -29,7 +29,8 @@ object EqualSpaceCdfUpdate {
     val ranges = icdfSampling(icdf)
     val divider = ranges
       .flatMap(rangeM => rangeM.primitivize.start :: rangeM.primitivize.end :: Nil)
-      .distinct.filter(d => !d.isInfinity)
+      .distinct
+      .filter(d => !d.isInfinity)
 
     Cmap.divider(divider)
   }

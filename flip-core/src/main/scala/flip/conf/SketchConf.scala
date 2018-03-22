@@ -12,8 +12,6 @@ trait SketchConfB[+D <: Sketch[_]] extends DataBinningDistConfB[D] {
   val dataKernelWindow: Double
 }
 
-
-
 object SketchConf {
 
   def default: SketchConf = DefaultSketchConf

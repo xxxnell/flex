@@ -40,13 +40,13 @@ object GradualConceptDriftExp {
     implicit val conf: SketchConf = SketchConf(
       startThreshold = start,
       thresholdPeriod = period,
-      boundaryCorr = 0.01,
       decayFactor = 1,
       queueSize = 30,
       cmapSize = samplingNo,
       cmapNo = 5,
       cmapStart = Some(-10d),
       cmapEnd = Some(10),
+      boundaryRatio = 0.01,
       counterSize = samplingNo
     )
     val sketch0 = Sketch.empty[Double]

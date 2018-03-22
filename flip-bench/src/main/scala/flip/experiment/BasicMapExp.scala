@@ -13,13 +13,13 @@ object BasicMapExp {
     implicit val conf: SketchConf = SketchConf(
       startThreshold = 50,
       thresholdPeriod = 100,
-      boundaryCorr = 0.1,
       decayFactor = 0,
       queueSize = 30,
       cmapSize = samplingNo,
       cmapNo = 5,
       cmapStart = Some(-10d),
       cmapEnd = Some(10),
+      boundaryRatio = 0.1,
       counterSize = samplingNo
     )
     val sketch0 = Sketch.empty[Double]
