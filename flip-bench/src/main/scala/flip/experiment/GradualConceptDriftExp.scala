@@ -1,6 +1,6 @@
 package flip.experiment
 
-import flip._
+import flip.implicits._
 import flip.experiment.ops.ExpOutOps
 import flip.rand.IRng
 

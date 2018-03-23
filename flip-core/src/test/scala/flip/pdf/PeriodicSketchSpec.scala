@@ -17,7 +17,7 @@ class PeriodicSketchSpec extends Specification with ScalaCheck {
       // construct
       val (cmapSize, cmapNo, cmapStart, cmapEnd) = (50, 100, Some(-100d), Some(100d))
       val (counterSize, counterNo) = (10, 2)
-      implicit val conf: PeriodicSketchConf = CustomSketchConf(
+      implicit val conf: PeriodicSketchConf = CustomPeriodicSketchConf(
         startThreshold = 0, thresholdPeriod = 1,
         cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
         counterSize = counterSize, counterNo = counterNo
@@ -52,7 +52,7 @@ class PeriodicSketchSpec extends Specification with ScalaCheck {
       // construct
       val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 100, Some(-100d), Some(100d))
       val (counterSize, counterNo) = (10, 2)
-      implicit val conf: PeriodicSketchConf = CustomSketchConf(
+      implicit val conf: PeriodicSketchConf = CustomPeriodicSketchConf(
         startThreshold = 0, thresholdPeriod = 1,
         cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
         counterSize = counterSize, counterNo = counterNo
@@ -96,7 +96,7 @@ class PeriodicSketchSpec extends Specification with ScalaCheck {
         val (start, period) = (0, 1)
         val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 1, Some(0d), Some(10d))
         val (counterSize, counterNo) = (2, 1)
-        implicit val conf: PeriodicSketchConf = CustomSketchConf(
+        implicit val conf: PeriodicSketchConf = CustomPeriodicSketchConf(
           startThreshold = start, thresholdPeriod = period,
           cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
           counterSize = counterSize, counterNo = counterNo
@@ -128,7 +128,7 @@ object PeriodicSketchGen {
 
   def intPeriodicSketchGen: Gen[PeriodicSketch[Int]] = for {
     measure <- MeasureGen.intMeasureGen
-    conf <- SketchConfGen.sketchConfGen
+    conf <- SketchConfGen.periodicSketchConfGen
   } yield PeriodicSketch.empty(measure, conf)
 
   def periodicSketchSample: Option[PeriodicSketch[Int]] = intPeriodicSketchGen.sample

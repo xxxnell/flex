@@ -27,7 +27,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
       }
 
       "SimpleSketch" in {
-        implicit val conf: CustomSketchConf = SimpleSketchConf(
+        implicit val conf: CustomSketchConf = CustomSimpleSketchConf(
           binNo = 10, start = 0d, end = 10d,
           counterSize = 10, counterNo = 2
         )

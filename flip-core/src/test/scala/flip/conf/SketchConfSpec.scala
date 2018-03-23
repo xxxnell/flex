@@ -29,16 +29,19 @@ class SketchConfSpec extends Specification with ScalaCheck {
 
 object SketchConfGen {
 
-  def sketchConfGen: Gen[PeriodicSketchConf] = for {
+  def sketchConfGen: Gen[SketchConf] = for {
     cmapNo <- Gen.choose(1, 10)
     cmapSize <- Gen.choose(100, 10000)
     counterNo <- Gen.choose(1, 10)
     counterSize <- Gen.choose(100, 10000)
   } yield CustomSketchConf(cmapNo = cmapNo, cmapSize= cmapSize, counterNo = counterNo, counterSize = counterSize)
 
-//  def periodicSketchConfGen: Gen[PeriodicSketchConf] = for {
-//
-//  } yield PeriodicSketchConf
+  def periodicSketchConfGen: Gen[PeriodicSketchConf] = for {
+    cmapNo <- Gen.choose(1, 10)
+    cmapSize <- Gen.choose(100, 10000)
+    counterNo <- Gen.choose(1, 10)
+    counterSize <- Gen.choose(100, 10000)
+  } yield CustomPeriodicSketchConf(cmapNo = cmapNo, cmapSize= cmapSize, counterNo = counterNo, counterSize = counterSize)
 
 //  def cmapConfGen: Gen[CmapConf] = uniformCmapConfGen
 //

@@ -24,7 +24,7 @@ object CustomSketchConf {
             // sketch: periodic
             startThreshold: Double = DefaultSketchConf.startThreshold,
             thresholdPeriod: Double = DefaultSketchConf.thresholdPeriod): CustomSketchConf = {
-    CustomAdaPerSketchConf(
+    CustomAdaPerSketchConf.bare(
       delta,
       mixingRatio,
       dataKernelWindow,

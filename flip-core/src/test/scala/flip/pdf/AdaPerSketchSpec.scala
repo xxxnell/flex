@@ -3,7 +3,7 @@ package flip.pdf
 import org.specs2.mutable._
 import org.specs2.ScalaCheck
 import flip._
-import flip.conf.{CustomAdaPerSketchConf, CustomSketchConf}
+import flip.conf.{AdaPerSketchConf, CustomAdaPerSketchConf, CustomSketchConf}
 import flip.measure.syntax._
 
 import scala.language.postfixOps
@@ -15,7 +15,7 @@ class AdaPerSketchSpec extends Specification with ScalaCheck {
     "type invariance" in {
 
       "type invariance after update" in {
-        implicit val conf: CustomAdaPerSketchConf = SketchConf(
+        implicit val conf: CustomAdaPerSketchConf = CustomAdaPerSketchConf(
           queueSize = 10,
           cmapSize = 100, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
           counterSize = 20, counterNo = 2
@@ -29,7 +29,7 @@ class AdaPerSketchSpec extends Specification with ScalaCheck {
       }
 
       "type invariance after rearrange" in {
-        implicit val conf: CustomAdaPerSketchConf = SketchConf(
+        implicit val conf: CustomAdaPerSketchConf = CustomAdaPerSketchConf(
           queueSize = 10,
           cmapSize = 100, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
           counterSize = 20, counterNo = 2
@@ -49,7 +49,7 @@ class AdaPerSketchSpec extends Specification with ScalaCheck {
 
       "empty queue" in {
         val queueSize = 1
-        implicit val conf: CustomAdaPerSketchConf = SketchConf(
+        implicit val conf: CustomAdaPerSketchConf = CustomAdaPerSketchConf(
           queueSize = queueSize,
           cmapSize = 100, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
           counterSize = 20, counterNo = 2
@@ -62,7 +62,7 @@ class AdaPerSketchSpec extends Specification with ScalaCheck {
 
       "queue io" in {
         val queueSize = 2
-        implicit val conf: CustomAdaPerSketchConf = SketchConf(
+        implicit val conf: CustomAdaPerSketchConf = CustomAdaPerSketchConf(
           queueSize = queueSize,
           cmapSize = 100, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
           counterSize = 20, counterNo = 2
@@ -87,7 +87,7 @@ class AdaPerSketchSpec extends Specification with ScalaCheck {
 
       "queue only" in {
         val queueSize = 1
-        implicit val conf: CustomAdaPerSketchConf = SketchConf(
+        implicit val conf: CustomAdaPerSketchConf = CustomAdaPerSketchConf(
           queueSize = queueSize,
           cmapSize = 100, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
           counterSize = 20, counterNo = 2
@@ -102,7 +102,7 @@ class AdaPerSketchSpec extends Specification with ScalaCheck {
 
       "queue and structure" in {
         val queueSize = 1
-        implicit val conf: CustomAdaPerSketchConf = SketchConf(
+        implicit val conf: CustomAdaPerSketchConf = CustomAdaPerSketchConf(
           queueSize = queueSize,
           cmapSize = 100, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
           counterSize = 20, counterNo = 2
@@ -122,7 +122,7 @@ class AdaPerSketchSpec extends Specification with ScalaCheck {
 
       "queue only" in {
         val queueSize = 1
-        implicit val conf: CustomAdaPerSketchConf = SketchConf(
+        implicit val conf: CustomAdaPerSketchConf = CustomAdaPerSketchConf(
           queueSize = queueSize,
           cmapSize = 100, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
           counterSize = 20, counterNo = 2
@@ -137,7 +137,7 @@ class AdaPerSketchSpec extends Specification with ScalaCheck {
 
       "queue and structure" in {
         val queueSize = 1
-        implicit val conf: CustomAdaPerSketchConf = SketchConf(
+        implicit val conf: CustomAdaPerSketchConf = CustomAdaPerSketchConf(
           queueSize = queueSize,
           cmapSize = 100, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
           counterSize = 20, counterNo = 2
@@ -154,7 +154,7 @@ class AdaPerSketchSpec extends Specification with ScalaCheck {
     }
 
     "narrowUpdate" in {
-      implicit val conf: CustomAdaPerSketchConf = SketchConf(
+      implicit val conf: CustomAdaPerSketchConf = CustomAdaPerSketchConf(
         cmapSize = 2000, cmapNo = 20, cmapStart = Some(-10d), cmapEnd = Some(10d),
         counterSize = 1000, counterNo = 10
       )
@@ -165,7 +165,7 @@ class AdaPerSketchSpec extends Specification with ScalaCheck {
     }
 
     "deepUpdate" in {
-      implicit val conf: CustomAdaPerSketchConf = SketchConf(
+      implicit val conf: CustomAdaPerSketchConf = CustomAdaPerSketchConf(
         cmapSize = 2000, cmapNo = 20, cmapStart = Some(-10d), cmapEnd = Some(10d),
         counterSize = 10000, counterNo = 10
       )
@@ -179,7 +179,7 @@ class AdaPerSketchSpec extends Specification with ScalaCheck {
 
       "basic" in {
         val cmapSize = 20
-        implicit val conf: CustomAdaPerSketchConf = CustomSketchConf(
+        implicit val conf: CustomAdaPerSketchConf = CustomAdaPerSketchConf(
           cmapSize = cmapSize, cmapNo = 2, cmapStart = Some(-10.0), cmapEnd = Some(10.0),
           queueSize = 50,
           counterSize = cmapSize
@@ -200,7 +200,7 @@ class AdaPerSketchSpec extends Specification with ScalaCheck {
 
       "queue only" in {
         val queueSize = 10
-        implicit val conf: CustomAdaPerSketchConf = SketchConf(
+        implicit val conf: CustomAdaPerSketchConf = CustomAdaPerSketchConf(
           queueSize = queueSize,
           cmapSize = 20, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
           counterSize = 20, counterNo = 2
@@ -218,7 +218,7 @@ class AdaPerSketchSpec extends Specification with ScalaCheck {
 
       "structure dominant" in {
         val queueSize = 1
-        implicit val conf: CustomAdaPerSketchConf = SketchConf(
+        implicit val conf: CustomAdaPerSketchConf = CustomAdaPerSketchConf(
           queueSize = queueSize,
           cmapSize = 20, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
           counterSize = 20, counterNo = 2
@@ -236,7 +236,7 @@ class AdaPerSketchSpec extends Specification with ScalaCheck {
 
       "mixed" in {
         val queueSize = 3
-        implicit val conf: CustomAdaPerSketchConf = SketchConf(
+        implicit val conf: CustomAdaPerSketchConf = CustomAdaPerSketchConf(
           queueSize = queueSize,
           cmapSize = 20, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
           counterSize = 20, counterNo = 2
@@ -253,7 +253,7 @@ class AdaPerSketchSpec extends Specification with ScalaCheck {
       }
 
       "multiple cmaps" in {
-        implicit val conf: CustomAdaPerSketchConf = SketchConf(
+        implicit val conf: CustomAdaPerSketchConf = CustomAdaPerSketchConf(
           queueSize = 3,
           startThreshold = 2d, thresholdPeriod = 2d,
           cmapSize = 20, cmapNo = 3, cmapStart = Some(-10d), cmapEnd = Some(10d),
