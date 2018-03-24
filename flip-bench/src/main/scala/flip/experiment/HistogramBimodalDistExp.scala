@@ -13,8 +13,8 @@ object HistogramBimodalDistExp { self =>
     val sampleNo = 1000
     val underlying = { (0.5, NumericDist.normal(-2.0, 1)) + (0.5, NumericDist.normal(2.0, 1)) }
     val (_, datas) = underlying.samples(sampleNo)
-    val start = underlying.icdf(0.01)
-    val end = underlying.icdf(0.99)
+    val start = underlying.icdf(0.05)
+    val end = underlying.icdf(0.95)
 
     val emptyHisto = {
       implicit val histoConf: HistogramConf = HistogramConf(

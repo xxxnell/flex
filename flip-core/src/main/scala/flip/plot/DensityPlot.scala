@@ -43,7 +43,7 @@ trait DensityPlotOps extends PlotOps[DensityPlot] {
 
   def normalizeCumulative(plot: DensityPlot): DensityPlot = {
     val cum = cumulative(plot)
-    val max = cum.interpolation(Double.MaxValue)
+    val max = cum.records.lastOption.map(_._2).getOrElse(1.0)
     cum * (1 / max)
   }
 

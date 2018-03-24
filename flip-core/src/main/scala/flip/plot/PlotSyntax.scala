@@ -53,6 +53,7 @@ trait DensityPlotSyntax {
     def ops: PlotOps[DensityPlot] = DensityPlot
 
     def cumulative: DensityPlot = DensityPlot.cumulative(plot)
+    def normalizeCumulative: DensityPlot = DensityPlot.normalizeCumulative(plot)
     def inverseNormalizeCumulative: DensityPlot = DensityPlot.inverseNormalizeCumulative(plot)
   }
 
