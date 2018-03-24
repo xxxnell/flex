@@ -18,8 +18,6 @@ object GettingStartedExp {
     // get probability for interval [0.0, 1.0]
     println("result: " + utdSketch.probability(0.0, 1.0))
     println("expected: " + underlying.probability(0.0, 1.0))
-    // result: 0.35479611850109305
-    // expected: 0.34134474606854304
   }
 
 }

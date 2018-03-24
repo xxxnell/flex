@@ -13,7 +13,7 @@ object DefaultSmoothDistConf extends SmoothDistConf {
 
   val delta: Double = DefaultSketchConf.delta
 
-  val sampling: EqualizedIcdfSamplingConf = IcdfSamplingConf.default
+  val sampling: EqualizeIcdfSamplingConf = IcdfSamplingConf.default
 
 }
 

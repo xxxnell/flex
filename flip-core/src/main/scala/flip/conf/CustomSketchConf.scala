@@ -1,6 +1,6 @@
 package flip.conf
 
-trait CustomSketchConf extends SketchConf
+trait CustomSketchConf extends CustomDataBinningDistConf with SketchConf
 
 object CustomSketchConf {
 
@@ -9,51 +9,32 @@ object CustomSketchConf {
             // sketch
             mixingRatio: Double = DefaultSketchConf.mixingRatio,
             dataKernelWindow: Double = DefaultSketchConf.dataKernelWindow,
-            boundaryCorr: Double = DefaultSketchConf.boundaryCorrection,
             decayFactor: Double = DefaultSketchConf.decayFactor,
-            // adaptive
-            queueSize: Int = DefaultSketchConf.queueSize,
-            // periodic
-            startThreshold: Double = DefaultSketchConf.startThreshold,
-            thresholdPeriod: Double = DefaultSketchConf.thresholdPeriod,
-            // bind
-            bindSampling: Int = DefaultSketchConf.bindSampling,
-            // cmap
+            // sketch: cmap
             cmapSize: Int = DefaultSketchConf.cmap.size,
             cmapNo: Int = DefaultSketchConf.cmap.no,
             cmapStart: Option[Double] = DefaultSketchConf.cmap.start,
             cmapEnd: Option[Double] = DefaultSketchConf.cmap.end,
-            // counter
+            boundaryRatio: Double = DefaultSketchConf.cmap.boundaryRatio,
+            // sketch: counter
             counterSize: Int = DefaultSketchConf.counter.size,
-            counterNo: Int = DefaultSketchConf.counter.no): CustomAdaPerSketchConf = {
-    AdaPerSketchConf.custom(
+            counterNo: Int = DefaultSketchConf.counter.no,
+            // sketch: adaptive
+            queueSize: Int = DefaultSketchConf.queueSize,
+            // sketch: periodic
+            startThreshold: Double = DefaultSketchConf.startThreshold,
+            thresholdPeriod: Double = DefaultSketchConf.thresholdPeriod): CustomSketchConf = {
+    CustomAdaPerSketchConf.bare(
       delta,
       mixingRatio,
       dataKernelWindow,
-      boundaryCorr,
       decayFactor,
+      CmapConf.uniformEqualize(cmapSize, cmapNo, cmapStart, cmapEnd, boundaryRatio),
+      CounterConf(counterSize, counterNo),
       queueSize,
       startThreshold,
-      thresholdPeriod,
-      bindSampling,
-      CmapConf.uniform(cmapSize, cmapNo, cmapStart, cmapEnd),
-      CounterConf(counterSize, counterNo)
+      thresholdPeriod
     )
   }
-
-  def periodic( // sketch
-               mixingRatio: Double,
-               dataKernelWindow: Double,
-               // periodic
-               startThreshold: Double,
-               thresholdPeriod: Double,
-               // cmap
-               cmapSize: Int,
-               cmapNo: Int,
-               cmapStart: Option[Double],
-               cmapEnd: Option[Double],
-               // counter
-               counterSize: Int,
-               counterNo: Int): CustomPeriodicSketchConf = ???
 
 }

@@ -20,13 +20,13 @@ trait AllSyntax
 
 trait ConfPkgSyntax extends ConfPkgSyntax1 {
 
-  type SketchConf = CustomSketchConf
+  type SketchConf = flip.conf.CustomSketchConf
 
-  val SketchConf: CustomSketchConf.type = CustomSketchConf
+  def SketchConf: CustomSketchConf.type = CustomSketchConf
 
-  type HistogramConf = CustomSimpleSketchConf
+  type HistogramConf = flip.conf.CustomSimpleSketchConf
 
-  def HistogramConf: SimpleSketchConf.type = SimpleSketchConf
+  def HistogramConf: CustomSimpleSketchConf.type = CustomSimpleSketchConf
 
 }
 

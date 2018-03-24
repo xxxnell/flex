@@ -1,6 +1,6 @@
 package flip.experiment
 
-import flip._
+import flip.implicits._
 import flip.experiment.ops.ExpOutOps
 
 /**
@@ -11,19 +11,15 @@ object HistogramBimodalDistExp { self =>
   def main(args: Array[String]): Unit = {
     val expName = "histogram-bimodal"
     val sampleNo = 1000
-    val samplingNo = 20
     val underlying = { (0.5, NumericDist.normal(-2.0, 1)) + (0.5, NumericDist.normal(2.0, 1)) }
     val (_, datas) = underlying.samples(sampleNo)
-    val idxDatas = (datas.indices zip datas).toList
-    val start = -4.8
-    val end = 4.8
+    val start = underlying.icdf(0.05)
+    val end = underlying.icdf(0.95)
 
     val emptyHisto = {
       implicit val histoConf: HistogramConf = HistogramConf(
-        binNo = samplingNo,
         start = start,
-        end = end,
-        counterSize = samplingNo
+        end = end
       )
       Histogram.empty[Double]
     }

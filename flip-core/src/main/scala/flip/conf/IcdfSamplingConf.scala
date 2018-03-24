@@ -1,12 +1,16 @@
 package flip.conf
 
-trait IcdfSamplingConf
+trait IcdfSamplingConf {
+
+  def size: Int
+
+}
 
 object IcdfSamplingConf {
 
-  val default: EqualizedIcdfSamplingConf = EqualizedIcdfSamplingConf.default
+  val default: EqualizeIcdfSamplingConf = EqualizeIcdfSamplingConf.default
 
-  def apply(size: Int = default.size, boundaryRatio: Double = default.boundaryRatio): EqualizedIcdfSamplingConf =
-    EqualizedIcdfSamplingConf(size, boundaryRatio)
+  def apply(size: Int = default.size, boundaryRatio: Double = default.boundaryRatio): EqualizeIcdfSamplingConf =
+    EqualizeIcdfSamplingConf(size, boundaryRatio)
 
 }

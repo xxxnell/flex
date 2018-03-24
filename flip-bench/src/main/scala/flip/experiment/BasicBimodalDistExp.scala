@@ -8,22 +8,11 @@ object BasicBimodalDistExp {
   def main(args: Array[String]): Unit = {
     val expName1 = "basic-bimodal"
     val dataNo = 1000
-    val samplingNo = 20
-    val start = 50
-    val period = 100
 
     val sketch0 = {
       implicit val conf: SketchConf = SketchConf(
-        startThreshold = start,
-        thresholdPeriod = period,
-        boundaryCorr = 0.1,
-        decayFactor = 0,
-        queueSize = 30,
-        cmapSize = samplingNo,
-        cmapNo = 5,
         cmapStart = Some(-10d),
-        cmapEnd = Some(10),
-        counterSize = samplingNo
+        cmapEnd = Some(10)
       )
       Sketch.empty[Double]
     }

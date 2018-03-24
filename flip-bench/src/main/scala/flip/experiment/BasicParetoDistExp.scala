@@ -1,6 +1,6 @@
 package flip.experiment
 
-import flip._
+import flip.implicits._
 import flip.experiment.ops.ExpOutOps
 
 object BasicParetoDistExp {
@@ -8,21 +8,10 @@ object BasicParetoDistExp {
   def main(args: Array[String]): Unit = {
     val expName1 = "basic-pareto"
     val dataNo = 1000
-    val samplingNo = 20
-    val start = 50
-    val period = 100
 
     implicit val conf: SketchConf = SketchConf(
-      startThreshold = start,
-      thresholdPeriod = period,
-      boundaryCorr = 0.1,
-      decayFactor = 0,
-      queueSize = 0,
-      cmapSize = samplingNo,
-      cmapNo = 5,
-      cmapStart = Some(-10d),
-      cmapEnd = Some(10),
-      counterSize = samplingNo
+      cmapStart = Some(-10),
+      cmapEnd = Some(10)
     )
     val sketch0 = Sketch.empty[Double]
     val underlying = NumericDist.pareto(1d, 1d)
