@@ -179,8 +179,8 @@ class SketchPropSpec extends Specification with ScalaCheck {
         val (_, samples) = dist.samples(sampleNo)
         val sketch0 = Sketch.empty[Double]
 
-        val utdSketch = samples.foldLeft(sketch0){ case (sketch, sample) => sketch.update(sample) }
-        val prob = utdSketch.probability(start, end)
+        val sketch1 = sketch0.updateInOrder(samples)
+        val prob = sketch1.probability(start, end)
 
         if(similar(prob, expected, error)) ok
         else ko(s"Estimated probability for [$start, $end]: $prob. expected: $expected")
@@ -228,15 +228,15 @@ class SketchPropSpec extends Specification with ScalaCheck {
           )
           val sketch0 = Sketch.empty[Double]
           val sketch1 = sketch0.deepUpdate(1)._1
+          val cmap0 = sketch0.youngCmap
+          val cmap1 = sketch1.youngCmap
 
-          val cond1 = sketch0.youngCmap != sketch1.youngCmap
-          val cond2 = sketch0.youngCmap.size == sketch1.youngCmap.size
+          val cond1 = cmap0.size == cmap1.size
+          val cond2 = cmap0 != cmap1
 
-          if(cond1 && cond2) ok
-          else ko(
-            s"cmap1(${sketch0.youngCmap.size}): ${sketch0.youngCmap}, " +
-              s"cmap2(${sketch1.youngCmap.size}): ${sketch1.youngCmap}"
-          )
+          if(!cond1) ko(s"sketch0 size: ${cmap0.size}, sketch1 size: ${sketch1.youngCmap.size}")
+          else if(!cond2) ko(s"cmap1(${cmap0.size}): $cmap0, cmap2(${cmap1.size}): $cmap1")
+          else ok
         }
 
         "2 times" in {
@@ -251,8 +251,16 @@ class SketchPropSpec extends Specification with ScalaCheck {
           val cmap1 = sketch1.youngCmap
           val cmap2 = sketch2.youngCmap
 
-          if(cmap0 != cmap1 && cmap1 != cmap2) ok
-          else ko(s"cmap0: $cmap0, cmap1: $cmap1, cmap2: $cmap2")
+          val cond1 = cmap0.size == cmap1.size
+          val cond2 = cmap0 != cmap1
+          val cond3 = cmap1.size == cmap2.size
+          val cond4 = cmap0 != cmap1
+
+          if(!cond1) ko(s"sketch0 size: ${cmap0.size}, sketch1 size: ${cmap1.size}")
+          else if(!cond2) ko(s"sketch0 cmap: $cmap0, sketch1 cmap: $cmap1")
+          else if(!cond3) ko(s"sketch1 size: ${cmap1.size}, sketch2 size: ${cmap2.size}")
+          else if(!cond4) ko(s"sketch1 cmap: $cmap1, sketch2 cmap: $cmap1")
+          else ok
         }
 
       }
