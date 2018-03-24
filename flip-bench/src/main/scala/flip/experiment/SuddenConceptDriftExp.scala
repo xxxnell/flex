@@ -13,21 +13,10 @@ object SuddenConceptDriftExp {
     val expName = "sudden-cd-normal"
     val dataNo = 1000
     val draftStart = 300
-    val start = 50
-    val period = 100
-    val samplingNo = 20
 
     implicit val conf: SketchConf = SketchConf(
-      decayFactor = 1,
-      startThreshold = start,
-      thresholdPeriod = period,
-      queueSize = 30,
-      cmapSize = samplingNo,
-      cmapNo = 5,
-      cmapStart = Some(-10d),
-      cmapEnd = Some(10),
-      counterSize = 1000,
-      counterNo = 2
+      cmapStart = Some(-10),
+      cmapEnd = Some(10)
     )
     val sketch0 = Sketch.empty[Double]
     val (mean1, mean2) = (0.0, 5.0)

@@ -16,10 +16,6 @@ object GradualConceptDriftExp {
     val draftStart = 300
     val draftStartingPoint = 0.0
     val velocity = 0.01
-    val samplingNo = 20
-    val start = 50
-    val period = 100
-    val domainWidth = 1.5
 
     def center(idx: Int) =
       if (draftStart > idx) draftStartingPoint
@@ -38,16 +34,10 @@ object GradualConceptDriftExp {
     }
 
     implicit val conf: SketchConf = SketchConf(
-      startThreshold = start,
-      thresholdPeriod = period,
       decayFactor = 1,
-      queueSize = 30,
-      cmapSize = samplingNo,
       cmapNo = 5,
       cmapStart = Some(-10d),
-      cmapEnd = Some(10),
-      boundaryRatio = 0.01,
-      counterSize = samplingNo
+      cmapEnd = Some(10)
     )
     val sketch0 = Sketch.empty[Double]
     val sketchTraces = sketch0 :: sketch0.updateTrace(datas)
@@ -78,9 +68,9 @@ object GradualConceptDriftExp {
     val avgEuc = idxEuc.takeRight(avgSize).map(_._2).sum / avgSize
 
     val str = s"Similarity for gradual concept-drifted data stream with velocity $velocity: \n" +
-      s" KLD(Sketch($samplingNo)): $avgKld \n" +
-      s" Cosine(Sketch($samplingNo)): $avgCos \n" +
-      s" Euclidean(Sketch($samplingNo)): $avgEuc"
+      s" KLD: $avgKld \n" +
+      s" Cosine: $avgCos \n" +
+      s" Euclidean: $avgEuc"
     println(str)
   }
 

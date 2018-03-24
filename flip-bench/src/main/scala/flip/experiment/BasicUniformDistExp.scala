@@ -8,21 +8,10 @@ object BasicUniformDistExp {
   def main(args: Array[String]): Unit = {
     val expName1 = "basic-uniform"
     val dataNo = 1000
-    val samplingNo = 20
-    val start = 50
-    val period = 100
 
     implicit val conf: SketchConf = SketchConf(
-      startThreshold = start,
-      thresholdPeriod = period,
-      decayFactor = 0,
-      queueSize = 0,
-      cmapSize = samplingNo,
-      cmapNo = 5,
-      cmapStart = Some(-10d),
-      cmapEnd = Some(10),
-      boundaryRatio = 0.1,
-      counterSize = samplingNo
+      cmapStart = Some(-10),
+      cmapEnd = Some(10)
     )
     val sketch0 = Sketch.empty[Double]
     val underlying = NumericDist.uniform(0.0, 1.0)

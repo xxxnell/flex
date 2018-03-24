@@ -60,5 +60,9 @@ ax1.set_ylim(8E5)
 # Save Plot
 
 plt.legend()
-plt.savefig(name + '.pdf')
-plt.savefig(name + '.png')
+if len(sketch_count) != 0:
+    print(len(sketch_count) != 0)
+    plt.savefig(name + '.pdf')
+    plt.savefig(name + '.png')
+else:
+    print("Benchmark contains no performance records.")

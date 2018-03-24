@@ -19,7 +19,7 @@ object CustomSimpleSketchConf {
             dataKernelWindow: Double = DefaultSketchConf.dataKernelWindow,
             decayFactor: Double = DefaultSketchConf.decayFactor,
             // sketch: cmap
-            binNo: Int,
+            binNo: Int = DefaultSketchConf.cmap.size,
             start: Double,
             end: Double,
             // sketch: counter

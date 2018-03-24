@@ -8,19 +8,10 @@ object BasicMapExp {
   def main(args: Array[String]): Unit = {
     val expName = "basic-map"
     val dataNo = 300
-    val samplingNo = 20
 
     implicit val conf: SketchConf = SketchConf(
-      startThreshold = 50,
-      thresholdPeriod = 100,
-      decayFactor = 0,
-      queueSize = 30,
-      cmapSize = samplingNo,
-      cmapNo = 5,
-      cmapStart = Some(-10d),
-      cmapEnd = Some(10),
-      boundaryRatio = 0.1,
-      counterSize = samplingNo
+      cmapStart = Some(-10),
+      cmapEnd = Some(10)
     )
     val sketch0 = Sketch.empty[Double]
     val underlying = NumericDist.normal(0.0, 1)

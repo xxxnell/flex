@@ -11,18 +11,14 @@ object HistogramLognormalDistExp { self =>
   def main(args: Array[String]): Unit = {
     val expName = "histogram-lognormal"
     val sampleNo = 1000
-    val samplingNo = 20
     val underlying = NumericDist.logNormal(0.0, 1)
     val (_, datas) = underlying.samples(sampleNo)
-    val idxDatas = (datas.indices zip datas).toList
     val smplStart = 0.0
     val smplEnd = underlying.icdf(0.95)
 
     implicit val histoConf: HistogramConf = HistogramConf(
-      binNo = samplingNo,
       start = smplStart,
-      end = smplEnd,
-      counterSize = samplingNo
+      end = smplEnd
     )
     val emptyHisto = Histogram.empty[Double]
 
