@@ -41,9 +41,15 @@ trait DensityPlotOps extends PlotOps[DensityPlot] {
     )
   }
 
-  def inverseCumulative(plot: DensityPlot): DensityPlot = {
+  def normalizeCumulative(plot: DensityPlot): DensityPlot = {
+    val cum = cumulative(plot)
+    val max = cum.interpolation(Double.MaxValue)
+    cum * (1 / max)
+  }
+
+  def inverseNormalizeCumulative(plot: DensityPlot): DensityPlot = {
     unsafeModifyRecords(
-      cumulative(plot),
+      normalizeCumulative(plot),
       (records: List[Record]) => records.map { case (range, value) => (RangeP.point(value), range.middle) })
   }
 

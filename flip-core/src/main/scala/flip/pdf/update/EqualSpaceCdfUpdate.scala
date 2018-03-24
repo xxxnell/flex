@@ -8,6 +8,7 @@ import flip.pdf.sampling.IcdfSampling
 import flip.plot._
 import flip.plot.syntax._
 import flip.range.RangeM
+import flip.measure.syntax._
 
 import scala.language.higherKinds
 
@@ -24,8 +25,9 @@ object EqualSpaceCdfUpdate {
       val c2 = mixingRatio / (mixingRatio + 1)
       (c1, sampling) + (c2, DensityPlot.squareKernel(ps, window))
     } else sampling
-    val icdfPlot = pdf.inverseCumulative
-    val icdf = (d: Double) => measure.from(icdfPlot.interpolation(d))
+    val icdfPlot = pdf.inverseNormalizeCumulative
+    val icdf = (d: Double) =>
+      if (d <= 0) measure.from(-∞) else if (d >= 1) measure.from(∞) else measure.from(icdfPlot.interpolation(d))
     val ranges = icdfSampling(icdf)
     val divider = ranges
       .map(rangeM => rangeM.primitivize.start)
@@ -47,10 +49,10 @@ object EqualSpaceCdfUpdate {
     * @param corr boundary marginal ratio for the separation unit.
     *             If corr=1, cmapForEqualSpaceCumCorr is identical to standard cmapForEqualSpaceCum.
     *             If corr=0, cmap has no margin.
-    * */
+    **/
   @deprecated
   def cmapForEqualSpaceCumCorr(plot: DensityPlot, corr: Double, cmapSize: Int): Cmap = {
-    lazy val icdf = plot.inverseCumulative
+    lazy val icdf = plot.inverseNormalizeCumulative
 
     val cdfDivider = if (cmapSize < 2) {
       Nil
