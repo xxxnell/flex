@@ -2,8 +2,10 @@ package flip.pdf
 
 import flip.conf.SmoothDistConf
 import flip.measure.Measure
+import flip.plot.DensityPlot
 import flip.rand._
 import flip.range._
+import flip.measure.syntax._
 
 /**
   * Dirac delta function.
@@ -14,20 +16,31 @@ case class DeltaDist[A](measure: Measure[A], conf: SmoothDistConf, pole: A, rng:
 
 trait DeltaDistOps extends NumericDistOps[DeltaDist] {
 
-  override def pdf[A](dist: DeltaDist[A], a: A): Option[Double] = {
+  override def pdf[A](dist: DeltaDist[A], a: A): Double = {
     val pole = dist.measure.to(dist.pole)
 
-    if (a != pole) Some(0) else Some(Double.PositiveInfinity)
+    if (a != pole) 0.0 else Double.PositiveInfinity
   }
 
-  override def cdf[A](dist: DeltaDist[A], a: A): Option[Double] = {
+  override def cdf[A](dist: DeltaDist[A], a: A): Double = {
     val p = dist.measure.to(a)
     val pole = dist.measure.to(dist.pole)
 
-    if (p >= pole) Some(1) else Some(0)
+    if (p >= pole) 1.0 else 0.0
   }
 
-  def icdf[A](dist: DeltaDist[A], p: Double): A = dist.pole
+  override def icdf[A](dist: DeltaDist[A], p: Double): A = dist.pole
+
+  override def sampling[A](dist: DeltaDist[A]): DensityPlot = {
+    val measure = dist.measure
+    val poleP = measure.to(dist.pole)
+    val width = dist.conf.delta
+    val start = poleP - width
+    val end = poleP + width
+    val records = (RangeP(∞, start), 0.0) :: (RangeP(start, end), 1 / (2 * width)) :: (RangeP(end, -∞), 0.0) :: Nil
+
+    DensityPlot.disjoint(records)
+  }
 
 }
 

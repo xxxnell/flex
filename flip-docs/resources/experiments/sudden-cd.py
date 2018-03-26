@@ -14,7 +14,7 @@ fig = plt.figure(figsize=(10, 5))
 nrows = 1
 ncols = 2
 countmin = 50
-countmax = 600
+countmax = 700
 
 moving_start = 300
 dest = 5
@@ -23,7 +23,7 @@ def data_loc(i):
     return dir + "sudden-cd-normal-pdf-" + str(i) + ".out"
 
 def expected(x, start, i):
-    if i < start:
+    if i <= start:
         return norm.pdf(x)
     else:
         return norm.pdf(np.array(x) - dest)
@@ -56,7 +56,7 @@ ax1.set_ylim(medianmin, medianmax)
 
 rearr_start = 50
 rearr_period = 100
-kld_max = 1.0
+kld_max = 1.5
 
 kld_data_loc = dir + "sudden-cd-normal-kld.out"
 
@@ -67,10 +67,9 @@ ax2.axvline(moving_start, color='r', linestyle=':', linewidth=1)
 
 # Save
 
-plt.legend()
+# plt.legend()
 plt.savefig(name + '.pdf')
 plt.savefig(name + '.png')
-plt.show()
 
 
 # Animated PDF

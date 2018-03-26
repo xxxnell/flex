@@ -35,12 +35,9 @@ def pdfframe_with_expected(ax, expected, xmin, xmax, ymin, ymax):
 
 # errorbar
 
-def empty_pdf_errorbar_dataframe(ax, annotation = None):
+def empty_pdf_errorbar_dataframe(ax):
     x1, xerr1, y1 = ([0], [0], [0])
     err = ax.errorbar(x1, y1, xerr=xerr1, fmt='.', color='royalblue')
-
-    if annotation is not None:
-        ax.set_title(annotation)
 
     return err
 
@@ -88,21 +85,18 @@ def animated_pdfplot_errorbar(data_loc, start, end, step, expected, xmin, xmax, 
 
 # bar
 
-def init_pdf_bar_dataframe(ax, x_base, xerr, y_base, annotation = None):
+def init_pdf_bar_dataframe(ax, x_base, xerr, y_base):
     height = y_base
     width = [i * 2 for i in xerr]
 
     bars = ax.bar(x_base, height, width = width, align = 'center', edgecolor=['black']*len(x_base))
 
-    if annotation is not None:
-        ax.set_title(annotation)
-
     return bars
 
 
-def init_pdf_bar_dataframe_for_loc(ax, data_loc, xmin, xmax, annotation = None):
+def init_pdf_bar_dataframe_for_loc(ax, data_loc, xmin, xmax):
     x_base, xerr, y_base = prep.data_loc_to_data(data_loc, xmin, xmax, 10000)
-    return init_pdf_bar_dataframe(ax, x_base, xerr, y_base, annotation)
+    return init_pdf_bar_dataframe(ax, x_base, xerr, y_base)
 
 def setbar(bars, x_base, xerr, y_base):
     height = y_base
@@ -128,9 +122,15 @@ def setbar_for_loc(bars, data_loc, xmin, xmax):
     return setbar(bars, x_base, xerr, y_base)
 
 
-def pdfplot_bar(ax, expected, data_loc, xmin, xmax, ymin, ymax, annotation = None):
+def pdfplot_bar(ax, expected, data_loc, xmin, xmax, ymin, ymax):
     pdfframe_with_expected(ax, expected, xmin, xmax, ymin, ymax)
-    bars = init_pdf_bar_dataframe_for_loc(ax, data_loc, xmin, xmax, annotation)
+    bars = init_pdf_bar_dataframe_for_loc(ax, data_loc, xmin, xmax)
+    setbar_for_loc(bars, data_loc, xmin, xmax)
+
+
+def pdfplot_bar_wo_expected(ax, data_loc, xmin, xmax, ymin, ymax):
+    pdfframe(ax, xmin, xmax, ymin, ymax)
+    bars = init_pdf_bar_dataframe_for_loc(ax, data_loc, xmin, xmax)
     setbar_for_loc(bars, data_loc, xmin, xmax)
 
 

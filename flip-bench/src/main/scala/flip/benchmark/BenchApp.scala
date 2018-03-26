@@ -12,12 +12,11 @@ object BenchApp {
   def main(args: Array[String]): Unit = {
 
     // confs
-    val opts = BenchAppConfs.envOptions
-      .param("iterateBenchSize", (0 to 550 by 10).map(_.toString).toArray: _*)
-      .build()
+    val opts0 = BenchAppConfs.envOptions(args.toList)
+    val opts1 = BenchAppConfs.iterateSize(opts0, 0, 1000, 10)
 
     // run
-    val results = new Runner(opts).run().asScala
+    val results = new Runner(opts1.build()).run().asScala
 
     // results
     val path = "benchmarks"
@@ -33,12 +32,20 @@ object BenchAppConfs {
   val thread = 1
   val fork = 1
 
-  def envOptions: ChainedOptionsBuilder = {
-    new OptionsBuilder()
-      .warmupIterations(BenchAppConfs.warmup)
-      .measurementIterations(BenchAppConfs.measurement)
-      .threads(BenchAppConfs.thread)
-      .forks(BenchAppConfs.fork)
+  def envOptions(args: List[String]): ChainedOptionsBuilder = {
+    val includeO: Option[String] = args.headOption
+
+    val builder0 = new OptionsBuilder()
+    val builder1 = builder0.warmupIterations(BenchAppConfs.warmup)
+    val builder2 = builder1.measurementIterations(BenchAppConfs.measurement)
+    val builder3 = builder2.threads(BenchAppConfs.thread)
+    val builder4 = builder3.forks(BenchAppConfs.fork)
+    val builder5 = includeO.fold(builder4)(include => builder4.include(include))
+
+    builder5
   }
+
+  def iterateSize(builder: ChainedOptionsBuilder, start: Int, end: Int, by: Int): ChainedOptionsBuilder =
+    builder.param("iterateBenchSize", (start to end by by).map(_.toString).toArray: _*)
 
 }

@@ -14,11 +14,10 @@ class HCounterArbitrarySpec extends Specification with ScalaCheck {
         implicit val hcounterGen: Arbitrary[HCounter] = HCounterGen.hcounterA
 
         prop { (hcounter: HCounter) =>
-          (for {
-            updatedHcounter <- hcounter.update(10, 20)
-            test = updatedHcounter.sum == (hcounter.sum + 20)
-          } yield test)
-            .fold(ko)(test => if (test) ok else ko)
+          val updatedHcounter = hcounter.update(10, 20)
+          val cond = updatedHcounter.sum == (hcounter.sum + 20)
+
+          if (cond) ok else ko
         }.setArbitrary(hcounterGen)
       }
 
@@ -26,12 +25,11 @@ class HCounterArbitrarySpec extends Specification with ScalaCheck {
         implicit val hcounterGen: Arbitrary[HCounter] = HCounterGen.hcounterA
 
         prop { (hcounter: HCounter) =>
-          (for {
-            updatedHcounter <- hcounter.update(10, 20)
-            value <- updatedHcounter.get(10)
-          } yield value == 20)
-            .fold(ko)(test => if(test) ok else ko )
+          val updatedHcounter = hcounter.update(10, 20)
+          val value = updatedHcounter.get(10)
+          val cond = value == 20
 
+          if(cond) ok else ko
         }.setArbitrary(hcounterGen)
       }
 

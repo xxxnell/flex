@@ -8,21 +8,17 @@ trait DefaultSketchConf extends AdaPerSketchConf {
 
   val dataKernelWindow: Double = 1e-5
 
-  val boundaryCorrection: Double = 1
-
   val decayFactor: Double = 1
 
-  val startThreshold: Double = 100
+  val startThreshold: Double = 50
 
   val thresholdPeriod: Double = 100
 
   val queueSize: Int = 50
 
-  lazy val bindSampling: Int = cmap.no
+  val cmap: UniformEqualizeCmapConf = CmapConf.uniformEqualize(20, 3, Some(-1000d), Some(1000d), 0.1)
 
-  val cmap: UniformCmapConf = CmapConf.uniform(200, 3, Some(-1000d), Some(1000d))
-
-  val counter: CounterConf = CounterConf.apply(70, 2)
+  val counter: CounterConf = CounterConf.apply(Int.MaxValue, 1)
 
 }
 

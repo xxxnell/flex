@@ -2,6 +2,7 @@ package flip.pdf
 
 import flip.conf.SmoothDistConf
 import flip.measure.Measure
+import flip.rand.IRng
 
 import scala.language.higherKinds
 
@@ -11,27 +12,40 @@ import scala.language.higherKinds
   * */
 trait PredefinedDist[A] extends SmoothDist[A] {
 
-  def probability(from: A, to: A): Option[Double]
+  def probability(from: A, to: A): Double
 
 }
 
 trait PredefinedDistOps[D[_] <: PredefinedDist[_]] extends SmoothDistPropOps[D] {
 
-  def probability[A](dist: D[A], from: A, to: A): Option[Double] =
+  def probability[A](dist: D[A], from: A, to: A): Double =
     dist.asInstanceOf[PredefinedDist[A]].probability(from, to)
 
 }
 
 object PredefinedDist extends PredefinedDistOps[PredefinedDist] {
 
-  case class PredefinedDistImpl[A](measure: Measure[A], conf: SmoothDistConf, probabilityF: (A, A) => Option[Double])
+  case class PredefinedDistImpl[A](measure: Measure[A], rng: IRng, conf: SmoothDistConf, probabilityF: (A, A) => Double)
       extends PredefinedDist[A] {
-    def probability(from: A, to: A): Option[Prim] = probabilityF(from, to)
+    def probability(from: A, to: A): Prim = probabilityF(from, to)
   }
 
-  def bare[A](measure: Measure[A], conf: SmoothDistConf, probability: (A, A) => Option[Double]): PredefinedDist[A] =
-    PredefinedDistImpl(measure, conf, probability)
+  def bare[A](measure: Measure[A], rng: IRng, conf: SmoothDistConf, probability: (A, A) => Double): PredefinedDist[A] =
+    PredefinedDistImpl(measure, rng, conf, probability)
 
-  def sample[A](dist: PredefinedDist[A]): (PredefinedDist[A], A) = ???
+  def probability[A](probability: (A, A) => Double)(implicit measure: Measure[A],
+                                                    conf: SmoothDistConf): PredefinedDist[A] =
+    bare(measure, IRng(-1), conf, probability)
+
+  def modifyRng[A](dist: PredefinedDist[A], f: IRng => IRng): PredefinedDist[A] =
+    bare(dist.measure, f(dist.rng), dist.conf, dist.probability)
+
+  override def pdf[A](dist: PredefinedDist[A], a: A): Prim = ???
+
+  override def cdf[A](dist: PredefinedDist[A], a: A): Prim =
+    throw new IllegalArgumentException("PredefinedDist can't execute cdf")
+
+  override def icdf[A](dist: PredefinedDist[A], p: Prim): A =
+    throw new IllegalArgumentException("PredefinedDist can't execute icdf")
 
 }

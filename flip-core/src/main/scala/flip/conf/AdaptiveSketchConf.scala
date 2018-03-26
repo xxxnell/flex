@@ -1,9 +1,11 @@
 package flip.conf
 
+import flip.pdf.AdaptiveSketch
+
 /**
   * A configuration for AdaptiveSketch.
   * */
-trait AdaptiveSketchConf extends SketchConf {
+trait AdaptiveSketchConfB[+D <: AdaptiveSketch[_]] extends SketchConf {
 
   val queueSize: Int
 

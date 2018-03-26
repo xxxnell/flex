@@ -1,5 +1,6 @@
 package flip.counter
 
+import flip.measure.syntax._
 import org.scalacheck.{Arbitrary, Gen}
 import org.specs2.ScalaCheck
 import org.specs2.mutable._
@@ -16,16 +17,12 @@ class CounterSpec extends Specification with ScalaCheck {
 
         prop { (counterCdimCount: (Counter, CDim), count : Double) =>
           val (counter, cdim) = counterCdimCount
-          val countergen = counter.update(cdim, count)
-          val updatedcount = countergen.get.get(cdim).get
-          val koMsg =
-            s"count : $count " +
-            s"counterupdated : $updatedcount"
+          val utdCounter = counter.update(cdim, count)
+          val gotCount = utdCounter.get(cdim)
 
-          if( updatedcount == count) ok
-          else ko(koMsg)
-        }.setArbitrary1(counterCdimCountA)
-          .setArbitrary2(countGenA)
+          if(gotCount != count) ko
+          else ok
+        }.setArbitrary1(counterCdimCountA).setArbitrary2(countGenA)
       }
 
     }
@@ -39,15 +36,10 @@ class CounterSpec extends Specification with ScalaCheck {
 
           prop { (counterCdim: (Counter, CDim)) =>
             val (counter, cdim) = counterCdim
-            val corr = 1e-5f
-            val koMsg =
-              s"Cannot get the recorded count: " +
-                s"counter size -> ${counter.size}, cdim -> $cdim"
+            val recorded = counter.get(cdim)
+            val cond = recorded ~= 0.0
 
-            (for {
-              recorded <- counter.get(cdim)
-            } yield recorded)
-              .fold(ko(koMsg))(recorded => recorded must beCloseTo(0d, corr))
+            if(!cond) ko else ok
           }.setArbitrary(counterCdimA)
         }
 
@@ -56,16 +48,11 @@ class CounterSpec extends Specification with ScalaCheck {
 
           prop { (counterCdim: (Counter, CDim), count: Double) =>
             val (counter, cdim) = counterCdim
-            val corr = 1e-5f
-            val koMsg =
-              s"Cannot get the recorded count: " +
-                s"counter size -> ${counter.size}, cdim -> $cdim, count -> $count"
+            val utdCounter = counter.update(cdim, count)
+            val recorded = utdCounter.get(cdim)
+            val cond = recorded ~= count
 
-            (for {
-              counter <- counter.update(cdim, count)
-              recorded <- counter.get(cdim)
-            } yield recorded)
-              .fold(ko(koMsg))(recorded => recorded must beCloseTo(count, corr))
+            if(!cond) ko else ok
           }.setArbitrary1(counterCdimA)
         }
 
@@ -76,12 +63,7 @@ class CounterSpec extends Specification with ScalaCheck {
 
         prop { (counterSize: (Counter, Int)) =>
           val (counter, size) = counterSize
-          //val corr = 1e-5f
-          val koMsg =
-            s"Cannot get the recorded count: " +
-              s"counter size -> ${counter.size}, cdim -> $size"
-          if( counter.size == size) ok
-          else ko(koMsg)
+          if(counter.size == size) ok else ko
         }.setArbitrary(counterCdimA)
       }
 

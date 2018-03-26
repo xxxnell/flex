@@ -11,7 +11,6 @@ object AsciiArtPlot {
 
     ranges
       .map(range => (range, dist.probability(range.start, range.end)))
-      .flatMap { case (range, probO) => probO.map(prob => (range, prob)) }
       .map {
         case (range, prob) =>
           s"${asciiForRange(range, rangeReprSize)} ${asciiForProb(prob)} ${asciiProbBarForProb(prob)}"

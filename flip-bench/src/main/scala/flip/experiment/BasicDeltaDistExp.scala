@@ -19,20 +19,14 @@ object BasicDeltaDistExp {
       cmapEnd = Some(10d),
       counterSize = samplingNo
     )
-    val sketch = Sketch.empty[Double]
+    val sketch0 = Sketch.empty[Double]
     val (_, datas) = Dist.delta(0.1).samples(dataNo)
-    val dataIdxs = datas.zipWithIndex
-
-    var tempSketchO: Option[Sketch[Double]] = Option(sketch)
-    val idxUtdSketches: List[(Int, Sketch[Double])] = (0, sketch) :: dataIdxs.flatMap {
-      case (data, idx) =>
-        tempSketchO = tempSketchO.flatMap(_.update(data))
-        tempSketchO.map(sketch => (idx + 1, sketch))
-    }
-    val plots = idxUtdSketches.flatMap { case (idx, utdSkt) => utdSkt.densityPlot.map(plot => (idx, plot)) }
+    val sketchTraces = sketch0 :: sketch0.updateTrace(datas)
+    val idxSketches = sketchTraces.indices.zip(sketchTraces).toList.filter { case (idx, _) => idx % 10 == 0 }
+    val idxPlots = idxSketches.map { case (idx, utdSkt) => (idx, utdSkt.densityPlot) }
 
     ExpOutOps.clear(expName)
-    ExpOutOps.writePlots(expName, "pdf", plots)
+    ExpOutOps.writePlots(expName, "pdf", idxPlots)
   }
 
 }

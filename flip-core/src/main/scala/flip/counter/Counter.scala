@@ -18,13 +18,13 @@ trait Counter {
 
 trait CounterOps[C <: Counter] extends CounterLaws[C] {
 
-  def update(counter: C, cdim: CDim, count: Double): Option[C]
+  def update(counter: C, cdim: CDim, count: Double): C
 
 }
 
 trait CounterLaws[C <: Counter] { self: CounterOps[C] =>
 
-  def get(counter: C, cdim: CDim): Option[Double] = Try(counter.counts.apply(cdim)).toOption
+  def get(counter: C, cdim: CDim): Double = counter.counts.apply(cdim)
 
   def size(counter: C): Int = counter.counts.size
 
@@ -33,8 +33,8 @@ trait CounterLaws[C <: Counter] { self: CounterOps[C] =>
 trait CounterSyntax {
 
   implicit class CounterSyntaxImpl(counter: Counter) {
-    def update(cdim: CDim, count: Double): Option[Counter] = Counter.update(counter, cdim, count)
-    def get(cdim: CDim): Option[Double] = Counter.get(counter, cdim)
+    def update(cdim: CDim, count: Double): Counter = Counter.update(counter, cdim, count)
+    def get(cdim: CDim): Double = Counter.get(counter, cdim)
     def size: Int = Counter.size(counter)
   }
 
@@ -44,10 +44,9 @@ object Counter extends CounterOps[Counter] {
 
   def empty(size: Int): VectorCounter = VectorCounter.empty(size)
 
-  def update(counter: Counter, cdim: CDim, count: Double): Option[Counter] = counter match {
+  def update(counter: Counter, cdim: CDim, count: Double): Counter = counter match {
     case counter: ListCounter => ListCounter.update(counter, cdim, count)
     case counter: VectorCounter => VectorCounter.update(counter, cdim, count)
-    case _ => None
   }
 
 }

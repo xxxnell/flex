@@ -1,7 +1,7 @@
 import sbt.Keys._
-import flip.Dependencies._
 import flip.FlipBuilds
 import flip.Releases
+import flip.Tasks
 
 name := "flip"
 
@@ -10,6 +10,7 @@ lazy val root = project
   .settings(moduleName := "root")
   .settings(Releases.publishSettings)
   .settings(Releases.noPublishSettings)
+  .settings(Tasks.taskSettings(flipBench))
   .aggregate(flipCore, flipBench)
 
 lazy val flipCore = flipModule("flip-core")

@@ -1,6 +1,8 @@
 package flip.conf
 
-trait DistConf {
+import flip.pdf.Dist
+
+trait DistConfB[+D <: Dist[_]] {
 
   val delta: Double
 

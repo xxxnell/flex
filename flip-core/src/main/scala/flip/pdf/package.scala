@@ -1,5 +1,6 @@
 package flip
 
+import cats.data.NonEmptyList
 import flip.cmap.Cmap
 import flip.hcounter.HCounter
 
@@ -18,7 +19,7 @@ package object pdf {
 
   type Structure = (Cmap, HCounter)
 
-  type Structures = List[Structure]
+  type Structures = NonEmptyList[Structure]
 
   implicit def autocast[A](sketch: Sketch[A]): SimpleSketch[A] = SimpleSketch.sketch2SimpleSketch(sketch)
 

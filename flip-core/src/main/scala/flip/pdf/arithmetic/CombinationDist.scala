@@ -4,13 +4,15 @@ import cats.data.NonEmptyList
 import flip.conf.DistConf
 import flip.measure.Measure
 import flip.pdf.{Dist, DistPropOps}
+import flip.plot.DensityPlot
+import flip.plot.syntax._
 import flip.rand._
 
 import scala.language.higherKinds
 
 trait CombinationDist[A] extends Dist[A] {
 
-  lazy val normalized: NonEmptyList[(Out, Dist[A])] = CombinationDist.normalizing(components)
+  lazy val normalizedComponents: NonEmptyList[(Double, Dist[A])] = CombinationDist.normalizing(components)
 
   /**
     * @return list of (weight, distribution)
@@ -39,18 +41,18 @@ trait CombinationDistOps[D[_] <: CombinationDist[_]] extends DistPropOps[D] {
       components => NonEmptyList.fromList(components.toList.updated(idx, f(utdWeight, utdDist))).get)
   }
 
-  def probability[A](combi: D[A], start: A, end: A): Option[Double] = {
-    val components = combi.normalized
+  def probability[A](combi: D[A], start: A, end: A): Double = {
+    val components = combi.normalizedComponents
     val probs = components.map {
       case (weight, dist) =>
-        (weight, dist.asInstanceOf[Dist[A]].probability(start, end).get)
+        (weight, dist.asInstanceOf[Dist[A]].probability(start, end))
     }
 
-    Some(probs.map { case (weight, prob) => weight * prob }.toList.sum)
+    probs.map { case (weight, prob) => weight * prob }.toList.sum
   }
 
-  def sample[A](combi: D[A]): (D[A], A) = {
-    val components = combi.normalized
+  override def sample[A](combi: D[A]): (D[A], A) = {
+    val components = combi.normalizedComponents
     val (utdRng, rnd) = combi.rng.next
 
     val cumWeightDist = {
@@ -73,24 +75,32 @@ trait CombinationDistOps[D[_] <: CombinationDist[_]] extends DistPropOps[D] {
     (utdCombi2, sample)
   }
 
-  override def pdf[A](combi: D[A], a: A): Option[Double] = {
-    val components = combi.normalized
-    val pdfs = components.map {
-      case (weight, dist) =>
-        (weight, dist.asInstanceOf[Dist[A]].pdf(a).get)
-    }
+  def sampling[A](combi: D[A]): DensityPlot = {
+    val components = combi.normalizedComponents
 
-    Some(pdfs.map { case (weight, prob) => weight * prob }.toList.sum)
+    components
+      .map { case (weight, dist) => dist.sampling * weight }
+      .foldLeft(DensityPlot.empty) { case (acc, plot) => acc + plot }
   }
 
-  override def cdf[A](combi: D[A], a: A): Option[Double] = {
-    val components = combi.normalized
-    val cdfs = components.map {
+  override def pdf[A](combi: D[A], a: A): Double = {
+    val components = combi.normalizedComponents
+    val pdfs = components.map {
       case (weight, dist) =>
-        (weight, dist.asInstanceOf[Dist[A]].cdf(a).get)
+        (weight, dist.asInstanceOf[Dist[A]].pdf(a))
     }
 
-    Some(cdfs.map { case (weight, prob) => weight * prob }.toList.sum)
+    pdfs.map { case (weight, prob) => weight * prob }.toList.sum
+  }
+
+  override def cdf[A](combi: D[A], a: A): Double = {
+    val components = combi.normalizedComponents
+    val cdfs = components.map {
+      case (weight, dist) =>
+        (weight, dist.asInstanceOf[Dist[A]].cdf(a))
+    }
+
+    cdfs.map { case (weight, prob) => weight * prob }.toList.sum
   }
 
   def normalizingConstant(weights: NonEmptyList[Double]): Double = 1 / weights.toList.sum

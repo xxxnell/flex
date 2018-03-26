@@ -8,12 +8,8 @@ class Byteswap32Hmap(seed: Int) extends Hmap {
 
   val hseed: Int = byteswap32(seed)
 
-  def apply(hdim: HDim, size: Int): Option[CDim] = {
-    try {
-      if (size > 0) Some(Math.abs(byteswap32(hseed + hdim)) % size) else None
-    } catch {
-      case _: Exception => None
-    }
+  def apply(hdim: HDim, size: Int): CDim = {
+    Math.abs(byteswap32(hseed + hdim)) % size
   }
 
   override def toString: String = s"Byteswap32Hmap(seed -> $seed)"

@@ -17,7 +17,7 @@ class PeriodicSketchSpec extends Specification with ScalaCheck {
       // construct
       val (cmapSize, cmapNo, cmapStart, cmapEnd) = (50, 100, Some(-100d), Some(100d))
       val (counterSize, counterNo) = (10, 2)
-      implicit val conf: PeriodicSketchConf = CustomSketchConf(
+      implicit val conf: PeriodicSketchConf = CustomPeriodicSketchConf(
         startThreshold = 0, thresholdPeriod = 1,
         cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
         counterSize = counterSize, counterNo = counterNo
@@ -52,7 +52,7 @@ class PeriodicSketchSpec extends Specification with ScalaCheck {
       // construct
       val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 100, Some(-100d), Some(100d))
       val (counterSize, counterNo) = (10, 2)
-      implicit val conf: PeriodicSketchConf = CustomSketchConf(
+      implicit val conf: PeriodicSketchConf = CustomPeriodicSketchConf(
         startThreshold = 0, thresholdPeriod = 1,
         cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
         counterSize = counterSize, counterNo = counterNo
@@ -96,39 +96,25 @@ class PeriodicSketchSpec extends Specification with ScalaCheck {
         val (start, period) = (0, 1)
         val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 1, Some(0d), Some(10d))
         val (counterSize, counterNo) = (2, 1)
-        implicit val conf: PeriodicSketchConf = CustomSketchConf(
+        implicit val conf: PeriodicSketchConf = CustomPeriodicSketchConf(
           startThreshold = start, thresholdPeriod = period,
           cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
           counterSize = counterSize, counterNo = counterNo
         )
         val sketch0: Sketch[Double] = PeriodicSketch.empty[Double]
-        val datas = Stream.from(1, 1).take(3)
+        val datas = Stream.from(1, 1).take(3).toList
 
-        val sequencialSketchsO: Option[List[Sketch[Double]]] = datas
-          .foldLeft(Option(List(sketch0))){ case (accO, data) => for {
-            acc <- accO
-            sketch <- acc.lastOption
-            utdSketch <- sketch.update(data)
-          } yield acc :+ utdSketch }
+        var sketch = sketch0
+        val seqSketches = datas.map { data => sketch = sketch.update(data); sketch }
+        val seqCmaps = seqSketches.map(sketch => sketch.youngCmap)
 
-        val sequencialCmapsO: Option[List[Cmap]] = sequencialSketchsO.flatMap(sketches =>
-          sketches.traverse(sketch => sketch.youngCmap)
-        )
-
-        val cond = sequencialCmapsO.exists(cmaps => cmaps.sliding(2)
-          .map {
-            case cmap1 :: cmap2 :: Nil => Some((cmap1, cmap2))
-            case _ => None
-          }.forall {
-            case Some((cmap1: DividerCmap, cmap2: DividerCmap)) => cmap1 != cmap2
-            case _ => false
-          }
-        )
+        val cond = seqCmaps.sliding(2).forall {
+          case cmap1 :: cmap2 :: Nil => cmap1 != cmap2
+          case _ => false
+        }
 
         if(cond) ok else ko(
-          sequencialCmapsO.map(cmaps =>
-            cmaps.zipWithIndex.map { case (cmap, idx) => s"cmap ${idx+1}: $cmap"}.mkString("\n")
-          ).getOrElse("empty cmap")
+          seqCmaps.zipWithIndex.map { case (cmap, idx) => s"cmap ${idx+1}: $cmap"}.mkString("\n")
         )
       }
 
@@ -142,7 +128,7 @@ object PeriodicSketchGen {
 
   def intPeriodicSketchGen: Gen[PeriodicSketch[Int]] = for {
     measure <- MeasureGen.intMeasureGen
-    conf <- SketchConfGen.sketchConfGen
+    conf <- SketchConfGen.periodicSketchConfGen
   } yield PeriodicSketch.empty(measure, conf)
 
   def periodicSketchSample: Option[PeriodicSketch[Int]] = intPeriodicSketchGen.sample

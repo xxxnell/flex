@@ -26,13 +26,10 @@ class HCounterSpec extends Specification with ScalaCheck {
           val index = 10
           val count = 20
           val hcounter = HCounter.empty(1, 50, 0)
-          val utdHcounterO = hcounter.update(index, count)
+          val utdHcounter = hcounter.update(index, count)
+          val got = utdHcounter.get(index)
 
-          (for {
-            utdHcounter <- utdHcounterO
-            got <- utdHcounter.get(index)
-          } yield got)
-            .fold(ko)(got => if(got != count) ko(s"count: $got, expected: $count") else ok)
+          if(got != count) ko(s"count: $got, expected: $count") else ok
         }
 
         "irregular index: overflow" in {

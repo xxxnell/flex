@@ -1,5 +1,12 @@
 import numpy as np
 
+def data_str(name):
+    with open(name, 'r') as f:
+        content = f.readlines()
+
+    return list(map(lambda elem: [d.strip() for d in elem.split(",")], content))
+
+
 def data(name, i):
     with open(name, 'r') as f:
         content = f.readlines()

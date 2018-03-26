@@ -1,7 +1,7 @@
 package flip.experiment
 
-import flip._
-import flip.experiment.ops.{ComparisonOps, DataOps, ExpOutOps}
+import flip.implicits._
+import flip.experiment.ops.ExpOutOps
 
 /**
   * A experiment for sudden concept drift.
@@ -13,23 +13,12 @@ object SuddenConceptDriftExp {
     val expName = "sudden-cd-normal"
     val dataNo = 1000
     val draftStart = 300
-    val start = 50
-    val period = 100
-    val samplingNo = 20
 
     implicit val conf: SketchConf = SketchConf(
-      decayFactor = 1,
-      startThreshold = start,
-      thresholdPeriod = period,
-      queueSize = 30,
-      cmapSize = samplingNo,
-      cmapNo = 5,
-      cmapStart = Some(-10d),
-      cmapEnd = Some(10),
-      counterSize = 1000,
-      counterNo = 2
+      cmapStart = Some(-10),
+      cmapEnd = Some(10)
     )
-    val sketch = Sketch.empty[Double]
+    val sketch0 = Sketch.empty[Double]
     val (mean1, mean2) = (0.0, 5.0)
     val underlying1 = NumericDist.normal(mean1, 1)
     val (_, datas1) = underlying1.samples(draftStart)
@@ -38,23 +27,13 @@ object SuddenConceptDriftExp {
     def underlying(idx: Int) = if (idx < draftStart) underlying1 else underlying2
     def center(idx: Int) = if (idx < draftStart) mean1 else mean2
     val datas = datas1 ++ datas2
-    val dataIdxs = (datas.indices zip datas).toList
-
-    val idxUtdSketches = DataOps.update(sketch, dataIdxs).filter { case (idx, _) => idx % 10 == 0 }
-    val idxDensityPlots = idxUtdSketches.flatMap { case (idx, utdSkt) => utdSkt.pdfPlot.map((idx, _)) }
-    val idxKld = idxUtdSketches.flatMap {
-      case (idx, utdSkt) =>
-        ComparisonOps.identicalDomain(underlying(idx), utdSkt, KLD[Double]).map((idx, _))
-    }
-    val idxCos = idxUtdSketches.flatMap {
-      case (idx, utdSkt) =>
-        ComparisonOps.identicalDomain(underlying(idx), utdSkt, Cosine[Double]).map((idx, _))
-    }
-    val idxEuc = idxUtdSketches.flatMap {
-      case (idx, utdSkt) =>
-        ComparisonOps.identicalDomain(underlying(idx), utdSkt, Euclidean[Double]).map((idx, _))
-    }
-    val idxSktMedian = idxUtdSketches.flatMap { case (idx, skt) => skt.median.map((idx, _)) }
+    val sketchTraces = sketch0 :: sketch0.updateTrace(datas)
+    val idxSketches = sketchTraces.indices.zip(sketchTraces).toList.filter { case (idx, _) => idx % 10 == 0 }
+    val idxDensityPlots = idxSketches.map { case (idx, utdSkt) => (idx, utdSkt.pdfPlot) }
+    val idxKld = idxSketches.map { case (idx, utdSkt) => (idx, KLD(underlying(idx), utdSkt)) }
+    val idxCos = idxSketches.map { case (idx, utdSkt) => (idx, Cosine(underlying(idx), utdSkt)) }
+    val idxEuc = idxSketches.map { case (idx, utdSkt) => (idx, Euclidean(underlying(idx), utdSkt)) }
+    val idxSktMedian = idxSketches.map { case (idx, skt) => (idx, skt.median) }
 
     ExpOutOps.clear(expName)
     ExpOutOps.writePlots(expName, "pdf", idxDensityPlots)

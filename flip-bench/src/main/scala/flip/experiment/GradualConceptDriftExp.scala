@@ -1,7 +1,7 @@
 package flip.experiment
 
-import flip._
-import flip.experiment.ops.{ComparisonOps, DataOps, ExpOutOps}
+import flip.implicits._
+import flip.experiment.ops.ExpOutOps
 import flip.rand.IRng
 
 /**
@@ -16,10 +16,6 @@ object GradualConceptDriftExp {
     val draftStart = 300
     val draftStartingPoint = 0.0
     val velocity = 0.01
-    val samplingNo = 20
-    val start = 50
-    val period = 100
-    val domainWidth = 1.5
 
     def center(idx: Int) =
       if (draftStart > idx) draftStartingPoint
@@ -28,68 +24,29 @@ object GradualConceptDriftExp {
     def underlying(idx: Int, rng: IRng = rng): NumericDist[Double] =
       if (draftStart > idx) NumericDist.normal(draftStartingPoint, 1.0, rng)
       else NumericDist.normal(center(idx), 1.0, rng)
-    val dataIdx: List[(Int, Double)] = {
+    val datas: List[Double] = {
       var tempRng = rng
       (0 to dataNo).toList.map(idx => {
         val (utdDist, sample) = underlying(idx, tempRng).sample
         tempRng = utdDist.asInstanceOf[NumericDist[Double]].rng
-        (idx, sample)
+        sample
       })
     }
 
     implicit val conf: SketchConf = SketchConf(
-      startThreshold = start,
-      thresholdPeriod = period,
-      boundaryCorr = 0.01,
       decayFactor = 1,
-      queueSize = 30,
-      cmapSize = samplingNo,
       cmapNo = 5,
       cmapStart = Some(-10d),
-      cmapEnd = Some(10),
-      counterSize = samplingNo
+      cmapEnd = Some(10)
     )
-    val sketch = Sketch.empty[Double]
-
-    val idxUtdSketches = DataOps.update(sketch, dataIdx).filter { case (idx, _) => idx % 10 == 0 }
-    val idxPdf = idxUtdSketches.flatMap { case (idx, skt) => skt.sampling.map((idx, _)) }
-    val idxKld = idxUtdSketches.flatMap {
-      case (idx, skt) =>
-        ComparisonOps
-          .uniformDomain(
-            underlying(idx),
-            draftStartingPoint - domainWidth,
-            center(idx) + domainWidth,
-            samplingNo * 3,
-            skt,
-            KLD[Double])
-          .map((idx, _))
-    }
-    val idxCos = idxUtdSketches.flatMap {
-      case (idx, skt) =>
-        ComparisonOps
-          .uniformDomain(
-            underlying(idx),
-            draftStartingPoint - domainWidth,
-            center(idx) + domainWidth,
-            samplingNo * 3,
-            skt,
-            Cosine[Double])
-          .map((idx, _))
-    }
-    val idxEuc = idxUtdSketches.flatMap {
-      case (idx, skt) =>
-        ComparisonOps
-          .uniformDomain(
-            underlying(idx),
-            draftStartingPoint - domainWidth,
-            center(idx) + domainWidth,
-            samplingNo * 3,
-            skt,
-            Euclidean[Double])
-          .map((idx, _))
-    }
-    val idxSktMedian = idxUtdSketches.flatMap { case (idx, skt) => skt.median.map((idx, _)) }
+    val sketch0 = Sketch.empty[Double]
+    val sketchTraces = sketch0 :: sketch0.updateTrace(datas)
+    val idxSketches = sketchTraces.indices.zip(sketchTraces).toList.filter { case (idx, _) => idx % 10 == 0 }
+    val idxPdf = idxSketches.map { case (idx, skt) => (idx, skt.sampling) }
+    val idxKld = idxSketches.map { case (idx, utdSkt) => (idx, KLD(underlying(idx), utdSkt)) }
+    val idxCos = idxSketches.map { case (idx, utdSkt) => (idx, Cosine(underlying(idx), utdSkt)) }
+    val idxEuc = idxSketches.map { case (idx, utdSkt) => (idx, Euclidean(underlying(idx), utdSkt)) }
+    val idxSktMedian = idxSketches.map { case (idx, skt) => (idx, skt.median) }
 
     // out
 
@@ -111,9 +68,9 @@ object GradualConceptDriftExp {
     val avgEuc = idxEuc.takeRight(avgSize).map(_._2).sum / avgSize
 
     val str = s"Similarity for gradual concept-drifted data stream with velocity $velocity: \n" +
-      s" KLD(Sketch($samplingNo)): $avgKld \n" +
-      s" Cosine(Sketch($samplingNo)): $avgCos \n" +
-      s" Euclidean(Sketch($samplingNo)): $avgEuc"
+      s" KLD: $avgKld \n" +
+      s" Cosine: $avgCos \n" +
+      s" Euclidean: $avgEuc"
     println(str)
   }
 

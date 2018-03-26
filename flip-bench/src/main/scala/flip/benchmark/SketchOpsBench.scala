@@ -17,16 +17,16 @@ class SketchOpsBench { self =>
   @Param(Array("0", "50"))
   var queueSize: Int = _
 
-  @Param(Array("5", "20"))
+  @Param(Array("3", "30"))
   var cmapNo: Int = _
 
-  @Param(Array("200", "2000"))
+  @Param(Array("20", "200"))
   var cmapSize: Int = _
 
-  @Param(Array("2", "10"))
+  @Param(Array("1"))
   var counterNo: Int = _
 
-  @Param(Array("40", "1000"))
+  @Param(Array("2147483647"))
   var counterSize: Int = _
 
   // variables
@@ -51,7 +51,7 @@ class SketchOpsBench { self =>
     val sketch0 = Sketch.empty[Double]
 
     self.conf = conf
-    self.sketch = sketch0.narrowUpdate(samples: _*).getOrElse(sketch0)
+    self.sketch = sketch0.narrowUpdate(samples: _*)
   }
 
   @Benchmark
@@ -72,17 +72,17 @@ class SketchOpsBench { self =>
   }
 
   @Benchmark
-  def sampling: Option[DensityPlot] = {
+  def sampling: DensityPlot = {
     sketch.sampling
   }
 
   @Benchmark
-  def narrowUpdate: Option[Sketch[Double]] = {
+  def narrowUpdate: Sketch[Double] = {
     sketch.narrowUpdate(1)
   }
 
   @Benchmark
-  def deepUpdate: Option[(Sketch[Double], Option[(Cmap, HCounter)])] = {
+  def deepUpdate: (Sketch[Double], Option[(Cmap, HCounter)]) = {
     sketch.deepUpdate(1.0 to 10.0 by 1.0: _*)
   }
 
@@ -92,18 +92,28 @@ class SketchOpsBench { self =>
   }
 
   @Benchmark
-  def rearrange: Option[Sketch[Double]] = {
+  def rearrange: Sketch[Double] = {
     sketch.rearrange
   }
 
   @Benchmark
-  def probability: Option[Double] = {
+  def probability: Double = {
     sketch.probability(1, 2)
   }
 
   @Benchmark
-  def count: Option[Double] = {
+  def count: Double = {
     sketch.count(1, 2)
+  }
+
+  @Benchmark
+  def median: Double = {
+    sketch.median
+  }
+
+  @Benchmark
+  def sample: (Sketch[Double], Double) = {
+    sketch.sample
   }
 
 }

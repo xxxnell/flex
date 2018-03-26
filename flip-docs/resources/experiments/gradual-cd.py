@@ -67,10 +67,9 @@ ax2.axvline(moving_start, color='r', linestyle=':', linewidth=1)
 
 # Save
 
-plt.legend()
+# plt.legend()
 plt.savefig(name + '.pdf')
 plt.savefig(name + '.png')
-plt.show()
 
 
 # Animated PDF

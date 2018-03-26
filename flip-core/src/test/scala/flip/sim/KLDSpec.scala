@@ -1,32 +1,25 @@
 package flip.sim
 
-import org.specs2.mutable._
-import org.specs2.ScalaCheck
-import flip.conf.DistConf
-import flip.pdf.Dist
-import flip.range.RangeP
+import flip.conf.SmoothDistConf
 import flip.measure.syntax._
+import flip.pdf.Dist
+import org.specs2.ScalaCheck
+import org.specs2.mutable._
 
 class KLDSpec extends Specification with ScalaCheck {
 
   "KLD" should {
 
     "basic" in {
+      implicit val conf: SmoothDistConf = SmoothDistConf(samplingSize = 300, samplingBoundaryRatio = 0.01)
       val normal1 = Dist.normal(0.0, 1)
-      val normal2 = Dist.normal(0.5d, 1)
-      val samples = (-2.5 to 2.5 by 0.1).toList.sliding(2).flatMap {
-        case s1 :: s2 :: Nil => Some(RangeP(s1, s2))
-        case _ => None
-      }.toList
-      val expected = 0.1234
+      val normal2 = Dist.normal(0.5, 1)
+      val expected = 0.125
 
-      (for {
-        sampling <- normal1.sampling(samples)
-        kld <- KLD.simForSampling(sampling, normal2)
-      } yield kld)
-        .fold(ko("Error occurs.")){ kld =>
-          if(kld ~= expected) ok else ko(s"kld: $kld, expected: $expected")
-        }
+      val kld = KLD.simForDist(normal1, normal2)
+      val cond1 = kld ~= expected
+
+      if(!cond1) ko(s"kld: $kld, expected: $expected") else ok
     }
 
   }

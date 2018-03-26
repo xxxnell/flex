@@ -98,14 +98,28 @@ object Releases extends ReleaseProcess {
   )
 
   lazy val publishSettings = Seq(
+    publishMavenStyle := true,
+    publishArtifact in Test := false,
+    pomIncludeRepository := { _ =>
+      false
+    },
     homepage := Some(url("https://github.com/xxxnell/flip")),
     licenses := Seq("MIT" -> url("http://opensource.org/licenses/MIT")),
+    scmInfo := Some(
+      ScmInfo(
+        url("https://github.com/xxxnell/flip"),
+        "scm:git:git@github.com:xxxnell/flip.git"
+      )
+    ),
+    developers := List(
+      Developer("xxxnell", "Nell", "xxxxxnell@gmail.com", url("https://twitter.com/xxxnell"))
+    ),
     // bintray
     bintrayRepository := "oss-maven",
     // release
     releaseIgnoreUntrackedFiles := true,
-    releaseTagComment := s"+ releasing ${(version in ThisBuild).value}",
-    releaseCommitMessage := s"* [skip ci] setting version to ${(version in ThisBuild).value}",
+    releaseTagComment := s"+ Releasing ${(version in ThisBuild).value}",
+    releaseCommitMessage := s"* [skip ci] Setting version to ${(version in ThisBuild).value}",
     releaseProcess := releaseSteps
   )
 

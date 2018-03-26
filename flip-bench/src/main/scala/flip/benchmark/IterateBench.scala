@@ -10,26 +10,26 @@ import org.openjdk.jmh.infra.Blackhole
 @BenchmarkMode(Array(Mode.AverageTime))
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @State(Scope.Thread)
-class IterateBench {
+class IterateBench { self =>
 
   // params
 
-  @Param(Array("0"))
+  @Param(Array("30"))
   var queueSize: Int = _
 
   @Param(Array("50", "100", "150", "200"))
   var iterateBenchSize: Int = _
 
-  @Param(Array("5"))
+  @Param(Array("2"))
   var cmapNo: Int = _
 
-  @Param(Array("200"))
+  @Param(Array("20"))
   var cmapSize: Int = _
 
-  @Param(Array("3"))
+  @Param(Array("2"))
   var counterNo: Int = _
 
-  @Param(Array("70"))
+  @Param(Array("100000"))
   var counterSize: Int = _
 
   // variables
@@ -61,9 +61,9 @@ class IterateBench {
     val n = iterateBenchSize
 
     var i = 0
-    var sketchO: Option[Sketch[Double]] = Some(sketch)
+    var sketch: Sketch[Double] = self.sketch
     while (i < n) {
-      sketchO = sketchO.flatMap(sketch => sketch.update(signals(i)))
+      sketch = sketch.update(signals(i))
       i += 1
     }
   }

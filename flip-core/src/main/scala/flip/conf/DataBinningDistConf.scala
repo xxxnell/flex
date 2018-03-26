@@ -1,3 +1,5 @@
 package flip.conf
 
-trait DataBinningDistConf extends SamplingDistConf {}
+import flip.pdf.DataBinningDist
+
+trait DataBinningDistConfB[+D <: DataBinningDist[_]] extends SamplingDistConfB[D]

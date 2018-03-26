@@ -4,6 +4,7 @@ import flip.conf.SamplingDistConf
 import flip.measure.Measure
 import flip.plot.DensityPlot
 import flip.range.syntax._
+import flip.rand.IRng
 
 import scala.language.higherKinds
 
@@ -19,30 +20,35 @@ trait PlottedDist[A] extends SamplingDist[A] {
 
 trait PlottedDistPropOps[D[_] <: PlottedDist[_]] extends SamplingDistPropOps[D] {
 
-  def sampling[A](dist: D[A]): Option[DensityPlot] = Some(dist.sampling)
+  def modifySampling[A](dist: D[A], f: DensityPlot => DensityPlot): D[A]
 
-  def filter[A](dist: PlottedDist[A], f: RangeP => Boolean): PlottedDist[A] =
-    PlottedDist.bare(
-      dist.measure,
-      DensityPlot.disjoint(dist.sampling.records.filter { case (range, _) => f(range) }),
-      dist.conf
-    )
+  def sampling[A](dist: D[A]): DensityPlot = dist.sampling
 
-  def probability[A](dist: D[A], start: A, end: A): Option[Double] = {
+  def filter[A](dist: D[A], f: RangeP => Boolean): D[A] =
+    modifySampling(dist, sampling => DensityPlot.disjoint(sampling.records.filter { case (range, _) => f(range) }))
+
+  def probability[A](dist: D[A], start: A, end: A): Double = {
     val measure = dist.measure.asInstanceOf[Measure[A]]
-    Some(dist.sampling.integral(measure.to(start), measure.to(end)))
+    dist.sampling.integral(measure.to(start), measure.to(end))
   }
 
 }
 
 object PlottedDist extends PlottedDistPropOps[PlottedDist] {
 
-  case class PlottedDistImpl[A](measure: Measure[A], sampling: DensityPlot, conf: SamplingDistConf)
+  private case class PlottedDistImpl[A](measure: Measure[A], rng: IRng, sampling: DensityPlot, conf: SamplingDistConf)
       extends PlottedDist[A]
 
-  def bare[A](measure: Measure[A], densityPlot: DensityPlot, conf: SamplingDistConf): PlottedDist[A] =
-    PlottedDistImpl(measure, densityPlot, conf)
+  def bare[A](measure: Measure[A], rng: IRng, densityPlot: DensityPlot, conf: SamplingDistConf): PlottedDist[A] =
+    PlottedDistImpl(measure, rng, densityPlot, conf)
 
-  def sample[A](dist: PlottedDist[A]): (PlottedDist[A], A) = ???
+  def densityPlot[A](densityPlot: DensityPlot)(implicit measure: Measure[A], conf: SamplingDistConf): PlottedDist[A] =
+    bare(measure, IRng(densityPlot.hashCode()), densityPlot, conf)
+
+  def modifyRng[A](dist: PlottedDist[A], f: IRng => IRng): PlottedDist[A] =
+    bare(dist.measure, f(dist.rng), dist.sampling, dist.conf)
+
+  def modifySampling[A](dist: PlottedDist[A], f: DensityPlot => DensityPlot): PlottedDist[A] =
+    bare(dist.measure, dist.rng, f(dist.sampling), dist.conf)
 
 }

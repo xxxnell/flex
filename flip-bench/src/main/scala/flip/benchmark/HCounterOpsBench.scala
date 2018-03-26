@@ -22,7 +22,7 @@ class HCounterOpsBench {
   var hcounter: HCounter = _
 
   @Setup
-  def setupHCounter = {
+  def setupHCounter(): Unit = {
     hcounter = HCounter.empty(counterNo, counterSize, seed)
   }
 
@@ -32,13 +32,13 @@ class HCounterOpsBench {
   }
 
   @Benchmark
-  def update: Option[HCounter] = {
+  def update: HCounter = {
     val dim = 1
     hcounter.update(dim, 1)
   }
 
   @Benchmark
-  def get: Option[Double] = {
+  def get: Double = {
     val dim = 1
     hcounter.get(dim)
   }
@@ -49,7 +49,7 @@ class HCounterOpsBench {
   }
 
   @Benchmark
-  def count: Option[Double] = {
+  def count: Double = {
     val (dim1, dim2) = (1, 3)
     hcounter.count(dim1, dim2)
   }
