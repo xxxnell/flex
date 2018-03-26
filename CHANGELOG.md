@@ -2,12 +2,19 @@
 
 ## 0.0.x
 
-This version is a experimental section to try various features of Flip. 
+This version is a experimental section to try various features and interfaces of Flip. 
 
 
-### [0.0.3]()
+### [0.0.3](https://github.com/xxxnell/flip/tree/v0.0.3)
 
-* Fix minor bugs [#17](https://github.com/xxxnell/flip/issues/17)
+> 2018-03-26
+
+We refine its usabilities and inner workings. Especially, the functions of `Dist` including `Sketch` doesn't consider the empty structure anuymore. Thus, many functions do not return options, making them easier to use. 
+
+* Many functions of `Dist` doesn't return `Option` [#1](https://github.com/xxxnell/flip/issues/1) [#3](https://github.com/xxxnell/flip/issues/3)
+* Implement `sample` for Sketch [#25](https://github.com/xxxnell/flip/issues/25)
+* Support for-comprehension [#26](https://github.com/xxxnell/flip/issues/26)
+* Fix minor bugs [#16](https://github.com/xxxnell/flip/issues/16) [#17](https://github.com/xxxnell/flip/issues/17) [#20](https://github.com/xxxnell/flip/issues/20)
 
 
 ### [0.0.2](https://github.com/xxxnell/flip/tree/v0.0.2)
