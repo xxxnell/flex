@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/xxxnell/flip.svg?branch=master)](https://travis-ci.org/xxxnell/flip)
 [![codecov](https://codecov.io/gh/xxxnell/flip/branch/master/graph/badge.svg)](https://codecov.io/gh/xxxnell/flip)
 [![Waffle.io - Columns and their card count](https://badge.waffle.io/xxxnell/flip.svg?columns=to%20do)](https://waffle.io/xxxnell/flip)
-[ ![Download](https://api.bintray.com/packages/xxxnell/oss-maven/flip/images/download.svg) ](https://bintray.com/xxxnell/oss-maven/flip/_latestVersion)
+[![Latest version](https://index.scala-lang.org/xxxnell/flip/flip/latest.svg)](https://index.scala-lang.org/xxxnell/flip/flip)
 
 
 *Flip* is *F*ast, *L*ightweight pure-functional library for *I*nformation theory and *P*robability distribution. *Flip* aims to extract and process statistical features of the input data stream in a short time using only small memory. It has the following features:
@@ -16,12 +16,10 @@
 
 ## Getting Started
 
-*Flip* is published to jCenter and built for Scala 2.12, so you can add the following to your `build.sbt`:
+*Flip* is published to Maven Central and built for Scala 2.12, so you can add the following to your `build.sbt`:
 
 ``` scala
-resolvers += Resolver.jcenterRepo
-
-libraryDependencies += "com.xxxnell" %% "flip" % "0.0.2"
+libraryDependencies += "com.xxxnell" %% "flip" % "0.0.3"
 ```
 
 
@@ -47,7 +45,7 @@ val utdSketch = samples.foldLeft(sketch0) {
 // get probability for interval [0.0, 1.0]
 println("result: " + utdSketch.probability(0.0, 1.0))
 println("expected: " + underlying.probability(0.0, 1.0))
-// result: 0.35479611850109305
+// result: 0.35909395435107017
 // expected: 0.34134474606854304
 ```
 
