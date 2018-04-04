@@ -72,6 +72,8 @@ In all of these experiments, I did not provide any prior knowledge to predict th
 
 Contributions are always welcome. Any kind of contribution, such as writing a unit test, documentation, bug fix, or implementing [the density estimation algorithm of `Sketch`](./flip-docs/algorithm.md) in another language, is helpful. If you need some help, please contact me via [email](mailto:xxxxxnell@gmail.com) or [twitter](https://twitter.com/xxxnell).
 
+The `master` branch of this repository contains the latest stable release of *Flip*. In general, pull requests should be submitted against `develop` branch. 
+
 Fo more detail, see the [contributing](./CONTRIBUTING.md) documentation.
 
 
