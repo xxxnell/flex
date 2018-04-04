@@ -8,7 +8,7 @@
 
 *Flip* is *F*ast, *L*ightweight pure-functional library for *I*nformation theory and *P*robability distribution. *Flip* aims to extract and process statistical features of the input data stream in a short time using only small memory. It has the following features:
 
-* Quicly estimate and summarize probability distribution for random variable stream using `Sketch`
+* Quickly estimate and summarize probability distribution for random variable stream using `Sketch`
 * Combine several probability distributions by probability monad
 * Generate random variables from many predefined and estimated probability disributions 
 * Measure similarity between two probability distribution using Kullback–Leibler divergence
@@ -65,19 +65,21 @@ In this figure, the dashed orange line is the expected underlying probability di
 
 ![animated gradual concept drift](./flip-docs/resources/experiments/gradual-cd-normal-histo.gif)
 
-In all of these experiments, I did not provide any prior knowledge to predict the underlying distirbution accurately. It works precisely with the default configuration. For more example, see the [experiment](./flip-docs/experiment.md) documentation. If you want to learn how to use `Sketch` in a real world, see the [codes for these experiments](./flip-bench/src/main/scala/flip/experiment).
+In all of these experiments, I did not provide any prior knowledge to predict the underlying distirbution accurately. It works precisely with the default configuration. For more example, see the [experiment](./flip-docs/experiment.md) documentation. If you want to learn how to use `Sketch` in a real world, see the [code for these experiments](./flip-bench/src/main/scala/flip/experiment).
 
 
 ## Contributing
 
 Contributions are always welcome. Any kind of contribution, such as writing a unit test, documentation, bug fix, or implementing [the density estimation algorithm of `Sketch`](./flip-docs/algorithm.md) in another language, is helpful. If you need some help, please contact me via [email](mailto:xxxxxnell@gmail.com) or [twitter](https://twitter.com/xxxnell).
 
+The `master` branch of this repository contains the latest stable release of *Flip*. In general, pull requests should be submitted against `develop` branch. 
+
 Fo more detail, see the [contributing](./CONTRIBUTING.md) documentation.
 
 
 ## License
 
-All code of *Flip*  is available to you under the [MIT license](./LICENSE). 
+All code of *Flip* is available to you under the [MIT license](./LICENSE). 
 
 Copyright the maintainers.
 
