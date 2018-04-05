@@ -9,7 +9,7 @@ This guide is for people who would like to be involved in building *Flip*.
 
 This project follows a standard [fork and pull](https://help.github.com/articles/about-pull-requests/) model for contributions via GitHub pull requests.
  
-* Pull requests should be submitted from a separate branch (e.g. `using git checkout -b "feature/username/fix-123"`). Especially, note that the `master` branch of this repository contains the latest stable release of *Flip*.
+* Pull requests should be submitted from a separate `feature` branch starting from the `develop` branch (e.g. `using git checkout -b "feature/username/fix-123"`). Especially, note that the `master` branch of this repository contains the latest stable release of *Flip*. For more detail, see [git-flow cheatsheet](https://danielkummer.github.io/git-flow-cheatsheet/index.html).
 * Commit messages should general use the present tense, normal sentence capitalization, and no final punctuation.
 * The commit message should be written like a mini changelog. The commit message should have the following prefix: `*` when the code or functionality changes. `+` when new code or functionality is added. `-` when redundant or unnecessary code or functionality is removed.
 * It is recommended that the first line of the commit message should not exceed 72 characters.
