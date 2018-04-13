@@ -348,7 +348,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
           cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
           counterSize = counterSize, counterNo = counterNo
         )
-        val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
+        val sketch0 = Sketch.empty[Double](implicitly[Measure[Double]], conf)
 
         val count = sketch0.count(0, 10)
 
