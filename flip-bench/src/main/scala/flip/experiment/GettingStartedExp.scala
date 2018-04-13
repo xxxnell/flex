@@ -18,7 +18,7 @@ object GettingStartedExp {
     // probability for interval [0.0, 1.0]
     println(
       s"Estimated Pr(0.0 ≤ x ≤ 1.0): ${sketch1.probability(0.0, 1.0)}, " +
-      s"Expected Pr(0.0 ≤ x ≤ 1.0): ${underlying.probability(0.0, 1.0)}"
+        s"Expected Pr(0.0 ≤ x ≤ 1.0): ${underlying.probability(0.0, 1.0)}"
     )
 
     // median
