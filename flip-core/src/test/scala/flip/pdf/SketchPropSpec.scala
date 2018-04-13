@@ -3,6 +3,7 @@ package flip.pdf
 import org.scalacheck.Gen
 import org.specs2.ScalaCheck
 import org.specs2.mutable._
+import flip.implicits._
 import flip.conf._
 import flip.measure.Measure
 import flip.measure.syntax._
@@ -482,14 +483,21 @@ class SketchPropSpec extends Specification with ScalaCheck {
 
     }
 
-    "sample" in {
+    "sample & samples" in {
 
       "basic" in {
-        val (_, samples) = NumericDist.normal(0.0, 1).samples(100)
-        val sketch0 = Sketch.empty[Double].updateInOrder(samples)
-        val (sketch1, sample) = sketch0.sample
+        val (_, samples0) = NumericDist.normal(0.0, 1).samples(100)
+        val sketch0 = Sketch.empty[Double].updateInOrder(samples0)
+        val (sketch1, samples1) = sketch0.samples(100)
+        val sketch2 = Sketch.empty[Double].updateInOrder(samples1)
 
-        if(sample.isNaN || sample.isInfinite) ko(s"sample: $sample") else ok
+        val cond1 = samples1.forall(sample => !sample.isNaN)
+        val cond2 = samples1.forall(sample => !sample.isInfinite)
+        val cond3 = KLD(sketch1, sketch2) < 1
+
+        if(!cond1 || !cond2) ko(s"samples: $samples1")
+        else if(!cond3) ko(s"samples: $samples1, KLD: ${KLD(sketch1, sketch2)}")
+        else ok
       }
 
       "empty" in {
