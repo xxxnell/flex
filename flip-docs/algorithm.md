@@ -1,4 +1,4 @@
-# Algorithm
+P# Algorithm
 
 Update process of `Sketch` of *Flip* internally divides into two types: `narrowUpdate` and `deepUpdate`. `narrowUpdate` changes count only, not bin, while `deepUpdate` changes both bin and count. Then, when a user updates data using `Sketch`, most of the time `narrowUpdate` is called, but `deepUpdate` is called to rearrange bin periodically, every 100 times by default.
 
@@ -9,7 +9,7 @@ The algorithm of `narrowUpdate` is intuitive. The algorithm of `deepUpdate` matt
 
 The following figure shows the difference between conventional and `Sketch`'s method to determine quantization points. (left) The conventional method simply divides the domain equally. (right) `Sketch` method finds points on domain that equally divides the cumulative density.
 
-![equal space split algorithm](resources/diagrams/equal-space-split-algorithm.png)
+![equal space split algorithm](resources/diagrams/concepts/equal-space-split-algorithm.png)
 
 For those who study image processing, this algorithm can be compared to the [Histogram Equalization](https://en.wikipedia.org/wiki/Histogram_equalization) algorithm.
 
