@@ -1,13 +1,28 @@
 package flip
 
-import sbt._
 import sbt.Keys._
+import sbt.{Def, _}
 import complete.DefaultParsers._
-import complete.Parser
+import pl.project13.scala.sbt.JmhPlugin.JmhKeys._
 
 object Tasks {
 
-  lazy val experiment = inputKey[Unit]("Execute all experiments")
+  def benchTaskSettings(benchProject: Project) = Seq(
+    benchmarkTaskSetting(benchProject),
+    experimentTaskSetting(benchProject)
+  )
+
+  // benchmark
+
+  lazy val benchmark = inputKey[Unit]("Execute benchmarks")
+
+  def benchmarkTaskSetting(project: Project) = benchmark := {
+    (run in (project, Jmh)).evaluated
+  }
+
+  // experiment
+
+  lazy val experiment = inputKey[Unit]("Execute experiments")
 
   def experimentTaskSetting(project: Project) = experiment := {
     val mains = (discoveredMainClasses in (project, Compile)).value
@@ -24,9 +39,5 @@ object Tasks {
 
     targets.foreach(main => r.run(main, classpath, Seq(), logger))
   }
-
-  def taskSettings(expProject: Project) = Seq(
-    experimentTaskSetting(expProject)
-  )
 
 }
