@@ -13,7 +13,7 @@ object CustomAdaPerSketchConf {
                                                 cmap: CmapConf,
                                                 counter: CounterConf,
                                                 // sketch: adaptive
-                                                queueSize: Int,
+                                                bufferSize: Int,
                                                 // sketch: periodic
                                                 startThreshold: Double,
                                                 thresholdPeriod: Double)
@@ -35,7 +35,7 @@ object CustomAdaPerSketchConf {
             counterSize: Int = DefaultSketchConf.counter.size,
             counterNo: Int = DefaultSketchConf.counter.no,
             // sketch: adaptive
-            queueSize: Int = DefaultSketchConf.queueSize,
+             bufferSize: Int = DefaultSketchConf.bufferSize,
             // sketch: periodic
             startThreshold: Double = DefaultSketchConf.startThreshold,
             thresholdPeriod: Double = DefaultSketchConf.thresholdPeriod): CustomAdaPerSketchConf =
@@ -46,7 +46,7 @@ object CustomAdaPerSketchConf {
       decayFactor,
       CmapConf.uniformEqualize(cmapSize, cmapNo, cmapStart, cmapEnd, boundaryRatio),
       CounterConf(counterSize, counterNo),
-      queueSize,
+      bufferSize,
       startThreshold,
       thresholdPeriod
     )
@@ -60,7 +60,7 @@ object CustomAdaPerSketchConf {
            cmap: CmapConf,
            counter: CounterConf,
            // sketch: adaptive
-           queueSize: Int,
+            bufferSize: Int,
            // sketch: periodic
            startThreshold: Double,
            thresholdPeriod: Double): CustomAdaPerSketchConf =
@@ -71,7 +71,7 @@ object CustomAdaPerSketchConf {
       decayFactor,
       cmap,
       counter,
-      queueSize,
+      bufferSize,
       startThreshold,
       thresholdPeriod
     )

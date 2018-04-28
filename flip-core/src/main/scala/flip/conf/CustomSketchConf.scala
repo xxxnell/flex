@@ -20,7 +20,7 @@ object CustomSketchConf {
             counterSize: Int = DefaultSketchConf.counter.size,
             counterNo: Int = DefaultSketchConf.counter.no,
             // sketch: adaptive
-            queueSize: Int = DefaultSketchConf.queueSize,
+            bufferSize: Int = DefaultSketchConf.bufferSize,
             // sketch: periodic
             startThreshold: Double = DefaultSketchConf.startThreshold,
             thresholdPeriod: Double = DefaultSketchConf.thresholdPeriod): CustomSketchConf = {
@@ -31,7 +31,7 @@ object CustomSketchConf {
       decayFactor,
       CmapConf.uniformEqualize(cmapSize, cmapNo, cmapStart, cmapEnd, boundaryRatio),
       CounterConf(counterSize, counterNo),
-      queueSize,
+      bufferSize,
       startThreshold,
       thresholdPeriod
     )

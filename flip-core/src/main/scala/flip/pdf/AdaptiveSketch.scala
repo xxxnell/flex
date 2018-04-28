@@ -4,23 +4,27 @@ import flip.conf.{AdaPerSketchConf, AdaptiveSketchConf}
 import flip.measure.Measure
 import flip.plot.CountPlot
 import flip.rand.IRng
+import flip.pdf.Buffer.syntax._
 
 import scala.language.higherKinds
 import cats.implicits._
 
+import scala.collection.immutable.Queue
+
 /**
-  * Adaptive Sketch has its own queue to hold recent input streams temporarily.
-  * This queue retains its maximum length.
-  * This queue acts as a reference data stream ξ for deepUpdate when Adaptive
+  * Adaptive Sketch has its own buffer to hold recent input streams temporarily.
+  * This buffer retains its maximum length.
+  * The buffer acts as a reference data stream ξ for deepUpdate when Adaptive
   * Sketch has to rearrange. So, even if the concept drift occurs, rearranging
   * can constitute the correct strueture of Sketch.
   *
   * rearrange(S) = deepUpdate(S, ξ)
-  *  where S is sketch and ξ is data stream in the queue of Adaptive Sketch.
+  *  where S is sketch and ξ is recent data stream in the buffer of Adaptive
+  *  Sketch.
   * */
 trait AdaptiveSketch[A] extends Sketch[A] {
 
-  val queue: List[(A, Count)]
+  val buffer: Buffer[A]
 
   def conf: AdaptiveSketchConf
 
@@ -28,7 +32,7 @@ trait AdaptiveSketch[A] extends Sketch[A] {
 
 trait AdaptiveSketchOps[S[_] <: AdaptiveSketch[_]] extends SketchPrimPropOps[S] with AdaptiveSketchLaws[S] { self =>
 
-  def modifyQueue[A](sketch: S[A], f: List[(A, Count)] => List[(A, Count)]): S[A]
+  def modifyBuffer[A](sketch: S[A], f: Buffer[A] => Buffer[A]): S[A]
 
   // overrides
 
@@ -59,45 +63,49 @@ trait AdaptiveSketchOps[S[_] <: AdaptiveSketch[_]] extends SketchPrimPropOps[S] 
   }
 
   override def rearrange[A](sketch: S[A]): S[A] = {
-    val (sketch1, _) = deepUpdate(sketch, sketch.queue.asInstanceOf[List[(A, Count)]])
-    clearQueue(sketch1)
+    val (sketch1, _) = deepUpdate(sketch, sketch.buffer.asInstanceOf[List[(A, Count)]])
+    clearBuffer(sketch1)
   }
 
 }
 
 trait AdaptiveSketchLaws[S[_] <: AdaptiveSketch[_]] { self: AdaptiveSketchOps[S] =>
 
-  def append[A](sketch: S[A], as: List[(A, Count)]): (S[A], List[(A, Count)]) = {
-    var oldAs = List.empty[(A, Count)]
-    val utdSkt = modifyQueue(sketch, (queue: List[(A, Count)]) => {
-      val (utd, old) = (as ++ queue).splitAt(sketch.conf.queueSize)
-      oldAs = old
-      utd
+  def append[A](sketch0: S[A], as: List[(A, Count)]): (S[A], List[(A, Count)]) = {
+    import flip._
+
+    var rem: Buffer[A] = null
+    val sketch1 = modifyBuffer(sketch0, (buffer0: Buffer[A]) => {
+      val concat = buffer0 ++ as
+      val overflow = concat.size - sketch0.conf.bufferSize
+      val (_rem, buffer1) = concat.splitAt(overflow)
+      rem = _rem
+      buffer1
     })
 
-    (utdSkt, oldAs)
+    (sketch1, rem.toList)
   }
 
-  def clearQueue[A](sketch: S[A]): S[A] = modifyQueue(sketch, _ => List.empty[(A, Count)])
+  def clearBuffer[A](sketch: S[A]): S[A] = modifyBuffer(sketch, _ => Buffer.empty[A])
 
   def countForQueue[A](sketch: S[A], start: A, end: A): Count = {
     val measure: Measure[A] = sketch.measure.asInstanceOf[Measure[A]]
     val startP = measure.to(start)
     val endP = measure.to(end)
 
-    sketch.queue
-      .asInstanceOf[List[(A, Count)]]
+    sketch.buffer.asInstanceOf[Buffer[A]]
+      .toList
       .filter { case (a, _) => measure.to(a) >= startP && measure.to(a) <= endP }
       .map(_._2)
       .sum
   }
 
-  def sumForQueue[A](sketch: S[A]): Count = sketch.queue.foldLeft(0d) { case (acc, (_, count)) => acc + count }
+  def sumForQueue[A](sketch: S[A]): Count = sketch.buffer.sum
 
   def pdfForQueue[A](sketch: S[A], a: A): Double = {
     val cmap = youngCmap(sketch)
     val measure = sketch.measure.asInstanceOf[Measure[A]]
-    val queue = sketch.queue.asInstanceOf[List[(A, Count)]]
+    val queue = sketch.buffer.asInstanceOf[List[(A, Count)]]
     val p = measure.to(a)
     val adim = cmap(p)
     val filteredQ1 = queue.filter { case (_a, _) => cmap(measure.to(_a)) == adim - 1 }
@@ -125,9 +133,9 @@ object AdaptiveSketch extends AdaptiveSketchOps[AdaptiveSketch] {
 
   def modifyRng[A](dist: AdaptiveSketch[A], f: IRng => IRng): AdaptiveSketch[A] = ???
 
-  def modifyQueue[A](sketch: AdaptiveSketch[A], f: List[(A, Count)] => List[(A, Count)]): AdaptiveSketch[A] =
+  def modifyBuffer[A](sketch: AdaptiveSketch[A], f: Buffer[A] => Buffer[A]): AdaptiveSketch[A] =
     sketch match {
-      case sketch: AdaPerSketch[A] => AdaPerSketch.modifyQueue(sketch, f)
+      case sketch: AdaPerSketch[A] => AdaPerSketch.modifyBuffer(sketch, f)
     }
 
   def modifyStructure[A](sketch: AdaptiveSketch[A], f: Structures => Structures): AdaptiveSketch[A] =

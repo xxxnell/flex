@@ -1,10 +1,11 @@
 package flip.pdf
 
-import org.specs2.mutable._
-import org.specs2.ScalaCheck
 import flip._
-import flip.conf.{AdaPerSketchConf, CustomAdaPerSketchConf, CustomSketchConf}
+import flip.conf.CustomAdaPerSketchConf
 import flip.measure.syntax._
+import flip.pdf.Buffer.syntax._
+import org.specs2.ScalaCheck
+import org.specs2.mutable._
 
 import scala.language.postfixOps
 
@@ -16,7 +17,7 @@ class AdaPerSketchSpec extends Specification with ScalaCheck {
 
       "type invariance after update" in {
         implicit val conf: CustomAdaPerSketchConf = CustomAdaPerSketchConf(
-          queueSize = 10,
+          bufferSize = 10,
           cmapSize = 100, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
           counterSize = 20, counterNo = 2
         )
@@ -24,13 +25,13 @@ class AdaPerSketchSpec extends Specification with ScalaCheck {
         val sketch1 = sketch0.update(1)
 
         if(!sketch1.isInstanceOf[AdaPerSketch[Double]]) ko
-        else if(sketch1.asInstanceOf[AdaPerSketch[Double]].queue.isEmpty) ko("Queue is not cleaned.")
+        else if(sketch1.asInstanceOf[AdaPerSketch[Double]].buffer.isEmpty) ko("Buffer is not cleaned.")
         else ok
       }
 
       "type invariance after rearrange" in {
         implicit val conf: CustomAdaPerSketchConf = CustomAdaPerSketchConf(
-          queueSize = 10,
+          bufferSize = 10,
           cmapSize = 100, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
           counterSize = 20, counterNo = 2
         )
@@ -39,31 +40,31 @@ class AdaPerSketchSpec extends Specification with ScalaCheck {
         val sketch2 = sketch1.rearrange
 
         if(!sketch2.isInstanceOf[AdaPerSketch[Double]]) ko
-        else if(sketch2.asInstanceOf[AdaPerSketch[Double]].queue.nonEmpty) ko("Queue is not cleaned.")
+        else if(sketch2.asInstanceOf[AdaPerSketch[Double]].buffer.nonEmpty) ko("Buffer is not cleaned.")
         else ok
       }
 
     }
 
-    "queue" in {
+    "buffer" in {
 
-      "empty queue" in {
-        val queueSize = 1
+      "empty buffer" in {
+        val bufferSize = 1
         implicit val conf: CustomAdaPerSketchConf = CustomAdaPerSketchConf(
-          queueSize = queueSize,
+          bufferSize = bufferSize,
           cmapSize = 100, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
           counterSize = 20, counterNo = 2
         )
         val sketch = AdaPerSketch.empty[Double]
-        val queue = sketch.asInstanceOf[AdaPerSketch[Double]].queue
+        val buffer = sketch.asInstanceOf[AdaPerSketch[Double]].buffer
 
-        if(queue.nonEmpty) ko("Queue of empty sketch have to be empty.") else ok
+        if(buffer.nonEmpty) ko("Buffer of empty sketch have to be empty.") else ok
       }
 
-      "queue io" in {
-        val queueSize = 2
+      "buffer io" in {
+        val bufferSize = 2
         implicit val conf: CustomAdaPerSketchConf = CustomAdaPerSketchConf(
-          queueSize = queueSize,
+          bufferSize = bufferSize,
           cmapSize = 100, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
           counterSize = 20, counterNo = 2
         )
@@ -72,12 +73,12 @@ class AdaPerSketchSpec extends Specification with ScalaCheck {
         val sketch1 = sketch.update(1)
         val sketch2 = sketch1.update(2)
         val sketch3 = sketch2.update(3)
-        val q2 = sketch2.asInstanceOf[AdaPerSketch[Double]].queue
-        val q3 = sketch3.asInstanceOf[AdaPerSketch[Double]].queue
+        val q2 = sketch2.asInstanceOf[AdaPerSketch[Double]].buffer
+        val q3 = sketch3.asInstanceOf[AdaPerSketch[Double]].buffer
 
-        if(q3.size != queueSize) ko(s"queue1 size: ${q3.size}.")
-        else if(q3.size != q3.size) ko(s"queue1 size(${q3.size}) and queue2 size(${q3.size}) have to equal.")
-        else if(q2.headOption == q3.headOption) ko(s"queue1: $q2 == queue2: $q3")
+        if(q3.size != bufferSize) ko(s"buffer1 size: ${q3.size}.")
+        else if(q3.size != q3.size) ko(s"buffer1 size(${q3.size}) and buffer2 size(${q3.size}) have to equal.")
+        else if(q2.headOption == q3.headOption) ko(s"buffer1: $q2 == buffer2: $q3")
         else ok
       }
 
@@ -85,10 +86,10 @@ class AdaPerSketchSpec extends Specification with ScalaCheck {
 
     "count" in {
 
-      "queue only" in {
-        val queueSize = 1
+      "buffer only" in {
+        val bufferSize = 1
         implicit val conf: CustomAdaPerSketchConf = CustomAdaPerSketchConf(
-          queueSize = queueSize,
+          bufferSize = bufferSize,
           cmapSize = 100, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
           counterSize = 20, counterNo = 2
         )
@@ -100,10 +101,10 @@ class AdaPerSketchSpec extends Specification with ScalaCheck {
         if(count <= 0) ko(s"Counts nothing: $count") else ok
       }
 
-      "queue and structure" in {
-        val queueSize = 1
+      "buffer and structure" in {
+        val bufferSize = 1
         implicit val conf: CustomAdaPerSketchConf = CustomAdaPerSketchConf(
-          queueSize = queueSize,
+          bufferSize = bufferSize,
           cmapSize = 100, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
           counterSize = 20, counterNo = 2
         )
@@ -120,10 +121,10 @@ class AdaPerSketchSpec extends Specification with ScalaCheck {
 
     "sum" in {
 
-      "queue only" in {
-        val queueSize = 1
+      "buffer only" in {
+        val bufferSize = 1
         implicit val conf: CustomAdaPerSketchConf = CustomAdaPerSketchConf(
-          queueSize = queueSize,
+          bufferSize = bufferSize,
           cmapSize = 100, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
           counterSize = 20, counterNo = 2
         )
@@ -135,10 +136,10 @@ class AdaPerSketchSpec extends Specification with ScalaCheck {
         if(sum < 1) ko(s"Counts nothing: $sum") else ok
       }
 
-      "queue and structure" in {
-        val queueSize = 1
+      "buffer and structure" in {
+        val bufferSize = 1
         implicit val conf: CustomAdaPerSketchConf = CustomAdaPerSketchConf(
-          queueSize = queueSize,
+          bufferSize = bufferSize,
           cmapSize = 100, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
           counterSize = 20, counterNo = 2
         )
@@ -181,7 +182,7 @@ class AdaPerSketchSpec extends Specification with ScalaCheck {
         val cmapSize = 20
         implicit val conf: CustomAdaPerSketchConf = CustomAdaPerSketchConf(
           cmapSize = cmapSize, cmapNo = 2, cmapStart = Some(-10.0), cmapEnd = Some(10.0),
-          queueSize = 50,
+          bufferSize = 50,
           counterSize = cmapSize
         )
         val sketch0 = AdaPerSketch.empty[Double]
@@ -198,10 +199,10 @@ class AdaPerSketchSpec extends Specification with ScalaCheck {
 
     "fastPdf" in {
 
-      "queue only" in {
-        val queueSize = 10
+      "buffer only" in {
+        val bufferSize = 10
         implicit val conf: CustomAdaPerSketchConf = CustomAdaPerSketchConf(
-          queueSize = queueSize,
+          bufferSize = bufferSize,
           cmapSize = 20, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
           counterSize = 20, counterNo = 2
         )
@@ -217,9 +218,9 @@ class AdaPerSketchSpec extends Specification with ScalaCheck {
       }
 
       "structure dominant" in {
-        val queueSize = 1
+        val bufferSize = 1
         implicit val conf: CustomAdaPerSketchConf = CustomAdaPerSketchConf(
-          queueSize = queueSize,
+          bufferSize = bufferSize,
           cmapSize = 20, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
           counterSize = 20, counterNo = 2
         )
@@ -235,9 +236,9 @@ class AdaPerSketchSpec extends Specification with ScalaCheck {
       }
 
       "mixed" in {
-        val queueSize = 3
+        val bufferSize = 3
         implicit val conf: CustomAdaPerSketchConf = CustomAdaPerSketchConf(
-          queueSize = queueSize,
+          bufferSize = bufferSize,
           cmapSize = 20, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
           counterSize = 20, counterNo = 2
         )
@@ -254,7 +255,7 @@ class AdaPerSketchSpec extends Specification with ScalaCheck {
 
       "multiple cmaps" in {
         implicit val conf: CustomAdaPerSketchConf = CustomAdaPerSketchConf(
-          queueSize = 3,
+          bufferSize = 3,
           startThreshold = 2d, thresholdPeriod = 2d,
           cmapSize = 20, cmapNo = 3, cmapStart = Some(-10d), cmapEnd = Some(10d),
           counterSize = 20, counterNo = 2

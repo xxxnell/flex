@@ -7,6 +7,6 @@ import flip.pdf.AdaptiveSketch
   * */
 trait AdaptiveSketchConfB[+D <: AdaptiveSketch[_]] extends SketchConf {
 
-  val queueSize: Int
+  val bufferSize: Int
 
 }

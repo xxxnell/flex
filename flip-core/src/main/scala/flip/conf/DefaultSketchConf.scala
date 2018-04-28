@@ -14,7 +14,7 @@ trait DefaultSketchConf extends AdaPerSketchConf {
 
   val thresholdPeriod: Double = 100
 
-  val queueSize: Int = 50
+  val bufferSize: Int = 50
 
   val cmap: UniformEqualizeCmapConf = CmapConf.uniformEqualize(20, 3, Some(-1000d), Some(1000d), 0.1)
 

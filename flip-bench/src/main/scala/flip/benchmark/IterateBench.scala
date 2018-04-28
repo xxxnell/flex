@@ -15,7 +15,7 @@ class IterateBench { self =>
   // params
 
   @Param(Array("30"))
-  var queueSize: Int = _
+  var bufferSize: Int = _
 
   @Param(Array("50", "100", "150", "200"))
   var iterateBenchSize: Int = _
@@ -43,7 +43,7 @@ class IterateBench { self =>
     implicit val conf: SketchConf = SketchConf(
       startThreshold = 100,
       thresholdPeriod = 100,
-      queueSize = queueSize,
+      bufferSize = bufferSize,
       cmapSize = cmapSize,
       cmapNo = cmapNo,
       cmapStart = Some(-10d),
