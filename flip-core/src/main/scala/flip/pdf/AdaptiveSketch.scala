@@ -75,13 +75,16 @@ trait AdaptiveSketchLaws[S[_] <: AdaptiveSketch[_]] { self: AdaptiveSketchOps[S]
     import flip._
 
     var rem: Buffer[A] = null
-    val sketch1 = modifyBuffer(sketch0, (buffer0: Buffer[A]) => {
-      val concat = buffer0 ++ as
-      val overflow = concat.size - sketch0.conf.bufferSize
-      val (_rem, buffer1) = concat.splitAt(overflow)
-      rem = _rem
-      buffer1
-    })
+    val sketch1 = modifyBuffer(
+      sketch0,
+      (buffer0: Buffer[A]) => {
+        val concat = buffer0 ++ as
+        val overflow = concat.size - sketch0.conf.bufferSize
+        val (_rem, buffer1) = concat.splitAt(overflow)
+        rem = _rem
+        buffer1
+      }
+    )
 
     (sketch1, rem.toList)
   }
@@ -93,7 +96,8 @@ trait AdaptiveSketchLaws[S[_] <: AdaptiveSketch[_]] { self: AdaptiveSketchOps[S]
     val startP = measure.to(start)
     val endP = measure.to(end)
 
-    sketch.buffer.asInstanceOf[Buffer[A]]
+    sketch.buffer
+      .asInstanceOf[Buffer[A]]
       .toList
       .filter { case (a, _) => measure.to(a) >= startP && measure.to(a) <= endP }
       .map(_._2)

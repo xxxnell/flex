@@ -35,7 +35,7 @@ object CustomAdaPerSketchConf {
             counterSize: Int = DefaultSketchConf.counter.size,
             counterNo: Int = DefaultSketchConf.counter.no,
             // sketch: adaptive
-             bufferSize: Int = DefaultSketchConf.bufferSize,
+            bufferSize: Int = DefaultSketchConf.bufferSize,
             // sketch: periodic
             startThreshold: Double = DefaultSketchConf.startThreshold,
             thresholdPeriod: Double = DefaultSketchConf.thresholdPeriod): CustomAdaPerSketchConf =
@@ -60,7 +60,7 @@ object CustomAdaPerSketchConf {
            cmap: CmapConf,
            counter: CounterConf,
            // sketch: adaptive
-            bufferSize: Int,
+           bufferSize: Int,
            // sketch: periodic
            startThreshold: Double,
            thresholdPeriod: Double): CustomAdaPerSketchConf =

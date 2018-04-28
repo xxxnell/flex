@@ -67,9 +67,8 @@ class NarrowUpdateBench { self =>
 
   @Benchmark
   def modifyBuffer: AdaptiveSketch[Count] = {
-    AdaptiveSketch.modifyBuffer(
-      sketch.asInstanceOf[AdaptiveSketch[Double]],
-      (buffer0: Buffer[Double]) => buffer0 :+ (2.0, 1.0))
+    AdaptiveSketch
+      .modifyBuffer(sketch.asInstanceOf[AdaptiveSketch[Double]], (buffer0: Buffer[Double]) => buffer0 :+ (2.0, 1.0))
   }
 
 }
