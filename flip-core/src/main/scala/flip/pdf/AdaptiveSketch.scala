@@ -63,7 +63,7 @@ trait AdaptiveSketchOps[S[_] <: AdaptiveSketch[_]] extends SketchPrimPropOps[S] 
   }
 
   override def rearrange[A](sketch: S[A]): S[A] = {
-    val (sketch1, _) = deepUpdate(sketch, sketch.buffer.asInstanceOf[List[(A, Count)]])
+    val (sketch1, _) = deepUpdate(sketch, sketch.buffer.asInstanceOf[Buffer[A]].toList)
     clearBuffer(sketch1)
   }
 
