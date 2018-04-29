@@ -31,12 +31,16 @@ trait SketchPrimPropOps[S[_] <: Sketch[_]] extends SketchPrimPropLaws[S] with Sk
       strs => {
         val cmapNo = sketch.conf.cmap.no
         val effNo = if (cmapNo > 1) cmapNo - 1 else cmapNo
-        val (effStrs, refStrs) = strs.toList.splitAt(effNo)
-        def updatePs(cmap: Cmap, counter: HCounter, ps: List[(Prim, Count)]): HCounter =
-          counter.updates(ps.map { case (p, count) => (cmap(p), count) })
-        val utdEffStrs = effStrs.map { case (cmap, counter) => (cmap, updatePs(cmap, counter, ps)) }
-
-        NonEmptyList.fromListUnsafe(utdEffStrs ++ refStrs)
+        var i = 0
+        strs.map {
+          case (cmap, counter0) =>
+            if (i < effNo) {
+              val zs = ps.map { case (p, count) => (cmap(p), count) }
+              val counter1 = counter0.updates(zs)
+              i += 1
+              (cmap, counter1)
+            } else (cmap, counter0)
+        }
       }
     )
 
@@ -146,7 +150,8 @@ trait SketchPrimPropLaws[S[_] <: Sketch[_]] { self: SketchPrimPropOps[S] =>
   def sum(sketch: S[_]): Count = sumForStr(sketch)
 
   def narrowUpdate[A](sketch: S[A], as: List[(A, Count)]): S[A] = {
-    val ps = as.map { case (value, count) => (sketch.measure.asInstanceOf[Measure[A]](value), count) }
+    val measure = sketch.measure.asInstanceOf[Measure[A]]
+    val ps = as.map { case (value, count) => (measure(value), count) }
 
     primNarrowUpdateForStr(sketch, ps)
   }

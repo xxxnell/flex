@@ -15,7 +15,7 @@ import flip.range.syntax._
 @State(Scope.Thread)
 class CmapOpsBench {
 
-  @Param(Array("200", "20000"))
+  @Param(Array("20", "2000"))
   var cmapSize: Int = _
 
   var cmap: Cmap = _
@@ -27,8 +27,7 @@ class CmapOpsBench {
 
   @Benchmark
   def apply: HDim = {
-    val i = 1
-    cmap.apply(i)
+    cmap.apply(cmapSize / 2)
   }
 
   @Benchmark
@@ -43,8 +42,7 @@ class CmapOpsBench {
 
   @Benchmark
   def range: RangeP = {
-    val i = 2
-    cmap.range(i)
+    cmap.range(cmapSize / 2)
   }
 
 }

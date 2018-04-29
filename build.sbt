@@ -10,7 +10,7 @@ lazy val root = project
   .settings(moduleName := "root")
   .settings(Releases.publishSettings)
   .settings(Releases.noPublishSettings)
-  .settings(Tasks.taskSettings(flipBench))
+  .settings(Tasks.benchTaskSettings(flipBench))
   .aggregate(flipCore, flipBench)
 
 lazy val flipCore = flipModule("flip-core")

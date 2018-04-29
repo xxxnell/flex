@@ -15,7 +15,7 @@ class SketchOpsBench { self =>
   // parameters
 
   @Param(Array("0", "50"))
-  var queueSize: Int = _
+  var bufferSize: Int = _
 
   @Param(Array("3", "30"))
   var cmapNo: Int = _
@@ -47,7 +47,7 @@ class SketchOpsBench { self =>
       counterSize = counterSize,
       counterNo = counterNo
     )
-    val (_, samples) = NumericDist.normal(0.0, 1).samples(queueSize)
+    val (_, samples) = NumericDist.normal(0.0, 1).samples(bufferSize)
     val sketch0 = Sketch.empty[Double]
 
     self.conf = conf
@@ -59,7 +59,7 @@ class SketchOpsBench { self =>
     implicit val conf: SketchConf = SketchConf(
       startThreshold = 50,
       thresholdPeriod = 100,
-      queueSize = queueSize,
+      bufferSize = bufferSize,
       cmapSize = cmapSize,
       cmapNo = cmapNo,
       cmapStart = Some(-10d),

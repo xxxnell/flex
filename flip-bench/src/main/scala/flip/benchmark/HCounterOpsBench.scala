@@ -2,6 +2,7 @@ package flip.benchmark
 
 import java.util.concurrent.TimeUnit
 
+import flip.counter.Counter
 import org.openjdk.jmh.annotations._
 import flip.hcounter.HCounter
 
@@ -12,13 +13,14 @@ import scala.util.Random
 @State(Scope.Thread)
 class HCounterOpsBench {
 
-  @Param(Array("2", "30"))
+  @Param(Array("1"))
   var counterNo: Int = _
 
-  @Param(Array("1000", "100000"))
+  @Param(Array("20", "2000"))
   var counterSize: Int = _
 
   val seed = 0
+
   var hcounter: HCounter = _
 
   @Setup
@@ -33,13 +35,26 @@ class HCounterOpsBench {
 
   @Benchmark
   def update: HCounter = {
-    val dim = 1
+    val dim = counterSize / 2
     hcounter.update(dim, 1)
   }
 
   @Benchmark
+  def updates: HCounter = {
+    val dim = counterSize / 2
+    val as = (dim, 1.0) :: Nil
+    hcounter.updates(as)
+  }
+
+  @Benchmark
+  def counterUpdate: Counter = {
+    val dim = counterSize / 2
+    hcounter.structures.head._2.update(dim, 1)
+  }
+
+  @Benchmark
   def get: Double = {
-    val dim = 1
+    val dim = counterSize / 2
     hcounter.get(dim)
   }
 

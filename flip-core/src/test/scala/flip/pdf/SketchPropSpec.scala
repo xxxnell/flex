@@ -114,13 +114,15 @@ class SketchPropSpec extends Specification with ScalaCheck {
 
       "basic" in {
         implicit val conf: CustomSketchConf = CustomSketchConf(
+          bufferSize = 100,
           cmapSize = 10, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
           counterSize = 8, counterNo = 2
         )
         val sketch0 = Sketch.empty[Double]
 
-        val sketch = sketch0.narrowUpdate(0)
-        val count = sketch.count(-1, 1)
+        val sketch1 = sketch0.narrowUpdate(List.fill(100)(0.0): _*)
+        val sketch11 = sketch1.narrowUpdate(0)
+        val count = sketch1.count(-1, 1)
 
         if(count > 0) ok
         else ko(s"count: $count, expected: 0<x<1")
