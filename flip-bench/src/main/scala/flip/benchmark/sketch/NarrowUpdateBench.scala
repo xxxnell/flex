@@ -3,8 +3,8 @@ package flip.benchmark.sketch
 import java.util.concurrent.TimeUnit
 
 import flip.implicits._
-import flip.pdf.{AdaPerSketch, AdaptiveSketch, Buffer, Count}
 import flip.pdf.Buffer.syntax._
+import flip.pdf.{AdaptiveSketch, Buffer, Count}
 import flip.{NumericDist, Sketch, SketchConf}
 import org.openjdk.jmh.annotations._
 
@@ -15,13 +15,13 @@ class NarrowUpdateBench { self =>
 
   // parameters
 
-  @Param(Array("5000"))
+  @Param(Array("50"))
   var bufferSize: Int = _
 
   @Param(Array("3"))
   var cmapNo: Int = _
 
-  @Param(Array("20"))
+  @Param(Array("20", "2000"))
   var cmapSize: Int = _
 
   @Param(Array("1"))
@@ -46,8 +46,11 @@ class NarrowUpdateBench { self =>
     val (_, samples) = NumericDist.normal(0.0, 1).samples(bufferSize + 1)
     val sketch0 = Sketch.empty[Double]
 
-    self.conf = conf
+    (0 until cmapNo).foreach { _ =>
+      self.sketch = sketch0.narrowUpdate(samples: _*).rearrange
+    }
     self.sketch = sketch0.narrowUpdate(samples: _*)
+    self.conf = conf
   }
 
   @Benchmark
@@ -58,6 +61,11 @@ class NarrowUpdateBench { self =>
   @Benchmark
   def primNarrowUpdateForStr: Sketch[Double] = {
     Sketch.primNarrowUpdateForStr(sketch, (1.0, 1.0) :: Nil)
+  }
+
+  @Benchmark
+  def modifyStructure: Sketch[Double] = {
+    Sketch.modifyStructure(sketch, identity)
   }
 
   @Benchmark
