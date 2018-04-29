@@ -73,9 +73,7 @@ trait PlotLaws[P <: Plot] { self: PlotOps[P] =>
   }
 
   def interpolation(plot: P, x: Double): Double = {
-    val dataRefSize = 2
-
-    val midInterp = for {
+    lazy val midInterp = for {
       toIndexBlocks <- plot.middleIndex.to(x).lastOption
       fromIndexBlocks <- plot.middleIndex.from(x).headOption
       (toPoint, toBlocks) = toIndexBlocks
@@ -89,11 +87,11 @@ trait PlotLaws[P <: Plot] { self: PlotOps[P] =>
       fitting <- dataFitting(toP :: fromP :: Nil, x)
     } yield fitting
 
-    val headExt = plot.records.headOption
+    lazy val headExt = plot.records.headOption
       .filter { case (range, _) => range.start >= x }
       .map { case (_, value) => value }
 
-    val tailExt = plot.records.lastOption
+    lazy val tailExt = plot.records.lastOption
       .filter { case (range, _) => range.end <= x }
       .map { case (_, value) => value }
 
