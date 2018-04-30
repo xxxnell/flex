@@ -12,7 +12,7 @@ import flip.measure.syntax._
 
 import scala.language.higherKinds
 
-object EqualSpaceCdfUpdate {
+object EqUpdate {
 
   def updateCmap[A](sampling: DensityPlot,
                     ps: List[(Prim, Count)],
@@ -23,7 +23,7 @@ object EqualSpaceCdfUpdate {
     val pdf = if (ps.nonEmpty) {
       val c1 = 1 / (mixingRatio + 1)
       val c2 = mixingRatio / (mixingRatio + 1)
-      (c1, sampling) + (c2, DensityPlot.squareKernel(ps, window))
+      (c1, sampling) ++ (c2, DensityPlot.squareKernel(ps, window))
     } else sampling
     val icdfPlot = pdf.inverseNormalizeCumulative
     val icdf = (d: Double) =>

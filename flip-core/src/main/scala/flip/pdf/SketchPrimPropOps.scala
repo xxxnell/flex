@@ -5,7 +5,7 @@ import cats.implicits._
 import flip.cmap.Cmap
 import flip.hcounter.HCounter
 import flip.measure.Measure
-import flip.pdf.update.{EqualSpaceCdfUpdate, EqualSpaceSmoothingPs, NormalSmoothingPs, SmoothingPs}
+import flip.pdf.update.{EqUpdate, EqualSpaceSmoothingPs, NormalSmoothingPs, SmoothingPs}
 import flip.plot._
 import flip.range._
 import flip.range.syntax._
@@ -48,7 +48,7 @@ trait SketchPrimPropOps[S[_] <: Sketch[_]] extends SketchPrimPropLaws[S] with Sk
     * Deep update a list of primitive value <code>p</code> instead of <code>a</code> ∈ <code>A</code>
     * */
   def primDeepUpdate[A](sketch: S[A], ps: List[(Prim, Count)]): (S[A], Option[Structure]) = {
-    val utdCmap = EqualSpaceCdfUpdate.updateCmapForSketch[A](sketch.asInstanceOf[Sketch[A]], ps)
+    val utdCmap = EqUpdate.updateCmapForSketch[A](sketch.asInstanceOf[Sketch[A]], ps)
     val seed = ((sum(sketch) + ps.headOption.map(_._1).getOrElse(-1d)) * 1000).toInt
     val emptyCounter = counter(sketch.conf, seed)
     val (utdStrs, oldStrs) = ((utdCmap, emptyCounter) :: sketch.structures).toList.splitAt(sketch.conf.cmap.no)

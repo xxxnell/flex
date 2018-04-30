@@ -2,12 +2,10 @@ package flip.benchmark.sketch
 
 import java.util.concurrent.TimeUnit
 
-import flip.cmap.Cmap
-import flip.hcounter.HCounter
 import flip.implicits._
-import flip.pdf.Buffer.syntax._
-import flip.pdf.{AdaptiveSketch, Buffer, Count}
-import flip.{NumericDist, Sketch, SketchConf}
+import flip.pdf.update.EqUpdate
+import flip.pdf.{AdaptiveSketch, Count, Structure}
+import flip.{NumericDist, SketchConf}
 import org.openjdk.jmh.annotations._
 
 @BenchmarkMode(Array(Mode.AverageTime))
@@ -56,7 +54,7 @@ class DeepUpdateBench { self =>
   }
 
   @Benchmark
-  def deepUpdate: (Sketch[Count], Option[(Cmap, HCounter)]) = {
+  def deepUpdate: (Sketch[Count], Option[Structure]) = {
     sketch.deepUpdate()
   }
 

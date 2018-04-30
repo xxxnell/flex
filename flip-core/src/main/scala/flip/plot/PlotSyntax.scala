@@ -58,7 +58,7 @@ trait DensityPlotSyntax {
   }
 
   implicit class DensityPlotAddSyntaxImpl(wp: (Double, DensityPlot)) {
-    def +(wp2: (Double, DensityPlot)): DensityPlot = DensityPlot.weightedAdd(NonEmptyList.of(wp, wp2))
+    def ++(wp2: (Double, DensityPlot)): DensityPlot = DensityPlot.weightedAdd(NonEmptyList.of(wp, wp2))
   }
 
 }

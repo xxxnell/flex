@@ -9,7 +9,7 @@ import flip.hcounter.HCounter
 import flip.measure.Measure
 import flip.pdf.Sketch.fastPdf
 import flip.pdf.sampling.IcdfSampling
-import flip.pdf.update.EqualSpaceCdfUpdate
+import flip.pdf.update.EqUpdate
 import flip.plot.DensityPlot
 import flip.range.{RangeM, RangeP}
 import flip.rand.IRng
@@ -145,7 +145,7 @@ trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
 
   def concatStructures[A](as: List[(A, Count)], measure: Measure[A], conf: SketchConf): Structures = {
     val ps = as.map { case (a, c) => (measure.to(a), c) }
-    val cmap = EqualSpaceCdfUpdate.updateCmap(
+    val cmap = EqUpdate.updateCmap(
       DensityPlot.empty,
       ps,
       1000,
