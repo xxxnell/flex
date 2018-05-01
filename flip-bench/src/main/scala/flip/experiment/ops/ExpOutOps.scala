@@ -2,7 +2,7 @@ package flip.experiment.ops
 
 import java.io.{File, FileOutputStream}
 
-import flip.plot.Plot
+import flip.plot.RangePlot
 
 import scala.util.Try
 
@@ -17,14 +17,14 @@ object ExpOutOps {
   def writeStr(name: String, affix: String, str: String): Unit =
     writeStr(defaultPath, name, affix, str)
 
-  def writePlot(name: String, affix: String, plot: Plot): Unit =
+  def writePlot(name: String, affix: String, plot: RangePlot): Unit =
     writePlot(defaultPath, name, affix, plot)
 
   @deprecated
-  def writePlots(name: String, plots: List[(Int, Plot)]): Unit =
+  def writePlots(name: String, plots: List[(Int, RangePlot)]): Unit =
     writePlotsForDetails(defaultPath, name, plots)
 
-  def writePlots(name: String, subname: String, plots: List[(Int, Plot)]): Unit =
+  def writePlots(name: String, subname: String, plots: List[(Int, RangePlot)]): Unit =
     writePlotsForDetailsSubname(defaultPath, name, subname, plots)
 
   // ops
@@ -45,18 +45,18 @@ object ExpOutOps {
     fs.close()
   }
 
-  def writePlot(path: String, name: String, affix: String, plot: Plot): Unit = {
+  def writePlot(path: String, name: String, affix: String, plot: RangePlot): Unit = {
     writeStr(path, name, affix, plot.csv)
   }
 
-  def writePlotsForDetails(path: String, name: String, plots: List[(Int, Plot)]): Unit = {
+  def writePlotsForDetails(path: String, name: String, plots: List[(Int, RangePlot)]): Unit = {
     for (idxPlot <- plots) {
       val (idx, plot) = idxPlot
       writePlot(path, name, s"$idx", plot)
     }
   }
 
-  def writePlotsForDetailsSubname(path: String, name: String, subname: String, plots: List[(Int, Plot)]): Unit = {
+  def writePlotsForDetailsSubname(path: String, name: String, subname: String, plots: List[(Int, RangePlot)]): Unit = {
     for (idxPlot <- plots) {
       val (idx, plot) = idxPlot
       writePlot(path, name, s"$subname-$idx", plot)

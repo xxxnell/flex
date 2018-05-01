@@ -25,7 +25,7 @@ object EqUpdate {
       val c2 = mixingRatio / (mixingRatio + 1)
       (c1, sampling) ++ (c2, DensityPlot.squareKernel(ps, window))
     } else sampling
-    val icdfPlot = pdf.inverseNormalizeCumulative
+    val icdfPlot = pdf.inverseNormalizedCumulative
     val icdf = (d: Double) =>
       if (d <= 0) measure.from(-∞) else if (d >= 1) measure.from(∞) else measure.from(icdfPlot.interpolation(d))
     val ranges = icdfSampling(icdf)
@@ -52,7 +52,7 @@ object EqUpdate {
     **/
   @deprecated
   def cmapForEqualSpaceCumCorr(plot: DensityPlot, corr: Double, cmapSize: Int): Cmap = {
-    lazy val icdf = plot.inverseNormalizeCumulative
+    lazy val icdf = plot.inverseNormalizedCumulative
 
     val cdfDivider = if (cmapSize < 2) {
       Nil

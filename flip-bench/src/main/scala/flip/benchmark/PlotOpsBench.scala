@@ -3,7 +3,7 @@ package flip.benchmark
 import java.util.concurrent.TimeUnit
 
 import flip.{range, _}
-import flip.plot.{CountPlot, DensityPlot, Plot}
+import flip.plot.{CountPlot, DensityPlot, RangePlot}
 import flip.range.RangeP
 import flip.plot.syntax._
 import org.openjdk.jmh.annotations._
@@ -13,7 +13,7 @@ import org.openjdk.jmh.annotations._
 @State(Scope.Thread)
 class PlotOpsBench { self =>
 
-  @Param(Array("20", "2000"))
+  @Param(Array("20", "200", "2000"))
   var recordsNo: Int = _
 
   var records: List[(RangeP, Double)] = _

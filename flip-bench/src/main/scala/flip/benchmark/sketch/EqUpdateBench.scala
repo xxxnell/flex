@@ -92,7 +92,7 @@ class EqUpdateBench { self =>
     lazy val icdfPlotC: DensityPlot = icdfPlot
 
     def icdfPlot: DensityPlot = {
-      mergeC.inverseNormalizeCumulative
+      mergeC.inverseNormalizedCumulative
     }
 
     val rangesC: List[RangeM[Double]] = ranges

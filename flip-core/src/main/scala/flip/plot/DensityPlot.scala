@@ -7,9 +7,9 @@ import flip.range.syntax._
 import flip.plot.syntax._
 import flip.range
 
-trait DensityPlot extends Plot
+trait DensityPlot extends RangePlot
 
-trait DensityPlotOps extends PlotOps[DensityPlot] {
+trait DensityPlotOps extends RangePlotOps[DensityPlot] {
 
   def split(record: Record, p: Double): Option[(Record, Record)] = {
     val (range, value) = record
@@ -17,40 +17,6 @@ trait DensityPlotOps extends PlotOps[DensityPlot] {
     if (range.contains(p)) {
       Option(((RangeP(range.start, p), value), (RangeP(p, range.end), value)))
     } else None
-  }
-
-  def cumulative(plot: DensityPlot): DensityPlot = {
-    var accVal = 0d
-    val cumHead = (RangeP.point(Double.MinValue), 0d)
-
-    unsafeModifyRecords(
-      plot,
-      (records: List[Record]) => {
-        val utdRecord = records.flatMap {
-          case (range, value) =>
-            val startVal = accVal
-            val endVal = accVal + value * range.roughLength
-            accVal = endVal
-
-            (RangeP.point(range.start), startVal) :: (RangeP.point(range.end), endVal) :: Nil
-        }
-
-        utdRecord.headOption.fold(utdRecord)(utdHead =>
-          if (utdHead._1 != cumHead._1) cumHead :: utdRecord else utdRecord)
-      }
-    )
-  }
-
-  def normalizeCumulative(plot: DensityPlot): DensityPlot = {
-    val cum = cumulative(plot)
-    val max = cum.records.lastOption.map(_._2).getOrElse(1.0)
-    cum * (1 / max)
-  }
-
-  def inverseNormalizeCumulative(plot: DensityPlot): DensityPlot = {
-    unsafeModifyRecords(
-      normalizeCumulative(plot),
-      (records: List[Record]) => records.map { case (range, value) => (RangeP.point(value), range.middle) })
   }
 
   def weightedAdd(wps: NonEmptyList[(Double, DensityPlot)]): DensityPlot = {
