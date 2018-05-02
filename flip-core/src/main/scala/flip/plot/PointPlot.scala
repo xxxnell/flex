@@ -72,7 +72,7 @@ trait PointPlotLaws[P <: PointPlot] { self: PointPlotOps[P] =>
           var minIdx = 0
           while (j < _plots.length) {
             val (_, plot) = _plots.apply(j)
-            val x = if(idxs(j) < plot.records.length) plot.records.apply(idxs(j))._1 else Double.MaxValue
+            val x = if (idxs(j) < plot.records.length) plot.records.apply(idxs(j))._1 else Double.MaxValue
             if (x < xMin) {
               xMin = x
               minIdx = j
@@ -85,7 +85,7 @@ trait PointPlotLaws[P <: PointPlot] { self: PointPlotOps[P] =>
           while (k < _plots.length) {
             val (w, _plot) = _plots.apply(k)
             val idx = idxs(k)
-            val ref = if(idx < _plot.records.length) idx else _plot.records.length - 1
+            val ref = if (idx < _plot.records.length) idx else _plot.records.length - 1
             y2 += w * referencialInterpolation(_plot, xMin, ref)
             k += 1
           }
