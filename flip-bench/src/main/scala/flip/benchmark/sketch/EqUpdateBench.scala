@@ -85,7 +85,7 @@ class EqUpdateBench { self =>
       if (ps.nonEmpty) {
         val c1 = 1 / (mixingRatio + 1)
         val c2 = mixingRatio / (mixingRatio + 1)
-        (c1, sampling) ++ (c2, DensityPlot.squareKernel(ps, window))
+        (c1, sampling) :+ (c2, DensityPlot.squareKernel(ps, window))
       } else sampling
     }
 

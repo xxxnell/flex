@@ -80,7 +80,7 @@ trait CombinationDistOps[D[_] <: CombinationDist[_]] extends DistPropOps[D] {
 
     components
       .map { case (weight, dist) => dist.sampling * weight }
-      .foldLeft(DensityPlot.empty) { case (acc, plot) => acc + plot }
+      .foldLeft(DensityPlot.empty) { case (acc, plot) => acc :+ plot }
   }
 
   override def pdf[A](combi: D[A], a: A): Double = {

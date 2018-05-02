@@ -1,5 +1,6 @@
 package flip.plot
 
+import cats.data.NonEmptyList
 import flip.pdf.Prim
 import flip.plot.syntax._
 import flip.range._
@@ -137,11 +138,26 @@ trait RangePlotLaws[P <: RangePlot] { self: RangePlotOps[P] =>
     } yield RangeP(start, end)
   }
 
-  def add(plot1: P, plot2: P): P =
-    unsafeModifyRecords(plot1, records => {
-      val sumList = records ++ plot2.records
-      planarizeRecords(sumList).map { case (range, values) => (range, values.sum) }
-    })
+  def add(wps: NonEmptyList[(Double, P)]): P = {
+    val listWps = wps.toList
+    val norm = listWps.map(_._1).sum
+    val normWps = listWps.map {
+      case (weight, plot) =>
+        val normWeight = if (norm != 0) weight / norm else 1 / listWps.size.toDouble
+        (normWeight, plot)
+    }
+
+    val concatRecords: List[Record] = normWps
+      .map {
+        case (weight, plot) =>
+          plot.records.map { case (range, value) => (range, weight * value) }
+      }
+      .foldLeft(List.empty[Record]) { case (acc, rec) => acc ++ rec }
+
+    val mgdRecords = planarizeRecords(concatRecords).map { case (range, values) => (range, values.sum) }
+
+    unsafeModifyRecords(wps.head._2, _ => mgdRecords)
+  }
 
   def concat(plot1: P, plot2: P): P =
     unsafeModifyRecords(

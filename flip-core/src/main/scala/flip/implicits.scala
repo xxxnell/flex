@@ -69,7 +69,7 @@ trait PdfPkgSyntax
 
 }
 
-trait PlotPkgSyntax extends PlotSyntax with RangePlotSyntax with DensityPlotSyntax with CountPlotSyntax {
+trait PlotPkgSyntax extends flip.plot.PlotPkgSyntax {
 
   type CountPlot = flip.plot.CountPlot
 

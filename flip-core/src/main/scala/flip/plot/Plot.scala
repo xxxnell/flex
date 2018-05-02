@@ -1,12 +1,14 @@
 package flip.plot
 
+import cats.data.NonEmptyList
+
 trait Plot
 
 trait PlotOps[P <: Plot] {
 
   def interpolation(plot: P, x: Double): Double
 
-  def add(plot1: P, plot2: P): P
+  def add(plots: NonEmptyList[(Double, P)]): P
 
   def inverse(plot: P): P
 
@@ -20,7 +22,7 @@ object Plot extends PlotOps[Plot] {
 
   def interpolation(plot: Plot, x: Double): Double = ???
 
-  def add(plot1: Plot, plot2: Plot): Plot = ???
+  def add(plots: NonEmptyList[(Double, Plot)]): Plot = ???
 
   def inverse(plot: Plot): Plot = ???
 

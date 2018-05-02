@@ -4,6 +4,13 @@ import cats.data.NonEmptyList
 import flip.range.syntax._
 import flip.plot.syntax._
 
+trait PlotPkgSyntax
+    extends PlotSyntax
+    with PointPlotSyntax
+    with RangePlotSyntax
+    with CountPlotSyntax
+    with DensityPlotSyntax
+
 trait PlotSyntax {
 
   type Record = (RangeP, Double)
@@ -19,11 +26,24 @@ trait PolyPlotSyntax[P <: Plot] {
   def plot: P
   def ops: PlotOps[P]
   // syntax
-  def add(plot2: P): P = ops.add(plot, plot2)
-  def +(plot2: P): P = ops.add(plot, plot2)
+  def add(plot2: P): P = ops.add(NonEmptyList.of((1.0, plot), (1.0, plot2)))
+  def :+(plot2: P): P = add(plot2)
   def inverse: P = ops.inverse(plot)
   def normalizedCumulative: P = ops.normalizedCumulative(plot)
   def inverseNormalizedCumulative: P = ops.inverseNormalizedCumulative(plot)
+}
+
+trait PointPlotSyntax {
+
+  implicit class PointPlotSyntaxImpl(pPlot: PointPlot) extends PolyPlotSyntax[PointPlot] {
+    def plot: PointPlot = pPlot
+    def ops: PointPlotOps[PointPlot] = PointPlot
+  }
+
+  implicit class DensityPlotAddSyntaxImpl(wp: (Double, PointPlot)) {
+    def :+(wp2: (Double, PointPlot)): PointPlot = PointPlot.add(NonEmptyList.of(wp, wp2))
+  }
+
 }
 
 trait RangePlotSyntax {
@@ -70,7 +90,7 @@ trait DensityPlotSyntax {
   }
 
   implicit class DensityPlotAddSyntaxImpl(wp: (Double, DensityPlot)) {
-    def ++(wp2: (Double, DensityPlot)): DensityPlot = DensityPlot.weightedAdd(NonEmptyList.of(wp, wp2))
+    def :+(wp2: (Double, DensityPlot)): DensityPlot = DensityPlot.add(NonEmptyList.of(wp, wp2))
   }
 
 }

@@ -19,27 +19,6 @@ trait DensityPlotOps extends RangePlotOps[DensityPlot] {
     } else None
   }
 
-  def weightedAdd(wps: NonEmptyList[(Double, DensityPlot)]): DensityPlot = {
-    val listWps = wps.toList
-    val norm = listWps.map(_._1).sum
-    val normWps = listWps.map {
-      case (weight, plot) =>
-        val normWeight = if (norm != 0) weight / norm else 1 / listWps.size.toDouble
-        (normWeight, plot)
-    }
-
-    val concatRecords: List[Record] = normWps
-      .map {
-        case (weight, plot) =>
-          plot.records.map { case (range, value) => (range, weight * value) }
-      }
-      .foldLeft(List.empty[Record]) { case (acc, rec) => acc ++ rec }
-
-    val mgdRecords = planarizeRecords(concatRecords).map { case (range, values) => (range, values.sum) }
-
-    unsafeModifyRecords(wps.head._2, _ => mgdRecords)
-  }
-
 }
 
 object DensityPlot extends DensityPlotOps {
