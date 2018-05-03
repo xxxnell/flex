@@ -10,7 +10,7 @@ import flip.measure.Measure
 import flip.pdf.Sketch.fastPdf
 import flip.pdf.sampling.IcdfSampling
 import flip.pdf.update.EqUpdate
-import flip.plot.DensityPlot
+import flip.plot.{DensityPlot, PointPlot}
 import flip.range.{RangeM, RangeP}
 import flip.rand.IRng
 
@@ -92,6 +92,24 @@ trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
     DensityPlot.disjoint(rangeDensities)
   }
 
+  def fastSampling[A](sketch: S[A]): PointPlot = {
+    val cmap = youngCmap(sketch)
+    val rangePs = cmap.bin.toArray
+    val measure = sketch.measure.asInstanceOf[Measure[A]]
+
+    var i = 0
+    val records = Array.ofDim[(Double, Double)](rangePs.length)
+    while (i < rangePs.length) {
+      val rangeP = rangePs.apply(i)
+      val rangeM = rangeP.modifyMeasure(measure)
+      val prob = probability(sketch, rangeM.start, rangeM.end)
+      records.update(i, (rangeP.cutoffMiddle, prob))
+      i += 1
+    }
+
+    PointPlot.safe(records)
+  }
+
   def fastPdf[A](sketch: S[A], a: A): Double = {
     val cmap = youngCmap(sketch)
     val p = sketch.measure.asInstanceOf[Measure[A]].to(a)
@@ -146,7 +164,7 @@ trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
   def concatStructures[A](as: List[(A, Count)], measure: Measure[A], conf: SketchConf): Structures = {
     val ps = as.map { case (a, c) => (measure.to(a), c) }
     val cmap = EqUpdate.updateCmap(
-      DensityPlot.empty,
+      PointPlot.empty,
       ps,
       1000,
       conf.dataKernelWindow,

@@ -3,8 +3,7 @@ package flip.benchmark.sketch
 import java.util.concurrent.TimeUnit
 
 import flip.implicits._
-import flip.pdf.update.EqUpdate
-import flip.pdf.{AdaptiveSketch, Count, Structure}
+import flip.pdf.{Count, Structure}
 import flip.{NumericDist, SketchConf}
 import org.openjdk.jmh.annotations._
 

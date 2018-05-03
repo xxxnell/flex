@@ -20,7 +20,7 @@ class IterateBench { self =>
   @Param(Array("50", "100", "150", "200"))
   var iterateBenchSize: Int = _
 
-  @Param(Array("2"))
+  @Param(Array("3"))
   var cmapNo: Int = _
 
   @Param(Array("20"))
@@ -28,9 +28,6 @@ class IterateBench { self =>
 
   @Param(Array("2"))
   var counterNo: Int = _
-
-  @Param(Array("100000"))
-  var counterSize: Int = _
 
   // variables
 
@@ -48,7 +45,6 @@ class IterateBench { self =>
       cmapNo = cmapNo,
       cmapStart = Some(-10d),
       cmapEnd = Some(10d),
-      counterSize = counterSize,
       counterNo = counterNo
     )
 

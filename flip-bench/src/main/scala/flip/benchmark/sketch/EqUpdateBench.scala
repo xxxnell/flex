@@ -9,7 +9,7 @@ import flip.measure.syntax.{-∞, ∞}
 import flip.pdf.{AdaptiveSketch, Count}
 import flip.pdf.sampling.IcdfSampling
 import flip.pdf.update.EqUpdate
-import flip.plot.DensityPlot
+import flip.plot.{DensityPlot, PointPlot}
 import flip.range.RangeM
 import org.openjdk.jmh.annotations._
 
@@ -75,23 +75,23 @@ class EqUpdateBench { self =>
 
     // steps
 
-    lazy val samplingC: DensityPlot = sampling
+    lazy val samplingC: PointPlot = sampling
 
-    def sampling: DensityPlot = sketch.sampling
+    def sampling: PointPlot = sketch.fastSampling
 
-    lazy val mergeC: DensityPlot = merge
+    lazy val mergeC: PointPlot = merge
 
-    def merge: DensityPlot = {
+    def merge: PointPlot = {
       if (ps.nonEmpty) {
         val c1 = 1 / (mixingRatio + 1)
         val c2 = mixingRatio / (mixingRatio + 1)
-        (c1, sampling) :+ (c2, DensityPlot.squareKernel(ps, window))
-      } else sampling
+        (c1, samplingC) :+ (c2, PointPlot.squareKernel(ps, window))
+      } else samplingC
     }
 
-    lazy val icdfPlotC: DensityPlot = icdfPlot
+    lazy val icdfPlotC: PointPlot = icdfPlot
 
-    def icdfPlot: DensityPlot = {
+    def icdfPlot: PointPlot = {
       mergeC.inverseNormalizedCumulative
     }
 
@@ -120,13 +120,13 @@ class EqUpdateBench { self =>
   }
 
   @Benchmark
-  def sampling: DensityPlot = EqUpdateAlgorithm.sampling
+  def sampling: PointPlot = EqUpdateAlgorithm.sampling
 
   @Benchmark
-  def merge: DensityPlot = EqUpdateAlgorithm.merge
+  def merge: PointPlot = EqUpdateAlgorithm.merge
 
   @Benchmark
-  def icdfPlot: DensityPlot = EqUpdateAlgorithm.icdfPlot
+  def icdfPlot: PointPlot = EqUpdateAlgorithm.icdfPlot
 
   @Benchmark
   def ranges: List[RangeM[Double]] = EqUpdateAlgorithm.ranges

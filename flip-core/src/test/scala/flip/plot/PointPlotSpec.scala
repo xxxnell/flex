@@ -56,7 +56,7 @@ class PointPlotSpec extends Specification with ScalaCheck {
       val plot1 = PointPlot(records)
       val plot2 = plot1.inverseNormalizedCumulative
       val cond1 = plot2.interpolation(0.5) ~= (0.0, 0.05)
-      val cond2 = plot2.records.head._1 > 0 && plot2.records.last._1 < 1
+      val cond2 = plot2.records.head._1 >= 0 && plot2.records.last._1 <= 1
 
       if(!cond1) ko(s"${plot2.interpolation(0.5)}")
       if(!cond2) ko(s"first domain: ${plot2.records.head._1}, last domain: ${plot2.records.last._1}")

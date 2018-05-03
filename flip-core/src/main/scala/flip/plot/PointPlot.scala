@@ -1,8 +1,11 @@
 package flip.plot
 
 import cats.data.NonEmptyList
+import flip.pdf.{Count, Prim}
+import flip.range.RangeP
 
 import scala.collection.immutable.{TreeMap, TreeSet}
+import scala.language.postfixOps
 
 trait PointPlot extends Plot {
 
@@ -123,18 +126,17 @@ trait PointPlotLaws[P <: PointPlot] { self: PointPlotOps[P] =>
     modifyRecords(
       plot,
       (records0: Array[(Double, Double)]) => {
-        var (i, j, sum, cum) = (0, 0, 0.0, 0.0)
+        var (i, cum) = (0, 0.0)
+        var (x1, y1) = (Double.NaN, Double.NaN)
+        val sum = integralAll(plot)
         val records1 = Array.ofDim[(Double, Double)](records0.length)
         while (i < records0.length) {
-          val (_, y) = records0(i)
-          sum += y
+          val (x2, y2) = records0(i)
+          cum += (if(!x1.isNaN && !y1.isNaN) areaPoint(x1, y1, x2, y2) else 0.0) / sum
+          records1.update(i, (x2, cum))
+          x1 = x2
+          y1 = y2
           i += 1
-        }
-        while (j < records0.length) {
-          val (x, y) = records0(j)
-          cum += y / sum
-          records1.update(j, (x, cum))
-          j += 1
         }
         records1
       }
@@ -144,22 +146,41 @@ trait PointPlotLaws[P <: PointPlot] { self: PointPlotOps[P] =>
     modifyRecords(
       plot,
       (records0: Array[(Double, Double)]) => {
-        var (i, j, sum, cum) = (0, 0, 0.0, 0.0)
+        var (i, cum) = (0, 0.0)
+        var (x1, y1) = (Double.NaN, Double.NaN)
+        val sum = integralAll(plot)
         val records1 = Array.ofDim[(Double, Double)](records0.length)
         while (i < records0.length) {
-          val (_, y) = records0(i)
-          sum += y
+          val (x2, y2) = records0(i)
+          cum += (if(!x1.isNaN && !y1.isNaN) areaPoint(x1, y1, x2, y2) else 0.0) / sum
+          records1.update(i, (cum, x2))
+          x1 = x2
+          y1 = y2
           i += 1
-        }
-        while (j < records0.length) {
-          val (x, y) = records0(j)
-          cum += y / sum
-          records1.update(j, (cum, x))
-          j += 1
         }
         records1
       }
     )
+
+  def integralAll(plot: P): Double = {
+    val records = plot.records
+    var acc = 0.0
+    var (x1, y1) = (Double.NaN, Double.NaN)
+    var i = 0
+    while (i < records.length) {
+      val (x2, y2) = records.apply(i)
+      acc += (if(!x1.isNaN && !y1.isNaN) areaPoint(x1, y1, x2, y2) else 0.0)
+      x1 = x2
+      y1 = y2
+      i += 1
+    }
+    acc
+  }
+
+  def areaPoint(x1: Double, y1: Double, x2: Double, y2: Double): Double = {
+    if (y1 == 0 && y2 == 0) 0
+    else RangeP(x1, x2).roughLength * (y2 / 2 + y1 / 2)
+  }
 
 }
 
@@ -167,11 +188,35 @@ object PointPlot extends PointPlotOps[PointPlot] {
 
   private case class PointPlotImpl(records: Array[(Double, Double)]) extends PointPlot
 
-  def apply(records: Array[(Double, Double)]): PointPlot = bare(records)
+  def apply(records: Array[(Double, Double)]): PointPlot = safe(records)
 
-  def bare(records: Array[(Double, Double)]): PointPlot = PointPlotImpl(records)
+  def unsafe(records: Array[(Double, Double)]): PointPlot = PointPlotImpl(records)
+
+  def safe(records: Array[(Double, Double)]): PointPlot = unsafe(records.sortBy(_._1))
+
+  def empty: PointPlot = unsafe(Array.empty[(Double, Double)])
+
+  def squareKernel(ds: List[(Prim, Count)], window: Double): PointPlot = {
+    val sum = ds.map(d => d._2).sum
+    val _window = if (window <= 0) 1e-100 else window
+    val dsArr = ds.toArray
+    val records = Array.ofDim[(Double, Double)](dsArr.length * 2)
+
+    var i = 0
+    while(i < dsArr.length) {
+      val (value, count) = dsArr.apply(i)
+      val x1 = value - (_window / 2)
+      val x2 = value + (_window / 2)
+      val y = if (sum * _window > 0) count / (sum * _window) else 0
+      records.update(i * 2, (x1, y))
+      records.update(i * 2 + 1, (x2, y))
+      i += 1
+    }
+
+    unsafe(records)
+  }
 
   def modifyRecords(plot: PointPlot, f: Array[(Double, Double)] => Array[(Double, Double)]): PointPlot =
-    bare(f(plot.records))
+    unsafe(f(plot.records))
 
 }
