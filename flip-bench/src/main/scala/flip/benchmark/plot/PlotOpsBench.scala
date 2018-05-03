@@ -1,4 +1,4 @@
-package flip.benchmark
+package flip.benchmark.plot
 
 import java.util.concurrent.TimeUnit
 

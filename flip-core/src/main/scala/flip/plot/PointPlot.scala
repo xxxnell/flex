@@ -48,11 +48,16 @@ trait PointPlotLaws[P <: PointPlot] { self: PointPlotOps[P] =>
     * */
   def referencialInterpolation(plot: P, x: Double, i: Int): Double = {
     val records = plot.records
-    val refs =
-      if (i + 1 < records.length && i >= 0) records.apply(i) :: records.apply(i + 1) :: Nil
-      else if (i < records.length && i - 1 >= 0) records.apply(i - 1) :: records.apply(i) :: Nil
-      else throw new IllegalArgumentException(s"Index: $i, Size of records: ${plot.records.length}")
-    Fitting(refs, x).getOrElse(interpolation(plot, x))
+    def refs(j: Int): Option[List[(Double, Double)]] =
+      if (i + j < records.length && i + j - 1 >= 0) {
+        Some(records.apply(i + j - 1) :: records.apply(i + j) :: Nil)
+      } else if (i + j - 1 < records.length && i + j - 2 >= 0) {
+        Some(records.apply(i + j - 2) :: records.apply(i + j - 1) :: Nil)
+      } else None
+
+    (refs(1).flatMap(refs1 => Fitting(refs1, x)) orElse
+      refs(0).flatMap(refs0 => Fitting(refs0, x)))
+      .getOrElse(interpolation(plot, x))
   }
 
   def add(plots: NonEmptyList[(Double, P)]): P =
@@ -91,8 +96,8 @@ trait PointPlotLaws[P <: PointPlot] { self: PointPlotOps[P] =>
           }
 
           records1.update(i, (xMin, y2))
-          i += 1
           idxs.update(minIdx, idxs(minIdx) + 1)
+          i += 1
         }
 
         records1

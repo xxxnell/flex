@@ -13,17 +13,16 @@ object Fitting {
     * @param as List of (x, y)
     * */
   def dataFitting(as: List[(Double, Double)], x: Double): Option[Double] = {
-    val largeCutoff = 1e300
-    val smallCutoff = -1e300
-
-    val polyValid = as.forall {
+    lazy val largeCutoff = 1e300
+    lazy val smallCutoff = -1e300
+    lazy val polyValid = as.forall {
       case (_x, _y) =>
         _x < largeCutoff && _y < largeCutoff && _x > smallCutoff && _y > smallCutoff
     }
 
-    (as.size, polyValid) match {
-      case (size, true) if size > 2 =>
-        polynomialFitting(as, x)
+    as match {
+      case start :: end :: Nil if start._1 >= x && end._1 <= x => linearFitting(start, end, x)
+      case _ if as.size > 2 && polyValid => polynomialFitting(as, x)
       case _ =>
         for {
           start <- as.find(_._1 <= x)
