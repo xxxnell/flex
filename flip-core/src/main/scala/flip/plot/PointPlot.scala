@@ -132,7 +132,7 @@ trait PointPlotLaws[P <: PointPlot] { self: PointPlotOps[P] =>
         val records1 = Array.ofDim[(Double, Double)](records0.length)
         while (i < records0.length) {
           val (x2, y2) = records0(i)
-          cum += (if(!x1.isNaN && !y1.isNaN) areaPoint(x1, y1, x2, y2) else 0.0) / sum
+          cum += (if (!x1.isNaN && !y1.isNaN) areaPoint(x1, y1, x2, y2) else 0.0) / sum
           records1.update(i, (x2, cum))
           x1 = x2
           y1 = y2
@@ -152,7 +152,7 @@ trait PointPlotLaws[P <: PointPlot] { self: PointPlotOps[P] =>
         val records1 = Array.ofDim[(Double, Double)](records0.length)
         while (i < records0.length) {
           val (x2, y2) = records0(i)
-          cum += (if(!x1.isNaN && !y1.isNaN) areaPoint(x1, y1, x2, y2) else 0.0) / sum
+          cum += (if (!x1.isNaN && !y1.isNaN) areaPoint(x1, y1, x2, y2) else 0.0) / sum
           records1.update(i, (cum, x2))
           x1 = x2
           y1 = y2
@@ -169,7 +169,7 @@ trait PointPlotLaws[P <: PointPlot] { self: PointPlotOps[P] =>
     var i = 0
     while (i < records.length) {
       val (x2, y2) = records.apply(i)
-      acc += (if(!x1.isNaN && !y1.isNaN) areaPoint(x1, y1, x2, y2) else 0.0)
+      acc += (if (!x1.isNaN && !y1.isNaN) areaPoint(x1, y1, x2, y2) else 0.0)
       x1 = x2
       y1 = y2
       i += 1
@@ -203,7 +203,7 @@ object PointPlot extends PointPlotOps[PointPlot] {
     val records = Array.ofDim[(Double, Double)](dsArr.length * 2)
 
     var i = 0
-    while(i < dsArr.length) {
+    while (i < dsArr.length) {
       val (value, count) = dsArr.apply(i)
       val x1 = value - (_window / 2)
       val x2 = value + (_window / 2)

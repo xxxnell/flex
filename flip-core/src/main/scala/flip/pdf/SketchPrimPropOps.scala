@@ -25,8 +25,8 @@ trait SketchPrimPropOps[S[_] <: Sketch[_]] extends SketchPrimPropLaws[S] with Sk
   /**
     * Update a list of primitive value <code>p</code> without rearranging process only for structures.
     * */
-  def primNarrowUpdateForStr[A](sketch: S[A], ps: List[(Prim, Count)]): S[A] =
-    modifyStructure(
+  def primNarrowUpdateForStrs[A](sketch: S[A], ps: List[(Prim, Count)]): S[A] =
+    modifyStructures(
       sketch,
       strs => {
         val cmapNo = sketch.conf.cmap.no
@@ -52,21 +52,48 @@ trait SketchPrimPropOps[S[_] <: Sketch[_]] extends SketchPrimPropLaws[S] with Sk
     val seed = ((sum(sketch) + ps.headOption.map(_._1).getOrElse(-1d)) * 1000).toInt
     val emptyCounter = counter(sketch.conf, seed)
     val (utdStrs, oldStrs) = ((utdCmap, emptyCounter) :: sketch.structures).toList.splitAt(sketch.conf.cmap.no)
-    val utdSketch1 = modifyStructure(sketch, _ => NonEmptyList.fromListUnsafe(utdStrs))
-    val utdSketch2 = if (ps.nonEmpty) {
-      primNarrowPlotUpdateForStr(utdSketch1, smoothingPs(ps, 0.5), ps.map(_._2).sum)
-    } else utdSketch1
+    val sketch1 = modifyStructures(sketch, _ => NonEmptyList.fromListUnsafe(utdStrs))
+    val sketch2 = if (ps.nonEmpty) primSmoothingNarrowUpdateForStr(sketch1, ps) else sketch1
 
-    (utdSketch2, oldStrs.headOption)
+    (sketch2, oldStrs.headOption)
   }
 
+  @Deprecated
   def primNarrowPlotUpdateForStr[A](sketch: S[A], psDist: Dist[Prim], sum: Double): S[A] = {
     val ps = youngCmap(sketch).bin.map { range =>
       // todo range.middle is hacky approach
       (range.middle, psDist.probability(range.start, range.end) * sum)
     }
 
-    primNarrowUpdateForStr(sketch, ps)
+    primNarrowUpdateForStrs(sketch, ps)
+  }
+
+  def primSmoothingNarrowUpdateForStr[A](sketch: S[A], ps: List[(Prim, Count)]): S[A] = {
+    val maxCmapNo = sketch.conf.cmap.no
+    val cmapNo = self.cmapNo(sketch)
+    val effNo = if (maxCmapNo > 1) maxCmapNo - 1 else maxCmapNo
+    var i = 0
+    val sum = ps.map(_._2).sum
+    val cum = PointPlot.safe(ps.toArray).normalizedCumulative
+    var _sketch = sketch
+    while (i < cmapNo && i < effNo) {
+      _sketch = modifyStructure(_sketch, i, {
+        case (cmap, counter) =>
+          var j = 0
+          val bins = cmap.bin.toArray
+          var cum1 = 0.0
+          var _counter = counter
+          while (j < bins.length) {
+            val cum2 = cum.interpolation(bins.apply(j).end)
+            _counter = _counter.update(j, (cum2 - cum1) * sum)
+            cum1 = cum2
+            j += 1
+          }
+          (cmap, _counter)
+      })
+      i += 1
+    }
+    _sketch
   }
 
   // Read ops
@@ -153,7 +180,7 @@ trait SketchPrimPropLaws[S[_] <: Sketch[_]] { self: SketchPrimPropOps[S] =>
     val measure = sketch.measure.asInstanceOf[Measure[A]]
     val ps = as.map { case (value, count) => (measure(value), count) }
 
-    primNarrowUpdateForStr(sketch, ps)
+    primNarrowUpdateForStrs(sketch, ps)
   }
 
   def deepUpdate[A](sketch: S[A], as: List[(A, Count)]): (S[A], Option[Structure]) = {

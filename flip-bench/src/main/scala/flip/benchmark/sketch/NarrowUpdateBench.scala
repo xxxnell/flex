@@ -60,12 +60,12 @@ class NarrowUpdateBench { self =>
 
   @Benchmark
   def primNarrowUpdateForStr: Sketch[Double] = {
-    Sketch.primNarrowUpdateForStr(sketch, (1.0, 1.0) :: Nil)
+    Sketch.primNarrowUpdateForStrs(sketch, (1.0, 1.0) :: Nil)
   }
 
   @Benchmark
   def modifyStructure: Sketch[Double] = {
-    Sketch.modifyStructure(sketch, identity)
+    Sketch.modifyStructures(sketch, identity)
   }
 
   @Benchmark

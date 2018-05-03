@@ -2,8 +2,12 @@ package flip.benchmark.sketch
 
 import java.util.concurrent.TimeUnit
 
+import flip.cmap.Cmap
+import flip.hcounter.HCounter
 import flip.implicits._
-import flip.pdf.{Count, Structure}
+import flip.pdf.update.{EqUpdate, EqualSpaceSmoothingPs, SmoothingPs}
+import flip.pdf.{AdaptiveSketch, Count, Prim, Sketch, Structure}
+import flip.pdf.Buffer.syntax._
 import flip.{NumericDist, SketchConf}
 import org.openjdk.jmh.annotations._
 
@@ -33,7 +37,7 @@ class DeepUpdateBench { self =>
   var sketch: Sketch[Double] = _
 
   @Setup
-  def setupSketch(): Unit = {
+  def setup(): Unit = {
     implicit val conf: SketchConf = SketchConf(
       startThreshold = Int.MaxValue,
       thresholdPeriod = Int.MaxValue,
@@ -52,14 +56,72 @@ class DeepUpdateBench { self =>
     self.conf = conf
   }
 
-  @Benchmark
-  def deepUpdate: (Sketch[Count], Option[Structure]) = {
-    sketch.deepUpdate()
+  object DeepUpdateAlgorithm {
+
+    lazy val ps: List[(Count, Count)] = sketch.asInstanceOf[AdaptiveSketch[Double]].buffer.toList
+
+    lazy val cmapC: Cmap = cmap
+
+    def cmap: Cmap = EqUpdate.updateCmapForSketch(sketch, ps)
+
+    def seed: Int = ((Sketch.sum(sketch) + ps.headOption.map(_._1).getOrElse(-1d)) * 1000).toInt
+
+    lazy val emptyCounterC: HCounter = emptyCounter
+
+    def emptyCounter: HCounter = Sketch.counter(sketch.conf, seed)
+
+    def strs: (List[(Cmap, HCounter)], List[(Cmap, HCounter)]) =
+      ((cmapC, emptyCounterC) :: sketch.structures).toList.splitAt(sketch.conf.cmap.no)
+
+    def updatePs(): Sketch[Count] =
+      if (ps.nonEmpty) {
+        Sketch.primSmoothingNarrowUpdateForStr(sketch, ps)
+      } else sketch
+
   }
+
+//  @Benchmark
+//  def deepUpdate: (Sketch[Count], Option[Structure]) = {
+//    sketch.deepUpdate()
+//  }
+
+//  @Benchmark
+//  def primDeepUpdate: (Sketch[Count], Option[(Cmap, HCounter)]) = {
+//    Sketch.primDeepUpdate(sketch, sketch.asInstanceOf[AdaptiveSketch[Double]].buffer.toList)
+//  }
 
   @Benchmark
   def rearrange: Sketch[Count] = {
     sketch.rearrange
   }
+
+//  @Benchmark
+//  def cmap: Cmap = {
+//    DeepUpdateAlgorithm.cmap
+//  }
+//
+//  @Benchmark
+//  def seed: Int = {
+//    DeepUpdateAlgorithm.seed
+//  }
+//
+//  @Benchmark
+//  def emptyCounter: HCounter = {
+//    DeepUpdateAlgorithm.emptyCounter
+//  }
+//  @Benchmark
+//  def strs: (List[(Cmap, HCounter)], List[(Cmap, HCounter)]) = {
+//    DeepUpdateAlgorithm.strs
+//  }
+//
+//  @Benchmark
+//  def smoothingPs: Dist[Prim] = {
+//    DeepUpdateAlgorithm.smoothingPs
+//  }
+//
+//  @Benchmark
+//  def updatePs(): Sketch[Count] = {
+//    DeepUpdateAlgorithm.updatePs()
+//  }
 
 }

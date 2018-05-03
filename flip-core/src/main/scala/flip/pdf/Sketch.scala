@@ -49,7 +49,7 @@ trait SketchPropOps[S[_] <: Sketch[_]] extends DataBinningDistOps[S] with Sketch
 
   // update ops
 
-  def modifyStructure[A](sketch: S[A], f: Structures => Structures): S[A]
+  def modifyStructures[A](sketch: S[A], f: Structures => Structures): S[A]
 
   def narrowUpdate[A](sketch: S[A], as: List[(A, Count)]): S[A]
 
@@ -60,6 +60,13 @@ trait SketchPropOps[S[_] <: Sketch[_]] extends DataBinningDistOps[S] with Sketch
 }
 
 trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
+
+  def modifyStructure[A](sketch: S[A], i: Int, f: Structure => Structure): S[A] = {
+    modifyStructures(sketch, strs => {
+      val _strs = strs.toList
+      NonEmptyList.fromListUnsafe(_strs.updated(i, f(_strs.apply(i))))
+    })
+  }
 
   def flatDensity: Double = (1 / Cmap.max) * (1 / (1 - Cmap.min / Cmap.max))
 
@@ -194,10 +201,10 @@ object Sketch extends SketchPrimPropOps[Sketch] { self =>
 
   // mapping ops
 
-  def modifyStructure[A](sketch: Sketch[A], f: Structures => Structures): Sketch[A] = sketch match {
-    case sketch: RecurSketch[_] => RecurSketch.modifyStructure(sketch, f)
-    case sketch: AdaptiveSketch[_] => AdaptiveSketch.modifyStructure(sketch, f)
-    case _ => SimpleSketch.modifyStructure(sketch, f)
+  def modifyStructures[A](sketch: Sketch[A], f: Structures => Structures): Sketch[A] = sketch match {
+    case sketch: RecurSketch[_] => RecurSketch.modifyStructures(sketch, f)
+    case sketch: AdaptiveSketch[_] => AdaptiveSketch.modifyStructures(sketch, f)
+    case _ => SimpleSketch.modifyStructures(sketch, f)
   }
 
   def modifyRng[A](sketch: Sketch[A], f: IRng => IRng): Sketch[A] = sketch match {
