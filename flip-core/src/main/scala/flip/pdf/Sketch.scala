@@ -14,6 +14,7 @@ import flip.plot.{DensityPlot, PointPlot}
 import flip.range.{RangeM, RangeP}
 import flip.rand.IRng
 
+import scala.collection.mutable.ArrayBuffer
 import scala.language.higherKinds
 import scala.util.Try
 
@@ -100,21 +101,36 @@ trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
   }
 
   def fastSampling[A](sketch: S[A]): PointPlot = {
+    val RATIO = 100.0 // todo why 100.0?
+
     val cmap = youngCmap(sketch)
     val rangePs = cmap.bin.toArray
     val measure = sketch.measure.asInstanceOf[Measure[A]]
 
     var i = 0
-    val records = Array.ofDim[(Double, Double)](rangePs.length)
+    val records = new ArrayBuffer[(Double, Double)]
     while (i < rangePs.length) {
-      val rangeP = rangePs.apply(i)
-      val rangeM = rangeP.modifyMeasure(measure)
-      val prob = probability(sketch, rangeM.start, rangeM.end)
-      records.update(i, (rangeP.cutoffMiddle, prob))
+      lazy val rangeP0 = rangePs.apply(i - 1)
+      lazy val rangeP1 = rangePs.apply(i)
+      lazy val rangeM1 = rangeP1.modifyMeasure(measure)
+      lazy val w1 = rangeP1.cutoffLength
+      lazy val w0 = rangeP0.cutoffLength
+      lazy val widthRatio = w1 / w0
+      lazy val (_, prob0) = records.apply(i - 1)
+      lazy val prob1 = probability(sketch, rangeM1.start, rangeM1.end)
+
+      if(i > 0 && widthRatio < (1 / RATIO)) {
+        val _prob = prob0 + (prob1 - prob0) * (w1 / w0)
+        records.append((rangeP1.start, _prob))
+      } else if (i > 0 && widthRatio > RATIO) {
+        val _prob = prob1 + (prob0 - prob1) * (w0 / w1)
+        records.append((rangeP1.start, _prob))
+      }
+      records.append((rangeP1.cutoffMiddle, prob1))
       i += 1
     }
 
-    PointPlot.safe(records)
+    PointPlot.safe(records.toArray)
   }
 
   def fastPdf[A](sketch: S[A], a: A): Double = {

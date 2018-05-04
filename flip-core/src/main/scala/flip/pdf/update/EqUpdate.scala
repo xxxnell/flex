@@ -23,7 +23,7 @@ object EqUpdate {
     val merge = if (ps.nonEmpty) {
       val c1 = 1 / (mixingRatio + 1)
       val c2 = mixingRatio / (mixingRatio + 1)
-      (c1, sampling) :+ (c2, PointPlot.squareKernel(ps, window))
+      (c1, sampling) :+ (c2, PointPlot.deltas(ps, window))
     } else sampling
     val icdfPlot = merge.inverseNormalizedCumulative
     def icdf =

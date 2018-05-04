@@ -63,6 +63,17 @@ class PointPlotSpec extends Specification with ScalaCheck {
       else ok
     }
 
+    "integralAll" in {
+      val plot = PointPlot.deltas((1.0, 1.0) :: (1.5, 1.0) :: Nil, 1E-10)
+      val integral = PointPlot.integralAll(plot)
+      val cond1 = integral ~= 2
+
+      println(plot)
+
+      if(!cond1) ko(s"expected: 2, calculated: $integral")
+      else ok
+    }
+
   }
 
 }

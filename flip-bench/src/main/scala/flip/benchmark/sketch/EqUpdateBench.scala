@@ -84,8 +84,8 @@ class EqUpdateBench { self =>
     def merge: PointPlot = {
       if (ps.nonEmpty) {
         val c1 = 1 / (mixingRatio + 1)
-        val c2 = mixingRatio / (mixingRatio + 1)
-        (c1, samplingC) :+ (c2, PointPlot.squareKernel(ps, window))
+        val c2 = (mixingRatio / (mixingRatio + 1)) * (1 / ps.map(_._2).sum)
+        (c1, samplingC) :+ (c2, PointPlot.deltas(ps, window))
       } else samplingC
     }
 

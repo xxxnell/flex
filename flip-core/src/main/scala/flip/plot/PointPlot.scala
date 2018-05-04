@@ -196,20 +196,22 @@ object PointPlot extends PointPlotOps[PointPlot] {
 
   def empty: PointPlot = unsafe(Array.empty[(Double, Double)])
 
-  def squareKernel(ds: List[(Prim, Count)], window: Double): PointPlot = {
+  def deltas(ds: List[(Prim, Count)], window: Double): PointPlot = {
     val sum = ds.map(d => d._2).sum
     val _window = if (window <= 0) 1e-100 else window
     val dsArr = ds.toArray
-    val records = Array.ofDim[(Double, Double)](dsArr.length * 2)
+    val records = Array.ofDim[(Double, Double)](dsArr.length * 3)
 
     var i = 0
     while (i < dsArr.length) {
       val (value, count) = dsArr.apply(i)
       val x1 = value - (_window / 2)
-      val x2 = value + (_window / 2)
-      val y = if (sum * _window > 0) count / (sum * _window) else 0
-      records.update(i * 2, (x1, y))
-      records.update(i * 2 + 1, (x2, y))
+      val x2 = value
+      val x3 = value + (_window / 2)
+      val y = if (sum * _window > 0) (count * 2) / _window else 0
+      records.update(i * 3, (x1, 0))
+      records.update(i * 3 + 1, (x2, y))
+      records.update(i * 3 + 2, (x3, 0))
       i += 1
     }
 
