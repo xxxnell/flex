@@ -36,14 +36,25 @@ trait PointPlotLaws[P <: PointPlot] { self: PointPlotOps[P] =>
 
   def interpolation(plot: P, x: Double): Double = {
     val records = plot.records
-    plot.index.from(x).headOption.fold(0.0) {
-      case (x2, i2) =>
+
+    lazy val intp1 = plot.index.from(x).headOption.flatMap {
+      case (_, i2) =>
         if (i2 > 0) {
           val (x1, y1) = records(i2 - 1)
           val (x2, y2) = records(i2)
-          Fitting((x1, y1) :: (x2, y2) :: Nil, x).getOrElse(0.0)
-        } else 0.0
+          Fitting((x1, y1) :: (x2, y2) :: Nil, x)
+        } else None
     }
+    lazy val intp2 = plot.index.to(x).lastOption.flatMap {
+      case (_, i2) =>
+        if (i2 + 1 < records.length) {
+          val (x1, y1) = records(i2)
+          val (x2, y2) = records(i2 + 1)
+          Fitting((x1, y1) :: (x2, y2) :: Nil, x)
+        } else None
+    }
+
+    (intp1 orElse intp2).getOrElse(0.0)
   }
 
   /**

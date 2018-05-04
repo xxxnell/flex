@@ -119,7 +119,7 @@ trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
       lazy val (_, prob0) = records.apply(i - 1)
       lazy val prob1 = probability(sketch, rangeM1.start, rangeM1.end)
 
-      if(i > 0 && widthRatio < (1 / RATIO)) {
+      if (i > 0 && widthRatio < (1 / RATIO)) {
         val _prob = prob0 + (prob1 - prob0) * (w1 / w0)
         records.append((rangeP1.start, _prob))
       } else if (i > 0 && widthRatio > RATIO) {

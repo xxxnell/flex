@@ -18,7 +18,7 @@ object EqUpdate {
                     ps: List[(Prim, Count)],
                     mixingRatio: Double,
                     window: Double,
-                    icdfSampling: (Double => A) => List[RangeM[A]],
+                    icdfSampling: (Double => A) => List[A],
                     measure: Measure[A]): Cmap = {
     val merge = if (ps.nonEmpty) {
       val c1 = 1 / (mixingRatio + 1)
@@ -28,11 +28,16 @@ object EqUpdate {
     val icdfPlot = merge.inverseNormalizedCumulative
     def icdf =
       (d: Double) =>
-        if (d <= 0) measure.from(-∞) else if (d >= 1) measure.from(∞) else measure.from(icdfPlot.interpolation(d))
-    val ranges = icdfSampling(icdf)
-    val divider = ranges
-      .map(rangeM => rangeM.primitivize.start)
-      .drop(1)
+        if (d <= 0) measure.from(-∞)
+        else if (d >= 1) measure.from(∞)
+        else {
+          println(s"icdfPlot.interpolation($d): ${icdfPlot.interpolation(d)}")
+          measure.from(icdfPlot.interpolation(d))
+      }
+    val divider = icdfSampling(icdf).map(a => measure.to(a))
+
+    println(s"icdfPlot: $icdfPlot")
+    println(s"divider: $divider")
 
     Cmap.divider(divider)
   }

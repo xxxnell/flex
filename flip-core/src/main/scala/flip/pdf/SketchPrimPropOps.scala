@@ -48,14 +48,14 @@ trait SketchPrimPropOps[S[_] <: Sketch[_]] extends SketchPrimPropLaws[S] with Sk
     * Deep update a list of primitive value <code>p</code> instead of <code>a</code> ∈ <code>A</code>
     * */
   def primDeepUpdate[A](sketch: S[A], ps: List[(Prim, Count)]): (S[A], Option[Structure]) = {
-    val utdCmap = EqUpdate.updateCmapForSketch[A](sketch.asInstanceOf[Sketch[A]], ps)
+    val cmap1 = EqUpdate.updateCmapForSketch[A](sketch.asInstanceOf[Sketch[A]], ps)
     val seed = ((sum(sketch) + ps.headOption.map(_._1).getOrElse(-1d)) * 1000).toInt
     val emptyCounter = counter(sketch.conf, seed)
-    val (utdStrs, oldStrs) = ((utdCmap, emptyCounter) :: sketch.structures).toList.splitAt(sketch.conf.cmap.no)
-    val sketch1 = modifyStructures(sketch, _ => NonEmptyList.fromListUnsafe(utdStrs))
+    val (strs1, strs0) = ((cmap1, emptyCounter) :: sketch.structures).toList.splitAt(sketch.conf.cmap.no)
+    val sketch1 = modifyStructures(sketch, _ => NonEmptyList.fromListUnsafe(strs1))
     val sketch2 = if (ps.nonEmpty) primSmoothingNarrowUpdateForStr(sketch1, ps) else sketch1
 
-    (sketch2, oldStrs.headOption)
+    (sketch2, strs0.headOption)
   }
 
   @Deprecated
@@ -75,22 +75,37 @@ trait SketchPrimPropOps[S[_] <: Sketch[_]] extends SketchPrimPropLaws[S] with Sk
     var i = 0
     val sum = ps.map(_._2).sum
     val cum = PointPlot.safe(ps.toArray).normalizedCumulative
+
+//    println(s"cum: $cum")
+
     var _sketch = sketch
     while (i < cmapNo && i < effNo) {
-      _sketch = modifyStructure(_sketch, i, {
-        case (cmap, counter) =>
-          var j = 0
-          val bins = cmap.bin.toArray
-          var cum1 = 0.0
-          var _counter = counter
-          while (j < bins.length) {
-            val cum2 = cum.interpolation(bins.apply(j).end)
-            _counter = _counter.update(j, (cum2 - cum1) * sum)
-            cum1 = cum2
-            j += 1
-          }
-          (cmap, _counter)
-      })
+      _sketch = modifyStructure(
+        _sketch,
+        i, {
+          case (cmap, counter) =>
+            var j = 0
+            val bins = cmap.bin.toArray
+            var cum1 = 0.0
+            var _counter = counter
+
+//          println(s"bins: ${bins.toList}")
+
+            while (j < bins.length) {
+              val cum2 = cum.interpolation(bins.apply(j).end)
+
+//            println(s"bins($j): ${bins(j)}")
+//            println(s"cum.interpolation(${bins.apply(j).end}): ${cum.interpolation(bins.apply(j).end)}")
+//            println(s"sum: $sum")
+//            println(s"count: ${(cum2 - cum1) * sum}")
+
+              _counter = _counter.update(j, (cum2 - cum1) * sum)
+              cum1 = cum2
+              j += 1
+            }
+            (cmap, _counter)
+        }
+      )
       i += 1
     }
     _sketch

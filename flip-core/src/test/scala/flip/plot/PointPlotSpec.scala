@@ -24,6 +24,19 @@ class PointPlotSpec extends Specification with ScalaCheck {
         else ok
       }
 
+      "overlapped index" in {
+        val records = 0.9807692307688678 -> 5.000005 ::
+          0.9807692307688678 -> 5.625 ::
+          1.0 -> 6.875 ::
+          1.0 -> 6.875 :: Nil
+        val plot1 = PointPlot(records.toArray)
+        val intp = plot1.interpolation(0.9878048780487806)
+
+        val cond1 = intp > 5.625 && intp < 6.875
+        if(!cond1) ko(s"$intp")
+        else ok
+      }
+
     }
 
     "add" in {
@@ -68,11 +81,11 @@ class PointPlotSpec extends Specification with ScalaCheck {
       val integral = PointPlot.integralAll(plot)
       val cond1 = integral ~= 2
 
-      println(plot)
-
       if(!cond1) ko(s"expected: 2, calculated: $integral")
       else ok
     }
+
+    /** End */
 
   }
 

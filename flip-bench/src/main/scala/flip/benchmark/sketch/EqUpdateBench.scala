@@ -68,7 +68,7 @@ class EqUpdateBench { self =>
 
     lazy val measure: Measure[Double] = sketch.measure
 
-    lazy val icdfSampling: (Double => Double) => List[RangeM[Double]] =
+    lazy val icdfSampling: (Double => Double) => List[Double] =
       IcdfSampling.samplingF(measure, sketch.conf.cmap)
 
     lazy val ps: List[(Double, Count)] = sketch.asInstanceOf[AdaptiveSketch[Double]].buffer.dataset.toList
@@ -95,21 +95,14 @@ class EqUpdateBench { self =>
       mergeC.inverseNormalizedCumulative
     }
 
-    val rangesC: List[RangeM[Double]] = ranges
+    val rangesC: List[Double] = ranges
 
-    def ranges: List[RangeM[Double]] = {
+    def ranges: List[Double] = {
       def icdf =
         (d: Double) =>
           if (d <= 0) measure.from(-∞) else if (d >= 1) measure.from(∞) else measure.from(icdfPlotC.interpolation(d))
       icdfSampling(icdf)
     }
-
-    val dividerC: List[Double] = divider
-
-    def divider: List[Double] =
-      rangesC
-        .map(rangeM => rangeM.primitivize.start)
-        .drop(1)
 
   }
 
@@ -129,9 +122,6 @@ class EqUpdateBench { self =>
   def icdfPlot: PointPlot = EqUpdateAlgorithm.icdfPlot
 
   @Benchmark
-  def ranges: List[RangeM[Double]] = EqUpdateAlgorithm.ranges
-
-  @Benchmark
-  def divider: List[Double] = EqUpdateAlgorithm.divider
+  def ranges: List[Double] = EqUpdateAlgorithm.ranges
 
 }

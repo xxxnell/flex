@@ -9,20 +9,29 @@ import flip.range.RangeM
   * */
 trait IcdfSampling[C <: IcdfSamplingConf] extends IcdfSamplingLaws[C] {
 
-  def sampling[A](icdf: Double => A, measure: Measure[A], conf: C): List[RangeM[A]]
+  def sampling[A](icdf: Double => A, measure: Measure[A], conf: C): List[A]
 
 }
 
 trait IcdfSamplingLaws[C <: IcdfSamplingConf] { self: IcdfSampling[C] =>
 
-  def samplingF[A](measure: Measure[A], conf: C): (Double => A) => List[RangeM[A]] =
+  def samplingF[A](measure: Measure[A], conf: C): (Double => A) => List[A] =
     (icdf: Double => A) => sampling(icdf, measure, conf)
+
+  def samplingRanges[A](icdf: Double => A, measure: Measure[A], conf: C): List[RangeM[A]] =
+    sampling(icdf, measure, conf)
+      .sliding(2)
+      .toList
+      .flatMap {
+        case q1 :: q2 :: Nil => Some(RangeM(q1, q2)(measure))
+        case _ => None
+      }
 
 }
 
 object IcdfSampling extends IcdfSampling[IcdfSamplingConf] {
 
-  def sampling[A](icdf: Double => A, measure: Measure[A], conf: IcdfSamplingConf): List[RangeM[A]] = conf match {
+  def sampling[A](icdf: Double => A, measure: Measure[A], conf: IcdfSamplingConf): List[A] = conf match {
     case conf: EqualizeIcdfSamplingConf => EqualizeIcdfSampling.sampling(icdf, measure, conf)
   }
 
