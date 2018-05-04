@@ -113,20 +113,23 @@ trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
       lazy val rangeP0 = rangePs.apply(i - 1)
       lazy val rangeP1 = rangePs.apply(i)
       lazy val rangeM1 = rangeP1.modifyMeasure(measure)
-      lazy val w1 = rangeP1.cutoffLength
-      lazy val w0 = rangeP0.cutoffLength
-      lazy val widthRatio = w1 / w0
-      lazy val (_, prob0) = records.apply(i - 1)
-      lazy val prob1 = probability(sketch, rangeM1.start, rangeM1.end)
+      lazy val l1 = rangeP1.cutoffLength
+      lazy val l0 = rangeP0.cutoffLength
+      lazy val widthRatio = l1 / l0
+      lazy val (_, prod0) = records.apply(records.length - 1)
+      lazy val prod1O: Option[Double] =
+        if (l1 != 0) Some(probability(sketch, rangeM1.start, rangeM1.end) / l1) else None
 
-      if (i > 0 && widthRatio < (1 / RATIO)) {
-        val _prob = prob0 + (prob1 - prob0) * (w1 / w0)
-        records.append((rangeP1.start, _prob))
-      } else if (i > 0 && widthRatio > RATIO) {
-        val _prob = prob1 + (prob0 - prob1) * (w0 / w1)
-        records.append((rangeP1.start, _prob))
-      }
-      records.append((rangeP1.cutoffMiddle, prob1))
+      prod1O.foreach(prod1 => {
+        if (records.nonEmpty && widthRatio < (1 / RATIO) && l0 > 0) {
+          val _prob = prod0 + (prod1 - prod0) * (l1 / l0)
+          records.append((rangeP1.start, _prob))
+        } else if (records.nonEmpty && widthRatio > RATIO && l1 > 0) {
+          val _prob = prod1 + (prod0 - prod1) * (l0 / l1)
+          records.append((rangeP1.start, _prob))
+        }
+        records.append((rangeP1.cutoffMiddle, prod1))
+      })
       i += 1
     }
 

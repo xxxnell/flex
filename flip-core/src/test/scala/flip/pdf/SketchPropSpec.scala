@@ -174,7 +174,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
         val dist = NumericDist.normal(0.0, 1.0)
         val expected = dist.probability(start, end)
         val sampleNo = 3000
-        val (cmapSize, cmapNo, cmapStart, cmapEnd) = (1000, 2, Some(-10.0), Some(10.0))
+        val (cmapSize, cmapNo, cmapStart, cmapEnd) = (20, 2, Some(-10.0), Some(10.0))
 
         implicit val conf: CustomSketchConf = CustomSketchConf(
           cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd
@@ -399,7 +399,10 @@ class SketchPropSpec extends Specification with ScalaCheck {
         val sketch2 = sketch1.rearrange
         val sum = sketch2.sum
 
-        if(sum ~= expected) ok else ko(s"sum: $sum, expected: $expected")
+        val cond1 = sum ~= expected
+
+        if(!cond1) ko(s"sum: $sum, expected: $expected")
+        else ok
       }
 
       "after rearrange update" in {
@@ -498,7 +501,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
         val cond3 = KLD(sketch1, sketch2) < 1
 
         if(!cond1 || !cond2) ko(s"samples: $samples1")
-        else if(!cond3) ko(s"samples: $samples1, KLD: ${KLD(sketch1, sketch2)}")
+        else if(!cond3) ko(s"KLD: ${KLD(sketch1, sketch2)}")
         else ok
       }
 
