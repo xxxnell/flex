@@ -28,16 +28,8 @@ object EqUpdate {
     val icdfPlot = merge.inverseNormalizedCumulative
     def icdf =
       (d: Double) =>
-        if (d <= 0) measure.from(-∞)
-        else if (d >= 1) measure.from(∞)
-        else {
-          println(s"icdfPlot.interpolation($d): ${icdfPlot.interpolation(d)}")
-          measure.from(icdfPlot.interpolation(d))
-      }
+        if (d <= 0) measure.from(-∞) else if (d >= 1) measure.from(∞) else measure.from(icdfPlot.interpolation(d))
     val divider = icdfSampling(icdf).map(a => measure.to(a))
-
-    println(s"icdfPlot: $icdfPlot")
-    println(s"divider: $divider")
 
     Cmap.divider(divider)
   }

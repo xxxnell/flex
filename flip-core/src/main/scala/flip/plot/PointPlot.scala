@@ -140,11 +140,14 @@ trait PointPlotLaws[P <: PointPlot] { self: PointPlotOps[P] =>
         var (i, cum) = (0, 0.0)
         var (x1, y1) = (Double.NaN, Double.NaN)
         val sum = integralAll(plot)
-        val records1 = Array.ofDim[(Double, Double)](records0.length)
+        val length = records0.length + 2
+        val records1 = Array.ofDim[(Double, Double)](length)
+        records1.update(0, (Double.MinValue, 0))
+        records1.update(length - 1, (Double.MaxValue, 1))
         while (i < records0.length) {
           val (x2, y2) = records0(i)
           cum += (if (!x1.isNaN && !y1.isNaN) areaPoint(x1, y1, x2, y2) else 0.0) / sum
-          records1.update(i, (x2, cum))
+          records1.update(i + 1, (x2, cum))
           x1 = x2
           y1 = y2
           i += 1
@@ -154,24 +157,7 @@ trait PointPlotLaws[P <: PointPlot] { self: PointPlotOps[P] =>
     )
 
   def inverseNormalizedCumulative(plot: P): P =
-    modifyRecords(
-      plot,
-      (records0: Array[(Double, Double)]) => {
-        var (i, cum) = (0, 0.0)
-        var (x1, y1) = (Double.NaN, Double.NaN)
-        val sum = integralAll(plot)
-        val records1 = Array.ofDim[(Double, Double)](records0.length)
-        while (i < records0.length) {
-          val (x2, y2) = records0(i)
-          cum += (if (!x1.isNaN && !y1.isNaN) areaPoint(x1, y1, x2, y2) else 0.0) / sum
-          records1.update(i, (cum, x2))
-          x1 = x2
-          y1 = y2
-          i += 1
-        }
-        records1
-      }
-    )
+    inverse(normalizedCumulative(plot))
 
   def integralAll(plot: P): Double = {
     val records = plot.records

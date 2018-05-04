@@ -76,8 +76,6 @@ trait SketchPrimPropOps[S[_] <: Sketch[_]] extends SketchPrimPropLaws[S] with Sk
     val sum = ps.map(_._2).sum
     val cum = PointPlot.safe(ps.toArray).normalizedCumulative
 
-//    println(s"cum: $cum")
-
     var _sketch = sketch
     while (i < cmapNo && i < effNo) {
       _sketch = modifyStructure(
@@ -88,17 +86,8 @@ trait SketchPrimPropOps[S[_] <: Sketch[_]] extends SketchPrimPropLaws[S] with Sk
             val bins = cmap.bin.toArray
             var cum1 = 0.0
             var _counter = counter
-
-//          println(s"bins: ${bins.toList}")
-
             while (j < bins.length) {
               val cum2 = cum.interpolation(bins.apply(j).end)
-
-//            println(s"bins($j): ${bins(j)}")
-//            println(s"cum.interpolation(${bins.apply(j).end}): ${cum.interpolation(bins.apply(j).end)}")
-//            println(s"sum: $sum")
-//            println(s"count: ${(cum2 - cum1) * sum}")
-
               _counter = _counter.update(j, (cum2 - cum1) * sum)
               cum1 = cum2
               j += 1
