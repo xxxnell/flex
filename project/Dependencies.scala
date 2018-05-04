@@ -6,7 +6,7 @@ import sbt.Keys.libraryDependencies
 object Dependencies {
 
   val cats = Seq(
-    "org.typelevel" %% "cats" % Versions.cats
+    "org.typelevel" %% "cats-core" % Versions.cats
   )
 
   val monixs = Seq(
