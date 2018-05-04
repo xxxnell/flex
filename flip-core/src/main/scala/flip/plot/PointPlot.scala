@@ -1,8 +1,10 @@
 package flip.plot
 
-import cats.data.NonEmptyList
+import flip._
 import flip.pdf.{Count, Prim}
 import flip.range.RangeP
+
+import cats.data.NonEmptyList
 
 import scala.collection.immutable.{TreeMap, TreeSet}
 import scala.language.postfixOps
@@ -196,7 +198,7 @@ object PointPlot extends PointPlotOps[PointPlot] {
   def deltas(ds: List[(Prim, Count)], window: Double): PointPlot = {
     val sum = ds.map(d => d._2).sum
     val _window = if (window <= 0) 1e-100 else window
-    val dsArr = ds.toArray
+    val dsArr = ds.sortBy(_._1).toArray
     val records = Array.ofDim[(Double, Double)](dsArr.length * 3)
 
     var i = 0
