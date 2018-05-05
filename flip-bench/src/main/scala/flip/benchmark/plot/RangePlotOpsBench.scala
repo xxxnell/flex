@@ -11,7 +11,7 @@ import org.openjdk.jmh.annotations._
 @BenchmarkMode(Array(Mode.AverageTime))
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @State(Scope.Thread)
-class PlotOpsBench { self =>
+class RangePlotOpsBench { self =>
 
   @Param(Array("20", "200", "2000"))
   var recordsNo: Int = _
@@ -24,8 +24,6 @@ class PlotOpsBench { self =>
 
   var densityPlot: DensityPlot = _
 
-  var pointPlot: PointPlot = _
-
   @Setup
   def setup(): Unit = {
     val recordsP = (0.0 until recordsNo.toDouble by 1.0).toArray.map(p => (p, math.cos(p)))
@@ -35,14 +33,6 @@ class PlotOpsBench { self =>
     self.recordsR = recordsR
     self.countPlot = CountPlot.disjoint(recordsR)
     self.densityPlot = DensityPlot.disjoint(recordsR)
-    self.pointPlot = PointPlot.apply(recordsP)
-  }
-
-  @Benchmark
-  def constructOfPointPlot: PointPlot = {
-    val pointPlot = PointPlot.apply(recordsP)
-    pointPlot.index
-    pointPlot
   }
 
   @Benchmark
@@ -51,48 +41,23 @@ class PlotOpsBench { self =>
   }
 
   @Benchmark
-  def interpolationOfPointPlot: Double = {
-    pointPlot.interpolation(recordsNo / 2)
-  }
-
-  @Benchmark
-  def addOfDensityPlot(): DensityPlot = {
+  def add(): DensityPlot = {
     (1.0, densityPlot) :+ (1.0, densityPlot)
   }
 
   @Benchmark
-  def addOfPointPlot(): PointPlot = {
-    (1.0, pointPlot) :+ (1.0, pointPlot)
-  }
-
-  @Benchmark
-  def inverseOfDensityPlot: DensityPlot = {
+  def inverse: DensityPlot = {
     densityPlot.inverse
   }
 
   @Benchmark
-  def inverseOfPointPlot: PointPlot = {
-    pointPlot.inverse
-  }
-
-  @Benchmark
-  def normalizedCumulativeOfDensityPlot: DensityPlot = {
+  def normalizedCumulative: DensityPlot = {
     densityPlot.normalizedCumulative
   }
 
   @Benchmark
-  def normalizedCumulativeOfPointPlot: PointPlot = {
-    pointPlot.normalizedCumulative
-  }
-
-  @Benchmark
-  def inverseNormalizedCumulativeOfDensityPlot: DensityPlot = {
+  def inverseNormalizedCumulative: DensityPlot = {
     densityPlot.inverseNormalizedCumulative
-  }
-
-  @Benchmark
-  def inverseNormalizedCumulativeOfPointPlot: PointPlot = {
-    pointPlot.inverseNormalizedCumulative
   }
 
   @Benchmark
