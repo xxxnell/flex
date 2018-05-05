@@ -10,6 +10,39 @@ class PointPlotSpec extends Specification with ScalaCheck {
 
   "PointPlot" should {
 
+    "constructor" in {
+
+      "deltas" in {
+
+        "empty" in {
+          val plot = PointPlot.deltas(Nil, 1E-10)
+          val cond1 = plot.records.length == 0
+
+          if(!cond1) ko(plot.toString)
+          else ok
+        }
+
+        "overlapped" in {
+          val ds = (0.0, 1.0) :: (2.0, 1.0) :: (1.0, 1.0) :: (0.0, 1.0) :: Nil
+          val plot = PointPlot.deltas(ds, 1E-10)
+          val cond1 = plot.records.toList.sliding(2).forall {
+            case (x1, _) :: (x2, _) :: Nil => x1 < x2
+          }
+          val cond2 = PointPlot.integralAll(plot) ~= 4
+          val cond3 = plot.of(0) > 0 && plot.of(1) > 0 && plot.of(2) > 0
+
+          println(plot.csv)
+
+          if(!cond1) ko(s"x of records: ${plot.records.toList.map(_._1)}")
+          else if(!cond2) ko(s"counts: ${PointPlot.integralAll(plot)}")
+          else if(!cond3) ko(s"pdf(0): ${plot.of(0)}, pdf(1): ${plot.of(1)}, pdf(2): ${plot.of(2)}")
+          else ok
+        }
+
+      }
+
+    }
+
     "interpolation" in {
 
       "basic" in {

@@ -17,6 +17,7 @@ trait PlotSyntax {
 
   implicit class PlotSyntaxImpl(plot: Plot) {
     def interpolation(argument: Double): Double = Plot.interpolation(plot, argument)
+    def of(argument: Double): Double = Plot.interpolation(plot, argument)
   }
 
 }
@@ -38,6 +39,8 @@ trait PointPlotSyntax {
   implicit class PointPlotSyntaxImpl(pPlot: PointPlot) extends PolyPlotSyntax[PointPlot] {
     def plot: PointPlot = pPlot
     def ops: PointPlotOps[PointPlot] = PointPlot
+    def csv: String = ShowPlot.dsvPointPlot(plot, ", ")
+    def dsv(delimiter: String): String = ShowPlot.dsvPointPlot(plot, delimiter)
   }
 
   implicit class DensityPlotAddSyntaxImpl(wp: (Double, PointPlot)) {
@@ -55,8 +58,8 @@ trait RangePlotSyntax {
     def integralAll: Double = RangePlot.integralAll(plot)
     def isEmpty: Boolean = RangePlot.isEmpty(plot)
     def nonEmpty: Boolean = !RangePlot.isEmpty(plot)
-    def csv: String = ShowPlot.dsv(plot, ", ")
-    def dsv(delimiter: String): String = ShowPlot.dsv(plot, delimiter)
+    def csv: String = ShowPlot.dsvRangePlot(plot, ", ")
+    def dsv(delimiter: String): String = ShowPlot.dsvRangePlot(plot, delimiter)
   }
 
 }

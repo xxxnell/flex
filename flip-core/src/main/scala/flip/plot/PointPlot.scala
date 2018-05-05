@@ -3,10 +3,10 @@ package flip.plot
 import flip._
 import flip.pdf.{Count, Prim}
 import flip.range.RangeP
-
 import cats.data.NonEmptyList
 
 import scala.collection.immutable.{TreeMap, TreeSet}
+import scala.collection.mutable.ArrayBuffer
 import scala.language.postfixOps
 
 trait PointPlot extends Plot {
@@ -198,20 +198,39 @@ object PointPlot extends PointPlotOps[PointPlot] {
   def deltas(ds: List[(Prim, Count)], window: Double): PointPlot = {
     val sum = ds.map(d => d._2).sum
     val _window = if (window <= 0) 1e-100 else window
-    val dsArr = ds.sortBy(_._1).toArray
-    val records = Array.ofDim[(Double, Double)](dsArr.length * 3)
+    val dsArr1 = ds.sortBy(_._1).toArray
 
+    // merge
     var i = 0
-    while (i < dsArr.length) {
-      val (value, count) = dsArr.apply(i)
+    val diff = if(dsArr1.length > 0) Array.ofDim[Double](dsArr1.length - 1) else Array.empty[Double]
+    while (i < dsArr1.length - 1) {
+      diff.update(i, dsArr1.apply(i + 1)._1 - dsArr1.apply(i)._1)
+      i += 1
+    }
+    var j = 0
+    val dsArr2 = new ArrayBuffer[(Double, Double)]
+    while (j < dsArr1.length) {
+      val _diff = if(j > 0) diff.apply(j - 1) else Double.MaxValue
+      val (x1, count1) = dsArr1.apply(j)
+      lazy val (x0, count0) = dsArr2.apply(dsArr2.length - 1)
+      if(_diff > window * 2) dsArr2.append((x1, count1))
+      else dsArr2.update(dsArr2.length - 1, (x0, count0 + count1))
+      j += 1
+    }
+
+    // deltas
+    var k = 0
+    val records = Array.ofDim[(Double, Double)](dsArr2.length * 3)
+    while (k < dsArr2.length) {
+      val (value, count) = dsArr2.apply(k)
       val x1 = value - (_window / 2)
       val x2 = value
       val x3 = value + (_window / 2)
       val y = if (sum * _window > 0) (count * 2) / _window else 0
-      records.update(i * 3, (x1, 0))
-      records.update(i * 3 + 1, (x2, y))
-      records.update(i * 3 + 2, (x3, 0))
-      i += 1
+      records.update(k * 3, (x1, 0))
+      records.update(k * 3 + 1, (x2, y))
+      records.update(k * 3 + 2, (x3, 0))
+      k += 1
     }
 
     unsafe(records)
