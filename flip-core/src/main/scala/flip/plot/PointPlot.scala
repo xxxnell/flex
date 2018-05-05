@@ -202,7 +202,7 @@ object PointPlot extends PointPlotOps[PointPlot] {
 
     // merge
     var i = 0
-    val diff = if(dsArr1.length > 0) Array.ofDim[Double](dsArr1.length - 1) else Array.empty[Double]
+    val diff = if (dsArr1.length > 0) Array.ofDim[Double](dsArr1.length - 1) else Array.empty[Double]
     while (i < dsArr1.length - 1) {
       diff.update(i, dsArr1.apply(i + 1)._1 - dsArr1.apply(i)._1)
       i += 1
@@ -210,10 +210,10 @@ object PointPlot extends PointPlotOps[PointPlot] {
     var j = 0
     val dsArr2 = new ArrayBuffer[(Double, Double)]
     while (j < dsArr1.length) {
-      val _diff = if(j > 0) diff.apply(j - 1) else Double.MaxValue
+      val _diff = if (j > 0) diff.apply(j - 1) else Double.MaxValue
       val (x1, count1) = dsArr1.apply(j)
       lazy val (x0, count0) = dsArr2.apply(dsArr2.length - 1)
-      if(_diff > window * 2) dsArr2.append((x1, count1))
+      if (_diff > window * 2) dsArr2.append((x1, count1))
       else dsArr2.update(dsArr2.length - 1, (x0, count0 + count1))
       j += 1
     }
