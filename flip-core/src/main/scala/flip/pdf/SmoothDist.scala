@@ -24,7 +24,7 @@ trait SmoothDistPropLaws[D[_] <: SmoothDist[_]] { self: SmoothDistPropOps[D] =>
   def sampling[A](dist: D[A]): DensityPlot = {
     val icdf: Double => A = p => self.icdf(dist, p)
     val measure = dist.measure.asInstanceOf[Measure[A]]
-    val records = IcdfSampling.sampling(icdf, measure, dist.conf.sampling).flatMap { range =>
+    val records = IcdfSampling.samplingRanges(icdf, measure, dist.conf.sampling).flatMap { range =>
       val length = range.roughLength
       if (length > 0) Some((range.primitivize, probability(dist, range.start, range.end) / length)) else None
     }

@@ -5,9 +5,16 @@ object ShowPlot {
   /**
     * Delimiter-seperated value
     * */
-  def dsv(plot: Plot, delimiter: String): String = {
+  def dsvRangePlot(plot: RangePlot, delimiter: String): String = {
     plot.records
       .map { case (range, value) => range.start :: range.end :: value :: Nil }
+      .map(datas => datas.mkString(delimiter))
+      .mkString("\n")
+  }
+
+  def dsvPointPlot(plot: PointPlot, delimiter: String): String = {
+    plot.records
+      .map { case (point, value) => point :: value :: Nil }
       .map(datas => datas.mkString(delimiter))
       .mkString("\n")
   }

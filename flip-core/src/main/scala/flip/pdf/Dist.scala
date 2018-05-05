@@ -58,11 +58,11 @@ trait DistPropLaws[D[_] <: Dist[_]] { self: DistPropOps[D] =>
   }
 
   def cdfPlot[A](dist: D[A]): DensityPlot = {
-    sampling(dist).normalizeCumulative
+    sampling(dist).normalizedCumulative
   }
 
   def icdfPlot[A](dist: D[A]): DensityPlot = {
-    sampling(dist).inverseNormalizeCumulative
+    sampling(dist).inverseNormalizedCumulative
   }
 
   def interpolationPdf[A](dist: D[A], a: A): Double = {

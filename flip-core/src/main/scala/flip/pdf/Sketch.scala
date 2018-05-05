@@ -9,11 +9,12 @@ import flip.hcounter.HCounter
 import flip.measure.Measure
 import flip.pdf.Sketch.fastPdf
 import flip.pdf.sampling.IcdfSampling
-import flip.pdf.update.EqualSpaceCdfUpdate
-import flip.plot.DensityPlot
+import flip.pdf.update.EqUpdate
+import flip.plot.{DensityPlot, PointPlot}
 import flip.range.{RangeM, RangeP}
 import flip.rand.IRng
 
+import scala.collection.mutable.ArrayBuffer
 import scala.language.higherKinds
 import scala.util.Try
 
@@ -49,7 +50,7 @@ trait SketchPropOps[S[_] <: Sketch[_]] extends DataBinningDistOps[S] with Sketch
 
   // update ops
 
-  def modifyStructure[A](sketch: S[A], f: Structures => Structures): S[A]
+  def modifyStructures[A](sketch: S[A], f: Structures => Structures): S[A]
 
   def narrowUpdate[A](sketch: S[A], as: List[(A, Count)]): S[A]
 
@@ -60,6 +61,13 @@ trait SketchPropOps[S[_] <: Sketch[_]] extends DataBinningDistOps[S] with Sketch
 }
 
 trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
+
+  def modifyStructure[A](sketch: S[A], i: Int, f: Structure => Structure): S[A] = {
+    modifyStructures(sketch, strs => {
+      val _strs = strs.toList
+      NonEmptyList.fromListUnsafe(_strs.updated(i, f(_strs.apply(i))))
+    })
+  }
 
   def flatDensity: Double = (1 / Cmap.max) * (1 / (1 - Cmap.min / Cmap.max))
 
@@ -90,6 +98,42 @@ trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
       .map { case (rangeM, prob) => (RangeP.forRangeM(rangeM), Try(prob / rangeM.roughLength).toOption) }
       .flatMap { case (range, densityO) => densityO.map(density => (range, density)) }
     DensityPlot.disjoint(rangeDensities)
+  }
+
+  def fastSampling[A](sketch: S[A]): PointPlot = {
+    val RATIO = 100.0 // todo why 100.0?
+
+    val cmap = youngCmap(sketch)
+    val rangePs = cmap.bin.toArray
+    val measure = sketch.measure.asInstanceOf[Measure[A]]
+
+    var i = 0
+    val records = new ArrayBuffer[(Double, Double)]
+    while (i < rangePs.length) {
+      lazy val rangeP0 = rangePs.apply(i - 1)
+      lazy val rangeP1 = rangePs.apply(i)
+      lazy val rangeM1 = rangeP1.modifyMeasure(measure)
+      lazy val l1 = rangeP1.cutoffLength
+      lazy val l0 = rangeP0.cutoffLength
+      lazy val widthRatio = l1 / l0
+      lazy val (_, prod0) = records.apply(records.length - 1)
+      lazy val prod1O: Option[Double] =
+        if (l1 != 0) Some(probability(sketch, rangeM1.start, rangeM1.end) / l1) else None
+
+      prod1O.foreach(prod1 => {
+        if (records.nonEmpty && widthRatio < (1 / RATIO) && l0 > 0) {
+          val _prob = prod0 + (prod1 - prod0) * (l1 / l0)
+          records.append((rangeP1.start, _prob))
+        } else if (records.nonEmpty && widthRatio > RATIO && l1 > 0) {
+          val _prob = prod1 + (prod0 - prod1) * (l0 / l1)
+          records.append((rangeP1.start, _prob))
+        }
+        records.append((rangeP1.cutoffMiddle, prod1))
+      })
+      i += 1
+    }
+
+    PointPlot.safe(records.toArray)
   }
 
   def fastPdf[A](sketch: S[A], a: A): Double = {
@@ -145,8 +189,8 @@ trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
 
   def concatStructures[A](as: List[(A, Count)], measure: Measure[A], conf: SketchConf): Structures = {
     val ps = as.map { case (a, c) => (measure.to(a), c) }
-    val cmap = EqualSpaceCdfUpdate.updateCmap(
-      DensityPlot.empty,
+    val cmap = EqUpdate.updateCmap(
+      PointPlot.empty,
       ps,
       1000,
       conf.dataKernelWindow,
@@ -176,10 +220,10 @@ object Sketch extends SketchPrimPropOps[Sketch] { self =>
 
   // mapping ops
 
-  def modifyStructure[A](sketch: Sketch[A], f: Structures => Structures): Sketch[A] = sketch match {
-    case sketch: RecurSketch[_] => RecurSketch.modifyStructure(sketch, f)
-    case sketch: AdaptiveSketch[_] => AdaptiveSketch.modifyStructure(sketch, f)
-    case _ => SimpleSketch.modifyStructure(sketch, f)
+  def modifyStructures[A](sketch: Sketch[A], f: Structures => Structures): Sketch[A] = sketch match {
+    case sketch: RecurSketch[_] => RecurSketch.modifyStructures(sketch, f)
+    case sketch: AdaptiveSketch[_] => AdaptiveSketch.modifyStructures(sketch, f)
+    case _ => SimpleSketch.modifyStructures(sketch, f)
   }
 
   def modifyRng[A](sketch: Sketch[A], f: IRng => IRng): Sketch[A] = sketch match {

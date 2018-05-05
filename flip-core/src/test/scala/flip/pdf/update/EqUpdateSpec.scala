@@ -5,9 +5,9 @@ import flip.pdf.Sketch
 import org.specs2.mutable._
 import org.specs2.ScalaCheck
 
-class EqualSpaceCdfUpdateSpec extends Specification with ScalaCheck {
+class EqUpdateSpec extends Specification with ScalaCheck {
 
-  "EqualSpaceCdfUpdate" should {
+  "EqUpdate" should {
 
     "updateCmap" in {
       implicit val conf: CustomSketchConf = CustomSketchConf(
@@ -17,7 +17,7 @@ class EqualSpaceCdfUpdateSpec extends Specification with ScalaCheck {
       val sketch0 = Sketch.empty[Double]
       val ps = (0.0 to 100.0 by 1).toList.map(p => (p, 1.0))
 
-      EqualSpaceCdfUpdate.updateCmapForSketch(sketch0, ps)
+      EqUpdate.updateCmapForSketch(sketch0, ps)
       ok
     }
 

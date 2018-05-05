@@ -5,7 +5,7 @@ import flip.conf.SketchConf
 import flip.measure.Measure
 import flip.pdf.monad.{SketchBind, SketchFunctor}
 import flip.pdf.{Count, Dist, Sketch, Structure}
-import flip.plot.DensityPlot
+import flip.plot.{DensityPlot, PointPlot}
 import flip.range.RangeM
 
 trait SketchSyntax extends SketchPropSyntax with SketchMonadSyntax
@@ -47,6 +47,7 @@ trait SketchPropSyntax {
     def domain: RangeM[A] = Sketch.domain(sketch)
     def cdfPlot: DensityPlot = Sketch.cdfPlot(sketch)
     def median: A = Sketch.median(sketch)
+    def fastSampling: PointPlot = Sketch.fastSampling(sketch)
   }
 
 }

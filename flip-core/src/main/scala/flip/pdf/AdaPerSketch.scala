@@ -64,7 +64,7 @@ object AdaPerSketch extends AdaPerSketchOps[AdaPerSketch] {
   def modifyRng[A](sketch: AdaPerSketch[A], f: IRng => IRng): AdaPerSketch[A] =
     bare(sketch.measure, f(sketch.rng), sketch.conf, sketch.structures, sketch.buffer, sketch.thresholds, sketch.count)
 
-  def modifyStructure[A](sketch: AdaPerSketch[A], f: Structures => Structures): AdaPerSketch[A] =
+  def modifyStructures[A](sketch: AdaPerSketch[A], f: Structures => Structures): AdaPerSketch[A] =
     bare(sketch.measure, sketch.rng, sketch.conf, f(sketch.structures), sketch.buffer, sketch.thresholds, sketch.count)
 
   def modifyBuffer[A](sketch: AdaPerSketch[A], f: Buffer[A] => Buffer[A]): AdaPerSketch[A] =

@@ -65,9 +65,9 @@ object RecurSketch extends RecurSketchOps[RecurSketch] {
       case _ => bare(sketch.measure, f(sketch.rng), sketch.conf, sketch.structures, sketch.thresholds, sketch.count)
     }
 
-  def modifyStructure[A](sketch: RecurSketch[A], f: Structures => Structures): RecurSketch[A] =
+  def modifyStructures[A](sketch: RecurSketch[A], f: Structures => Structures): RecurSketch[A] =
     sketch match {
-      case periodic: PeriodicSketch[A] => PeriodicSketch.modifyStructure(periodic, f)
+      case periodic: PeriodicSketch[A] => PeriodicSketch.modifyStructures(periodic, f)
       case _ => bare(sketch.measure, sketch.rng, sketch.conf, f(sketch.structures), sketch.thresholds, sketch.count)
     }
 

@@ -4,7 +4,7 @@ import flip.conf.{CustomSimpleSketchConf, CustomSketchConf, SimpleSketchConf, Sm
 import flip.measure.TrivialMeasures
 import flip.pdf.SimpleSketch
 import flip.pdf.syntax.{DistSyntax, NumericDistSyntax, SamplingDistSyntax, SketchSyntax, SmoothDistSyntax}
-import flip.plot.{CountPlotSyntax, DensityPlotSyntax, PlotSyntax}
+import flip.plot.{CountPlotSyntax, DensityPlotSyntax, PlotSyntax, RangePlotSyntax}
 import flip.range.RangeSyntax
 import flip.sim.SimSyntax
 
@@ -69,7 +69,7 @@ trait PdfPkgSyntax
 
 }
 
-trait PlotPkgSyntax extends PlotSyntax with DensityPlotSyntax with CountPlotSyntax {
+trait PlotPkgSyntax extends flip.plot.PlotPkgSyntax {
 
   type CountPlot = flip.plot.CountPlot
 

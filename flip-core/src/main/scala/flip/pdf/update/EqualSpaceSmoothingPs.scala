@@ -11,7 +11,7 @@ object EqualSpaceSmoothingPs extends SmoothingPs {
   def apply(ps: List[(Prim, Count)], scale: Double): Dist[Prim] = {
     lazy val conf = SmoothDistConf.default
     lazy val plot = smoothingPsPlotForEqualSpaceCumulative(ps)
-    lazy val cdf = plot.normalizeCumulative
+    lazy val cdf = plot.normalizedCumulative
     def probability(start: Prim, end: Prim): Double = cdf.interpolation(end) - cdf.interpolation(start)
 
     if (ps.nonEmpty) {

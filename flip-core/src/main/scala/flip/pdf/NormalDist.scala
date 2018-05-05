@@ -56,6 +56,8 @@ object NormalDist extends NormalDistOps {
   def bare[A](measure: Measure[A], conf: SmoothDistConf, mean: Prim, variance: Prim, rng: IRng): NormalDist[A] =
     NormalDistImpl(measure, conf, mean, variance, rng)
 
+  def std(implicit measure: Measure[Double], conf: SmoothDistConf): NormalDist[Double] = apply(0.0, 1.0)
+
   def modifyRng[A](dist: NormalDist[A], f: IRng => IRng): NormalDist[A] =
     bare(dist.measure, dist.conf, dist.mean, dist.variance, f(dist.rng))
 

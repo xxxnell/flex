@@ -61,9 +61,9 @@ object PeriodicSketch extends PeriodicSketchOps[PeriodicSketch] { self =>
       case _ => bare(sketch.measure, f(sketch.rng), sketch.conf, sketch.structures, sketch.thresholds, sketch.count)
     }
 
-  def modifyStructure[A](sketch: PeriodicSketch[A], f: Structures => Structures): PeriodicSketch[A] =
+  def modifyStructures[A](sketch: PeriodicSketch[A], f: Structures => Structures): PeriodicSketch[A] =
     sketch match {
-      case sketch: AdaPerSketch[A] => AdaPerSketch.modifyStructure(sketch, f)
+      case sketch: AdaPerSketch[A] => AdaPerSketch.modifyStructures(sketch, f)
       case _ => bare(sketch.measure, sketch.rng, sketch.conf, f(sketch.structures), sketch.thresholds, sketch.count)
     }
 
