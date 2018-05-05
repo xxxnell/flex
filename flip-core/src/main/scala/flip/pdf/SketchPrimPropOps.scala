@@ -11,6 +11,7 @@ import flip.range._
 import flip.range.syntax._
 
 import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 import scala.language.{higherKinds, postfixOps}
 
 /**
@@ -69,33 +70,46 @@ trait SketchPrimPropOps[S[_] <: Sketch[_]] extends SketchPrimPropLaws[S] with Sk
   }
 
   def primSmoothingNarrowUpdateForStr[A](sketch: S[A], ps: List[(Prim, Count)]): S[A] = {
+    // Retrieve count cumulative plot
+    val psArr = ps.sortBy(_._1).toArray
+    var i = 0
+    val cumArr = Array.ofDim[(Double, Double)](psArr.length + 2)
+    var _cum = 0.0
+    cumArr.update(0, (Double.MinValue, 0))
+    while (i < psArr.length) {
+      val (x, count) = psArr.apply(i)
+      _cum += count
+      cumArr.update(i + 1, (x, _cum))
+      i += 1
+    }
+    cumArr.update(psArr.length + 1, (Double.MaxValue, _cum))
+    val cum = PointPlot.unsafe(cumArr)
+
+    // NarrowUpdate counts
     val maxCmapNo = sketch.conf.cmap.no
     val cmapNo = self.cmapNo(sketch)
     val effNo = if (maxCmapNo > 1) maxCmapNo - 1 else maxCmapNo
-    var i = 0
-    val sum = ps.map(_._2).sum
-    val cum = PointPlot.safe(ps.toArray).normalizedCumulative
-
+    var j = 0
     var _sketch = sketch
-    while (i < cmapNo && i < effNo) {
+    while (j < cmapNo && j < effNo) {
       _sketch = modifyStructure(
         _sketch,
-        i, {
+        j, {
           case (cmap, counter) =>
-            var j = 0
+            var k = 0
             val bins = cmap.bin.toArray
             var cum1 = 0.0
             var _counter = counter
-            while (j < bins.length) {
-              val cum2 = cum.interpolation(bins.apply(j).end)
-              _counter = _counter.update(j, (cum2 - cum1) * sum)
+            while (k < bins.length) {
+              val cum2 = cum.interpolation(bins.apply(k).end)
+              _counter = _counter.update(k, cum2 - cum1)
               cum1 = cum2
-              j += 1
+              k += 1
             }
             (cmap, _counter)
         }
       )
-      i += 1
+      j += 1
     }
     _sketch
   }

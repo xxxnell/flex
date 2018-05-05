@@ -72,8 +72,6 @@ trait AdaptiveSketchOps[S[_] <: AdaptiveSketch[_]] extends SketchPrimPropOps[S] 
 trait AdaptiveSketchLaws[S[_] <: AdaptiveSketch[_]] { self: AdaptiveSketchOps[S] =>
 
   def append[A](sketch0: S[A], as: List[(A, Count)]): (S[A], List[(A, Count)]) = {
-    import flip._
-
     var rem: Buffer[A] = null
     val sketch1 = modifyBuffer(
       sketch0,
