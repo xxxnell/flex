@@ -1,11 +1,11 @@
 package flip.benchmark
 
 import flip.benchmark.ops.BenchOutOps
-import org.openjdk.jmh.results.{Result => BenchResult}
 import org.openjdk.jmh.runner.Runner
 import org.openjdk.jmh.runner.options._
 
 import scala.collection.JavaConverters._
+import scala.math._
 
 object BenchApp {
 
@@ -13,7 +13,7 @@ object BenchApp {
 
     // confs
     val opts0 = BenchAppConfs.envOptions(args.toList)
-    val opts1 = BenchAppConfs.iterateSize(opts0, 0, 1000, 10)
+    val opts1 = BenchAppConfs.expIterateSize(opts0, 1, 1000, 2)
 
     // run
     val results = new Runner(opts1.build()).run().asScala
@@ -45,7 +45,13 @@ object BenchAppConfs {
     builder5
   }
 
-  def iterateSize(builder: ChainedOptionsBuilder, start: Int, end: Int, by: Int): ChainedOptionsBuilder =
+  def linearIterateSize(builder: ChainedOptionsBuilder, start: Int, end: Int, by: Int): ChainedOptionsBuilder =
     builder.param("iterateBenchSize", (start to end by by).map(_.toString).toArray: _*)
+
+  def expIterateSize(builder: ChainedOptionsBuilder, start: Int, end: Int, base: Double): ChainedOptionsBuilder = {
+    builder.param(
+      "iterateBenchSize",
+      (0 to (log(end / start) / log(base)).toInt).map(a => (start * pow(base, a).toInt).toString).toArray: _*)
+  }
 
 }

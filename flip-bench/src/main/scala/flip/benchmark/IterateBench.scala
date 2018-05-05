@@ -17,7 +17,7 @@ class IterateBench { self =>
   @Param(Array("30"))
   var bufferSize: Int = _
 
-  @Param(Array("50", "100", "150", "200"))
+  @Param(Array("0"))
   var iterateBenchSize: Int = _
 
   @Param(Array("3"))
@@ -28,7 +28,7 @@ class IterateBench { self =>
 
   // variables
 
-  var signals: List[Double] = _
+  var signals: Array[Double] = _
 
   var sketch: Sketch[Double] = _
 
@@ -44,17 +44,15 @@ class IterateBench { self =>
       cmapEnd = Some(10d)
     )
 
-    signals = SignalOps.normalSignals(iterateBenchSize)
+    signals = SignalOps.normalSignals(iterateBenchSize).toArray
     sketch = Sketch.empty[Double]
   }
 
   @Benchmark
   def iterate(bh: Blackhole): Unit = bh.consume {
-    val n = iterateBenchSize
-
     var i = 0
     var sketch: Sketch[Double] = self.sketch
-    while (i < n) {
+    while (i < signals.length) {
       sketch = sketch.update(signals(i))
       i += 1
     }
