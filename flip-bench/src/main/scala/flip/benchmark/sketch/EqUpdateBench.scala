@@ -95,9 +95,9 @@ class EqUpdateBench { self =>
       mergeC.inverseNormalizedCumulative
     }
 
-    val rangesC: List[Double] = ranges
+    val dividerC: List[Double] = divider
 
-    def ranges: List[Double] = {
+    def divider: List[Double] = {
       def icdf =
         (d: Double) =>
           if (d <= 0) measure.from(-∞) else if (d >= 1) measure.from(∞) else measure.from(icdfPlotC.interpolation(d))
@@ -122,6 +122,6 @@ class EqUpdateBench { self =>
   def icdfPlot: PointPlot = EqUpdateAlgorithm.icdfPlot
 
   @Benchmark
-  def ranges: List[Double] = EqUpdateAlgorithm.ranges
+  def ranges: List[Double] = EqUpdateAlgorithm.divider
 
 }
