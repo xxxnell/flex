@@ -26,9 +26,6 @@ class IterateBench { self =>
   @Param(Array("20"))
   var cmapSize: Int = _
 
-  @Param(Array("2"))
-  var counterNo: Int = _
-
   // variables
 
   var signals: List[Double] = _
@@ -44,8 +41,7 @@ class IterateBench { self =>
       cmapSize = cmapSize,
       cmapNo = cmapNo,
       cmapStart = Some(-10d),
-      cmapEnd = Some(10d),
-      counterNo = counterNo
+      cmapEnd = Some(10d)
     )
 
     signals = SignalOps.normalSignals(iterateBenchSize)
