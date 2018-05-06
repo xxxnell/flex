@@ -15,17 +15,19 @@ object PointToPointBind { self =>
                         f: A => Dist[B],
                         measureB: Measure[B],
                         conf: DistConf): List[(Double, Dist[B])] = {
-    dist.sampling.records.map {
-      case (range, value) =>
-        val weight = range.roughLength * value
-        val pointDist = f(dist.measure.from(range.middle)) match {
-          case delta: DeltaDist[B] =>
-            UniformDist(delta.pole, range.roughLength)(measureB, SmoothDistConf.forDistConf(conf))
-          case d => d
-        }
+//    dist.sampling.records.map {
+//      case (range, value) =>
+//        val weight = range.roughLength * value
+//        val pointDist = f(dist.measure.from(range.middle)) match {
+//          case delta: DeltaDist[B] =>
+//            UniformDist(delta.pole, range.roughLength)(measureB, SmoothDistConf.forDistConf(conf))
+//          case d => d
+//        }
+//
+//        (weight, pointDist)
+//    }
 
-        (weight, pointDist)
-    }
+    ???
   }
 
 }

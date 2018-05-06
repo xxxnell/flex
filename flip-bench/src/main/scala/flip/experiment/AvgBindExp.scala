@@ -32,10 +32,10 @@ object AvgBindExp {
       c1 <- sketchC1
     } yield (a1 + b1 + c1) / 3
 
-    val prevSketchAPdf = sketchA1.pdfPlot
-    val prevSketchBPdf = sketchB1.pdfPlot
-    val prevSketchCPdf = sketchC1.pdfPlot
-    val bindingSketchPdf = bindingSketch.pdfPlot
+    val prevSketchAPdf = sketchA1.barPlot
+    val prevSketchBPdf = sketchB1.barPlot
+    val prevSketchCPdf = sketchC1.barPlot
+    val bindingSketchPdf = bindingSketch.barPlot
 
     // out
 

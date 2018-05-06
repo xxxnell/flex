@@ -19,7 +19,7 @@ class PointPlotOpsBench { self =>
   var recordsP: Array[(Double, Double)] = _
 
   var recordsR: List[(RangeP, Double)] = _
-  
+
   var pointPlot: PointPlot = _
 
   @Setup

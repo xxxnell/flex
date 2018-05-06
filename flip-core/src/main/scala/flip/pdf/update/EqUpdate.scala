@@ -20,12 +20,12 @@ object EqUpdate {
                     window: Double,
                     icdfSampling: (Double => A) => List[A],
                     measure: Measure[A]): Cmap = {
-    val merge = if (ps.nonEmpty) {
+    val mergedCum = if (ps.nonEmpty) {
       val c1 = 1 / (mixingRatio + 1)
       val c2 = mixingRatio / (mixingRatio + 1)
-      (c1, sampling) :+ (c2, PointPlot.deltas(ps, window))
+      (c1, sampling.normalizedCumulative) :+ (c2, PointPlot.deltas(ps, window).normalizedCumulative)
     } else sampling
-    val icdfPlot = merge.inverseNormalizedCumulative
+    val icdfPlot = mergedCum.inverse
     def icdf =
       (d: Double) =>
         if (d <= 0) measure.from(-∞) else if (d >= 1) measure.from(∞) else measure.from(icdfPlot.interpolation(d))
@@ -35,7 +35,7 @@ object EqUpdate {
   }
 
   def updateCmapForSketch[A](sketch: Sketch[A], ps: List[(Prim, Count)]): Cmap = {
-    val sampling = sketch.fastSampling
+    val sampling = sketch.pointSampling
     val mixingRatio = sketch.conf.mixingRatio
     val window = sketch.conf.dataKernelWindow
     val measure = sketch.measure

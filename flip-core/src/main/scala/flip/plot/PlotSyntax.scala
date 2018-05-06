@@ -39,6 +39,8 @@ trait PointPlotSyntax {
   implicit class PointPlotSyntaxImpl(pPlot: PointPlot) extends PolyPlotSyntax[PointPlot] {
     def plot: PointPlot = pPlot
     def ops: PointPlotOps[PointPlot] = PointPlot
+    def integralAll: Double = PointPlot.integralAll(plot)
+    def map(f: (Double, Double) => (Double, Double)): PointPlot = PointPlot.map(pPlot, f)
     def csv: String = ShowPlot.dsvPointPlot(plot, ", ")
     def dsv(delimiter: String): String = ShowPlot.dsvPointPlot(plot, delimiter)
   }

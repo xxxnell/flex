@@ -1,7 +1,7 @@
 package flip.pdf
 
 import flip.conf.DataBinningDistConf
-import flip.plot.DensityPlot
+import flip.plot.{DensityPlot, PointPlot}
 import flip.rand.IRng
 
 import scala.language.higherKinds
@@ -35,8 +35,8 @@ object DataBinningDist extends DataBinningDistOps[DataBinningDist] {
     case _ => ???
   }
 
-  def sampling[A](dist: DataBinningDist[A]): DensityPlot = dist match {
-    case (sketch: Sketch[A]) => Sketch.sampling(sketch)
+  def sampling[A](dist: DataBinningDist[A]): PointPlot = dist match {
+    case (sketch: Sketch[A]) => Sketch.pointSampling(sketch)
     case _ => ???
   }
 

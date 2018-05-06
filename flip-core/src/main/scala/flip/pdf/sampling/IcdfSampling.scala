@@ -18,6 +18,7 @@ trait IcdfSamplingLaws[C <: IcdfSamplingConf] { self: IcdfSampling[C] =>
   def samplingF[A](measure: Measure[A], conf: C): (Double => A) => List[A] =
     (icdf: Double => A) => sampling(icdf, measure, conf)
 
+  @Deprecated
   def samplingRanges[A](icdf: Double => A, measure: Measure[A], conf: C): List[RangeM[A]] =
     sampling(icdf, measure, conf)
       .sliding(2)

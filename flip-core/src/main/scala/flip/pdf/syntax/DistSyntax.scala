@@ -5,7 +5,7 @@ import flip.measure.Measure
 import flip.pdf.arithmetic.CombinationDist
 import flip.pdf.monad.{DistBind, DistFunctor}
 import flip.pdf.{Dist, PlottedDist, SamplingDist, Sketch}
-import flip.plot.{AsciiArtPlot, DensityPlot}
+import flip.plot.{AsciiArtPlot, DensityPlot, PointPlot}
 import flip.range.RangeM
 
 import scala.language.higherKinds
@@ -23,7 +23,7 @@ trait DistPropSyntax {
     def icdf(p: Double): A = Dist.icdf(dist, p)
     def sample: (Dist[A], A) = Dist.sample(dist)
     def samples(n: Int): (Dist[A], List[A]) = Dist.samples(dist, n)
-    def sampling: DensityPlot = Dist.sampling(dist)
+    def sampling: PointPlot = Dist.sampling(dist)
   }
 
 }

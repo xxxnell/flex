@@ -7,12 +7,11 @@ import flip.cmap.Cmap
 import flip.conf.{PeriodicSketchConf, SketchConf}
 import flip.hcounter.HCounter
 import flip.measure.Measure
-import flip.pdf.Sketch.fastPdf
 import flip.pdf.sampling.IcdfSampling
 import flip.pdf.update.EqUpdate
 import flip.plot.{DensityPlot, PointPlot}
-import flip.range.{RangeM, RangeP}
 import flip.rand.IRng
+import flip.range.{RangeM, RangeP}
 
 import scala.collection.mutable.ArrayBuffer
 import scala.language.higherKinds
@@ -81,8 +80,10 @@ trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
 
   def rearrange[A](sketch: S[A]): S[A] = deepUpdate(sketch, Nil)._1
 
-  def sampling[A](sketch: S[A]): DensityPlot = {
-    samplingForRanges(sketch, samplingPoints(sketch))
+  def sampling[A](sketch: S[A]): PointPlot = pointSampling(sketch)
+
+  def rangeSampling[A](sketch: S[A]): DensityPlot = {
+    rangeSamplingForRanges(sketch, samplingPoints(sketch))
   }
 
   def samplingPoints[A](sketch: S[A]): List[RangeM[A]] = {
@@ -92,7 +93,7 @@ trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
     rangePs.map(rangeP => rangeP.modifyMeasure(measure))
   }
 
-  def samplingForRanges[A](sketch: S[A], ranges: List[RangeM[A]]): DensityPlot = {
+  def rangeSamplingForRanges[A](sketch: S[A], ranges: List[RangeM[A]]): DensityPlot = {
     val rangeProbs = ranges.map(range => (range, probability(sketch, range.start, range.end)))
     val rangeDensities = rangeProbs
       .map { case (rangeM, prob) => (RangeP.forRangeM(rangeM), Try(prob / rangeM.roughLength).toOption) }
@@ -100,7 +101,7 @@ trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
     DensityPlot.disjoint(rangeDensities)
   }
 
-  def fastSampling[A](sketch: S[A]): PointPlot = {
+  def pointSampling[A](sketch: S[A]): PointPlot = {
     val RATIO = 100.0 // todo why 100.0?
 
     val cmap = youngCmap(sketch)
@@ -142,7 +143,7 @@ trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
     val idx = cmap(p)
     val rangePs = cmap.range(idx - 1) :: cmap.range(idx) :: cmap.range(idx + 1) :: Nil
     val rangeMs = rangePs.map(rangeP => rangeP.modifyMeasure(sketch.measure.asInstanceOf[Measure[A]]))
-    val sampling = samplingForRanges(sketch, rangeMs)
+    val sampling = rangeSamplingForRanges(sketch, rangeMs)
 
     sampling.interpolation(p)
   }

@@ -75,6 +75,8 @@ trait PlotPkgSyntax extends flip.plot.PlotPkgSyntax {
 
   type DensityPlot = flip.plot.DensityPlot
 
+  type PointPlot = flip.plot.PointPlot
+
 }
 
 trait RangePkgSyntax extends RangeSyntax

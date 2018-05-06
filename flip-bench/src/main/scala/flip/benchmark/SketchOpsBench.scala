@@ -72,7 +72,7 @@ class SketchOpsBench { self =>
   }
 
   @Benchmark
-  def sampling: DensityPlot = {
+  def sampling: PointPlot = {
     sketch.sampling
   }
 

@@ -77,7 +77,7 @@ class EqUpdateBench { self =>
 
     lazy val samplingC: PointPlot = sampling
 
-    def sampling: PointPlot = sketch.fastSampling
+    def sampling: PointPlot = sketch.pointSampling
 
     lazy val mergeC: PointPlot = merge
 

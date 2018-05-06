@@ -22,8 +22,8 @@ object BasicBindExp {
     val sketch1 = sketch0.updateInOrder(datas)
 
     val bindingSketch = sketch1.flatMap(x => NumericDist.normal(x, 1.5))
-    val prevSketchPdf = sketch1.pdfPlot
-    val bindingSketchPdf = bindingSketch.pdfPlot
+    val prevSketchPdf = sketch1.barPlot
+    val bindingSketchPdf = bindingSketch.barPlot
 
     // out
 

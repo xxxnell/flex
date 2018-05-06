@@ -36,6 +36,21 @@ trait PointPlotOps[P <: PointPlot] extends PlotOps[P] with PointPlotLaws[P] {
 
 trait PointPlotLaws[P <: PointPlot] { self: PointPlotOps[P] =>
 
+  def map(plot: P, f: (Double, Double) => (Double, Double)): P =
+    modifyRecords(
+      plot,
+      records0 => {
+        var i = 0
+        val records1 = Array.ofDim[(Double, Double)](records0.length)
+        while (i < records0.length) {
+          val (x, y) = records0.apply(i)
+          records1.update(i, f(x, y))
+          i += 1
+        }
+        records1
+      }
+    )
+
   def interpolation(plot: P, x: Double): Double = {
     val records = plot.records
 

@@ -206,13 +206,13 @@ class SketchPropSpec extends Specification with ScalaCheck {
 
         val cond1 = plot.records.nonEmpty
         val cond2 = plot.records.forall { case (_, value) => !value.isNaN }
-        val cond3 = plot.records.headOption.forall { case (range, _) => range.end ~= cmapStart.value }
-        val cond4 = plot.records.lastOption.forall { case (range, _) => range.start ~= cmapEnd.value }
+        val cond3 = plot.records.drop(1).headOption.forall { case (p, _) => p ~= cmapStart.value }
+        val cond4 = plot.records.dropRight(1).lastOption.forall { case (p, _) => p ~= cmapEnd.value }
 
         if(!cond1) ko("Plot record is empty.")
         else if(!cond2) ko("Some value is NaN")
-        else if(!cond3) ko(s"${plot.records.headOption} is first range. cmapStart: $cmapStart")
-        else if(!cond4) ko(s"${plot.records.lastOption} is last range. cmapEnd: $cmapEnd")
+        else if(!cond3) ko(s"${plot.records.drop(1).headOption} is first range. cmapStart: $cmapStart")
+        else if(!cond4) ko(s"${plot.records.dropRight(1).lastOption} is last range. cmapEnd: $cmapEnd")
         else ok
       }
 
@@ -491,9 +491,9 @@ class SketchPropSpec extends Specification with ScalaCheck {
     "sample & samples" in {
 
       "basic" in {
-        val (_, samples0) = NumericDist.normal(0.0, 1).samples(100)
+        val (_, samples0) = NumericDist.normal(0.0, 1).samples(200)
         val sketch0 = Sketch.empty[Double].updateInOrder(samples0)
-        val (sketch1, samples1) = sketch0.samples(100)
+        val (sketch1, samples1) = sketch0.samples(200)
         val sketch2 = Sketch.empty[Double].updateInOrder(samples1)
 
         val cond1 = samples1.forall(sample => !sample.isNaN)

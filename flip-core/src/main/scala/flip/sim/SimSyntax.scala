@@ -1,7 +1,7 @@
 package flip.sim
 
-import flip.pdf.{Dist, SamplingDist}
-import flip.plot.DensityPlot
+import flip.pdf.Dist
+import flip.plot.PointPlot
 
 trait SimSyntax extends ConsineSyntax with KLDSyntax with L2SqSyntax
 
@@ -12,7 +12,7 @@ trait ConsineSyntax {
   def Cosine[A](d1: Dist[A], d2: Dist[A]): Double =
     cosine(d1, d2).simForDist(d1, d2)
 
-  def CosineDensity[A](d1: Dist[A], d2: Dist[A]): DensityPlot =
+  def CosineDensity[A](d1: Dist[A], d2: Dist[A]): PointPlot =
     cosine(d1, d2).simDensityForDist(d1, d2)
 
 }
@@ -24,7 +24,7 @@ trait KLDSyntax {
   def KLD[A](d1: Dist[A], d2: Dist[A]): Double =
     kld.simForDist(d1, d2)
 
-  def KLDDensity[A](d1: Dist[A], d2: Dist[A]): DensityPlot =
+  def KLDDensity[A](d1: Dist[A], d2: Dist[A]): PointPlot =
     kld.simDensityForDist(d1, d2)
 
 }
@@ -36,7 +36,7 @@ trait L2SqSyntax {
   def L2Sq[A](d1: Dist[A], d2: Dist[A]): Double =
     l2sq(d1, d2).simForDist(d1, d2)
 
-  def L2SqDensity[A](d1: Dist[A], d2: Dist[A]): DensityPlot =
+  def L2SqDensity[A](d1: Dist[A], d2: Dist[A]): PointPlot =
     l2sq(d1, d2).simDensityForDist(d1, d2)
 
   def L2[A](d1: Dist[A], d2: Dist[A]): Double =

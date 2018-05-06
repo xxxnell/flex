@@ -2,7 +2,7 @@ package flip.pdf
 
 import flip.conf.SamplingDistConf
 import flip.measure.Measure
-import flip.plot.DensityPlot
+import flip.plot.{DensityPlot, PointPlot}
 import flip.range.RangeM
 import flip.rand.IRng
 
@@ -38,7 +38,7 @@ object SamplingDist extends SamplingDistPropOps[SamplingDist] {
     case _ => ???
   }
 
-  def sampling[A](dist: SamplingDist[A]): DensityPlot = dist match {
+  def sampling[A](dist: SamplingDist[A]): PointPlot = dist match {
     case dataBinning: DataBinningDist[A] => DataBinningDist.sampling(dataBinning)
     case plotted: PlottedDist[A] => PlottedDist.sampling(plotted)
     case _ => ???

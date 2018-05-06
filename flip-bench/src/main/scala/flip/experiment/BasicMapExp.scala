@@ -21,8 +21,8 @@ object BasicMapExp {
     val (_, sketch1) = idxSketches.lastOption.getOrElse((0, sketch0))
 
     val mapped = sketch1.map(x => math.exp(x))
-    val prevSketchPdf = sketch1.pdfPlot
-    val bindingSketchPdf = mapped.pdfPlot
+    val prevSketchPdf = sketch1.barPlot
+    val bindingSketchPdf = mapped.barPlot
 
     // out
 
