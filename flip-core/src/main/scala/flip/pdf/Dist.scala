@@ -8,6 +8,7 @@ import flip.plot.{DensityPlot, PointPlot}
 import flip.range.{RangeM, RangeP}
 import flip.rand.IRng
 
+import scala.collection.mutable.ListBuffer
 import scala.language.higherKinds
 
 /**
@@ -50,11 +51,15 @@ trait DistPropLaws[D[_] <: Dist[_]] { self: DistPropOps[D] =>
   }
 
   def samples[A](dist: D[A], n: Int): (D[A], List[A]) = {
-    (0 until n).foldLeft[(D[A], List[A])]((dist, Nil)) {
-      case ((utdDist1, acc), _) =>
-        val (utdDist2, s) = sample(utdDist1)
-        (utdDist2, s :: acc)
+    var (i, _dist) = (0, dist)
+    val acc = new ListBuffer[A]
+    while (i < n) {
+      val (_dist1, s) = sample(_dist)
+      acc.append(s)
+      _dist = _dist1
+      i += 1
     }
+    (_dist, acc.toList)
   }
 
   def cdfPlot[A](dist: D[A]): PointPlot = {
