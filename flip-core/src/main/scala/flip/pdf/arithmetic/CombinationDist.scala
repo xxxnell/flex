@@ -4,7 +4,7 @@ import cats.data.NonEmptyList
 import flip.conf.DistConf
 import flip.measure.Measure
 import flip.pdf.{Dist, DistPropOps}
-import flip.plot.DensityPlot
+import flip.plot.{DensityPlot, PointPlot}
 import flip.plot.syntax._
 import flip.rand._
 
@@ -75,12 +75,11 @@ trait CombinationDistOps[D[_] <: CombinationDist[_]] extends DistPropOps[D] {
     (utdCombi2, sample)
   }
 
-  def sampling[A](combi: D[A]): DensityPlot = {
-    val components = combi.normalizedComponents
+  def sampling[A](combi: D[A]): PointPlot = {
+    val wps = combi.normalizedComponents
+      .map { case (weight, dist) => (weight, dist.sampling) }
 
-    components
-      .map { case (weight, dist) => dist.sampling * weight }
-      .foldLeft(DensityPlot.empty) { case (acc, plot) => acc :+ plot }
+    PointPlot.add(wps)
   }
 
   override def pdf[A](combi: D[A], a: A): Double = {

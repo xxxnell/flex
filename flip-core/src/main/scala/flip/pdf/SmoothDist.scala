@@ -3,7 +3,7 @@ package flip.pdf
 import flip.conf.SmoothDistConf
 import flip.measure.Measure
 import flip.pdf.sampling.IcdfSampling
-import flip.plot.DensityPlot
+import flip.plot.{DensityPlot, PointPlot}
 import flip.rand.IRng
 
 import scala.language.higherKinds
@@ -21,14 +21,11 @@ trait SmoothDistPropOps[D[_] <: SmoothDist[_]] extends DistPropOps[D] with Smoot
 
 trait SmoothDistPropLaws[D[_] <: SmoothDist[_]] { self: SmoothDistPropOps[D] =>
 
-  def sampling[A](dist: D[A]): DensityPlot = {
+  def sampling[A](dist: D[A]): PointPlot = {
     val icdf: Double => A = p => self.icdf(dist, p)
     val measure = dist.measure.asInstanceOf[Measure[A]]
-    val records = IcdfSampling.samplingRanges(icdf, measure, dist.conf.sampling).flatMap { range =>
-      val length = range.roughLength
-      if (length > 0) Some((range.primitivize, probability(dist, range.start, range.end) / length)) else None
-    }
-    DensityPlot.disjoint(records)
+    val records = IcdfSampling.sampling(icdf, measure, dist.conf.sampling).map(p => (measure.to(p), pdf(dist, p)))
+    PointPlot.unsafe(records.toArray)
   }
 
 }
@@ -62,7 +59,7 @@ object SmoothDist extends SmoothDistPropOps[SmoothDist] {
     case numeric: NumericDist[A] => NumericDist.icdf(numeric, p)
   }
 
-  override def sampling[A](dist: SmoothDist[A]): DensityPlot = dist match {
+  override def sampling[A](dist: SmoothDist[A]): PointPlot = dist match {
     case dist: NumericDist[A] => NumericDist.sampling(dist)
     case _ => super.sampling(dist)
   }

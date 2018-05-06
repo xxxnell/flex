@@ -4,7 +4,7 @@ import cats.implicits._
 import flip.conf.{DistConf, SamplingDistConf, SmoothDistConf}
 import flip.measure.Measure
 import flip.pdf.arithmetic.CombinationDist
-import flip.plot.DensityPlot
+import flip.plot.{DensityPlot, PointPlot}
 import flip.range.{RangeM, RangeP}
 import flip.rand.IRng
 
@@ -30,7 +30,7 @@ trait DistPropOps[D[_] <: Dist[_]] extends DistPropLaws[D] {
 
   def modifyRng[A](dist: D[A], f: IRng => IRng): D[A]
 
-  def sampling[A](dist: D[A]): DensityPlot
+  def sampling[A](dist: D[A]): PointPlot
 
 }
 
@@ -57,17 +57,18 @@ trait DistPropLaws[D[_] <: Dist[_]] { self: DistPropOps[D] =>
     }
   }
 
-  def cdfPlot[A](dist: D[A]): DensityPlot = {
+  def cdfPlot[A](dist: D[A]): PointPlot = {
     sampling(dist).normalizedCumulative
   }
 
-  def icdfPlot[A](dist: D[A]): DensityPlot = {
+  def icdfPlot[A](dist: D[A]): PointPlot = {
     sampling(dist).inverseNormalizedCumulative
   }
 
   def interpolationPdf[A](dist: D[A], a: A): Double = {
     val plot = sampling(dist)
-    DensityPlot.interpolation(plot, dist.measure.asInstanceOf[Measure[A]].to(a))
+    val p = dist.measure.asInstanceOf[Measure[A]].to(a)
+    plot.interpolation(p)
   }
 
   def pdf[A](dist: D[A], a: A): Double = interpolationPdf(dist, a: A)
@@ -134,7 +135,7 @@ object Dist extends DistPropOps[Dist] { self =>
     case combination: CombinationDist[A] => CombinationDist.modifyRng(combination, f)
   }
 
-  def sampling[A](dist: Dist[A]): DensityPlot = dist match {
+  def sampling[A](dist: Dist[A]): PointPlot = dist match {
     case smooth: SmoothDist[A] => SmoothDist.sampling(smooth)
     case sampling: SamplingDist[A] => SamplingDist.sampling(sampling)
     case combination: CombinationDist[A] => CombinationDist.sampling(combination)

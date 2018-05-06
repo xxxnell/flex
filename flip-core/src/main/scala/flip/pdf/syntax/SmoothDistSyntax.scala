@@ -11,11 +11,11 @@ trait SmoothDistPropSyntax {
 
   implicit class SmoothDistPropSyntaxImpl[A](dist: SmoothDist[A]) {
     def samplingDist(implicit measure: Measure[A], conf: SamplingDistConf): PlottedDist[A] =
-      PlottedDist.densityPlot[A](dist.sampling)
+      PlottedDist.pointPlot[A](dist.sampling)
   }
 
-  implicit class PlottedDistPropSyntaxImpl[A](dist: PlottedDist[A]) {
-    def filter(f: RangeP => Boolean): PlottedDist[A] = PlottedDist.filter(dist, f)
-  }
+//  implicit class PlottedDistPropSyntaxImpl[A](dist: PlottedDist[A]) {
+//    def filter(f: RangeP => Boolean): PlottedDist[A] = PlottedDist.filter(dist, f)
+//  }
 
 }

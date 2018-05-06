@@ -18,7 +18,7 @@ object BasicUniformDistExp {
     val (_, datas) = underlying.samples(dataNo)
     val sketchTraces = sketch0 :: sketch0.updateTrace(datas)
     val idxSketches = sketchTraces.indices.zip(sketchTraces).toList.filter { case (idx, _) => idx % 10 == 0 }
-    val idxDensityPlots = idxSketches.map { case (idx, utdSkt) => (idx, utdSkt.densityPlot) }
+    val idxDensityPlots = idxSketches.map { case (idx, utdSkt) => (idx, utdSkt.barPlot) }
     val idxKld = idxSketches.map { case (idx, utdSkt) => (idx, KLD(underlying, utdSkt)) }
     val idxCos = idxSketches.map { case (idx, utdSkt) => (idx, Cosine(underlying, utdSkt)) }
     val idxEuc = idxSketches.map { case (idx, utdSkt) => (idx, Euclidean(underlying, utdSkt)) }

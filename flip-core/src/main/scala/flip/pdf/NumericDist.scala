@@ -2,7 +2,7 @@ package flip.pdf
 
 import flip.conf.SmoothDistConf
 import flip.measure.Measure
-import flip.plot.DensityPlot
+import flip.plot.{DensityPlot, PointPlot}
 import flip.rand.IRng
 
 import scala.language.higherKinds
@@ -95,7 +95,7 @@ object NumericDist extends NumericDistOps[NumericDist] {
     case dist: UniformDist[A] => UniformDist.icdf(dist, p)
   }
 
-  override def sampling[A](dist: NumericDist[A]): DensityPlot = dist match {
+  override def sampling[A](dist: NumericDist[A]): PointPlot = dist match {
     case dist: DeltaDist[A] => DeltaDist.sampling(dist)
     case _ => super.sampling(dist)
   }

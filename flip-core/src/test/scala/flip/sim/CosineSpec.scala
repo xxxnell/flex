@@ -34,7 +34,7 @@ class CosineSpec extends Specification with ScalaCheck {
       val histo = Histogram.empty[Double]
       val utdHisto = histo.update(datas: _*)
 
-      val underlyingSmp = PlottedDist.densityPlot[Double](underlying.sampling)
+      val underlyingSmp = PlottedDist.pointPlot[Double](underlying.sampling)
       val cos = flip.sim.syntax.Cosine(underlyingSmp, utdHisto)
 
       if(cos > 1) ko(s"Theoretically, cosine similarity cannot be greater then 1. cos: $cos")

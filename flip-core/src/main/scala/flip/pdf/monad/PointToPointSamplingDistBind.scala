@@ -10,8 +10,10 @@ object PointToPointSamplingDistBind extends SamplingDistBind[SamplingDist, Dist,
                  f: A => Dist[B],
                  measure: Measure[B],
                  conf: SamplingDistConf): SamplingDist[B] = {
-    val binded = PointToPointBind.bind(dist, f, measure, conf)
-    PlottedDist.densityPlot(binded.sampling)(measure, conf)
+//    val binded = PointToPointBind.bind(dist, f, measure, conf)
+//    PlottedDist.densityPlot(binded.sampling)(measure, conf)
+
+    ???
   }
 
 }
