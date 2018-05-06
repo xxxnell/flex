@@ -103,9 +103,10 @@ trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
 
   def pointSampling[A](sketch: S[A]): PointPlot = {
     val RATIO = 100.0 // todo why 100.0?
+    val CUTOFF = 1E300 // todo CUTOFF is hacky approach
 
     val cmap = youngCmap(sketch)
-    val rangePs = cmap.bin.toArray
+    val rangePs = cmap.bin.filter(range => math.abs(range.start) < CUTOFF && math.abs(range.end) < CUTOFF).toArray
     val measure = sketch.measure.asInstanceOf[Measure[A]]
 
     var i = 0
