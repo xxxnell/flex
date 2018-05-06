@@ -15,13 +15,12 @@ class CosineSpec extends Specification with ScalaCheck {
       val normal2 = Dist.normal(0.0, 1)
       val expect = 1.0
 
-      val sampling = normal1.samplingDist
-      val cosineSim = Cosine(sampling, normal2)
-      val cosine = cosineSim.simForDist(sampling, normal2)
-      val cosineDensity = cosineSim.simDensityForDist(sampling, normal2)
+      val cosineSim = Cosine(normal1, normal2)
+      val cosine = cosineSim.simForDist(normal1, normal2)
+      val cosineDensity = cosineSim.simDensityForDist(normal1, normal2)
 
       if(cosine ~= expect) ok
-      else ko(s"Cosine similarity $cosine is not $expect. ")
+      else ko(s"Cosine similarity $cosine is not $expect.")
     }
 
     "basic 2" in {

@@ -491,9 +491,9 @@ class SketchPropSpec extends Specification with ScalaCheck {
     "sample & samples" in {
 
       "basic" in {
-        val (_, samples0) = NumericDist.normal(0.0, 1).samples(100)
+        val (_, samples0) = NumericDist.normal(0.0, 1).samples(200)
         val sketch0 = Sketch.empty[Double].updateInOrder(samples0)
-        val (sketch1, samples1) = sketch0.samples(100)
+        val (sketch1, samples1) = sketch0.samples(200)
         val sketch2 = Sketch.empty[Double].updateInOrder(samples1)
 
         val cond1 = samples1.forall(sample => !sample.isNaN)
