@@ -176,6 +176,22 @@ trait PointPlotLaws[P <: PointPlot] { self: PointPlotOps[P] =>
   def inverseNormalizedCumulative(plot: P): P =
     inverse(normalizedCumulative(plot))
 
+  def avgChangeRate(plot: P): P =
+    modifyRecords(
+      plot,
+      records0 => {
+        var i = 0
+        val records1 = new ArrayBuffer[(Double, Double)]
+        while (i < records0.length) {
+          lazy val (x0, y0) = records0.apply(i - 1)
+          lazy val (x1, y1) = records0.apply(i)
+          if (i > 0 && x0 != x1) records1.append((x1, (y1 - y0) / (x1 - x0)))
+          i += 1
+        }
+        records1.toArray
+      }
+    )
+
   def integralAll(plot: P): Double = {
     val records = plot.records
     var acc = 0.0

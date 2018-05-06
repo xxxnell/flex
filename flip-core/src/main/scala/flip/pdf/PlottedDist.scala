@@ -24,13 +24,10 @@ trait PlottedDistPropOps[D[_] <: PlottedDist[_]] extends SamplingDistPropOps[D] 
 
   def sampling[A](dist: D[A]): PointPlot = dist.sampling
 
-//  def filter[A](dist: D[A], f: RangeP => Boolean): D[A] =
-//    modifySampling(dist, sampling => DensityPlot.disjoint(sampling.records.filter { case (range, _) => f(range) }))
-
   def probability[A](dist: D[A], start: A, end: A): Double = {
     val measure = dist.measure.asInstanceOf[Measure[A]]
-//    dist.sampling.integral(measure.to(start), measure.to(end))
-    ???
+    val cum = dist.sampling.normalizedCumulative
+    cum.interpolation(measure.to(end)) - cum.interpolation(measure.to(start))
   }
 
 }
