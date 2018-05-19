@@ -94,12 +94,15 @@ trait AdaptiveSketchLaws[S[_] <: AdaptiveSketch[_]] { self: AdaptiveSketchOps[S]
     val startP = measure.to(start)
     val endP = measure.to(end)
 
-    sketch.buffer
-      .asInstanceOf[Buffer[A]]
-      .toList
-      .filter { case (a, _) => measure.to(a) >= startP && measure.to(a) <= endP }
-      .map(_._2)
-      .sum
+    val buffer = sketch.buffer.asInstanceOf[Buffer[A]].toList.toArray
+    var i = 0
+    var acc = 0.0
+    while (i < buffer.length) {
+      val (a, count) = buffer.apply(i)
+      if (measure.to(a) >= startP && measure.to(a) <= endP) acc += count
+      i += 1
+    }
+    acc
   }
 
   def sumForQueue[A](sketch: S[A]): Count = sketch.buffer.sum
