@@ -215,9 +215,9 @@ object Sketch extends SketchPrimPropOps[Sketch] { self =>
     case _ => SimpleSketch.empty(measure, conf)
   }
 
-  def concat[A](ps: List[(A, Count)])(implicit measure: Measure[A], conf: SketchConf): Sketch[A] = conf match {
-    case conf: PeriodicSketchConf => PeriodicSketch.concat(ps)(measure, conf)
-    case _ => SimpleSketch.concat(ps)(measure, conf)
+  def concat[A](as: List[(A, Count)])(implicit measure: Measure[A], conf: SketchConf): Sketch[A] = conf match {
+    case conf: PeriodicSketchConf => PeriodicSketch.concat(as)(measure, conf)
+    case _ => SimpleSketch.concat(as)(measure, conf)
   }
 
   // mapping ops

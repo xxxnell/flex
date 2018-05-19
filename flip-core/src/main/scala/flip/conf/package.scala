@@ -20,4 +20,8 @@ package object conf {
 
   type AdaPerSketchConf = AdaPerSketchConfB[AdaPerSketch[_]]
 
+  type SelectiveSketchConf = SelectiveSketchConfB[SelectiveSketch[_]]
+
+  type AdaSelSketchConf = AdaSelSketchConfB[AdaSelSketch[_]]
+
 }
