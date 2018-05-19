@@ -15,10 +15,10 @@ import scala.collection.immutable.Queue
   * Adaptive Sketch has its own buffer to hold recent input streams temporarily.
   * This buffer retains its maximum length.
   * The buffer acts as a reference data stream ξ for deepUpdate when Adaptive
-  * Sketch has to rearrange. So, even if the concept drift occurs, rearranging
+  * Sketch has to rebuild. So, even if the concept drift occurs, rearranging
   * can constitute the correct strueture of Sketch.
   *
-  * rearrange(S) = deepUpdate(S, ξ)
+  * rebuild(S) = deepUpdate(S, ξ)
   *  where S is sketch and ξ is recent data stream in the buffer of Adaptive
   *  Sketch.
   * */
@@ -62,7 +62,7 @@ trait AdaptiveSketchOps[S[_] <: AdaptiveSketch[_]] extends SketchPrimPropOps[S] 
     super.narrowUpdate(sketch1, old)
   }
 
-  override def rearrange[A](sketch: S[A]): S[A] = {
+  override def rebuild[A](sketch: S[A]): S[A] = {
     val (sketch1, _) = deepUpdate(sketch, sketch.buffer.asInstanceOf[Buffer[A]].toList)
     clearBuffer(sketch1)
   }

@@ -50,7 +50,7 @@ class DeepUpdateBench { self =>
     val sketch0 = Sketch.empty[Double]
 
     (0 until cmapNo).foreach { _ =>
-      self.sketch = sketch0.narrowUpdate(samples: _*).rearrange
+      self.sketch = sketch0.narrowUpdate(samples: _*).rebuild
     }
     self.sketch = sketch0.narrowUpdate(samples: _*)
     self.conf = conf
@@ -91,8 +91,8 @@ class DeepUpdateBench { self =>
 //  }
 
   @Benchmark
-  def rearrange: Sketch[Count] = {
-    sketch.rearrange
+  def rebuild: Sketch[Count] = {
+    sketch.rebuild
   }
 
 //  @Benchmark

@@ -52,7 +52,7 @@ class EqUpdateBench { self =>
     val sketch0 = Sketch.empty[Double]
 
     (0 until cmapNo).foreach { _ =>
-      self.sketch = sketch0.narrowUpdate(samples: _*).rearrange
+      self.sketch = sketch0.narrowUpdate(samples: _*).rebuild
     }
     self.sketch = sketch0.narrowUpdate(samples: _*)
     self.conf = conf

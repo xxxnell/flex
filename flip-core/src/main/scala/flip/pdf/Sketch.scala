@@ -78,7 +78,7 @@ trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
     if (sum > 0) count / sum else flatDensity * RangeM.bare(start, end, measure).roughLength
   }
 
-  def rearrange[A](sketch: S[A]): S[A] = deepUpdate(sketch, Nil)._1
+  def rebuild[A](sketch: S[A]): S[A] = deepUpdate(sketch, Nil)._1
 
   def sampling[A](sketch: S[A]): PointPlot = pointSampling(sketch)
 
@@ -261,9 +261,9 @@ object Sketch extends SketchPrimPropOps[Sketch] { self =>
     case _ => super.narrowUpdate(sketch, as)
   }
 
-  override def rearrange[A](sketch: Sketch[A]): Sketch[A] = sketch match {
-    case (sketch: AdaptiveSketch[A]) => AdaptiveSketch.rearrange(sketch)
-    case _ => super.rearrange(sketch)
+  override def rebuild[A](sketch: Sketch[A]): Sketch[A] = sketch match {
+    case (sketch: AdaptiveSketch[A]) => AdaptiveSketch.rebuild(sketch)
+    case _ => super.rebuild(sketch)
   }
 
 }

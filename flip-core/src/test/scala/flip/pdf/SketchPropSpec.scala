@@ -311,7 +311,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
 
     }
 
-    "rearrange" in {
+    "rebuild" in {
 
       "basic" in {
         implicit val conf: CustomSketchConf = CustomSketchConf(
@@ -321,7 +321,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
         val sketch0 = Sketch.empty[Double]
 
         val sketch1 = sketch0.narrowUpdate(0.0 to 100.0 by 0.1: _*)
-        val sketch2 = sketch1.rearrange
+        val sketch2 = sketch1.rebuild
 
         ok
       }
@@ -387,7 +387,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
         if(sum ~= 5) ok else ko(s"sum: $sum, expected: 5")
       }
 
-      "after rearrange with 2 cmap" in {
+      "after rebuild with 2 cmap" in {
         implicit val conf: CustomSketchConf = CustomSketchConf(
           cmapSize = 10, cmapNo = 2, cmapStart = Some(0d), cmapEnd = Some(10d),
           counterSize = 100, counterNo = 2
@@ -396,7 +396,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
         val expected = 5 / (1 + math.exp(-1))
 
         val sketch1 = sketch0.update(1, 2, 3, 4, 5)
-        val sketch2 = sketch1.rearrange
+        val sketch2 = sketch1.rebuild
         val sum = sketch2.sum
 
         val cond1 = sum ~= expected
@@ -405,7 +405,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
         else ok
       }
 
-      "after rearrange update" in {
+      "after rebuild update" in {
         implicit val conf: CustomSketchConf = CustomSketchConf(
           cmapSize = 10, cmapNo = 2, cmapStart = Some(0d), cmapEnd = Some(10d),
           counterSize = 100, counterNo = 2
@@ -414,14 +414,14 @@ class SketchPropSpec extends Specification with ScalaCheck {
         val expected = 10 / (1 + math.exp(-1))
 
         val sketch1 = sketch0.update(1, 2, 3, 4, 5)
-        val sketch2 = sketch1.rearrange
+        val sketch2 = sketch1.rebuild
         val sketch3 = sketch2.update(1, 2, 3, 4, 5)
         val sum = sketch3.sum
 
         if(sum ~= expected) ok else ko(s"sum: $sum, expected: $expected")
       }
 
-      "after 2 rearrange and update with 3 cmap" in {
+      "after 2 rebuildw and update with 3 cmap" in {
         implicit val conf: CustomSketchConf = CustomSketchConf(
           cmapSize = 10, cmapNo = 3, cmapStart = Some(0d), cmapEnd = Some(10d),
           counterSize = 100, counterNo = 2
@@ -430,8 +430,8 @@ class SketchPropSpec extends Specification with ScalaCheck {
         val expected = (10 * math.exp(-1) + 5) / (1 + math.exp(-1))
 
         val sketch1 = sketch0.update(1, 2, 3, 4, 5)
-        val sketch2 = sketch1.rearrange
-        val sketch3 = sketch2.rearrange
+        val sketch2 = sketch1.rebuild
+        val sketch3 = sketch2.rebuild
         val sketch4 = sketch3.update(1, 2, 3, 4, 5)
         val sum = sketch4.sum
 

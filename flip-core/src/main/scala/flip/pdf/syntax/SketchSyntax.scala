@@ -37,8 +37,8 @@ trait SketchPropSyntax {
     //    def clear: Sketch = Sketch.clear(sketch)
     def probability(from: A, to: A): Double =
       Sketch.probability(sketch, from, to)
-    def rearrange: Sketch[A] =
-      Sketch.rearrange(sketch)
+    def rebuild: Sketch[A] =
+      Sketch.rebuild(sketch)
     def cmapNo: Int = Sketch.cmapNo(sketch)
     def cmapSize: Int = Sketch.cmapSize(sketch)
     def counterNo: Int = Sketch.counterNo(sketch)

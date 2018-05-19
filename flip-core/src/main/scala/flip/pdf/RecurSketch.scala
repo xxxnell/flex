@@ -8,7 +8,7 @@ import scala.language.higherKinds
 
 /**
   * RecurSketch, or Recurrent Sketch has a stream of thresholds. RecurSketch
-  * consumes the thresholds and rearranges itself when its counter for
+  * consumes the thresholds and rebuild itself when its counter for
   * number of data exceeds the threshold.
   * */
 trait RecurSketch[A] extends Sketch[A] {
@@ -35,7 +35,7 @@ trait RecurSketchLaws[S[_] <: RecurSketch[_]] { self: RecurSketchOps[S] =>
     val nextThreshold = sketch.thresholds.headOption.getOrElse(Double.PositiveInfinity)
     val utdSketch1 = narrowUpdate[A](sketch, as)
     val utdSketch2 = modifyCount(utdSketch1, count => count + as.map(_._2).sum)
-    val utdSketch3 = if (nextThreshold <= utdSketch2.count) dropThreshold(rearrange(utdSketch2)) else utdSketch2
+    val utdSketch3 = if (nextThreshold <= utdSketch2.count) dropThreshold(rebuild(utdSketch2)) else utdSketch2
     utdSketch3
   }
 

@@ -3,7 +3,7 @@ package flip.benchmark
 import java.util.concurrent.TimeUnit
 
 import org.openjdk.jmh.annotations._
-import flip._
+import flip.implicits._
 import flip.cmap.Cmap
 import flip.hcounter.HCounter
 
@@ -92,8 +92,8 @@ class SketchOpsBench { self =>
   }
 
   @Benchmark
-  def rearrange: Sketch[Double] = {
-    sketch.rearrange
+  def rebuild: Sketch[Double] = {
+    sketch.rebuild
   }
 
   @Benchmark

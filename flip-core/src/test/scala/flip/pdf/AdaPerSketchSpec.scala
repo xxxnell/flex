@@ -29,7 +29,7 @@ class AdaPerSketchSpec extends Specification with ScalaCheck {
         else ok
       }
 
-      "type invariance after rearrange" in {
+      "type invariance after rebuild" in {
         implicit val conf: CustomAdaPerSketchConf = CustomAdaPerSketchConf(
           bufferSize = 10,
           cmapSize = 100, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
@@ -37,7 +37,7 @@ class AdaPerSketchSpec extends Specification with ScalaCheck {
         )
         val sketch = AdaPerSketch.empty[Double]
         val sketch1 = sketch.update(1)
-        val sketch2 = sketch1.rearrange
+        val sketch2 = sketch1.rebuild
 
         if(!sketch2.isInstanceOf[AdaPerSketch[Double]]) ko
         else if(sketch2.asInstanceOf[AdaPerSketch[Double]].buffer.nonEmpty) ko("Buffer is not cleaned.")
@@ -176,7 +176,7 @@ class AdaPerSketchSpec extends Specification with ScalaCheck {
       ok
     }
 
-    "rearrange" in {
+    "rebuild" in {
 
       "basic" in {
         val cmapSize = 20
@@ -189,7 +189,7 @@ class AdaPerSketchSpec extends Specification with ScalaCheck {
         val (_, samples) = NumericDist.normal(0.0, 1).samples(100)
 
         val sketch1 = sketch0.narrowUpdate(samples: _*)
-        val sketch2 = sketch1.rearrange
+        val sketch2 = sketch1.rebuild
         val sketch3 = sketch2.narrowUpdate(samples: _*)
 
         ok
