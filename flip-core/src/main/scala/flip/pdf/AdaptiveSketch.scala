@@ -1,15 +1,15 @@
 package flip.pdf
 
-import flip.conf.{AdaPerSketchConf, AdaptiveSketchConf}
+import cats.implicits._
+import flip.Memo
+import flip.Memo.syntax._
+import flip.conf.AdaptiveSketchConf
 import flip.measure.Measure
+import flip.pdf.Buffer.syntax._
 import flip.plot.CountPlot
 import flip.rand.IRng
-import flip.pdf.Buffer.syntax._
 
 import scala.language.higherKinds
-import cats.implicits._
-
-import scala.collection.immutable.Queue
 
 /**
   * Adaptive Sketch has its own buffer to hold recent input streams temporarily.
@@ -36,15 +36,21 @@ trait AdaptiveSketchOps[S[_] <: AdaptiveSketch[_]] extends SketchPrimPropOps[S] 
 
   // overrides
 
+  lazy val queueCorrectionMemo: Memo[AdaptiveSketchConf, Double] = Memo.empty(1)
+
   def queueCorrection(sketch: S[_]): Double = {
-    val cmapNo = sketch.conf.cmap.no
-    val decayFactor = sketch.conf.decayFactor
-    val effNo = if (cmapNo > 1) cmapNo - 1 else cmapNo
+    lazy val corr = queueCorrectionMemo.get(sketch.conf, conf => {
+      val cmapNo = conf.cmap.no
+      val decayFactor = conf.decayFactor
+      val effNo = if (cmapNo > 1) cmapNo - 1 else cmapNo
 
-    lazy val effRates = (0 until effNo).map(i => decayRate(decayFactor, i))
-    lazy val allRates = (0 until cmapNo).map(i => decayRate(decayFactor, i))
+      lazy val effRates = (0 until effNo).map(i => decayRate(decayFactor, i))
+      lazy val allRates = (0 until cmapNo).map(i => decayRate(decayFactor, i))
 
-    if (sketch.structures.size < cmapNo) 1 else effRates.sum / allRates.sum
+      effRates.sum / allRates.sum
+    })
+
+    if (sketch.structures.size < sketch.conf.cmap.no) 1 else corr
   }
 
   override def count[A](sketch: S[A], start: A, end: A): Count = {

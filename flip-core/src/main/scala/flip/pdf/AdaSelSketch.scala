@@ -22,12 +22,12 @@ trait AdaSelSketchOps[S[_] <: AdaSelSketch[_]] extends AdaptiveSketchOps[S] with
     val bufferPrims = sketch.buffer.asInstanceOf[Buffer[A]].toList.map { case (a, count) => (measure.to(a), count) }
     val bufferCdf = PointPlot.normalizedCumulative(bufferPrims)
     val samplingCdf = sampling(sketch).normalizedCumulative
-    val kld = cdfkld(bufferCdf, samplingCdf)
+    val kld = cdfKld(bufferCdf, samplingCdf)
 
     threshold < kld
   }
 
-  def cdfkld(plot1: PointPlot, plot2: PointPlot): Double = {
+  def cdfKld(plot1: PointPlot, plot2: PointPlot): Double = {
     val records = plot1.records
     var i = 1
     var (p, cum1) = records.apply(0)
