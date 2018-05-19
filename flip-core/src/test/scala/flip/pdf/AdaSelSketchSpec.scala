@@ -23,7 +23,7 @@ class AdaSelSketchSpec extends Specification with ScalaCheck {
       else if(sketch1.asInstanceOf[AdaSelSketch[Double]].buffer.isEmpty) ko("Buffer is cleaned.")
       else ok
     }
-    
+
   }
 
 }

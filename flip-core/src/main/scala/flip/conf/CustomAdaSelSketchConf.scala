@@ -42,7 +42,7 @@ object CustomAdaSelSketchConf {
             startThreshold: Double = DefaultSketchConf.startThreshold,
             thresholdPeriod: Double = DefaultSketchConf.thresholdPeriod,
             // sketch: selective
-            rebuildThreshold: Double = 1): CustomAdaSelSketchConf =
+            rebuildThreshold: Double = 0.05): CustomAdaSelSketchConf =
     bare(
       delta,
       mixingRatio,
