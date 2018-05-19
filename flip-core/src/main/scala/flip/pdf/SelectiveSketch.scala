@@ -43,8 +43,8 @@ object SelectiveSketch extends SelectiveSketchOps[SelectiveSketch] {
     case adasel: AdaSelSketch[A] => AdaSelSketch.modifyCount(adasel, f)
   }
 
-  override def rebuildCond[A](sketch: SelectiveSketch[A]): Boolean = sketch match {
-    case adasel: AdaSelSketch[A] => AdaSelSketch.rebuildCond(adasel)
+  override def diagnose[A](sketch: SelectiveSketch[A]): Boolean = sketch match {
+    case adasel: AdaSelSketch[A] => AdaSelSketch.diagnose(adasel)
   }
 
   // overrides

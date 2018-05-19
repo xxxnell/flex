@@ -16,7 +16,7 @@ trait AdaSelSketch[A] extends AdaptiveSketch[A] with SelectiveSketch[A] {
 
 trait AdaSelSketchOps[S[_] <: AdaSelSketch[_]] extends AdaptiveSketchOps[S] with SelectiveSketchOps[S] {
 
-  def rebuildCond[A](sketch: S[A]): Boolean = {
+  def diagnose[A](sketch: S[A]): Boolean = {
     val threshold = sketch.conf.rebuildThreshold
     val measure = sketch.measure.asInstanceOf[Measure[A]]
     val bufferPrims = sketch.buffer.asInstanceOf[Buffer[A]].toList.map { case (a, count) => (measure.to(a), count) }

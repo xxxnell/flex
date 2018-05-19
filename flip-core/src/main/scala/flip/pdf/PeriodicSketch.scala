@@ -55,9 +55,9 @@ object PeriodicSketch extends PeriodicSketchOps[PeriodicSketch] { self =>
     case adaper: AdaPerSketch[A] => AdaPerSketch.modifyCount(adaper, f)
   }
 
-  def rebuildCond[A](sketch: PeriodicSketch[A]): Boolean = sketch match {
-    case selective: SelectiveSketch[A] => SelectiveSketch.rebuildCond(selective)
-    case adaper: AdaPerSketch[A] => AdaPerSketch.rebuildCond(adaper)
+  def diagnose[A](sketch: PeriodicSketch[A]): Boolean = sketch match {
+    case selective: SelectiveSketch[A] => SelectiveSketch.diagnose(selective)
+    case adaper: AdaPerSketch[A] => AdaPerSketch.diagnose(adaper)
   }
 
   // overrides

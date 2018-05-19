@@ -137,16 +137,19 @@ object AdaptiveSketch extends AdaptiveSketchOps[AdaptiveSketch] {
 
   def modifyBuffer[A](sketch: AdaptiveSketch[A], f: Buffer[A] => Buffer[A]): AdaptiveSketch[A] =
     sketch match {
+      case sketch: AdaSelSketch[A] => AdaSelSketch.modifyBuffer(sketch, f)
       case sketch: AdaPerSketch[A] => AdaPerSketch.modifyBuffer(sketch, f)
     }
 
   def modifyStructures[A](sketch: AdaptiveSketch[A], f: Structures => Structures): AdaptiveSketch[A] =
     sketch match {
+      case sketch: AdaSelSketch[A] => AdaSelSketch.modifyStructures(sketch, f)
       case sketch: AdaPerSketch[A] => AdaPerSketch.modifyStructures(sketch, f)
     }
 
   def update[A](sketch: AdaptiveSketch[A], as: List[(A, Count)]): AdaptiveSketch[A] = sketch match {
-    case (sketch: AdaPerSketch[A]) => AdaPerSketch.update(sketch, as)
+    case sketch: AdaSelSketch[A] => AdaSelSketch.update(sketch, as)
+    case sketch: AdaPerSketch[A] => AdaPerSketch.update(sketch, as)
     case _ => narrowUpdate(sketch, as)
   }
 

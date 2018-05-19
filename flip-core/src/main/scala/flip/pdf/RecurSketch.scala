@@ -23,7 +23,7 @@ trait RecurSketchOps[S[_] <: RecurSketch[_]] extends SketchPrimPropOps[S] with R
 
   def modifyCount[A](sketch: S[A], f: Count => Count): S[A]
 
-  def rebuildCond[A](sketch: S[A]): Boolean
+  def diagnose[A](sketch: S[A]): Boolean
 
 }
 
@@ -36,7 +36,7 @@ trait RecurSketchLaws[S[_] <: RecurSketch[_]] { self: RecurSketchOps[S] =>
     val sketch2 = modifyCount(sketch1, count => count + as.map(_._2).sum)
     val nextThreshold = sketch0.thresholds.headOption.getOrElse(Double.PositiveInfinity)
     val cond1 = nextThreshold <= sketch2.count
-    val cond2 = cond1 && rebuildCond(sketch2)
+    val cond2 = cond1 && diagnose(sketch2)
     val sketch3 = if (cond1) dropThreshold(sketch2) else sketch2
     val sketch4 = if (cond2) rebuild(sketch3) else sketch3
 
@@ -70,8 +70,8 @@ object RecurSketch extends RecurSketchOps[RecurSketch] {
     case selective: SelectiveSketch[A] => SelectiveSketch.modifyCount(selective, f)
   }
 
-  def rebuildCond[A](sketch: RecurSketch[A]): Boolean = sketch match {
-    case periodic: PeriodicSketch[A] => PeriodicSketch.rebuildCond(periodic)
+  def diagnose[A](sketch: RecurSketch[A]): Boolean = sketch match {
+    case periodic: PeriodicSketch[A] => PeriodicSketch.diagnose(periodic)
   }
 
   // overrides

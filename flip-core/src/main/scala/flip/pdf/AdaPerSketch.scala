@@ -18,7 +18,7 @@ trait AdaPerSketch[A] extends AdaptiveSketch[A] with PeriodicSketch[A] {
 
 trait AdaPerSketchOps[S[_] <: AdaPerSketch[_]] extends AdaptiveSketchOps[S] with PeriodicSketchOps[S] {
 
-  def rebuildCond[A](sketch: S[A]): Boolean = true
+  def diagnose[A](sketch: S[A]): Boolean = true
 
 }
 
