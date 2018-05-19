@@ -3,6 +3,8 @@ package flip.pdf
 import flip.conf.AdaSelSketchConf
 import flip.measure.Measure
 import flip.rand.IRng
+import flip.pdf.Buffer.syntax._
+import flip.plot.PointPlot
 
 import scala.language.higherKinds
 
@@ -12,7 +14,39 @@ trait AdaSelSketch[A] extends AdaptiveSketch[A] with SelectiveSketch[A] {
 
 }
 
-trait AdaSelSketchOps[S[_] <: AdaSelSketch[_]] extends AdaptiveSketchOps[S] with SelectiveSketchOps[S] {}
+trait AdaSelSketchOps[S[_] <: AdaSelSketch[_]] extends AdaptiveSketchOps[S] with SelectiveSketchOps[S] {
+
+  def rebuildCond[A](sketch: S[A]): Boolean = {
+    val threshold = sketch.conf.rebuildThreshold
+    val measure = sketch.measure.asInstanceOf[Measure[A]]
+    val bufferPrims = sketch.buffer.asInstanceOf[Buffer[A]].toList.map { case (a, count) => (measure.to(a), count) }
+    val bufferCdf = PointPlot.normalizedCumulative(bufferPrims)
+    val samplingCdf = sampling(sketch).normalizedCumulative
+    val kld = cdfkld(bufferCdf, samplingCdf)
+
+    threshold < kld
+  }
+
+  def cdfkld(plot1: PointPlot, plot2: PointPlot): Double = {
+    val records = plot1.records
+    var i = 1
+    var (p, cum1) = records.apply(i)
+    var cum2 = plot2.interpolation(p)
+    var kldacc = 0.0
+    while (i < records.length) {
+      val (_p, _cum1) = records.apply(i)
+      val _cum2 = plot2.interpolation(_p)
+      kldacc += math.log((_cum1 - cum1) / (_cum2 - cum2))
+      p = _p
+      cum1 = _cum1
+      cum2 = _cum2
+      i += 1
+    }
+
+    (kldacc / (records.length - 1)) - 1
+  }
+
+}
 
 object AdaSelSketch extends AdaSelSketchOps[AdaSelSketch] {
 

@@ -1,6 +1,6 @@
 package flip.pdf
 
-import flip.conf.{AdaPerSketchConf, PeriodicSketchConf}
+import flip.conf.{AdaPerSketchConf, AdaSelSketchConf, PeriodicSketchConf, SelectiveSketchConf}
 import flip.measure.Measure
 import flip.rand.IRng
 
@@ -26,11 +26,13 @@ trait PeriodicSketchOps[S[_] <: PeriodicSketch[_]] extends RecurSketchOps[S] {
 object PeriodicSketch extends PeriodicSketchOps[PeriodicSketch] { self =>
 
   def empty[A](implicit measure: Measure[A], conf: PeriodicSketchConf): PeriodicSketch[A] = conf match {
+    case conf: SelectiveSketchConf => SelectiveSketch.empty(measure, conf)
     case conf: AdaPerSketchConf => AdaPerSketch.empty(measure, conf)
   }
 
   def concat[A](as: List[(A, Count)])(implicit measure: Measure[A], conf: PeriodicSketchConf): PeriodicSketch[A] =
     conf match {
+      case conf: SelectiveSketchConf => SelectiveSketch.concat(as)(measure, conf)
       case conf: AdaPerSketchConf => AdaPerSketch.concat(as)(measure, conf)
     }
 

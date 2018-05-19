@@ -1,6 +1,7 @@
 package flip.pdf
 
-import flip.conf.SelectiveSketchConf
+import flip.conf.{AdaPerSketchConf, AdaSelSketchConf, PeriodicSketchConf, SelectiveSketchConf}
+import flip.measure.Measure
 import flip.rand.IRng
 
 import scala.language.higherKinds
@@ -11,13 +12,18 @@ trait SelectiveSketch[A] extends PeriodicSketch[A] {
 
 }
 
-trait SelectiveSketchOps[S[_] <: SelectiveSketch[_]] extends PeriodicSketchOps[S] {
-
-  def rebuildCond[A](sketch: S[A]): Boolean = ???
-
-}
+trait SelectiveSketchOps[S[_] <: SelectiveSketch[_]] extends PeriodicSketchOps[S] {}
 
 object SelectiveSketch extends SelectiveSketchOps[SelectiveSketch] {
+
+  def empty[A](implicit measure: Measure[A], conf: SelectiveSketchConf): SelectiveSketch[A] = conf match {
+    case conf: AdaSelSketchConf => AdaSelSketch.empty(measure, conf)
+  }
+
+  def concat[A](as: List[(A, Count)])(implicit measure: Measure[A], conf: SelectiveSketchConf): SelectiveSketch[A] =
+    conf match {
+      case conf: AdaSelSketchConf => AdaSelSketch.concat(as)(measure, conf)
+    }
 
   override def modifyRng[A](sketch: SelectiveSketch[A], f: IRng => IRng): SelectiveSketch[A] = sketch match {
     case adasel: AdaSelSketch[A] => AdaSelSketch.modifyRng(adasel, f)
@@ -35,6 +41,10 @@ object SelectiveSketch extends SelectiveSketchOps[SelectiveSketch] {
 
   override def modifyCount[A](sketch: SelectiveSketch[A], f: Count => Count): SelectiveSketch[A] = sketch match {
     case adasel: AdaSelSketch[A] => AdaSelSketch.modifyCount(adasel, f)
+  }
+
+  override def rebuildCond[A](sketch: SelectiveSketch[A]): Boolean = sketch match {
+    case adasel: AdaSelSketch[A] => AdaSelSketch.rebuildCond(adasel)
   }
 
   // overrides
