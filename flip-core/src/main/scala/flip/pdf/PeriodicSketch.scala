@@ -21,6 +21,8 @@ trait PeriodicSketchOps[S[_] <: PeriodicSketch[_]] extends RecurSketchOps[S] {
 
   def thresholds(start: Double, period: Double): Stream[Count] = Stream.from(0).map(i => start + period * i)
 
+  def rebuildCond[A](sketch: S[A]): Boolean = true
+
 }
 
 object PeriodicSketch extends PeriodicSketchOps[PeriodicSketch] { self =>
