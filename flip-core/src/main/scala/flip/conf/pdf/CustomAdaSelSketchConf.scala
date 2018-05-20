@@ -88,4 +88,6 @@ object CustomAdaSelSketchConf {
       rebuildThreshold
     )
 
+  def default: AdaSelSketchConf = DefaultAdaSelSketchConf
+
 }

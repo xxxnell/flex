@@ -38,20 +38,24 @@ object PeriodicSketch extends PeriodicSketchOps[PeriodicSketch] { self =>
 
   def modifyRng[A](sketch: PeriodicSketch[A], f: IRng => IRng): PeriodicSketch[A] =
     sketch match {
+      case sketch: SelectiveSketch[A] => SelectiveSketch.modifyRng(sketch, f)
       case sketch: AdaPerSketch[A] => AdaPerSketch.modifyRng(sketch, f)
     }
 
   def modifyStructures[A](sketch: PeriodicSketch[A], f: Structures => Structures): PeriodicSketch[A] =
     sketch match {
+      case sketch: SelectiveSketch[A] => SelectiveSketch.modifyStructures(sketch, f)
       case sketch: AdaPerSketch[A] => AdaPerSketch.modifyStructures(sketch, f)
     }
 
   def modifyThresholds[A](sketch: PeriodicSketch[A], f: Stream[Double] => Stream[Double]): PeriodicSketch[A] =
     sketch match {
+      case sketch: SelectiveSketch[A] => SelectiveSketch.modifyThresholds(sketch, f)
       case sketch: AdaPerSketch[A] => AdaPerSketch.modifyThresholds(sketch, f)
     }
 
   def modifyCount[A](sketch: PeriodicSketch[A], f: Count => Count): PeriodicSketch[A] = sketch match {
+    case sketch: SelectiveSketch[A] => SelectiveSketch.modifyCount(sketch, f)
     case adaper: AdaPerSketch[A] => AdaPerSketch.modifyCount(adaper, f)
   }
 

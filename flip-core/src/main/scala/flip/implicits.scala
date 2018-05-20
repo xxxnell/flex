@@ -1,6 +1,6 @@
 package flip
 
-import flip.conf.pdf.{CustomAdaPerSketchConf, CustomSimpleSketchConf, CustomSketchConf, SmoothDistConf}
+import flip.conf.pdf._
 import flip.measure.TrivialMeasures
 import flip.pdf.SimpleSketch
 import flip.pdf.syntax.{DistSyntax, NumericDistSyntax, SamplingDistSyntax, SketchSyntax, SmoothDistSyntax}
@@ -21,7 +21,7 @@ trait ConfPkgSyntax extends ConfPkgSyntax1 {
 
   type SketchConf = CustomSketchConf
 
-  def SketchConf: CustomAdaPerSketchConf.type = CustomAdaPerSketchConf
+  def SketchConf: CustomAdaSelSketchConf.type = CustomAdaSelSketchConf
 
   type HistogramConf = CustomSimpleSketchConf
 
