@@ -1,11 +1,9 @@
 package flip.pdf
 
-import cats.implicits._
-import flip.conf.{DistConf, SamplingDistConf, SmoothDistConf}
+import flip.conf.pdf.{DistConf, SmoothDistConf}
 import flip.measure.Measure
 import flip.pdf.arithmetic.CombinationDist
-import flip.plot.{DensityPlot, PointPlot}
-import flip.range.{RangeM, RangeP}
+import flip.plot.PointPlot
 import flip.rand.IRng
 
 import scala.collection.mutable.ListBuffer

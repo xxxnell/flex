@@ -1,6 +1,5 @@
 package flip.pdf
 
-import flip.conf._
 import flip.implicits._
 import org.specs2.ScalaCheck
 import org.specs2.mutable._
@@ -17,7 +16,7 @@ class SketchMonadSpec extends Specification with ScalaCheck {
           val dataNo = 100
           val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 1, Some(0d), Some(10d))
           val (counterSize, counterNo) = (2, 1)
-          implicit val conf: CustomSketchConf = CustomSketchConf(
+          implicit val conf: SketchConf = SketchConf(
             cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
             counterSize = counterSize, counterNo = counterNo
           )
@@ -51,7 +50,7 @@ class SketchMonadSpec extends Specification with ScalaCheck {
           val dataNo = 100
           val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 1, Some(0d), Some(10d))
           val (counterSize, counterNo) = (2, 1)
-          implicit val conf: CustomSketchConf = CustomSketchConf(
+          implicit val conf: SketchConf = SketchConf(
             cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
             counterSize = counterSize, counterNo = counterNo
           )

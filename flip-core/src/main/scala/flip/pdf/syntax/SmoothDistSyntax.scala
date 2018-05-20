@@ -1,9 +1,8 @@
 package flip.pdf.syntax
 
-import flip.conf.SamplingDistConf
+import flip.conf.pdf.SamplingDistConf
 import flip.measure.Measure
 import flip.pdf.{PlottedDist, SmoothDist}
-import flip.range.syntax.RangeP
 
 trait SmoothDistSyntax extends SmoothDistPropSyntax
 

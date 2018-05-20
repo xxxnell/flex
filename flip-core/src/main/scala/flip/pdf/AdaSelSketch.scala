@@ -1,10 +1,10 @@
 package flip.pdf
 
-import flip.conf.AdaSelSketchConf
+import flip.conf.pdf.AdaSelSketchConf
 import flip.measure.Measure
-import flip.rand.IRng
 import flip.pdf.Buffer.syntax._
 import flip.plot.PointPlot
+import flip.rand.IRng
 
 import scala.language.higherKinds
 

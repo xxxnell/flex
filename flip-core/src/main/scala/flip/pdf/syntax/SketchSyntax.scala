@@ -1,7 +1,7 @@
 package flip.pdf.syntax
 
 import flip.cmap.Cmap
-import flip.conf.SketchConf
+import flip.conf.pdf.SketchConf
 import flip.measure.Measure
 import flip.pdf.monad.{SketchBind, SketchFunctor}
 import flip.pdf.{Count, Dist, Sketch, Structure}

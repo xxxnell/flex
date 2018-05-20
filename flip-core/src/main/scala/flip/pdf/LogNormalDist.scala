@@ -1,6 +1,6 @@
 package flip.pdf
 
-import flip.conf.SmoothDistConf
+import flip.conf.pdf.SmoothDistConf
 import flip.measure.Measure
 import flip.rand.IRng
 import org.apache.commons.math3.distribution.LogNormalDistribution

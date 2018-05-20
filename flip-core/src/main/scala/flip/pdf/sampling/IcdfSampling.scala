@@ -1,6 +1,6 @@
 package flip.pdf.sampling
 
-import flip.conf.{EqualizeIcdfSamplingConf, IcdfSamplingConf, SmoothDistConf}
+import flip.conf.pdf.{EqualizeIcdfSamplingConf, IcdfSamplingConf}
 import flip.measure.Measure
 import flip.range.RangeM
 

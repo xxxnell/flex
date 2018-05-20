@@ -1,11 +1,10 @@
 package flip.pdf.arithmetic
 
 import cats.data.NonEmptyList
-import flip.conf.DistConf
+import flip.conf.pdf.DistConf
 import flip.measure.Measure
 import flip.pdf.{Dist, DistPropOps}
-import flip.plot.{DensityPlot, PointPlot}
-import flip.plot.syntax._
+import flip.plot.PointPlot
 import flip.rand._
 
 import scala.language.higherKinds

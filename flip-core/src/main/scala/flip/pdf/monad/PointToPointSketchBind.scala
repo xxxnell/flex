@@ -1,10 +1,8 @@
 package flip.pdf.monad
 
-import flip.conf.{SketchConf, SmoothDistConf}
+import flip.conf.pdf.SketchConf
 import flip.measure.Measure
 import flip.pdf._
-import flip.pdf.arithmetic._
-import flip.range.RangeM
 
 import scala.collection.mutable.ListBuffer
 

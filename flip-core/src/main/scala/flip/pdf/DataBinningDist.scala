@@ -1,7 +1,7 @@
 package flip.pdf
 
-import flip.conf.DataBinningDistConf
-import flip.plot.{DensityPlot, PointPlot}
+import flip.conf.pdf.DataBinningDistConf
+import flip.plot.PointPlot
 import flip.rand.IRng
 
 import scala.language.higherKinds

@@ -3,7 +3,7 @@ package flip.pdf
 import cats.implicits._
 import flip.Memo
 import flip.Memo.syntax._
-import flip.conf.AdaptiveSketchConf
+import flip.conf.pdf.AdaptiveSketchConf
 import flip.measure.Measure
 import flip.pdf.Buffer.syntax._
 import flip.plot.CountPlot

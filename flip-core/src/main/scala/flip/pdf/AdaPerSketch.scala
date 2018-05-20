@@ -1,6 +1,6 @@
 package flip.pdf
 
-import flip.conf.AdaPerSketchConf
+import flip.conf.pdf.AdaPerSketchConf
 import flip.measure.Measure
 import flip.rand.IRng
 

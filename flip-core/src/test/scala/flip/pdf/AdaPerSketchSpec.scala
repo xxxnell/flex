@@ -1,7 +1,7 @@
 package flip.pdf
 
 import flip._
-import flip.conf.CustomAdaPerSketchConf
+import flip.conf.pdf.CustomAdaPerSketchConf
 import flip.measure.syntax._
 import flip.pdf.Buffer.syntax._
 import org.specs2.ScalaCheck

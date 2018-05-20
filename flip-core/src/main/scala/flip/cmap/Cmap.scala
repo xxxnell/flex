@@ -1,7 +1,7 @@
 package flip.cmap
 
 import cats.data.Kleisli
-import flip.conf.{CmapConf, UniformCmapConf}
+import flip.conf.cmap.{CmapConf, UniformCmapConf}
 import flip.hmap.HDim
 import flip.pdf._
 import flip.range.syntax._

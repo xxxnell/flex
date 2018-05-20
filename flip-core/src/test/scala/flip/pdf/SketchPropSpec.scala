@@ -1,10 +1,10 @@
 package flip.pdf
 
+import flip.conf.SketchConfGen
 import org.scalacheck.Gen
 import org.specs2.ScalaCheck
 import org.specs2.mutable._
 import flip.implicits._
-import flip.conf._
 import flip.measure.Measure
 import flip.measure.syntax._
 
@@ -16,7 +16,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
 
       "structure size" in {
         val cmapSize = 10
-        implicit val conf: CustomSketchConf = CustomSketchConf(
+        implicit val conf: SketchConf = SketchConf(
           cmapSize = cmapSize, cmapNo = 2, cmapStart = Some(0d), cmapEnd = Some(10d),
           counterSize = 10, counterNo = 2
         )
@@ -27,16 +27,6 @@ class SketchPropSpec extends Specification with ScalaCheck {
         else ok
       }
 
-      "SimpleSketch" in {
-        implicit val conf: CustomSketchConf = CustomSimpleSketchConf(
-          binNo = 10, start = 0d, end = 10d,
-          counterSize = 10, counterNo = 2
-        )
-        val sketch0 = Sketch.empty[Double]
-
-        sketch0 must beAnInstanceOf[SimpleSketch[Double]]
-      }
-
     }
 
     "count" in {
@@ -44,7 +34,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
       "basic 1" in {
         val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 2, Some(0d), Some(10d))
         val (counterSize, counterNo) = (8, 2)
-        implicit val conf: CustomSketchConf = CustomSketchConf(
+        implicit val conf: SketchConf = SketchConf(
           cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
           counterSize = counterSize, counterNo = counterNo
         )
@@ -60,7 +50,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
       "basic 2" in {
         val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 2, Some(0d), Some(10d))
         val (counterSize, counterNo) = (100, 2)
-        implicit val conf: CustomSketchConf = CustomSketchConf(
+        implicit val conf: SketchConf = SketchConf(
           cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
           counterSize = counterSize, counterNo = counterNo
         )
@@ -76,7 +66,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
       "count smaller space then cmap bound" in {
         val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 2, Some(0d), Some(10d))
         val (counterSize, counterNo) = (8, 2)
-        implicit val conf: CustomSketchConf = CustomSketchConf(
+        implicit val conf: SketchConf = SketchConf(
           cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
           counterSize = counterSize, counterNo = counterNo
         )
@@ -113,7 +103,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
     "narrowUpdate" in {
 
       "basic" in {
-        implicit val conf: CustomSketchConf = CustomSketchConf(
+        implicit val conf: SketchConf = SketchConf(
           bufferSize = 100,
           cmapSize = 10, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
           counterSize = 8, counterNo = 2
@@ -135,7 +125,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
       "empty" in {
         val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 2, Some(-10d), Some(10d))
         val (counterSize, counterNo) = (8, 2)
-        implicit val conf: CustomSketchConf = CustomSketchConf(
+        implicit val conf: SketchConf = SketchConf(
           cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
           counterSize = counterSize, counterNo = counterNo
         )
@@ -150,7 +140,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
       "from min to 0 after updated" in {
         val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 2, Some(0d), Some(10d))
         val (counterSize, counterNo) = (100, 2)
-        implicit val conf: CustomSketchConf = CustomSketchConf(
+        implicit val conf: SketchConf = SketchConf(
           cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
           counterSize = counterSize, counterNo = counterNo
         )
@@ -176,7 +166,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
         val sampleNo = 3000
         val (cmapSize, cmapNo, cmapStart, cmapEnd) = (20, 2, Some(-10.0), Some(10.0))
 
-        implicit val conf: CustomSketchConf = CustomSketchConf(
+        implicit val conf: SketchConf = SketchConf(
           cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd
         )
         val (_, samples) = dist.samples(sampleNo)
@@ -196,7 +186,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
       "basic" in {
         val cmapStart = Some(-10d)
         val cmapEnd = Some(10d)
-        implicit val conf: CustomSketchConf = CustomSketchConf(
+        implicit val conf: SketchConf = SketchConf(
           cmapSize = 3, cmapNo = 5, cmapStart = cmapStart, cmapEnd = cmapEnd,
           counterSize = 70, counterNo = 2
         )
@@ -225,7 +215,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
         "basic" in {
           val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 3, Some(-1d), Some(10d))
           val (counterSize, counterNo) = (8, 2)
-          implicit val conf: CustomSketchConf = CustomSketchConf(
+          implicit val conf: SketchConf = SketchConf(
             cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
             counterSize = counterSize, counterNo = counterNo
           )
@@ -243,7 +233,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
         }
 
         "2 times" in {
-          implicit val conf: CustomSketchConf = CustomSketchConf(
+          implicit val conf: SketchConf = SketchConf(
             cmapSize = 10, cmapNo = 2, cmapStart = Some(-1d), cmapEnd = Some(10d),
             counterSize = 8, counterNo = 2
           )
@@ -271,7 +261,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
       "structure size" in {
 
         "increasing" in {
-          implicit val conf: CustomSketchConf = CustomSketchConf(
+          implicit val conf: SketchConf = SketchConf(
             cmapSize = 10, cmapNo = 2, cmapStart = Some(-1d), cmapEnd = Some(10d),
             counterSize = 8, counterNo = 2
           )
@@ -289,7 +279,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
         }
 
         "bounded" in {
-          implicit val conf: CustomSketchConf = CustomSketchConf(
+          implicit val conf: SketchConf = SketchConf(
             cmapSize = 10, cmapNo = 2, cmapStart = Some(-1d), cmapEnd = Some(10d),
             counterSize = 8, counterNo = 2
           )
@@ -314,7 +304,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
     "rebuild" in {
 
       "basic" in {
-        implicit val conf: CustomSketchConf = CustomSketchConf(
+        implicit val conf: SketchConf = SketchConf(
           cmapSize = 1000, cmapNo = 5, cmapStart = Some(0d), cmapEnd = Some(10d),
           counterSize = 500, counterNo = 2
         )
@@ -331,7 +321,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
     "count" in {
 
       "basic" in {
-        implicit val conf: CustomSketchConf = CustomSketchConf(
+        implicit val conf: SketchConf = SketchConf(
           cmapSize = 10, cmapNo = 2, cmapStart = Some(0d), cmapEnd = Some(10d),
           counterSize = 8, counterNo = 2
         )
@@ -346,7 +336,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
       "empty" in {
         val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 2, Some(0d), Some(10d))
         val (counterSize, counterNo) = (8, 2)
-        implicit val conf: CustomSketchConf = CustomSketchConf(
+        implicit val conf: SketchConf = SketchConf(
           cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
           counterSize = counterSize, counterNo = counterNo
         )
@@ -362,7 +352,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
     "sum" in {
 
       "basic" in {
-        implicit val conf: CustomSketchConf = CustomSketchConf(
+        implicit val conf: SketchConf = SketchConf(
           cmapSize = 10, cmapNo = 2, cmapStart = Some(0d), cmapEnd = Some(10d),
           counterSize = 100, counterNo = 2
         )
@@ -375,7 +365,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
       }
 
       "after updated" in {
-        implicit val conf: CustomSketchConf = CustomSketchConf(
+        implicit val conf: SketchConf = SketchConf(
           cmapSize = 10, cmapNo = 2, cmapStart = Some(0d), cmapEnd = Some(10d),
           counterSize = 100, counterNo = 2
         )
@@ -388,7 +378,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
       }
 
       "after rebuild with 2 cmap" in {
-        implicit val conf: CustomSketchConf = CustomSketchConf(
+        implicit val conf: SketchConf = SketchConf(
           cmapSize = 10, cmapNo = 2, cmapStart = Some(0d), cmapEnd = Some(10d),
           counterSize = 100, counterNo = 2
         )
@@ -406,7 +396,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
       }
 
       "after rebuild update" in {
-        implicit val conf: CustomSketchConf = CustomSketchConf(
+        implicit val conf: SketchConf = SketchConf(
           cmapSize = 10, cmapNo = 2, cmapStart = Some(0d), cmapEnd = Some(10d),
           counterSize = 100, counterNo = 2
         )
@@ -422,7 +412,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
       }
 
       "after 2 rebuildw and update with 3 cmap" in {
-        implicit val conf: CustomSketchConf = CustomSketchConf(
+        implicit val conf: SketchConf = SketchConf(
           cmapSize = 10, cmapNo = 3, cmapStart = Some(0d), cmapEnd = Some(10d),
           counterSize = 100, counterNo = 2
         )
@@ -443,7 +433,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
     "fastPdf" in {
 
       "basic" in {
-        implicit val conf: CustomSketchConf = CustomSketchConf(
+        implicit val conf: SketchConf = SketchConf(
           cmapSize = 10, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
           counterSize = 10, counterNo = 2
         )
@@ -459,7 +449,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
       "boundary" in {
 
         "least" in {
-          implicit val conf: CustomSketchConf = CustomSketchConf(
+          implicit val conf: SketchConf = SketchConf(
             cmapSize = 10, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
             counterSize = 10, counterNo = 2
           )
@@ -471,7 +461,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
         }
 
         "largest" in {
-          implicit val conf: CustomSketchConf = CustomSketchConf(
+          implicit val conf: SketchConf = SketchConf(
             cmapSize = 10, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
             counterSize = 10, counterNo = 2
           )

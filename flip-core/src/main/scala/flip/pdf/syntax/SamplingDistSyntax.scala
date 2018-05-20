@@ -1,6 +1,6 @@
 package flip.pdf.syntax
 
-import flip.conf.{SamplingDistConf, SamplingDistConfB, SketchConf}
+import flip.conf.pdf.{SamplingDistConf, SamplingDistConfB, SketchConf}
 import flip.measure.Measure
 import flip.pdf.monad.{SamplingDistBind, SamplingDistFunctor}
 import flip.pdf.{Dist, SamplingDist, Sketch}

@@ -1,12 +1,9 @@
 package flip.pdf.monad
 
 import cats.data.NonEmptyList
-import flip.conf.{DistConf, IcdfSamplingConf, SamplingDistConf, SmoothDistConf}
+import flip.conf.pdf.{DistConf, SamplingDistConf, SmoothDistConf}
 import flip.measure.Measure
-import flip.measure.syntax.{-∞, ∞}
-import flip.pdf.arithmetic.Sum
-import flip.pdf.sampling.IcdfSampling
-import flip.pdf.{DeltaDist, Dist, NumericDist, PlottedDist, SamplingDist, Sketch, UniformDist}
+import flip.pdf.{DeltaDist, Dist, PlottedDist, UniformDist}
 import flip.plot.PointPlot
 
 import scala.collection.mutable.ArrayBuffer

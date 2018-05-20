@@ -2,7 +2,7 @@ package flip.benchmark.sketch
 
 import java.util.concurrent.TimeUnit
 
-import flip.conf.CustomAdaSelSketchConf
+import flip.conf.pdf.CustomAdaSelSketchConf
 import flip.implicits._
 import flip.pdf.{AdaptiveSketch, SelectiveSketch}
 import flip.plot.PointPlot

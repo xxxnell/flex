@@ -1,13 +1,13 @@
 package flip.pdf
 
-import org.scalacheck.Gen
-import org.specs2.mutable._
-import org.specs2.ScalaCheck
-import flip.conf._
+import cats.implicits._
+import flip.conf.SketchConfGen
+import flip.conf.pdf.{CustomPeriodicSketchConf, PeriodicSketchConf}
 import flip.measure._
 import flip.pdf.syntax._
-import cats.implicits._
-import flip.cmap.{Cmap, DividerCmap}
+import org.scalacheck.Gen
+import org.specs2.ScalaCheck
+import org.specs2.mutable._
 
 class PeriodicSketchSpec extends Specification with ScalaCheck {
 

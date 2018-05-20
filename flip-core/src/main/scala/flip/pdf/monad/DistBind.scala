@@ -1,6 +1,6 @@
 package flip.pdf.monad
 
-import flip.conf.{DistConfB, SamplingDistConf, SamplingDistConfB, SketchConf}
+import flip.conf.pdf.{SamplingDistConf, SamplingDistConfB, SketchConf}
 import flip.measure.Measure
 import flip.pdf.{Dist, SamplingDist, Sketch}
 

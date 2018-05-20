@@ -1,6 +1,6 @@
 package flip.pdf.update
 
-import flip.conf.CustomSketchConf
+import flip.implicits._
 import flip.pdf.Sketch
 import org.specs2.mutable._
 import org.specs2.ScalaCheck
@@ -10,7 +10,7 @@ class EqUpdateSpec extends Specification with ScalaCheck {
   "EqUpdate" should {
 
     "updateCmap" in {
-      implicit val conf: CustomSketchConf = CustomSketchConf(
+      implicit val conf: SketchConf = SketchConf(
         cmapSize = 1000, cmapNo = 5, cmapStart = Some(0d), cmapEnd = Some(10d),
         counterSize = 500, counterNo = 2
       )

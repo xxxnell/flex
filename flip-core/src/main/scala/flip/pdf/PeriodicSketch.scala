@@ -1,6 +1,6 @@
 package flip.pdf
 
-import flip.conf.{AdaPerSketchConf, AdaSelSketchConf, PeriodicSketchConf, SelectiveSketchConf}
+import flip.conf.pdf.{AdaPerSketchConf, PeriodicSketchConf, SelectiveSketchConf}
 import flip.measure.Measure
 import flip.rand.IRng
 

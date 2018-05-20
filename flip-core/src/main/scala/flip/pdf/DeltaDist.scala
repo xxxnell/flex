@@ -1,11 +1,9 @@
 package flip.pdf
 
-import flip.conf.SmoothDistConf
+import flip.conf.pdf.SmoothDistConf
 import flip.measure.Measure
-import flip.plot.{DensityPlot, PointPlot}
+import flip.plot.PointPlot
 import flip.rand._
-import flip.range._
-import flip.measure.syntax._
 
 /**
   * Dirac delta function.

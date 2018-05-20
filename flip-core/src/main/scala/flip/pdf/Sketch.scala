@@ -2,9 +2,8 @@ package flip.pdf
 
 import cats.data.NonEmptyList
 import cats.implicits._
-import flip._
 import flip.cmap.Cmap
-import flip.conf.{PeriodicSketchConf, SketchConf}
+import flip.conf.pdf._
 import flip.hcounter.HCounter
 import flip.measure.Measure
 import flip.pdf.sampling.IcdfSampling

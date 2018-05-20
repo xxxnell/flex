@@ -1,7 +1,7 @@
 package flip.pdf.monad
 
-import flip.conf.{DistConfB, SamplingDistConf, SamplingDistConfB}
-import flip.pdf.{Dist, SamplingDist}
+import flip.conf.pdf.{SamplingDistConf, SamplingDistConfB}
+import flip.pdf.SamplingDist
 
 import scala.language.higherKinds
 
