@@ -15,17 +15,14 @@ object GettingStartedExp {
       case (sketch, sample) => sketch.update(sample)
     }
 
-    // probability for interval [0.0, 1.0]
+    // analyze sketch
     println(
       s"Estimated Pr(0.0 ≤ x ≤ 1.0): ${sketch1.probability(0.0, 1.0)}, " +
-        s"Expected Pr(0.0 ≤ x ≤ 1.0): ${underlying.probability(0.0, 1.0)}"
+        s"Expected Pr(0.0 ≤ x ≤ 1.0): ${underlying.probability(0.0, 1.0)}\n" +
+        s"Estimated median: ${sketch1.median}, expected median: 0.0 \n" +
+        s"Sample from sketch: ${sketch1.sample._2} \n" +
+        s"KL-divergence: ${KLD(underlying, sketch1)}"
     )
-
-    // median
-    println(s"Estimated median: ${sketch1.median}, expected median: 0.0")
-
-    // sample from sketch
-    println("Sample from sketch: " + sketch1.sample._2)
   }
 
 }
