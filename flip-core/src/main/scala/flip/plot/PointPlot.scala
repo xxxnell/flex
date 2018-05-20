@@ -60,7 +60,7 @@ trait PointPlotLaws[P <: PointPlot] { self: PointPlotOps[P] =>
           val (x1, y1) = records(i2 - 1)
           val (x2, y2) = records(i2)
           Fitting((x1, y1) :: (x2, y2) :: Nil, x)
-        } else None
+        } else Some(records(i2)._2)
     }
     lazy val intp2 = plot.index.to(x).lastOption.flatMap {
       case (_, i2) =>
@@ -68,7 +68,7 @@ trait PointPlotLaws[P <: PointPlot] { self: PointPlotOps[P] =>
           val (x1, y1) = records(i2)
           val (x2, y2) = records(i2 + 1)
           Fitting((x1, y1) :: (x2, y2) :: Nil, x)
-        } else None
+        } else Some(records(i2)._2)
     }
 
     (intp1 orElse intp2).getOrElse(0.0)
@@ -157,14 +157,12 @@ trait PointPlotLaws[P <: PointPlot] { self: PointPlotOps[P] =>
         var (i, cum) = (0, 0.0)
         var (x1, y1) = (Double.NaN, Double.NaN)
         val sum = integralAll(plot)
-        val length = records0.length + 2
+        val length = records0.length
         val records1 = Array.ofDim[(Double, Double)](length)
-        records1.update(0, (Double.MinValue, 0))
-        records1.update(length - 1, (Double.MaxValue, 1))
         while (i < records0.length) {
           val (x2, y2) = records0(i)
           cum += (if (!x1.isNaN && !y1.isNaN) areaPoint(x1, y1, x2, y2) else 0.0) / sum
-          records1.update(i + 1, (x2, cum))
+          records1.update(i, (x2, cum))
           x1 = x2
           y1 = y2
           i += 1
@@ -268,7 +266,23 @@ object PointPlot extends PointPlotOps[PointPlot] {
   }
 
   def normalizedCumulative(ds: List[(Prim, Count)]): PointPlot = {
-    safe(ds.toArray).normalizedCumulative
+    val records = safe(ds.toArray).records
+    var i = 0
+    var sum = 0.0
+    while (i < records.length) {
+      sum += records.apply(i)._2
+      i += 1
+    }
+    var j = 0
+    var cum = 0.0
+    val records1 = Array.ofDim[(Prim, Count)](records.length)
+    while (j < records.length) {
+      val (p, count) = records.apply(j)
+      cum += (count / sum)
+      records1.update(j, (p, cum))
+      j += 1
+    }
+    unsafe(records1)
   }
 
   def modifyRecords(plot: PointPlot, f: Array[(Double, Double)] => Array[(Double, Double)]): PointPlot =

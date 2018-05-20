@@ -68,6 +68,22 @@ class PointPlotSpec extends Specification with ScalaCheck {
         else ok
       }
 
+      "out of scope" in {
+        val (v1, v2) = (1.0, 2.0)
+        val records =
+          0.0 -> v1 ::
+            1.0 -> 2.0 ::
+            2.0 -> 3.0 ::
+            3.0 -> v2 :: Nil
+        val plot1 = PointPlot(records.toArray)
+        val cond1 = plot1.interpolation(-10.0) == v1
+        val cond2 = plot1.interpolation(10.0) == v2
+
+        if(!cond1) ko(s"${plot1.interpolation(-10.0)} != $v1")
+        if(!cond2) ko(s"${plot1.interpolation(10.0)} != $v2")
+        else ok
+      }
+
     }
 
     "add" in {

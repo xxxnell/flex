@@ -25,9 +25,9 @@ package object flip extends AllSyntax { self =>
     (result, t1 - t0)
   }
 
-  def fmt(v: Double, i: Int): String = {
+  def fmt(v: Double, i: Int = 3): String = {
     import java.math.MathContext
-    if (!v.isNaN && !v.isInfinity) BigDecimal(v).round(new MathContext(3)).toString else v.toString
+    if (!v.isNaN && !v.isInfinity) BigDecimal(v).round(new MathContext(i)).toString else v.toString
   }
 
   implicit class ShowDouble(v: Double) {
