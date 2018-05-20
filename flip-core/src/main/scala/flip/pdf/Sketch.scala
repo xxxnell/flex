@@ -2,9 +2,8 @@ package flip.pdf
 
 import cats.data.NonEmptyList
 import cats.implicits._
-import flip._
 import flip.cmap.Cmap
-import flip.conf.{PeriodicSketchConf, SketchConf}
+import flip.conf.pdf._
 import flip.hcounter.HCounter
 import flip.measure.Measure
 import flip.pdf.sampling.IcdfSampling
@@ -78,7 +77,7 @@ trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
     if (sum > 0) count / sum else flatDensity * RangeM.bare(start, end, measure).roughLength
   }
 
-  def rearrange[A](sketch: S[A]): S[A] = deepUpdate(sketch, Nil)._1
+  def rebuild[A](sketch: S[A]): S[A] = deepUpdate(sketch, Nil)._1
 
   def sampling[A](sketch: S[A]): PointPlot = pointSampling(sketch)
 
@@ -215,9 +214,9 @@ object Sketch extends SketchPrimPropOps[Sketch] { self =>
     case _ => SimpleSketch.empty(measure, conf)
   }
 
-  def concat[A](ps: List[(A, Count)])(implicit measure: Measure[A], conf: SketchConf): Sketch[A] = conf match {
-    case conf: PeriodicSketchConf => PeriodicSketch.concat(ps)(measure, conf)
-    case _ => SimpleSketch.concat(ps)(measure, conf)
+  def concat[A](as: List[(A, Count)])(implicit measure: Measure[A], conf: SketchConf): Sketch[A] = conf match {
+    case conf: PeriodicSketchConf => PeriodicSketch.concat(as)(measure, conf)
+    case _ => SimpleSketch.concat(as)(measure, conf)
   }
 
   // mapping ops
@@ -261,9 +260,9 @@ object Sketch extends SketchPrimPropOps[Sketch] { self =>
     case _ => super.narrowUpdate(sketch, as)
   }
 
-  override def rearrange[A](sketch: Sketch[A]): Sketch[A] = sketch match {
-    case (sketch: AdaptiveSketch[A]) => AdaptiveSketch.rearrange(sketch)
-    case _ => super.rearrange(sketch)
+  override def rebuild[A](sketch: Sketch[A]): Sketch[A] = sketch match {
+    case (sketch: AdaptiveSketch[A]) => AdaptiveSketch.rebuild(sketch)
+    case _ => super.rebuild(sketch)
   }
 
 }

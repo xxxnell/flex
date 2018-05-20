@@ -267,6 +267,10 @@ object PointPlot extends PointPlotOps[PointPlot] {
     unsafe(records)
   }
 
+  def normalizedCumulative(ds: List[(Prim, Count)]): PointPlot = {
+    safe(ds.toArray).normalizedCumulative
+  }
+
   def modifyRecords(plot: PointPlot, f: Array[(Double, Double)] => Array[(Double, Double)]): PointPlot =
     unsafe(f(plot.records))
 

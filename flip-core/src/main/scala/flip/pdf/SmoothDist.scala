@@ -1,9 +1,9 @@
 package flip.pdf
 
-import flip.conf.SmoothDistConf
+import flip.conf.pdf.SmoothDistConf
 import flip.measure.Measure
 import flip.pdf.sampling.IcdfSampling
-import flip.plot.{DensityPlot, PointPlot}
+import flip.plot.PointPlot
 import flip.rand.IRng
 
 import scala.language.higherKinds

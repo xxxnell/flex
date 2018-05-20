@@ -1,3 +1,0 @@
-package flip.conf
-
-trait CustomDataBinningDistConf extends CustomSamplingDistConf with DataBinningDistConf

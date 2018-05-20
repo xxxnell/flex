@@ -3,7 +3,7 @@ package flip.benchmark
 import java.util.concurrent.TimeUnit
 
 import org.openjdk.jmh.annotations._
-import flip._
+import flip.implicits._
 import flip.cmap.Cmap
 import flip.hcounter.HCounter
 
@@ -17,17 +17,14 @@ class SketchOpsBench { self =>
   @Param(Array("0", "50"))
   var bufferSize: Int = _
 
-  @Param(Array("3", "30"))
+  @Param(Array("3"))
   var cmapNo: Int = _
 
-  @Param(Array("20", "200"))
+  @Param(Array("20", "2000"))
   var cmapSize: Int = _
 
   @Param(Array("1"))
   var counterNo: Int = _
-
-  @Param(Array("2147483647"))
-  var counterSize: Int = _
 
   // variables
 
@@ -44,7 +41,6 @@ class SketchOpsBench { self =>
       cmapNo = cmapNo,
       cmapStart = Some(-10d),
       cmapEnd = Some(10d),
-      counterSize = counterSize,
       counterNo = counterNo
     )
     val (_, samples) = NumericDist.normal(0.0, 1).samples(bufferSize)
@@ -64,7 +60,6 @@ class SketchOpsBench { self =>
       cmapNo = cmapNo,
       cmapStart = Some(-10d),
       cmapEnd = Some(10d),
-      counterSize = counterSize,
       counterNo = counterNo
     )
 
@@ -92,8 +87,8 @@ class SketchOpsBench { self =>
   }
 
   @Benchmark
-  def rearrange: Sketch[Double] = {
-    sketch.rearrange
+  def rebuild: Sketch[Double] = {
+    sketch.rebuild
   }
 
   @Benchmark
@@ -114,6 +109,11 @@ class SketchOpsBench { self =>
   @Benchmark
   def sample: (Sketch[Double], Double) = {
     sketch.sample
+  }
+
+  @Benchmark
+  def fastPdf: Double = {
+    sketch.pdf(1)
   }
 
 }

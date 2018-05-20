@@ -1,8 +1,8 @@
 package flip.pdf.monad
 
-import flip.conf.SamplingDistConf
+import flip.conf.pdf.SamplingDistConf
 import flip.measure.Measure
-import flip.pdf.{Dist, PlottedDist, SamplingDist}
+import flip.pdf.{Dist, SamplingDist}
 
 object PointToPointSamplingDistBind extends SamplingDistBind[SamplingDist, Dist, SamplingDist, SamplingDistConf] {
 

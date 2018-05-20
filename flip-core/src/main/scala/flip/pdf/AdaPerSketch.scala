@@ -1,6 +1,6 @@
 package flip.pdf
 
-import flip.conf.AdaPerSketchConf
+import flip.conf.pdf.AdaPerSketchConf
 import flip.measure.Measure
 import flip.rand.IRng
 
@@ -16,7 +16,11 @@ trait AdaPerSketch[A] extends AdaptiveSketch[A] with PeriodicSketch[A] {
 
 }
 
-trait AdaPerSketchOps[S[_] <: AdaPerSketch[_]] extends AdaptiveSketchOps[S] with PeriodicSketchOps[S] {}
+trait AdaPerSketchOps[S[_] <: AdaPerSketch[_]] extends AdaptiveSketchOps[S] with PeriodicSketchOps[S] {
+
+  def diagnose[A](sketch: S[A]): Boolean = true
+
+}
 
 object AdaPerSketch extends AdaPerSketchOps[AdaPerSketch] {
 
@@ -45,7 +49,7 @@ object AdaPerSketch extends AdaPerSketchOps[AdaPerSketch] {
       conf,
       structures(conf),
       Buffer.empty[A],
-      thresholds(conf.startThreshold, conf.thresholdPeriod),
+      periodicThresholds(conf.startThreshold, conf.thresholdPeriod),
       0)
 
   def concat[A](as: List[(A, Count)])(implicit measure: Measure[A], conf: AdaPerSketchConf): AdaPerSketch[A] = {
@@ -55,7 +59,7 @@ object AdaPerSketch extends AdaPerSketchOps[AdaPerSketch] {
       conf,
       concatStructures(as, measure, conf),
       Buffer.empty[A],
-      thresholds(conf.startThreshold, conf.thresholdPeriod),
+      periodicThresholds(conf.startThreshold, conf.thresholdPeriod),
       0)
 
     narrowUpdate(emptySketch, as)

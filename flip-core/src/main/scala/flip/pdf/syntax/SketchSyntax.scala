@@ -1,7 +1,7 @@
 package flip.pdf.syntax
 
 import flip.cmap.Cmap
-import flip.conf.SketchConf
+import flip.conf.pdf.SketchConf
 import flip.measure.Measure
 import flip.pdf.monad.{SketchBind, SketchFunctor}
 import flip.pdf.{Count, Dist, Sketch, Structure}
@@ -37,8 +37,8 @@ trait SketchPropSyntax {
     //    def clear: Sketch = Sketch.clear(sketch)
     def probability(from: A, to: A): Double =
       Sketch.probability(sketch, from, to)
-    def rearrange: Sketch[A] =
-      Sketch.rearrange(sketch)
+    def rebuild: Sketch[A] =
+      Sketch.rebuild(sketch)
     def cmapNo: Int = Sketch.cmapNo(sketch)
     def cmapSize: Int = Sketch.cmapSize(sketch)
     def counterNo: Int = Sketch.counterNo(sketch)

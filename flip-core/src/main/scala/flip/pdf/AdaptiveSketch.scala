@@ -1,24 +1,24 @@
 package flip.pdf
 
-import flip.conf.{AdaPerSketchConf, AdaptiveSketchConf}
+import cats.implicits._
+import flip.Memo
+import flip.Memo.syntax._
+import flip.conf.pdf.AdaptiveSketchConf
 import flip.measure.Measure
+import flip.pdf.Buffer.syntax._
 import flip.plot.CountPlot
 import flip.rand.IRng
-import flip.pdf.Buffer.syntax._
 
 import scala.language.higherKinds
-import cats.implicits._
-
-import scala.collection.immutable.Queue
 
 /**
   * Adaptive Sketch has its own buffer to hold recent input streams temporarily.
   * This buffer retains its maximum length.
   * The buffer acts as a reference data stream ξ for deepUpdate when Adaptive
-  * Sketch has to rearrange. So, even if the concept drift occurs, rearranging
+  * Sketch has to rebuild. So, even if the concept drift occurs, rearranging
   * can constitute the correct strueture of Sketch.
   *
-  * rearrange(S) = deepUpdate(S, ξ)
+  * rebuild(S) = deepUpdate(S, ξ)
   *  where S is sketch and ξ is recent data stream in the buffer of Adaptive
   *  Sketch.
   * */
@@ -36,15 +36,24 @@ trait AdaptiveSketchOps[S[_] <: AdaptiveSketch[_]] extends SketchPrimPropOps[S] 
 
   // overrides
 
+  lazy val queueCorrectionMemo: Memo[AdaptiveSketchConf, Double] = Memo.empty(1)
+
   def queueCorrection(sketch: S[_]): Double = {
-    val cmapNo = sketch.conf.cmap.no
-    val decayFactor = sketch.conf.decayFactor
-    val effNo = if (cmapNo > 1) cmapNo - 1 else cmapNo
+    lazy val corr = queueCorrectionMemo.get(
+      sketch.conf,
+      conf => {
+        val cmapNo = conf.cmap.no
+        val decayFactor = conf.decayFactor
+        val effNo = if (cmapNo > 1) cmapNo - 1 else cmapNo
 
-    lazy val effRates = (0 until effNo).map(i => decayRate(decayFactor, i))
-    lazy val allRates = (0 until cmapNo).map(i => decayRate(decayFactor, i))
+        lazy val effRates = (0 until effNo).map(i => decayRate(decayFactor, i))
+        lazy val allRates = (0 until cmapNo).map(i => decayRate(decayFactor, i))
 
-    if (sketch.structures.size < cmapNo) 1 else effRates.sum / allRates.sum
+        effRates.sum / allRates.sum
+      }
+    )
+
+    if (sketch.structures.size < sketch.conf.cmap.no) 1 else corr
   }
 
   override def count[A](sketch: S[A], start: A, end: A): Count = {
@@ -62,7 +71,7 @@ trait AdaptiveSketchOps[S[_] <: AdaptiveSketch[_]] extends SketchPrimPropOps[S] 
     super.narrowUpdate(sketch1, old)
   }
 
-  override def rearrange[A](sketch: S[A]): S[A] = {
+  override def rebuild[A](sketch: S[A]): S[A] = {
     val (sketch1, _) = deepUpdate(sketch, sketch.buffer.asInstanceOf[Buffer[A]].toList)
     clearBuffer(sketch1)
   }
@@ -94,12 +103,15 @@ trait AdaptiveSketchLaws[S[_] <: AdaptiveSketch[_]] { self: AdaptiveSketchOps[S]
     val startP = measure.to(start)
     val endP = measure.to(end)
 
-    sketch.buffer
-      .asInstanceOf[Buffer[A]]
-      .toList
-      .filter { case (a, _) => measure.to(a) >= startP && measure.to(a) <= endP }
-      .map(_._2)
-      .sum
+    val buffer = sketch.buffer.asInstanceOf[Buffer[A]].toList.toArray
+    var i = 0
+    var acc = 0.0
+    while (i < buffer.length) {
+      val (a, count) = buffer.apply(i)
+      if (measure.to(a) >= startP && measure.to(a) <= endP) acc += count
+      i += 1
+    }
+    acc
   }
 
   def sumForQueue[A](sketch: S[A]): Count = sketch.buffer.sum
@@ -137,16 +149,19 @@ object AdaptiveSketch extends AdaptiveSketchOps[AdaptiveSketch] {
 
   def modifyBuffer[A](sketch: AdaptiveSketch[A], f: Buffer[A] => Buffer[A]): AdaptiveSketch[A] =
     sketch match {
+      case sketch: AdaSelSketch[A] => AdaSelSketch.modifyBuffer(sketch, f)
       case sketch: AdaPerSketch[A] => AdaPerSketch.modifyBuffer(sketch, f)
     }
 
   def modifyStructures[A](sketch: AdaptiveSketch[A], f: Structures => Structures): AdaptiveSketch[A] =
     sketch match {
+      case sketch: AdaSelSketch[A] => AdaSelSketch.modifyStructures(sketch, f)
       case sketch: AdaPerSketch[A] => AdaPerSketch.modifyStructures(sketch, f)
     }
 
   def update[A](sketch: AdaptiveSketch[A], as: List[(A, Count)]): AdaptiveSketch[A] = sketch match {
-    case (sketch: AdaPerSketch[A]) => AdaPerSketch.update(sketch, as)
+    case sketch: AdaSelSketch[A] => AdaSelSketch.update(sketch, as)
+    case sketch: AdaPerSketch[A] => AdaPerSketch.update(sketch, as)
     case _ => narrowUpdate(sketch, as)
   }
 

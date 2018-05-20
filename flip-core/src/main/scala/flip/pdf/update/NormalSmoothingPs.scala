@@ -1,7 +1,7 @@
 package flip.pdf.update
 
 import cats.data.NonEmptyList
-import flip.conf.{DistConf, SmoothDistConf}
+import flip.conf.pdf.SmoothDistConf
 import flip.pdf.arithmetic.CombinationDist
 import flip.pdf.{Count, Dist, NumericDist, Prim}
 import flip.measure.syntax._
@@ -21,7 +21,7 @@ object NormalSmoothingPs extends SmoothingPs {
           val diff2 = math.abs(p2 * count2 - p3 * count3) / (count2 + count3)
           val avgDiff = (diff1 * count1 + diff2 * count3) / (count1 + count3)
           val variance = avgDiff / (math.sqrt(2) * Erf.erfInv(1 - scale))
-          Some((count2, NumericDist.normal(p2, variance)))
+          Some((count2, NumericDist.normal(p2, variance)(doubleMeasure, conf)))
         case _ => None
       }
       .toVector

@@ -1,6 +1,6 @@
 package flip.sim
 
-import flip.conf.SmoothDistConf
+import flip.conf.pdf.SmoothDistConf
 import flip.measure.syntax._
 import flip.pdf.{Dist, PlottedDist}
 import flip.sim.syntax._

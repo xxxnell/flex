@@ -1,6 +1,6 @@
 package flip.pdf.sampling
 
-import flip.conf.EqualizeIcdfSamplingConf
+import flip.conf.pdf.EqualizeIcdfSamplingConf
 import flip.pdf.NormalDist
 import flip.measure.syntax._
 import org.specs2.mutable._

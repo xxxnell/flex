@@ -1,6 +1,6 @@
 package flip.pdf.monad
 
-import flip.conf.{SketchConf, SmoothDistConf}
+import flip.conf.pdf.{SketchConf, SmoothDistConf}
 import flip.measure.Measure
 import flip.pdf.Sketch
 

@@ -1,6 +1,6 @@
 package flip.pdf.arithmetic
 
-import flip.conf.DistConf
+import flip.conf.pdf.DistConf
 import flip.measure.Measure
 import flip.pdf.Dist
 

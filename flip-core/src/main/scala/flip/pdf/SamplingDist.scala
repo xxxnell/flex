@@ -1,9 +1,7 @@
 package flip.pdf
 
-import flip.conf.SamplingDistConf
-import flip.measure.Measure
-import flip.plot.{DensityPlot, PointPlot}
-import flip.range.RangeM
+import flip.conf.pdf.SamplingDistConf
+import flip.plot.PointPlot
 import flip.rand.IRng
 
 import scala.language.higherKinds

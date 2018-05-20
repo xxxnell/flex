@@ -50,7 +50,7 @@ class DeepUpdateBench { self =>
     val sketch0 = Sketch.empty[Double]
 
     (0 until cmapNo).foreach { _ =>
-      self.sketch = sketch0.narrowUpdate(samples: _*).rearrange
+      self.sketch = sketch0.narrowUpdate(samples: _*).rebuild
     }
     self.sketch = sketch0.narrowUpdate(samples: _*)
     self.conf = conf
@@ -80,48 +80,43 @@ class DeepUpdateBench { self =>
 
   }
 
-//  @Benchmark
-//  def deepUpdate: (Sketch[Count], Option[Structure]) = {
-//    sketch.deepUpdate()
-//  }
-
-//  @Benchmark
-//  def primDeepUpdate: (Sketch[Count], Option[(Cmap, HCounter)]) = {
-//    Sketch.primDeepUpdate(sketch, sketch.asInstanceOf[AdaptiveSketch[Double]].buffer.toList)
-//  }
-
   @Benchmark
-  def rearrange: Sketch[Count] = {
-    sketch.rearrange
+  def deepUpdate: (Sketch[Count], Option[Structure]) = {
+    sketch.deepUpdate()
   }
 
-//  @Benchmark
-//  def cmap: Cmap = {
-//    DeepUpdateAlgorithm.cmap
-//  }
-//
-//  @Benchmark
-//  def seed: Int = {
-//    DeepUpdateAlgorithm.seed
-//  }
-//
-//  @Benchmark
-//  def emptyCounter: HCounter = {
-//    DeepUpdateAlgorithm.emptyCounter
-//  }
-//  @Benchmark
-//  def strs: (List[(Cmap, HCounter)], List[(Cmap, HCounter)]) = {
-//    DeepUpdateAlgorithm.strs
-//  }
-//
-//  @Benchmark
-//  def smoothingPs: Dist[Prim] = {
-//    DeepUpdateAlgorithm.smoothingPs
-//  }
-//
-//  @Benchmark
-//  def updatePs(): Sketch[Count] = {
-//    DeepUpdateAlgorithm.updatePs()
-//  }
+  @Benchmark
+  def primDeepUpdate: (Sketch[Count], Option[(Cmap, HCounter)]) = {
+    Sketch.primDeepUpdate(sketch, sketch.asInstanceOf[AdaptiveSketch[Double]].buffer.toList)
+  }
+
+  @Benchmark
+  def rebuild: Sketch[Count] = {
+    sketch.rebuild
+  }
+
+  @Benchmark
+  def cmap: Cmap = {
+    DeepUpdateAlgorithm.cmap
+  }
+
+  @Benchmark
+  def seed: Int = {
+    DeepUpdateAlgorithm.seed
+  }
+
+  @Benchmark
+  def emptyCounter: HCounter = {
+    DeepUpdateAlgorithm.emptyCounter
+  }
+  @Benchmark
+  def strs: (List[(Cmap, HCounter)], List[(Cmap, HCounter)]) = {
+    DeepUpdateAlgorithm.strs
+  }
+
+  @Benchmark
+  def updatePs(): Sketch[Count] = {
+    DeepUpdateAlgorithm.updatePs()
+  }
 
 }

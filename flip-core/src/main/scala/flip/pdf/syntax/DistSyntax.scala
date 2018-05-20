@@ -1,12 +1,11 @@
 package flip.pdf.syntax
 
-import flip.conf._
+import flip.conf.pdf._
 import flip.measure.Measure
 import flip.pdf.arithmetic.CombinationDist
 import flip.pdf.monad.{DistBind, DistFunctor}
-import flip.pdf.{Dist, PlottedDist, SamplingDist, Sketch}
-import flip.plot.{AsciiArtPlot, DensityPlot, PointPlot}
-import flip.range.RangeM
+import flip.pdf.{Dist, SamplingDist, Sketch}
+import flip.plot.PointPlot
 
 import scala.language.higherKinds
 

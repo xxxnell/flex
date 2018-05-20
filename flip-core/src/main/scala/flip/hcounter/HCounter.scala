@@ -1,13 +1,13 @@
 package flip.hcounter
 
 import cats.data.NonEmptyList
-import flip.conf.CounterConf
 import flip.counter.Counter
 import flip.hmap.{HDim, Hmap}
 import flip.pdf.Count
 
 import scala.util.hashing.byteswap32
 import cats.implicits._
+import flip.conf.counter.CounterConf
 
 /**
   * The HCounter, or Hashing Counter, is a probabilistic data structure that

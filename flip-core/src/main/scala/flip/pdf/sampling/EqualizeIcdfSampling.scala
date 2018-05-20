@@ -1,5 +1,5 @@
 package flip.pdf.sampling
-import flip.conf.EqualizeIcdfSamplingConf
+import flip.conf.pdf.EqualizeIcdfSamplingConf
 import flip.measure.Measure
 import flip.range.RangeM
 
