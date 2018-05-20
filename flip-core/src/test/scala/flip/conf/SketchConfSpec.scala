@@ -1,6 +1,6 @@
 package flip.conf
 
-import flip.conf.pdf.{CustomPeriodicSketchConf, PeriodicSketchConf}
+import flip.conf.pdf.{CustomAdaPerSketchConf, CustomPeriodicSketchConf, PeriodicSketchConf}
 import flip.implicits._
 import org.scalacheck.Gen
 import org.specs2.mutable._
@@ -43,7 +43,7 @@ object SketchConfGen {
     cmapSize <- Gen.choose(100, 10000)
     counterNo <- Gen.choose(1, 10)
     counterSize <- Gen.choose(100, 10000)
-  } yield CustomPeriodicSketchConf(cmapNo = cmapNo, cmapSize= cmapSize, counterNo = counterNo, counterSize = counterSize)
+  } yield CustomAdaPerSketchConf(cmapNo = cmapNo, cmapSize= cmapSize, counterNo = counterNo, counterSize = counterSize)
 
 //  def cmapConfGen: Gen[CmapConf] = uniformCmapConfGen
 //
