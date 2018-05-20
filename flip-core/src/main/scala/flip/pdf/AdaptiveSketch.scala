@@ -39,16 +39,19 @@ trait AdaptiveSketchOps[S[_] <: AdaptiveSketch[_]] extends SketchPrimPropOps[S] 
   lazy val queueCorrectionMemo: Memo[AdaptiveSketchConf, Double] = Memo.empty(1)
 
   def queueCorrection(sketch: S[_]): Double = {
-    lazy val corr = queueCorrectionMemo.get(sketch.conf, conf => {
-      val cmapNo = conf.cmap.no
-      val decayFactor = conf.decayFactor
-      val effNo = if (cmapNo > 1) cmapNo - 1 else cmapNo
+    lazy val corr = queueCorrectionMemo.get(
+      sketch.conf,
+      conf => {
+        val cmapNo = conf.cmap.no
+        val decayFactor = conf.decayFactor
+        val effNo = if (cmapNo > 1) cmapNo - 1 else cmapNo
 
-      lazy val effRates = (0 until effNo).map(i => decayRate(decayFactor, i))
-      lazy val allRates = (0 until cmapNo).map(i => decayRate(decayFactor, i))
+        lazy val effRates = (0 until effNo).map(i => decayRate(decayFactor, i))
+        lazy val allRates = (0 until cmapNo).map(i => decayRate(decayFactor, i))
 
-      effRates.sum / allRates.sum
-    })
+        effRates.sum / allRates.sum
+      }
+    )
 
     if (sketch.structures.size < sketch.conf.cmap.no) 1 else corr
   }

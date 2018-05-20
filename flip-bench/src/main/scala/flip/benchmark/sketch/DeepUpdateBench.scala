@@ -80,48 +80,43 @@ class DeepUpdateBench { self =>
 
   }
 
-//  @Benchmark
-//  def deepUpdate: (Sketch[Count], Option[Structure]) = {
-//    sketch.deepUpdate()
-//  }
+  @Benchmark
+  def deepUpdate: (Sketch[Count], Option[Structure]) = {
+    sketch.deepUpdate()
+  }
 
-//  @Benchmark
-//  def primDeepUpdate: (Sketch[Count], Option[(Cmap, HCounter)]) = {
-//    Sketch.primDeepUpdate(sketch, sketch.asInstanceOf[AdaptiveSketch[Double]].buffer.toList)
-//  }
+  @Benchmark
+  def primDeepUpdate: (Sketch[Count], Option[(Cmap, HCounter)]) = {
+    Sketch.primDeepUpdate(sketch, sketch.asInstanceOf[AdaptiveSketch[Double]].buffer.toList)
+  }
 
   @Benchmark
   def rebuild: Sketch[Count] = {
     sketch.rebuild
   }
 
-//  @Benchmark
-//  def cmap: Cmap = {
-//    DeepUpdateAlgorithm.cmap
-//  }
-//
-//  @Benchmark
-//  def seed: Int = {
-//    DeepUpdateAlgorithm.seed
-//  }
-//
-//  @Benchmark
-//  def emptyCounter: HCounter = {
-//    DeepUpdateAlgorithm.emptyCounter
-//  }
-//  @Benchmark
-//  def strs: (List[(Cmap, HCounter)], List[(Cmap, HCounter)]) = {
-//    DeepUpdateAlgorithm.strs
-//  }
-//
-//  @Benchmark
-//  def smoothingPs: Dist[Prim] = {
-//    DeepUpdateAlgorithm.smoothingPs
-//  }
-//
-//  @Benchmark
-//  def updatePs(): Sketch[Count] = {
-//    DeepUpdateAlgorithm.updatePs()
-//  }
+  @Benchmark
+  def cmap: Cmap = {
+    DeepUpdateAlgorithm.cmap
+  }
+
+  @Benchmark
+  def seed: Int = {
+    DeepUpdateAlgorithm.seed
+  }
+
+  @Benchmark
+  def emptyCounter: HCounter = {
+    DeepUpdateAlgorithm.emptyCounter
+  }
+  @Benchmark
+  def strs: (List[(Cmap, HCounter)], List[(Cmap, HCounter)]) = {
+    DeepUpdateAlgorithm.strs
+  }
+
+  @Benchmark
+  def updatePs(): Sketch[Count] = {
+    DeepUpdateAlgorithm.updatePs()
+  }
 
 }

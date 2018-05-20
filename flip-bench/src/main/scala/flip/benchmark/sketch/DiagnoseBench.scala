@@ -2,16 +2,11 @@ package flip.benchmark.sketch
 
 import java.util.concurrent.TimeUnit
 
-import flip.cmap.Cmap
 import flip.conf.CustomAdaSelSketchConf
 import flip.implicits._
-import flip.measure.Measure
-import flip.measure.syntax.{-∞, ∞}
-import flip.pdf.{AdaSelSketch, AdaptiveSketch, Count, SelectiveSketch}
-import flip.pdf.sampling.IcdfSampling
-import flip.pdf.update.EqUpdate
-import flip.plot.{DensityPlot, PointPlot}
-import flip.range.RangeM
+import flip.pdf.{AdaptiveSketch, SelectiveSketch}
+import flip.plot.PointPlot
+import flip.pdf.Buffer.syntax._
 import org.openjdk.jmh.annotations._
 
 @BenchmarkMode(Array(Mode.AverageTime))
@@ -63,5 +58,18 @@ class DiagnoseBench { self =>
   def diagnose: Boolean = {
     SelectiveSketch.diagnose(sketch.asInstanceOf[SelectiveSketch[Double]])
   }
+
+  @Benchmark
+  def bufferCdf: PointPlot = {
+    val measure = sketch.measure
+    val bufferPrims =
+      sketch.asInstanceOf[AdaptiveSketch[Double]].buffer.toList.map { case (a, count) => (measure.to(a), count) }
+    PointPlot.normalizedCumulative(bufferPrims)
+  }
+
+  @Benchmark
+  def samplingCdf: PointPlot = sketch.sampling.normalizedCumulative
+
+  def cdfKld: Double = ???
 
 }
