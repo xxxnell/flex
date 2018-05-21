@@ -98,36 +98,16 @@ trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
   }
 
   def pointSampling[A](sketch: S[A]): PointPlot = {
-    val RATIO = 100.0 // todo why 100.0?
-    val CUTOFF = 1E300 // todo CUTOFF is hacky approach
-
-    val cmap = youngCmap(sketch)
-    val rangePs = cmap.bin.filter(range => math.abs(range.start) < CUTOFF && math.abs(range.end) < CUTOFF).toArray
     val measure = sketch.measure.asInstanceOf[Measure[A]]
-
-    var i = 0
+    val ranges = sketch.structures.head.cmap.bin.toArray
     val records = new ArrayBuffer[(Double, Double)]
-    while (i < rangePs.length) {
-      lazy val rangeP0 = rangePs.apply(i - 1)
-      lazy val rangeP1 = rangePs.apply(i)
-      lazy val rangeM1 = rangeP1.modifyMeasure(measure)
-      lazy val l1 = rangeP1.cutoffLength
-      lazy val l0 = rangeP0.cutoffLength
-      lazy val widthRatio = l1 / l0
-      lazy val (_, prod0) = records.apply(records.length - 1)
-      lazy val prod1O: Option[Double] =
-        if (l1 != 0) Some(probability(sketch, rangeM1.start, rangeM1.end) / l1) else None
-
-      prod1O.foreach(prod1 => {
-        if (records.nonEmpty && widthRatio < (1 / RATIO) && l0 > 0) {
-          val _prob = prod0 + (prod1 - prod0) * (l1 / l0)
-          records.append((rangeP1.start, _prob))
-        } else if (records.nonEmpty && widthRatio > RATIO && l1 > 0) {
-          val _prob = prod1 + (prod0 - prod1) * (l0 / l1)
-          records.append((rangeP1.start, _prob))
-        }
-        records.append((rangeP1.cutoffMiddle, prod1))
-      })
+    var i = 1
+    while (i < ranges.length - 1) {
+      val rangeP = ranges.apply(i)
+      val rangeM = rangeP.modifyMeasure(measure)
+      val prob = probability(sketch, rangeM.start, rangeM.end)
+      val pdfO = if (!rangeM.isPoint) Some(prob / rangeM.cutoffLength) else None
+      pdfO.foreach(pdf => records.append((rangeP.cutoffMiddle, pdf)))
       i += 1
     }
 

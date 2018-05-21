@@ -40,7 +40,6 @@ trait SketchPrimPropOps[S[_] <: Sketch[_]] extends SketchPrimPropLaws[S] with Sk
 
   def primSmoothingNarrowUpdateForStr[A](sketch: S[A], ps: List[(Prim, Count)]): S[A] = {
     val cum = PointPlot.cumulative(ps)
-
     def updateForCum(hist: Histogram[Double], cum: PointPlot): Histogram[Double] = hist.modifyCounter { counter =>
       val bins = hist.cmap.bin.toArray
       var (i, cump1, _counter) = (0, 0.0, counter)

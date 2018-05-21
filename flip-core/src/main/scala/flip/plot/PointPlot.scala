@@ -70,8 +70,13 @@ trait PointPlotLaws[P <: PointPlot] { self: PointPlotOps[P] =>
           Fitting((x1, y1) :: (x2, y2) :: Nil, x)
         } else Some(records(i2)._2)
     }
+    lazy val intp3 = if(plot.records.length > 0) {
+      val (x2, y2) = plot.records.apply(0)
+      val (x3, y3) = plot.records.apply(plot.records.length - 1)
+      if (x <= x2) Some(y2) else if (x >= x3) Some(y3) else None
+    } else None
 
-    (intp1 orElse intp2).getOrElse(0.0)
+    (intp1 orElse intp2 orElse intp3).getOrElse(Double.NaN)
   }
 
   /**
@@ -266,7 +271,7 @@ object PointPlot extends PointPlotOps[PointPlot] {
   }
 
   def cumulative(ds: List[(Prim, Count)]): PointPlot = {
-    val records = safe(ds.toArray).records
+    val records = ds.sortBy(_._1)
     var i = 0
     var cum = 0.0
     val records1 = Array.ofDim[(Prim, Count)](records.length)
@@ -280,7 +285,7 @@ object PointPlot extends PointPlotOps[PointPlot] {
   }
 
   def normalizedCumulative(ds: List[(Prim, Count)]): PointPlot = {
-    val records = safe(ds.toArray).records
+    val records = ds.sortBy(_._1)
     var i = 0
     var sum = 0.0
     while (i < records.length) {

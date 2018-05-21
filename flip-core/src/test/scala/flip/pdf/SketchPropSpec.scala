@@ -485,13 +485,14 @@ class SketchPropSpec extends Specification with ScalaCheck {
         val sketch0 = Sketch.empty[Double].updateInOrder(samples0)
         val (sketch1, samples1) = sketch0.samples(200)
         val sketch2 = Sketch.empty[Double].updateInOrder(samples1)
+        val kld = KLD(sketch1, sketch2)
 
         val cond1 = samples1.forall(sample => !sample.isNaN)
         val cond2 = samples1.forall(sample => !sample.isInfinite)
-        val cond3 = KLD(sketch1, sketch2) < 1
+        val cond3 = kld < 1
 
         if(!cond1 || !cond2) ko(s"samples: $samples1")
-        else if(!cond3) ko(s"KLD: ${KLD(sketch1, sketch2)}")
+        else if(!cond3) ko(s"KLD: $kld")
         else ok
       }
 
