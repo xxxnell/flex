@@ -20,6 +20,12 @@ trait DataBinningDistOps[D[_] <: DataBinningDist[_]] extends SamplingDistPropOps
 
   def update[A](dist: D[A], as: List[(A, Count)]): D[A]
 
+  def count[A](dist: D[A], start: A, end: A): Count
+
+  def sum(dist: D[_]): Count
+
+//  def clear(sketch: S): S
+
 }
 
 trait DataBinningDistLaws[D[_] <: DataBinningDist[_]]
@@ -28,24 +34,39 @@ object DataBinningDist extends DataBinningDistOps[DataBinningDist] {
 
   def modifyRng[A](dist: DataBinningDist[A], f: IRng => IRng): DataBinningDist[A] = dist match {
     case sketch: Sketch[A] => Sketch.modifyRng(sketch, f)
+    case hist: Histogram[A] => Histogram.modifyRng(hist, f)
   }
 
   def probability[A](dist: DataBinningDist[A], start: A, end: A): Double = dist match {
     case (sketch: Sketch[A]) => Sketch.probability(sketch, start, end)
-    case _ => ???
+    case hist: Histogram[A] => Histogram.probability(hist, start, end)
   }
 
   def sampling[A](dist: DataBinningDist[A]): PointPlot = dist match {
-    case (sketch: Sketch[A]) => Sketch.pointSampling(sketch)
-    case _ => ???
+    case (sketch: Sketch[A]) => Sketch.sampling(sketch)
+    case hist: Histogram[A] => Histogram.sampling(hist)
   }
 
   def update[A](dist: DataBinningDist[A], as: List[(A, Count)]): DataBinningDist[A] = dist match {
     case sketch: Sketch[A] => Sketch.update(sketch, as)
+    case hist: Histogram[A] => Histogram.update(hist, as)
   }
+
+  def count[A](dist: DataBinningDist[A], start: A, end: A): Count = dist match {
+    case sketch: Sketch[A] => Sketch.count(sketch, start, end)
+    case hist: Histogram[A] => Histogram.count(hist, start, end)
+  }
+
+  def sum(dist: DataBinningDist[_]): Count = dist match {
+    case sketch: Sketch[_] => Sketch.sum(sketch)
+    case hist: Histogram[_] => Histogram.sum(hist)
+  }
+
+  // overrides
 
   override def pdf[A](dist: DataBinningDist[A], a: A): Double = dist match {
     case sketch: Sketch[A] => Sketch.pdf(sketch, a)
+    case hist: Histogram[A] => Histogram.pdf(hist, a)
   }
 
 }

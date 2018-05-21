@@ -1,7 +1,7 @@
 package flip.sim
 
-import flip.{Histogram, HistogramConf, NumericDist}
-import flip.pdf.{Dist, PlottedDist}
+import flip.conf.pdf.{CustomDataBinningDistConf, DataBinningDistConf}
+import flip.pdf.{Dist, Histogram, NumericDist, PlottedDist}
 import org.specs2.mutable._
 import org.specs2.ScalaCheck
 import flip.measure.syntax._
@@ -24,8 +24,8 @@ class CosineSpec extends Specification with ScalaCheck {
     }
 
     "basic 2" in {
-      implicit val histoConf: HistogramConf = HistogramConf(
-        binNo = 100, start = -3.0, end = 3.0,
+      implicit val histoConf: DataBinningDistConf = CustomDataBinningDistConf(
+        cmapSize = 100, cmapStart = Some(-3.0), cmapEnd = Some(3.0),
         counterSize = 100
       )
       val underlying = NumericDist.normal(0.0, 1)

@@ -1,8 +1,8 @@
 package flip
 
-import org.specs2.mutable._
+import flip.pdf.AdaSelSketch
 import org.specs2.ScalaCheck
-import flip.pdf.AdaPerSketch
+import org.specs2.mutable._
 
 class PackageSpec extends Specification with ScalaCheck {
 
@@ -13,15 +13,18 @@ class PackageSpec extends Specification with ScalaCheck {
     }
 
     "basic sketch type" in {
-      Sketch.empty[Double] must beAnInstanceOf[AdaPerSketch[Double]]
+      Sketch.empty[Double] must beAnInstanceOf[AdaSelSketch[Double]]
     }
 
     "sketch with custom conf" in {
-      val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 2, 0, 10)
+      val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 2, Some(0.0), Some(10.0))
       val (counterSize, counterNo) = (8, 2)
-      implicit val conf: SketchConf = SketchConf(cmapSize, cmapNo, cmapStart, cmapEnd, counterSize, counterNo)
+      implicit val conf: SketchConf = SketchConf(
+        cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
+        counterSize = counterSize, counterNo = counterNo
+      )
 
-      Sketch.empty[Double] must beAnInstanceOf[AdaPerSketch[Double]]
+      Sketch.empty[Double] must beAnInstanceOf[AdaSelSketch[Double]]
     }
 
   }

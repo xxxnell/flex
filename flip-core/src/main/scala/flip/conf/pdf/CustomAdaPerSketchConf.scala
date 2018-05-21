@@ -24,22 +24,22 @@ object CustomAdaPerSketchConf {
 
   def apply( // dist
             delta: Double = DefaultAdaPerSketchConf.delta,
-            // sketch
-            mixingRatio: Double = DefaultAdaPerSketchConf.mixingRatio,
-            dataKernelWindow: Double = DefaultAdaPerSketchConf.dataKernelWindow,
-            decayFactor: Double = DefaultAdaPerSketchConf.decayFactor,
-            // sketch: cmap
+            // cmap
             cmapSize: Int = DefaultAdaPerSketchConf.cmap.size,
             cmapNo: Int = DefaultAdaPerSketchConf.cmap.no,
             cmapStart: Option[Double] = DefaultAdaPerSketchConf.cmap.start,
             cmapEnd: Option[Double] = DefaultAdaPerSketchConf.cmap.end,
             boundaryRatio: Double = DefaultAdaPerSketchConf.cmap.boundaryRatio,
-            // sketch: counter
+            // counter
             counterSize: Int = DefaultAdaPerSketchConf.counter.size,
             counterNo: Int = DefaultAdaPerSketchConf.counter.no,
-            // sketch: adaptive
+            // sketch
+            mixingRatio: Double = DefaultAdaPerSketchConf.mixingRatio,
+            dataKernelWindow: Double = DefaultAdaPerSketchConf.dataKernelWindow,
+            decayFactor: Double = DefaultAdaPerSketchConf.decayFactor,
+            // adaptive sketch
             bufferSize: Int = DefaultAdaPerSketchConf.bufferSize,
-            // sketch: periodic
+            // periodic sketch
             startThreshold: Double = DefaultAdaPerSketchConf.startThreshold,
             thresholdPeriod: Double = DefaultAdaPerSketchConf.thresholdPeriod): CustomAdaPerSketchConf =
     bare(

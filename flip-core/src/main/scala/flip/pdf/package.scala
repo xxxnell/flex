@@ -17,9 +17,9 @@ package object pdf {
 
   type Ranges = List[Range]
 
-  type Structure = (Cmap, HCounter)
+//  type Structure = Histogram[]
 
-  type Structures = NonEmptyList[Structure]
+  type Structures = NonEmptyList[Histogram[Double]]
 
   implicit def autocast[A](sketch: Sketch[A]): SimpleSketch[A] = SimpleSketch.sketch2SimpleSketch(sketch)
 

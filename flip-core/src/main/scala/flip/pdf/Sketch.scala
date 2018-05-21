@@ -37,35 +37,32 @@ trait Sketch[A] extends DataBinningDist[A] {
 
 trait SketchPropOps[S[_] <: Sketch[_]] extends DataBinningDistOps[S] with SketchPropLaws[S] {
 
-  // read ops
-
-  /**
-    * Get the number of effective elements be memorized.
-    * */
-  def count[A](sketch: S[A], from: A, to: A): Count
-
-  def sum(sketch: S[_]): Count
-
   // update ops
 
   def modifyStructures[A](sketch: S[A], f: Structures => Structures): S[A]
 
   def narrowUpdate[A](sketch: S[A], as: List[(A, Count)]): S[A]
 
-  def deepUpdate[A](sketch: S[A], as: List[(A, Count)]): (S[A], Option[Structure])
-
-  //  def clear(sketch: S): S
+  def deepUpdate[A](sketch: S[A], as: List[(A, Count)]): (S[A], Option[Histogram[Double]])
 
 }
 
 trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
 
-  def modifyStructure[A](sketch: S[A], i: Int, f: Structure => Structure): S[A] = {
-    modifyStructures(sketch, strs => {
-      val _strs = strs.toList
-      NonEmptyList.fromListUnsafe(_strs.updated(i, f(_strs.apply(i))))
-    })
-  }
+  def modifyEffStructure[A](sketch: S[A], f: Histogram[Double] => Histogram[Double]): S[A] = modifyStructures(
+    sketch,
+    strs => {
+      val cmapNo = sketch.conf.cmap.no
+      val effNo = if (cmapNo > 1) cmapNo - 1 else cmapNo
+      var i = 0
+      strs.map { hist =>
+        if (i < effNo) {
+          i += 1
+          f(hist)
+        } else hist
+      }
+    }
+  )
 
   def flatDensity: Double = (1 / Cmap.max) * (1 / (1 - Cmap.min / Cmap.max))
 
@@ -152,23 +149,22 @@ trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
 
   def median[A](sketch: S[A]): A = {
     val measure = sketch.measure.asInstanceOf[Measure[A]]
-
     measure.from(icdfPlot(sketch).interpolation(0.5))
   }
 
   def cmapNo(sketch: S[_]): Int = sketch.structures.size.toInt
 
   def cmapSize(sketch: S[_]): Int =
-    sketch.structures.head._1.size
+    sketch.structures.head.cmap.size
 
   def counterNo(sketch: S[_]): Int =
-    sketch.structures.head._2.depth
+    sketch.structures.head.counter.depth
 
   def counterSize(sketch: S[_]): Int =
-    sketch.structures.head._2.width
+    sketch.structures.head.counter.width
 
   def youngCmap(sketch: S[_]): Cmap =
-    sketch.structures.head._1
+    sketch.structures.head.cmap
 
   def domain[A](sketch: S[A]): RangeM[A] = {
     val youngCmap = self.youngCmap(sketch)
@@ -186,7 +182,7 @@ trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
     else HCounter.emptyUncompressed(conf.cmap.size)
 
   def structures(conf: SketchConf): Structures =
-    NonEmptyList.of((Cmap(conf.cmap), counter(conf, -1)))
+    NonEmptyList.of(Histogram.empty(flip.doubleMeasure, conf))
 
   def concatStructures[A](as: List[(A, Count)], measure: Measure[A], conf: SketchConf): Structures = {
     val ps = as.map { case (a, c) => (measure.to(a), c) }
@@ -199,7 +195,7 @@ trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
       measure
     )
 
-    NonEmptyList.of((cmap, counter(conf, -1)))
+    NonEmptyList.of(Histogram.forCmap(cmap)(flip.doubleMeasure, conf))
   }
 
 }

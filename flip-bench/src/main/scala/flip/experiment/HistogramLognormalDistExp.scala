@@ -1,7 +1,9 @@
 package flip.experiment
 
+import flip.conf.pdf.{CustomDataBinningDistConf, DataBinningDistConf}
 import flip.implicits._
 import flip.experiment.ops.ExpOutOps
+import flip.pdf.Histogram
 
 /**
   * A experiment to compare with sketch and histogram.
@@ -13,12 +15,12 @@ object HistogramLognormalDistExp { self =>
     val sampleNo = 1000
     val underlying = NumericDist.logNormal(0.0, 1)
     val (_, datas) = underlying.samples(sampleNo)
-    val smplStart = 0.0
-    val smplEnd = underlying.icdf(0.95)
+    val start = 0.0
+    val end = underlying.icdf(0.95)
 
-    implicit val histoConf: HistogramConf = HistogramConf(
-      start = smplStart,
-      end = smplEnd
+    implicit val histoConf: DataBinningDistConf = CustomDataBinningDistConf(
+      cmapStart = Some(start),
+      cmapEnd = Some(end)
     )
     val emptyHisto = Histogram.empty[Double]
 
@@ -27,10 +29,10 @@ object HistogramLognormalDistExp { self =>
     val idxHistos = histoTraces.indices.zip(histoTraces).toList.filter { case (idx, _) => idx % 10 == 0 }
 
     // histogram results
-    val idxPdf = idxHistos.map { case (idx, histo) => (idx, histo.barPlot) }
-    val idxKld = idxHistos.map { case (idx, utdSkt) => (idx, KLD(underlying, utdSkt)) }
-    val idxCos = idxHistos.map { case (idx, utdSkt) => (idx, Cosine(underlying, utdSkt)) }
-    val idxEuc = idxHistos.map { case (idx, utdSkt) => (idx, Euclidean(underlying, utdSkt)) }
+    val idxPdf = idxHistos.map { case (idx, hist) => (idx, hist.barPlot) }
+    val idxKld = idxHistos.map { case (idx, hist) => (idx, KLD(underlying, hist)) }
+    val idxCos = idxHistos.map { case (idx, hist) => (idx, Cosine(underlying, hist)) }
+    val idxEuc = idxHistos.map { case (idx, hist) => (idx, Euclidean(underlying, hist)) }
 
     ExpOutOps.clear(expName)
 

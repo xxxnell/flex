@@ -6,6 +6,7 @@ import org.openjdk.jmh.annotations._
 import flip.implicits._
 import flip.cmap.Cmap
 import flip.hcounter.HCounter
+import flip.pdf.Histogram
 
 @BenchmarkMode(Array(Mode.AverageTime))
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
@@ -77,7 +78,7 @@ class SketchOpsBench { self =>
   }
 
   @Benchmark
-  def deepUpdate: (Sketch[Double], Option[(Cmap, HCounter)]) = {
+  def deepUpdate: (Sketch[Double], Option[Histogram[Double]]) = {
     sketch.deepUpdate(1.0 to 10.0 by 1.0: _*)
   }
 

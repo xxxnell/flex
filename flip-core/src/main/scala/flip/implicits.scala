@@ -2,8 +2,14 @@ package flip
 
 import flip.conf.pdf._
 import flip.measure.TrivialMeasures
-import flip.pdf.SimpleSketch
-import flip.pdf.syntax.{DistSyntax, NumericDistSyntax, SamplingDistSyntax, SketchSyntax, SmoothDistSyntax}
+import flip.pdf.syntax.{
+  DataBinningDistSyntax,
+  DistSyntax,
+  NumericDistSyntax,
+  SamplingDistSyntax,
+  SketchSyntax,
+  SmoothDistSyntax
+}
 import flip.range.RangeSyntax
 import flip.sim.SimSyntax
 
@@ -17,38 +23,17 @@ trait AllSyntax
     with RangePkgSyntax
     with SimPkgSyntax
 
-trait ConfPkgSyntax extends ConfPkgSyntax1 {
+trait ConfPkgSyntax extends flip.conf.ConfPkgSyntax {
 
   type SketchConf = CustomSketchConf
 
   def SketchConf: CustomAdaSelSketchConf.type = CustomAdaSelSketchConf
 
-  type HistogramConf = CustomSimpleSketchConf
-
-  def HistogramConf: CustomSimpleSketchConf.type = CustomSimpleSketchConf
-
-}
-
-trait ConfPkgSyntax1 extends ConfPkgSyntax2 {
-
-  implicit val defaultSmoothDistConf: flip.conf.pdf.SmoothDistConf = SmoothDistConf.default
-
-}
-
-trait ConfPkgSyntax2 {
-
-  implicit val defaultSketchConf: flip.conf.pdf.SketchConf = SketchConf.default
-
 }
 
 trait MeasurePkgSyntax extends TrivialMeasures
 
-trait PdfPkgSyntax
-    extends DistSyntax
-    with SamplingDistSyntax
-    with SmoothDistSyntax
-    with SketchSyntax
-    with NumericDistSyntax {
+trait PdfPkgSyntax extends flip.pdf.syntax.PdfPkgSyntax {
 
   type Dist[A] = flip.pdf.Dist[A]
 
@@ -61,10 +46,6 @@ trait PdfPkgSyntax
   type Sketch[A] = flip.pdf.Sketch[A]
 
   val Sketch: flip.pdf.Sketch.type = flip.pdf.Sketch
-
-  type Histogram[A] = flip.pdf.SimpleSketch[A]
-
-  val Histogram: SimpleSketch.type = flip.pdf.SimpleSketch
 
 }
 

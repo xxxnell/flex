@@ -30,13 +30,13 @@ class AdaPerSketchSpec extends Specification with ScalaCheck {
         val strSize = periodicSketch.structures.size
         val cmapSizes = periodicSketch.
           structures
-          .map { case (cmap, hcounter) => cmap.size }
+          .map { hist => hist.cmap.size }
         val counterNos = periodicSketch
           .structures
-          .map { case (cmap, hcounter) => hcounter.depth }
+          .map { hist => hist.counter.depth }
         val counterSizes = periodicSketch
           .structures
-          .map { case (cmap, hcounter) => hcounter.width }
+          .map { hist => hist.counter.width }
 
         val cond1 = strSize == 1
         val cond2 = cmapSizes.forall(_ == cmapSize)
@@ -65,13 +65,13 @@ class AdaPerSketchSpec extends Specification with ScalaCheck {
         val strSize = periodicSketch.structures.size
         val cmapSizes = periodicSketch.
           structures
-          .map { case (cmap, hcounter) => cmap.size }
+          .map { hist => hist.cmap.size }
         val counterNos = periodicSketch
           .structures
-          .map { case (cmap, hcounter) => hcounter.depth }
+          .map { hist => hist.counter.depth }
         val counterSizes = periodicSketch
           .structures
-          .map { case (cmap, hcounter) => hcounter.width }
+          .map { hist => hist.counter.width }
 
         val cond1 = strSize == 1
         val cond2 = cmapSizes.forall(_ == cmapSize)
