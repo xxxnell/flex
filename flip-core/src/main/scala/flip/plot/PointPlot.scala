@@ -265,6 +265,20 @@ object PointPlot extends PointPlotOps[PointPlot] {
     unsafe(records)
   }
 
+  def cumulative(ds: List[(Prim, Count)]): PointPlot = {
+    val records = safe(ds.toArray).records
+    var i = 0
+    var cum = 0.0
+    val records1 = Array.ofDim[(Prim, Count)](records.length)
+    while (i < records.length) {
+      val (p, count) = records.apply(i)
+      cum += count
+      records1.update(i, (p, cum))
+      i += 1
+    }
+    unsafe(records1)
+  }
+
   def normalizedCumulative(ds: List[(Prim, Count)]): PointPlot = {
     val records = safe(ds.toArray).records
     var i = 0

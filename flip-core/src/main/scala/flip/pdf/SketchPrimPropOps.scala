@@ -3,8 +3,8 @@ package flip.pdf
 import cats.data.NonEmptyList
 import cats.implicits._
 import flip.measure.Measure
-import flip.pdf.update.{EqUpdate, EqualSpaceSmoothingPs, SmoothingPs}
 import flip.pdf.syntax._
+import flip.pdf.update.{EqUpdate, EqualSpaceSmoothingPs, SmoothingPs}
 import flip.plot.PointPlot
 
 import scala.collection.mutable
@@ -38,78 +38,22 @@ trait SketchPrimPropOps[S[_] <: Sketch[_]] extends SketchPrimPropLaws[S] with Sk
     (sketch2, strs0.headOption)
   }
 
-//  @Deprecated
-//  def primNarrowPlotUpdateForStr[A](sketch: S[A], psDist: Dist[Prim], sum: Double): S[A] = {
-//    val ps = youngCmap(sketch).bin.map { range =>
-//      // todo range.middle is hacky approach
-//      (range.middle, psDist.probability(range.start, range.end) * sum)
-//    }
-//
-//    primNarrowUpdateForStrs(sketch, ps)
-//  }
-
   def primSmoothingNarrowUpdateForStr[A](sketch: S[A], ps: List[(Prim, Count)]): S[A] = {
-//    // Retrieve count cumulative plot
-//    val psArr = ps.sortBy(_._1).toArray
-//    var i = 0
-//    val cumArr = Array.ofDim[(Double, Double)](psArr.length + 2)
-//    var _cum = 0.0
-//    cumArr.update(0, (Double.MinValue, 0))
-//    while (i < psArr.length) {
-//      val (x, count) = psArr.apply(i)
-//      _cum += count
-//      cumArr.update(i + 1, (x, _cum))
-//      i += 1
-//    }
-//    cumArr.update(psArr.length + 1, (Double.MaxValue, _cum))
-//    val cum = PointPlot.unsafe(cumArr)
-    val cum = PointPlot.normalizedCumulative(ps)
+    val cum = PointPlot.cumulative(ps)
 
-    // NarrowUpdate counts
-//    val maxCmapNo = sketch.conf.cmap.no
-//    val cmapNo = self.cmapNo(sketch)
-//    val effNo = if (maxCmapNo > 1) maxCmapNo - 1 else maxCmapNo
-//    var j = 0
-//    var _sketch = sketch
-//    while (j < cmapNo && j < effNo) {
-//      _sketch = modifyStructure(
-//        _sketch,
-//        j, {
-//          hist =>
-//            var k = 0
-//            val bins = hist.cmap.bin.toArray
-//            var cum1 = 0.0
-//            var _counter = counter
-//            while (k < bins.length) {
-//              val cum2 = cum.interpolation(bins.apply(k).end)
-//              _counter = _counter.update(k, cum2 - cum1)
-//              cum1 = cum2
-//              k += 1
-//            }
-//            (cmap, _counter)
-//        }
-//      )
-//      j += 1
-//    }
-//    _sketch
-
-    modifyEffStructure(
-      sketch,
-      hist =>
-        hist.modifyCounter { counter =>
-          val bins = hist.cmap.bin.toArray
-          var i = 0
-          var cump1 = 0.0
-          var _counter = counter
-          while (i < bins.length) {
-            val cump2 = cum.interpolation(bins.apply(i).end)
-            _counter = counter.update(i, cump2 - cump1)
-            cump1 = cump2
-            i += 1
-          }
-          _counter
+    def updateForCum(hist: Histogram[Double], cum: PointPlot): Histogram[Double] = hist.modifyCounter { counter =>
+      val bins = hist.cmap.bin.toArray
+      var (i, cump1, _counter) = (0, 0.0, counter)
+      while (i < bins.length) {
+        val cump2 = cum.interpolation(bins.apply(i).end)
+        _counter = _counter.update(i, cump2 - cump1)
+        cump1 = cump2
+        i += 1
       }
-    )
+      _counter
+    }
+
+    modifyEffStructure(sketch, hist => updateForCum(hist, cum))
   }
 
   // Read ops
@@ -128,31 +72,6 @@ trait SketchPrimPropOps[S[_] <: Sketch[_]] extends SketchPrimPropLaws[S] with Sk
       }
     )
   }
-
-//  def singleCount(cmap: Cmap, hcounter: HCounter, pStart: Double, pEnd: Double): Double = {
-//    val (startHdim, endHdim) = (cmap.apply(pStart), cmap.apply(pEnd))
-//    val (startRng, endRng) = (cmap.range(startHdim), cmap.range(endHdim))
-//
-//    // mid count
-//    val midCount = if ((endHdim - 1) > (startHdim + 1)) {
-//      hcounter.count(startHdim + 1, endHdim - 1)
-//    } else 0.0
-//
-//    // boundary count
-//    val boundaryCount = if (startHdim == endHdim) {
-//      val count = hcounter.get(startHdim)
-//      val percent = startRng.overlapPercent(RangeP(pStart, pEnd))
-//      count * percent
-//    } else {
-//      val startCount = HCounter.get(hcounter, startHdim)
-//      val startPercent = startRng.overlapPercent(RangeP(pStart, startRng.end))
-//      val endCount = HCounter.get(hcounter, endHdim)
-//      val endPercent = endRng.overlapPercent(RangeP(endRng.start, pEnd))
-//      startCount * startPercent + endCount * endPercent
-//    }
-//
-//    midCount + boundaryCount
-//  }
 
   def primCountForStr(sketch: S[_], pFrom: Prim, pTo: Prim): Double = {
     val counts = sketch.structures.map { hist =>
