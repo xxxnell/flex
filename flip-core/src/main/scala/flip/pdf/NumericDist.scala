@@ -97,6 +97,7 @@ object NumericDist extends NumericDistOps[NumericDist] {
 
   override def sampling[A](dist: NumericDist[A]): PointPlot = dist match {
     case dist: DeltaDist[A] => DeltaDist.sampling(dist)
+    case dist: UniformDist[A] => UniformDist.sampling(dist)
     case _ => super.sampling(dist)
   }
 

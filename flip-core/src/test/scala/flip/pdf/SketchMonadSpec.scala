@@ -111,6 +111,8 @@ class SketchMonadSpec extends Specification with ScalaCheck {
 
     }
 
+    // End
+
   }
 
 }
