@@ -8,6 +8,7 @@ import flip.plot.{DensityPlot, PointPlot}
 import flip.range.RangeP
 import flip.rand.IRng
 
+import scala.collection.mutable.ArrayBuffer
 import scala.language.higherKinds
 
 trait Histogram[A] extends DataBinningDist[A] {
@@ -76,7 +77,18 @@ trait HistogramLaws[H[_] <: Histogram[_]] { self: HistogramOps[H] =>
 
   def rangeSampling[A](hist: Histogram[A]): DensityPlot = ???
 
-  def pointSampling[A](hist: Histogram[A]): PointPlot = ???
+  def pointSampling[A](hist: Histogram[A]): PointPlot = {
+    val bins = hist.cmap.bin.toArray
+    var i = 1
+    val records = new ArrayBuffer[(Double, Double)]
+    while (i < bins.length - 1) {
+      val count = hist.counter.get(i)
+      val range = bins.apply(i)
+      if (!range.isPoint) records.append((range.cutoffMiddle, count / range.cutoffLength))
+      i += 1
+    }
+    PointPlot.unsafe(records.toArray)
+  }
 
 }
 
