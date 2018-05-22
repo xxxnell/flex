@@ -27,8 +27,10 @@ object BenchApp {
 
 object BenchAppConfs {
 
-  val warmup = 20
-  val measurement = 30
+  val warmup = 5
+  val warmupTime: TimeValue = TimeValue.seconds(1)
+  val measurement = 10
+  val measurementTime: TimeValue = TimeValue.seconds(1)
   val thread = 1
   val fork = 1
 
@@ -37,12 +39,14 @@ object BenchAppConfs {
 
     val builder0 = new OptionsBuilder()
     val builder1 = builder0.warmupIterations(BenchAppConfs.warmup)
-    val builder2 = builder1.measurementIterations(BenchAppConfs.measurement)
-    val builder3 = builder2.threads(BenchAppConfs.thread)
-    val builder4 = builder3.forks(BenchAppConfs.fork)
-    val builder5 = includeO.fold(builder4)(include => builder4.include(include))
+    val builder2 = builder1.warmupTime(BenchAppConfs.warmupTime)
+    val builder3 = builder2.measurementIterations(BenchAppConfs.measurement)
+    val builder4 = builder3.measurementTime(BenchAppConfs.measurementTime)
+    val builder5 = builder4.threads(BenchAppConfs.thread)
+    val builder6 = builder5.forks(BenchAppConfs.fork)
+    val builder7 = includeO.fold(builder6)(include => builder4.include(include))
 
-    builder5
+    builder7
   }
 
   def linearIterateSize(builder: ChainedOptionsBuilder, start: Int, end: Int, by: Int): ChainedOptionsBuilder =

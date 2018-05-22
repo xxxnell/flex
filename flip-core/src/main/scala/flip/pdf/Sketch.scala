@@ -37,35 +37,32 @@ trait Sketch[A] extends DataBinningDist[A] {
 
 trait SketchPropOps[S[_] <: Sketch[_]] extends DataBinningDistOps[S] with SketchPropLaws[S] {
 
-  // read ops
-
-  /**
-    * Get the number of effective elements be memorized.
-    * */
-  def count[A](sketch: S[A], from: A, to: A): Count
-
-  def sum(sketch: S[_]): Count
-
   // update ops
 
   def modifyStructures[A](sketch: S[A], f: Structures => Structures): S[A]
 
   def narrowUpdate[A](sketch: S[A], as: List[(A, Count)]): S[A]
 
-  def deepUpdate[A](sketch: S[A], as: List[(A, Count)]): (S[A], Option[Structure])
-
-  //  def clear(sketch: S): S
+  def deepUpdate[A](sketch: S[A], as: List[(A, Count)]): (S[A], Option[Histogram[Double]])
 
 }
 
 trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
 
-  def modifyStructure[A](sketch: S[A], i: Int, f: Structure => Structure): S[A] = {
-    modifyStructures(sketch, strs => {
-      val _strs = strs.toList
-      NonEmptyList.fromListUnsafe(_strs.updated(i, f(_strs.apply(i))))
-    })
-  }
+  def modifyEffStructure[A](sketch: S[A], f: Histogram[Double] => Histogram[Double]): S[A] = modifyStructures(
+    sketch,
+    strs => {
+      val cmapNo = sketch.conf.cmap.no
+      val effNo = if (cmapNo > 1) cmapNo - 1 else cmapNo
+      var i = 0
+      strs.map { hist =>
+        if (i < effNo) {
+          i += 1
+          f(hist)
+        } else hist
+      }
+    }
+  )
 
   def flatDensity: Double = (1 / Cmap.max) * (1 / (1 - Cmap.min / Cmap.max))
 
@@ -101,74 +98,53 @@ trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
   }
 
   def pointSampling[A](sketch: S[A]): PointPlot = {
-    val RATIO = 100.0 // todo why 100.0?
-    val CUTOFF = 1E300 // todo CUTOFF is hacky approach
-
-    val cmap = youngCmap(sketch)
-    val rangePs = cmap.bin.filter(range => math.abs(range.start) < CUTOFF && math.abs(range.end) < CUTOFF).toArray
     val measure = sketch.measure.asInstanceOf[Measure[A]]
-
-    var i = 0
+    val ranges = sketch.structures.head.cmap.bin.toArray
     val records = new ArrayBuffer[(Double, Double)]
-    while (i < rangePs.length) {
-      lazy val rangeP0 = rangePs.apply(i - 1)
-      lazy val rangeP1 = rangePs.apply(i)
-      lazy val rangeM1 = rangeP1.modifyMeasure(measure)
-      lazy val l1 = rangeP1.cutoffLength
-      lazy val l0 = rangeP0.cutoffLength
-      lazy val widthRatio = l1 / l0
-      lazy val (_, prod0) = records.apply(records.length - 1)
-      lazy val prod1O: Option[Double] =
-        if (l1 != 0) Some(probability(sketch, rangeM1.start, rangeM1.end) / l1) else None
-
-      prod1O.foreach(prod1 => {
-        if (records.nonEmpty && widthRatio < (1 / RATIO) && l0 > 0) {
-          val _prob = prod0 + (prod1 - prod0) * (l1 / l0)
-          records.append((rangeP1.start, _prob))
-        } else if (records.nonEmpty && widthRatio > RATIO && l1 > 0) {
-          val _prob = prod1 + (prod0 - prod1) * (l0 / l1)
-          records.append((rangeP1.start, _prob))
-        }
-        records.append((rangeP1.cutoffMiddle, prod1))
-      })
+    var i = 1
+    while (i < ranges.length - 1) {
+      val rangeP = ranges.apply(i)
+      val rangeM = rangeP.modifyMeasure(measure)
+      val prob = probability(sketch, rangeM.start, rangeM.end)
+      val pdfO = if (!rangeM.isPoint) Some(prob / rangeM.cutoffLength) else None
+      pdfO.foreach(pdf => records.append((rangeP.cutoffMiddle, pdf)))
       i += 1
     }
 
     PointPlot.safe(records.toArray)
   }
 
-  def fastPdf[A](sketch: S[A], a: A): Double = {
-    val cmap = youngCmap(sketch)
-    val p = sketch.measure.asInstanceOf[Measure[A]].to(a)
-    val idx = cmap(p)
-    val rangePs = cmap.range(idx - 1) :: cmap.range(idx) :: cmap.range(idx + 1) :: Nil
-    val rangeMs = rangePs.map(rangeP => rangeP.modifyMeasure(sketch.measure.asInstanceOf[Measure[A]]))
-    val sampling = rangeSamplingForRanges(sketch, rangeMs)
+//  def fastPdf[A](sketch: S[A], a: A): Double = {
+//    val cmap = youngCmap(sketch)
+//    val p = sketch.measure.asInstanceOf[Measure[A]].to(a)
+//    val idx = cmap(p)
+//    val rangePs = cmap.range(idx - 1) :: cmap.range(idx) :: cmap.range(idx + 1) :: Nil
+//    val rangeMs = rangePs.map(rangeP => rangeP.modifyMeasure(sketch.measure.asInstanceOf[Measure[A]]))
+//    val sampling = rangeSamplingForRanges(sketch, rangeMs)
+//
+//    sampling.interpolation(p)
+//  }
 
-    sampling.interpolation(p)
-  }
-
-  override def pdf[A](dist: S[A], a: A): Count = fastPdf(dist, a)
+  override def pdf[A](dist: S[A], a: A): Count = interpolationPdf(dist, a) // fastPdf(dist, a)
 
   def median[A](sketch: S[A]): A = {
     val measure = sketch.measure.asInstanceOf[Measure[A]]
-
     measure.from(icdfPlot(sketch).interpolation(0.5))
   }
 
   def cmapNo(sketch: S[_]): Int = sketch.structures.size.toInt
 
   def cmapSize(sketch: S[_]): Int =
-    sketch.structures.head._1.size
+    sketch.structures.head.cmap.size
 
   def counterNo(sketch: S[_]): Int =
-    sketch.structures.head._2.depth
+    sketch.structures.head.counter.depth
 
   def counterSize(sketch: S[_]): Int =
-    sketch.structures.head._2.width
+    sketch.structures.head.counter.width
 
   def youngCmap(sketch: S[_]): Cmap =
-    sketch.structures.head._1
+    sketch.structures.head.cmap
 
   def domain[A](sketch: S[A]): RangeM[A] = {
     val youngCmap = self.youngCmap(sketch)
@@ -186,7 +162,7 @@ trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
     else HCounter.emptyUncompressed(conf.cmap.size)
 
   def structures(conf: SketchConf): Structures =
-    NonEmptyList.of((Cmap(conf.cmap), counter(conf, -1)))
+    NonEmptyList.of(Histogram.empty(flip.doubleMeasure, conf))
 
   def concatStructures[A](as: List[(A, Count)], measure: Measure[A], conf: SketchConf): Structures = {
     val ps = as.map { case (a, c) => (measure.to(a), c) }
@@ -199,7 +175,7 @@ trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
       measure
     )
 
-    NonEmptyList.of((cmap, counter(conf, -1)))
+    NonEmptyList.of(Histogram.forCmap(cmap)(flip.doubleMeasure, conf))
   }
 
 }

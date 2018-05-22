@@ -4,7 +4,7 @@ import flip.cmap.Cmap
 import flip.conf.pdf.SketchConf
 import flip.measure.Measure
 import flip.pdf.monad.{SketchBind, SketchFunctor}
-import flip.pdf.{Count, Dist, Sketch, Structure}
+import flip.pdf.{Count, Dist, Histogram, Sketch}
 import flip.plot.{DensityPlot, PointPlot}
 import flip.range.RangeM
 
@@ -30,11 +30,10 @@ trait SketchPropSyntax {
     }
     def narrowUpdate(as: A*): Sketch[A] =
       Sketch.narrowUpdate(sketch, as.toList.map(a => (a, 1d)))
-    def deepUpdate(as: A*): (Sketch[A], Option[Structure]) =
+    def deepUpdate(as: A*): (Sketch[A], Option[Histogram[Double]]) =
       Sketch.deepUpdate(sketch, as.toList.map(a => (a, 1d)))
     def count(from: A, to: A): Double = Sketch.count(sketch, from, to)
     def sum: Double = Sketch.sum(sketch)
-    //    def clear: Sketch = Sketch.clear(sketch)
     def probability(from: A, to: A): Double =
       Sketch.probability(sketch, from, to)
     def rebuild: Sketch[A] =

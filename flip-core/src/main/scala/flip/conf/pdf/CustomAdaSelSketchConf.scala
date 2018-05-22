@@ -1,6 +1,5 @@
 package flip.conf.pdf
 
-import flip.conf._
 import flip.conf.cmap.CmapConf
 import flip.conf.counter.CounterConf
 
@@ -27,25 +26,25 @@ object CustomAdaSelSketchConf {
 
   def apply( // dist
             delta: Double = DefaultAdaSelSketchConf.delta,
-            // sketch
-            mixingRatio: Double = DefaultAdaSelSketchConf.mixingRatio,
-            dataKernelWindow: Double = DefaultAdaSelSketchConf.dataKernelWindow,
-            decayFactor: Double = DefaultAdaSelSketchConf.decayFactor,
-            // sketch: cmap
+            // cmap
             cmapSize: Int = DefaultAdaSelSketchConf.cmap.size,
             cmapNo: Int = DefaultAdaSelSketchConf.cmap.no,
             cmapStart: Option[Double] = DefaultAdaSelSketchConf.cmap.start,
             cmapEnd: Option[Double] = DefaultAdaSelSketchConf.cmap.end,
             boundaryRatio: Double = DefaultAdaSelSketchConf.cmap.boundaryRatio,
-            // sketch: counter
+            // counter
             counterSize: Int = DefaultAdaSelSketchConf.counter.size,
             counterNo: Int = DefaultAdaSelSketchConf.counter.no,
-            // sketch: adaptive
+            // sketch
+            mixingRatio: Double = DefaultAdaSelSketchConf.mixingRatio,
+            dataKernelWindow: Double = DefaultAdaSelSketchConf.dataKernelWindow,
+            decayFactor: Double = DefaultAdaSelSketchConf.decayFactor,
+            // adaptive sketch
             bufferSize: Int = DefaultAdaSelSketchConf.bufferSize,
-            // sketch: periodic
+            // periodic sketch
             startThreshold: Double = DefaultAdaSelSketchConf.startThreshold,
             thresholdPeriod: Double = DefaultAdaSelSketchConf.thresholdPeriod,
-            // sketch: selective
+            // selective sketch
             rebuildThreshold: Double = DefaultAdaSelSketchConf.rebuildThreshold): CustomAdaSelSketchConf =
     bare(
       delta,

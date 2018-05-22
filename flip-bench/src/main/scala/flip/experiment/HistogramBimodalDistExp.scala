@@ -1,7 +1,9 @@
 package flip.experiment
 
+import flip.conf.pdf.{CustomDataBinningDistConf, DataBinningDistConf}
 import flip.implicits._
 import flip.experiment.ops.ExpOutOps
+import flip.pdf.Histogram
 
 /**
   * A experiment to compare with sketch and histogram.
@@ -17,9 +19,9 @@ object HistogramBimodalDistExp { self =>
     val end = underlying.icdf(0.95)
 
     val emptyHisto = {
-      implicit val histoConf: HistogramConf = HistogramConf(
-        start = start,
-        end = end
+      implicit val histoConf: DataBinningDistConf = CustomDataBinningDistConf(
+        cmapStart = Some(start),
+        cmapEnd = Some(end)
       )
       Histogram.empty[Double]
     }

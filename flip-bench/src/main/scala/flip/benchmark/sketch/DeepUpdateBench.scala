@@ -5,9 +5,9 @@ import java.util.concurrent.TimeUnit
 import flip.cmap.Cmap
 import flip.hcounter.HCounter
 import flip.implicits._
-import flip.pdf.update.{EqUpdate, EqualSpaceSmoothingPs, SmoothingPs}
-import flip.pdf.{AdaptiveSketch, Count, Prim, Sketch, Structure}
 import flip.pdf.Buffer.syntax._
+import flip.pdf.update.EqUpdate
+import flip.pdf.{AdaptiveSketch, Count, Histogram, Sketch}
 import flip.{NumericDist, SketchConf}
 import org.openjdk.jmh.annotations._
 
@@ -70,9 +70,6 @@ class DeepUpdateBench { self =>
 
     def emptyCounter: HCounter = Sketch.counter(sketch.conf, seed)
 
-    def strs: (List[(Cmap, HCounter)], List[(Cmap, HCounter)]) =
-      ((cmapC, emptyCounterC) :: sketch.structures).toList.splitAt(sketch.conf.cmap.no)
-
     def updatePs(): Sketch[Count] =
       if (ps.nonEmpty) {
         Sketch.primSmoothingNarrowUpdateForStr(sketch, ps)
@@ -81,12 +78,12 @@ class DeepUpdateBench { self =>
   }
 
   @Benchmark
-  def deepUpdate: (Sketch[Count], Option[Structure]) = {
+  def deepUpdate: (Sketch[Count], Option[Histogram[Double]]) = {
     sketch.deepUpdate()
   }
 
   @Benchmark
-  def primDeepUpdate: (Sketch[Count], Option[(Cmap, HCounter)]) = {
+  def primDeepUpdate: (Sketch[Count], Option[Histogram[Count]]) = {
     Sketch.primDeepUpdate(sketch, sketch.asInstanceOf[AdaptiveSketch[Double]].buffer.toList)
   }
 
@@ -108,10 +105,6 @@ class DeepUpdateBench { self =>
   @Benchmark
   def emptyCounter: HCounter = {
     DeepUpdateAlgorithm.emptyCounter
-  }
-  @Benchmark
-  def strs: (List[(Cmap, HCounter)], List[(Cmap, HCounter)]) = {
-    DeepUpdateAlgorithm.strs
   }
 
   @Benchmark

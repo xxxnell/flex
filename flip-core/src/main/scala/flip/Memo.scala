@@ -30,7 +30,7 @@ trait MemoOps {
     memo.queue += k
     memo.table += ((k, v))
     if (!memo.full && memo.queue.size >= memo.size) memo.full = true
-    if (memo.full) memo.table.remove(memo.queue.dequeue())
+    if (memo.full && memo.queue.nonEmpty) memo.table.remove(memo.queue.dequeue())
   }
 
 }
