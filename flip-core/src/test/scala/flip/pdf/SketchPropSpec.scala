@@ -430,53 +430,53 @@ class SketchPropSpec extends Specification with ScalaCheck {
 
     }
 
-    "fastPdf" in {
-
-      "basic" in {
-        implicit val conf: SketchConf = SketchConf(
-          cmapSize = 10, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
-          counterSize = 10, counterNo = 2
-        )
-        val sketch0 = Sketch.empty[Double]
-        val sketch1 = sketch0.update(0, 1, 1, 2, 3)
-
-        val interpPdf = SamplingDist.interpolationPdf(sketch1, 1d)
-        val fastPdf = Sketch.fastPdf(sketch1, 1d)
-
-        if(interpPdf ~= fastPdf) ok else ko(s"interpPdf: $interpPdf, fastPdf: $fastPdf")
-      }
-
-      "boundary" in {
-
-        "least" in {
-          implicit val conf: SketchConf = SketchConf(
-            cmapSize = 10, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
-            counterSize = 10, counterNo = 2
-          )
-          val sketch0 = Sketch.empty[Double]
-          val sketch1 = sketch0.update(0, 1, 1, 2, 3)
-          val fastPdf = Sketch.fastPdf(sketch1, Double.MinValue)
-
-          ok
-        }
-
-        "largest" in {
-          implicit val conf: SketchConf = SketchConf(
-            cmapSize = 10, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
-            counterSize = 10, counterNo = 2
-          )
-          val sketch0 = Sketch.empty[Double]
-          val sketch1O = sketch0.update(0, 1, 1, 2, 3)
-
-          val sketch1 = sketch1O
-          val fastPdf = Sketch.fastPdf(sketch1, Double.MaxValue)
-
-          ok
-        }
-
-      }
-
-    }
+//    "fastPdf" in {
+//
+//      "basic" in {
+//        implicit val conf: SketchConf = SketchConf(
+//          cmapSize = 10, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
+//          counterSize = 10, counterNo = 2
+//        )
+//        val sketch0 = Sketch.empty[Double]
+//        val sketch1 = sketch0.update(0, 1, 1, 2, 3)
+//
+//        val interpPdf = SamplingDist.interpolationPdf(sketch1, 1d)
+//        val fastPdf = Sketch.fastPdf(sketch1, 1d)
+//
+//        if(interpPdf ~= fastPdf) ok else ko(s"interpPdf: $interpPdf, fastPdf: $fastPdf")
+//      }
+//
+//      "boundary" in {
+//
+//        "least" in {
+//          implicit val conf: SketchConf = SketchConf(
+//            cmapSize = 10, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
+//            counterSize = 10, counterNo = 2
+//          )
+//          val sketch0 = Sketch.empty[Double]
+//          val sketch1 = sketch0.update(0, 1, 1, 2, 3)
+//          val fastPdf = Sketch.fastPdf(sketch1, Double.MinValue)
+//
+//          ok
+//        }
+//
+//        "largest" in {
+//          implicit val conf: SketchConf = SketchConf(
+//            cmapSize = 10, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
+//            counterSize = 10, counterNo = 2
+//          )
+//          val sketch0 = Sketch.empty[Double]
+//          val sketch1O = sketch0.update(0, 1, 1, 2, 3)
+//
+//          val sketch1 = sketch1O
+//          val fastPdf = Sketch.fastPdf(sketch1, Double.MaxValue)
+//
+//          ok
+//        }
+//
+//      }
+//
+//    }
 
     "sample & samples" in {
 

@@ -114,18 +114,18 @@ trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
     PointPlot.safe(records.toArray)
   }
 
-  def fastPdf[A](sketch: S[A], a: A): Double = {
-    val cmap = youngCmap(sketch)
-    val p = sketch.measure.asInstanceOf[Measure[A]].to(a)
-    val idx = cmap(p)
-    val rangePs = cmap.range(idx - 1) :: cmap.range(idx) :: cmap.range(idx + 1) :: Nil
-    val rangeMs = rangePs.map(rangeP => rangeP.modifyMeasure(sketch.measure.asInstanceOf[Measure[A]]))
-    val sampling = rangeSamplingForRanges(sketch, rangeMs)
+//  def fastPdf[A](sketch: S[A], a: A): Double = {
+//    val cmap = youngCmap(sketch)
+//    val p = sketch.measure.asInstanceOf[Measure[A]].to(a)
+//    val idx = cmap(p)
+//    val rangePs = cmap.range(idx - 1) :: cmap.range(idx) :: cmap.range(idx + 1) :: Nil
+//    val rangeMs = rangePs.map(rangeP => rangeP.modifyMeasure(sketch.measure.asInstanceOf[Measure[A]]))
+//    val sampling = rangeSamplingForRanges(sketch, rangeMs)
+//
+//    sampling.interpolation(p)
+//  }
 
-    sampling.interpolation(p)
-  }
-
-  override def pdf[A](dist: S[A], a: A): Count = fastPdf(dist, a)
+  override def pdf[A](dist: S[A], a: A): Count = interpolationPdf(dist, a) // fastPdf(dist, a)
 
   def median[A](sketch: S[A]): A = {
     val measure = sketch.measure.asInstanceOf[Measure[A]]
