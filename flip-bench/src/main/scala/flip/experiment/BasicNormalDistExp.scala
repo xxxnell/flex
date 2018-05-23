@@ -18,13 +18,15 @@ object BasicNormalDistExp {
     val (_, datas) = underlying.samples(dataNo)
     val sketchTraces = sketch0 :: sketch0.updateTrace(datas)
     val idxSketches = sketchTraces.indices.zip(sketchTraces).toList.filter { case (idx, _) => idx % 10 == 0 }
-    val idxDensityPlots = idxSketches.map { case (idx, utdSkt) => (idx, utdSkt.barPlot) }
-    val idxKld = idxSketches.map { case (idx, utdSkt) => (idx, KLD(underlying, utdSkt)) }
-    val idxCos = idxSketches.map { case (idx, utdSkt) => (idx, Cosine(underlying, utdSkt)) }
-    val idxEuc = idxSketches.map { case (idx, utdSkt) => (idx, Euclidean(underlying, utdSkt)) }
+    val idxPdf = idxSketches.map { case (idx, sketch) => (idx, sketch.barPlot.csv) }
+    val idxCdf = idxSketches.map { case (idx, sketch) => (idx, sketch.sampling.normalizedCumulative.csv) }
+    val idxKld = idxSketches.map { case (idx, sketch) => (idx, KLD(underlying, sketch)) }
+    val idxCos = idxSketches.map { case (idx, sketch) => (idx, Cosine(underlying, sketch)) }
+    val idxEuc = idxSketches.map { case (idx, sketch) => (idx, Euclidean(underlying, sketch)) }
 
     ExpOutOps.clear(expName1)
-    ExpOutOps.writePlots(expName1, "pdf", idxDensityPlots)
+    ExpOutOps.writeStrs(expName1, "pdf", idxPdf)
+    ExpOutOps.writeStrs(expName1, "cdf", idxCdf)
     ExpOutOps.writeStr(expName1, "kld", idxKld.map { case (idx, kld) => s"$idx, $kld" }.mkString("\n"))
     ExpOutOps.writeStr(expName1, "cosine", idxCos.map { case (idx, cosine) => s"$idx, $cosine" }.mkString("\n"))
     ExpOutOps.writeStr(expName1, "euclidean", idxEuc.map { case (idx, euc) => s"$idx, $euc" }.mkString("\n"))
