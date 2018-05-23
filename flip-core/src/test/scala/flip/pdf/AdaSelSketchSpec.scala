@@ -25,7 +25,7 @@ class AdaSelSketchSpec extends Specification with ScalaCheck {
 
     "diagnose" in {
 
-      "basic" in {
+      "ignore" in {
         val bufferSize = 50
         implicit val conf: CustomAdaSelSketchConf = CustomAdaSelSketchConf(
           cmapSize = 20, cmapNo = 2, cmapStart = Some(-3.0), cmapEnd = Some(3.0),
@@ -40,7 +40,7 @@ class AdaSelSketchSpec extends Specification with ScalaCheck {
         val sketch1 = sketch0.updateInOrder(samples)
         val diagnose = AdaSelSketch.diagnose(sketch1.asInstanceOf[AdaSelSketch[Double]])
 
-        if(diagnose) ko else ok
+        if(diagnose) ko(s"diagnose: $diagnose") else ok
       }
 
       "shifted" in {
@@ -57,7 +57,7 @@ class AdaSelSketchSpec extends Specification with ScalaCheck {
         val sketch1 = sketch0.updateInOrder(samples)
         val diagnose = AdaSelSketch.diagnose(sketch1.asInstanceOf[AdaSelSketch[Double]])
 
-        if(!diagnose) ko else ok
+        if(!diagnose) ko(s"diagnose: $diagnose") else ok
       }
 
       "broad" in {
@@ -74,7 +74,7 @@ class AdaSelSketchSpec extends Specification with ScalaCheck {
         val sketch1 = sketch0.updateInOrder(samples)
         val diagnose = AdaSelSketch.diagnose(sketch1.asInstanceOf[AdaSelSketch[Double]])
 
-        if(!diagnose) ko else ok
+        if(!diagnose) ko(s"diagnose: $diagnose") else ok
       }
 
     }
