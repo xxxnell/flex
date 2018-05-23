@@ -3,7 +3,7 @@ package flip.pdf
 import flip.conf.pdf.AdaSelSketchConf
 import flip.measure.Measure
 import flip.pdf.Buffer.syntax._
-import flip.pdf.diagnose.{CDFDiagnose, KLDDiagnose}
+import flip.pdf.diagnose.{CDFDiagnose, KLDDiagnose, KSDiagnose}
 import flip.plot.PointPlot
 import flip.rand.IRng
 
@@ -17,7 +17,7 @@ trait AdaSelSketch[A] extends AdaptiveSketch[A] with SelectiveSketch[A] {
 
 trait AdaSelSketchOps[S[_] <: AdaSelSketch[_]] extends AdaptiveSketchOps[S] with SelectiveSketchOps[S] {
 
-  private val tester: CDFDiagnose = KLDDiagnose
+  private val tester: CDFDiagnose = KSDiagnose
 
   def diagnose[A](sketch: S[A]): Boolean = {
     val threshold = sketch.conf.rebuildThreshold

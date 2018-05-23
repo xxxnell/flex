@@ -14,7 +14,9 @@ object KSDiagnose extends CDFDiagnose {
     var sup = 0.0
     cdfForeach(cdf1, cdf2, {
       case (x1, x2, cum11, cum12, cum21, cum22) =>
-        sup = (cum12 - cum11 :: cum22 - cum21 :: sup :: Nil).max
+        val diff1 = math.abs(cum12 - cum22)
+        val diff2 = math.abs(cum11 - cum21)
+        sup = (diff1 :: diff2 :: sup :: Nil).max
     })
     sup
   }
