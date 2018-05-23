@@ -16,9 +16,6 @@ object KSDiagnose extends CDFDiagnose {
       case (x1, x2, cum11, cum12, cum21, cum22) =>
         sup = (cum12 - cum11 :: cum22 - cum21 :: sup :: Nil).max
     })
-
-    println(sup)
-
     sup
   }
 
