@@ -271,7 +271,7 @@ object PointPlot extends PointPlotOps[PointPlot] {
   }
 
   def cumulative(ds: List[(Prim, Count)]): PointPlot = {
-    val records = ds.sortBy(_._1)
+    val records = ds.sortBy(_._1).toArray
     var i = 0
     var cum = 0.0
     val records1 = Array.ofDim[(Prim, Count)](records.length)
@@ -285,7 +285,7 @@ object PointPlot extends PointPlotOps[PointPlot] {
   }
 
   def normalizedCumulative(ds: List[(Prim, Count)]): PointPlot = {
-    val records = ds.sortBy(_._1)
+    val records = ds.sortBy(_._1).toArray
     var i = 0
     var sum = 0.0
     while (i < records.length) {
