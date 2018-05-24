@@ -6,6 +6,7 @@ import flip.pdf.Buffer.syntax._
 import flip.pdf.diagnose.{CDFDiagnose, KLDDiagnose, KSDiagnose}
 import flip.plot.PointPlot
 import flip.rand.IRng
+import flip.pdf.syntax._
 
 import scala.language.higherKinds
 
@@ -24,7 +25,8 @@ trait AdaSelSketchOps[S[_] <: AdaSelSketch[_]] extends AdaptiveSketchOps[S] with
     val measure = sketch.measure.asInstanceOf[Measure[A]]
     val bufferPrims = sketch.buffer.asInstanceOf[Buffer[A]].toList.map { case (a, count) => (measure.to(a), count) }
     val bufferCdf = PointPlot.normalizedCumulative(bufferPrims)
-    val samplingCdf = sampling(sketch).normalizedCumulative
+    val youngStr1 = sketch.structures.head.update(bufferPrims)
+    val samplingCdf = youngStr1.sampling.normalizedCumulative
 
     tester.diagnose(bufferCdf, samplingCdf, threshold)
   }

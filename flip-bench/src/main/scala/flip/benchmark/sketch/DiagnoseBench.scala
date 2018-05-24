@@ -4,9 +4,11 @@ import java.util.concurrent.TimeUnit
 
 import flip.conf.pdf.CustomAdaSelSketchConf
 import flip.implicits._
-import flip.pdf.{AdaptiveSketch, SelectiveSketch}
+import flip.measure.Measure
+import flip.pdf.{AdaptiveSketch, Count, Prim, SelectiveSketch}
 import flip.plot.PointPlot
 import flip.pdf.Buffer.syntax._
+import flip.pdf.diagnose.{CDFDiagnose, KLDDiagnose, KSDiagnose}
 import org.openjdk.jmh.annotations._
 
 @BenchmarkMode(Array(Mode.AverageTime))
@@ -59,16 +61,33 @@ class DiagnoseBench { self =>
     SelectiveSketch.diagnose(sketch.asInstanceOf[SelectiveSketch[Double]])
   }
 
+  lazy val measure: Measure[Count] = sketch.measure
+
+  lazy val bufferPrims: List[(Prim, Count)] =
+    sketch.asInstanceOf[AdaptiveSketch[Double]].buffer.toList.map { case (a, count) => (measure.to(a), count) }
+
   @Benchmark
   def bufferCdf: PointPlot = {
-    val measure = sketch.measure
-    val bufferPrims =
-      sketch.asInstanceOf[AdaptiveSketch[Double]].buffer.toList.map { case (a, count) => (measure.to(a), count) }
     PointPlot.normalizedCumulative(bufferPrims)
   }
 
+  lazy val _bufferCdf: PointPlot = bufferCdf
+
   @Benchmark
   def samplingCdf: PointPlot = sketch.sampling.normalizedCumulative
+
+  @Benchmark
+  def youngSamplingCdf: PointPlot = {
+    sketch.structures.head.update(bufferPrims).sampling.normalizedCumulative
+  }
+
+  lazy val _youngSamplingCdf: PointPlot =  youngSamplingCdf
+
+  @Benchmark
+  def ksDiagnose: Boolean = KSDiagnose.diagnose(_bufferCdf, _youngSamplingCdf, 0.1)
+
+  @Benchmark
+  def kldDiagnose: Boolean = KLDDiagnose.diagnose(_bufferCdf, _youngSamplingCdf, 0.1)
 
   def cdfKld: Double = ???
 
