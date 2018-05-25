@@ -31,8 +31,13 @@ class CmapOpsBench {
   }
 
   @Benchmark
-  def bin: List[RangeP] = {
-    cmap.bin
+  def bins: List[RangeP] = {
+    cmap.bins
+  }
+
+  @Benchmark
+  def binsArr: Array[RangeP] = {
+    cmap.binsArr
   }
 
   @Benchmark

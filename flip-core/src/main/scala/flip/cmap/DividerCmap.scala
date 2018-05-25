@@ -53,12 +53,28 @@ trait DividerCmapOps[DC <: DividerCmap] extends CmapOps[DC] {
   def divider2InverseIndexingMap(divider: List[Double]): TreeMap[HDim, Double] =
     TreeMap.apply(divider.sorted.zipWithIndex.map { case (div, idx) => (idx, div) }: _*)
 
-  def bin(cmap: DC): List[RangeP] = {
+  def bins(cmap: DC): List[RangeP] = {
     val divider = cmap.divider
 
     (min :: divider)
       .zip(divider :+ max)
       .map { case (start, end) => RangeP(start, end) }
+  }
+
+  def binsArr(cmap: DC): Array[RangeP] = {
+    val divider = cmap.divider.toArray
+    var i = 1
+    val bins = Array.ofDim[RangeP](divider.length + 1)
+    var start = divider(0)
+    bins.update(0, RangeP(min, start))
+    while (i < divider.length) {
+      val end = divider(i)
+      bins.update(i, RangeP(start, end))
+      start = end
+      i += 1
+    }
+    bins.update(divider.length, RangeP(start, max))
+    bins
   }
 
   def size(cmap: DC): Int = {

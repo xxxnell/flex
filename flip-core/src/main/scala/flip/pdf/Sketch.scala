@@ -84,7 +84,7 @@ trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
 
   def samplingPoints[A](sketch: S[A]): List[RangeM[A]] = {
     val cmap = youngCmap(sketch)
-    val rangePs = cmap.bin
+    val rangePs = cmap.bins
     val measure = sketch.measure.asInstanceOf[Measure[A]]
     rangePs.map(rangeP => rangeP.modifyMeasure(measure))
   }
@@ -99,7 +99,7 @@ trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
 
   def pointSampling[A](sketch: S[A]): PointPlot = {
     val measure = sketch.measure.asInstanceOf[Measure[A]]
-    val ranges = sketch.structures.head.cmap.bin.toArray
+    val ranges = sketch.structures.head.cmap.binsArr
     val records = new ArrayBuffer[(Double, Double)]
     var i = 1
     while (i < ranges.length - 1) {

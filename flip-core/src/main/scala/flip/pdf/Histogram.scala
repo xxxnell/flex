@@ -43,7 +43,7 @@ trait HistogramLaws[H[_] <: Histogram[_]] { self: HistogramOps[H] =>
       counter => {
         val measure = hist.measure.asInstanceOf[Measure[A]]
         val ps = as.map { case (a, count) => (measure.to(a), count) }.toArray
-        val bins = hist.cmap.bin.toArray
+        val bins = hist.cmap.binsArr
 
         var i = 0
         var j = 0
@@ -101,7 +101,7 @@ trait HistogramLaws[H[_] <: Histogram[_]] { self: HistogramOps[H] =>
   def rangeSampling[A](hist: Histogram[A]): DensityPlot = ???
 
   def pointSampling[A](hist: Histogram[A]): PointPlot = {
-    val bins = hist.cmap.bin.toArray
+    val bins = hist.cmap.binsArr
     var i = 1
     val records = new ArrayBuffer[(Double, Double)]
     while (i < bins.length - 1) {
