@@ -23,12 +23,13 @@ trait AdaSelSketchOps[S[_] <: AdaSelSketch[_]] extends AdaptiveSketchOps[S] with
   def diagnose[A](sketch: S[A]): Boolean = {
     val threshold = sketch.conf.rebuildThreshold
     val measure = sketch.measure.asInstanceOf[Measure[A]]
-    val bufferPrims = sketch.buffer.asInstanceOf[Buffer[A]].toList.map { case (a, count) => (measure.to(a), count) }
-    val bufferCdf = PointPlot.normalizedCumulative(bufferPrims)
-    val youngStr1 = sketch.structures.head.update(bufferPrims)
-    val samplingCdf = youngStr1.sampling.normalizedCumulative
+    val buffer = sketch.buffer.asInstanceOf[Buffer[A]]
+    val bufferPrims = buffer.toList.map { case (a, count) => (measure.to(a), count) }.sortBy(_._1)
+    val bufferCdf = PointPlot.unsafeNormalizedCumulative(bufferPrims)
+    val youngStr1 = sketch.structures.head.scanUpdate(bufferPrims)
+    val strCdf = youngStr1.sampling.normalizedCumulative
 
-    tester.diagnose(bufferCdf, samplingCdf, threshold)
+    tester.diagnose(bufferCdf, strCdf, threshold)
   }
 
 }

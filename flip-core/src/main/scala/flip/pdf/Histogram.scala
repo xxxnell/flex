@@ -37,6 +37,29 @@ trait HistogramLaws[H[_] <: Histogram[_]] { self: HistogramOps[H] =>
       }
     )
 
+  def scanUpdate[A](hist: H[A], as: List[(A, Count)]): H[A] =
+    modifyCounter(
+      hist,
+      counter => {
+        val measure = hist.measure.asInstanceOf[Measure[A]]
+        val ps = as.map { case (a, count) => (measure.to(a), count) }.toArray
+        val bins = hist.cmap.bin.toArray
+
+        var i = 0
+        var j = 0
+        var _counter = counter
+        while (i < bins.length && j < ps.length) {
+          val range = bins.apply(i)
+          while (j < ps.length && range.contains(ps.apply(j)._1)) {
+            _counter = _counter.update(i, ps.apply(j)._2)
+            j += 1
+          }
+          i += 1
+        }
+        _counter
+      }
+    )
+
   def count[A](hist: H[A], start: A, end: A): Count = {
     val measure = hist.measure.asInstanceOf[Measure[A]]
     primCount(hist, measure.to(start), measure.to(end))

@@ -95,7 +95,7 @@ trait PointPlotLaws[P <: PointPlot] { self: PointPlotOps[P] =>
       refs(0).flatMap(refs0 => Fitting(refs0, x)))
       .getOrElse(interpolation(plot, x))
   }
-
+  
   def add(plots: NonEmptyList[(Double, P)]): P =
     modifyRecords(
       plots.head._2,
@@ -270,8 +270,8 @@ object PointPlot extends PointPlotOps[PointPlot] {
     unsafe(records)
   }
 
-  def cumulative(ds: List[(Prim, Count)]): PointPlot = {
-    val records = ds.sortBy(_._1).toArray
+  def unsafeCumulative(ds: List[(Prim, Count)]): PointPlot = {
+    val records = ds.toArray
     var i = 0
     var cum = 0.0
     val records1 = Array.ofDim[(Prim, Count)](records.length)
@@ -284,8 +284,12 @@ object PointPlot extends PointPlotOps[PointPlot] {
     unsafe(records1)
   }
 
-  def normalizedCumulative(ds: List[(Prim, Count)]): PointPlot = {
-    val records = ds.sortBy(_._1).toArray
+  def cumulative(ds: List[(Prim, Count)]): PointPlot = {
+    unsafeCumulative(ds.sortBy(_._1))
+  }
+
+  def unsafeNormalizedCumulative(ds: List[(Prim, Count)]): PointPlot = {
+    val records = ds.toArray
     var i = 0
     var sum = 0.0
     while (i < records.length) {
@@ -302,6 +306,10 @@ object PointPlot extends PointPlotOps[PointPlot] {
       j += 1
     }
     unsafe(records1)
+  }
+
+  def normalizedCumulative(ds: List[(Prim, Count)]): PointPlot = {
+    unsafeNormalizedCumulative(ds.sortBy(_._1))
   }
 
   def modifyRecords(plot: PointPlot, f: Array[(Double, Double)] => Array[(Double, Double)]): PointPlot =
