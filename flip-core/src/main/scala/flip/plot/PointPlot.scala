@@ -82,20 +82,19 @@ trait PointPlotLaws[P <: PointPlot] { self: PointPlotOps[P] =>
   /**
     * @param i Referencial index for the records of the plot.
     * */
-  def referencialInterpolation(plot: P, x: Double, i: Int): Double = {
+  def referencialInterpolation(plot: P, x: Double, i: Int): Option[Double] = {
     val records = plot.records
-    def refs(j: Int): Option[List[(Double, Double)]] =
+    def refsForShift(j: Int): Option[((Double, Double), (Double, Double))] =
       if (i + j < records.length && i + j - 1 >= 0) {
-        Some(records.apply(i + j - 1) :: records.apply(i + j) :: Nil)
+        Some((records.apply(i + j - 1), records.apply(i + j)))
       } else if (i + j - 1 < records.length && i + j - 2 >= 0) {
-        Some(records.apply(i + j - 2) :: records.apply(i + j - 1) :: Nil)
+        Some((records.apply(i + j - 2), records.apply(i + j - 1)))
       } else None
 
-    (refs(1).flatMap(refs1 => Fitting(refs1, x)) orElse
-      refs(0).flatMap(refs0 => Fitting(refs0, x)))
-      .getOrElse(interpolation(plot, x))
+    (refsForShift(1) orElse refsForShift(0))
+      .flatMap { case (ref1, ref2) => if (ref1._1 <= x && ref2._1 >= x) Fitting(ref1 :: ref2 :: Nil, x) else None }
   }
-  
+
   def add(plots: NonEmptyList[(Double, P)]): P =
     modifyRecords(
       plots.head._2,
@@ -127,7 +126,7 @@ trait PointPlotLaws[P <: PointPlot] { self: PointPlotOps[P] =>
             val (w, _plot) = _plots.apply(k)
             val idx = idxs(k)
             val ref = if (idx < _plot.records.length) idx else _plot.records.length - 1
-            y2 += w * referencialInterpolation(_plot, xMin, ref)
+            y2 += w * referencialInterpolation(_plot, xMin, ref).getOrElse(interpolation(_plot, xMin))
             k += 1
           }
 

@@ -42,6 +42,8 @@ trait PointPlotSyntax {
     def integralAll: Double = PointPlot.integralAll(plot)
     def avgChangeRate: PointPlot = PointPlot.avgChangeRate(pPlot)
     def map(f: (Double, Double) => (Double, Double)): PointPlot = PointPlot.map(pPlot, f)
+    def referencialInterpolation(x: Double, ref: Int): Option[Double] =
+      PointPlot.referencialInterpolation(pPlot, x, ref)
     def csv: String = ShowPlot.dsvPointPlot(plot, ", ")
     def dsv(delimiter: String): String = ShowPlot.dsvPointPlot(plot, delimiter)
   }
