@@ -23,6 +23,62 @@ class AdaSelSketchSpec extends Specification with ScalaCheck {
       else ok
     }
 
+    "diagnose" in {
+
+      "ignore" in {
+        val bufferSize = 50
+        implicit val conf: CustomAdaSelSketchConf = CustomAdaSelSketchConf(
+          cmapSize = 20, cmapNo = 2, cmapStart = Some(-3.0), cmapEnd = Some(3.0),
+          counterSize = 20, counterNo = 2,
+          bufferSize = bufferSize,
+          startThreshold = Integer.MAX_VALUE,
+          rebuildThreshold = 0.1
+        )
+        val underlying = NormalDist.std
+        val (_, samples) = underlying.samples(bufferSize)
+        val sketch0: AdaSelSketch[Double] = AdaSelSketch.empty[Double]
+        val sketch1 = sketch0.updateInOrder(samples)
+        val diagnose = AdaSelSketch.diagnose(sketch1.asInstanceOf[AdaSelSketch[Double]])
+
+        if(diagnose) ko(s"diagnose: $diagnose") else ok
+      }
+
+      "shifted" in {
+        val bufferSize = 50
+        implicit val conf: CustomAdaSelSketchConf = CustomAdaSelSketchConf(
+          cmapSize = 20, cmapNo = 2, cmapStart = Some(-6.0), cmapEnd = Some(-3.0),
+          counterSize = 20, counterNo = 2,
+          bufferSize = bufferSize,
+          startThreshold = Integer.MAX_VALUE
+        )
+        val underlying = NormalDist.std
+        val (_, samples) = underlying.samples(bufferSize)
+        val sketch0: AdaSelSketch[Double] = AdaSelSketch.empty[Double]
+        val sketch1 = sketch0.updateInOrder(samples)
+        val diagnose = AdaSelSketch.diagnose(sketch1.asInstanceOf[AdaSelSketch[Double]])
+
+        if(!diagnose) ko(s"diagnose: $diagnose") else ok
+      }
+
+      "broad" in {
+        val bufferSize = 50
+        implicit val conf: CustomAdaSelSketchConf = CustomAdaSelSketchConf(
+          cmapSize = 20, cmapNo = 2, cmapStart = Some(-10.0), cmapEnd = Some(10.0),
+          counterSize = 20, counterNo = 2,
+          bufferSize = bufferSize,
+          startThreshold = Integer.MAX_VALUE
+        )
+        val underlying = NormalDist.std
+        val (_, samples) = underlying.samples(bufferSize)
+        val sketch0: AdaSelSketch[Double] = AdaSelSketch.empty[Double]
+        val sketch1 = sketch0.updateInOrder(samples)
+        val diagnose = AdaSelSketch.diagnose(sketch1.asInstanceOf[AdaSelSketch[Double]])
+
+        if(!diagnose) ko(s"diagnose: $diagnose") else ok
+      }
+
+    }
+
   }
 
 }

@@ -52,6 +52,7 @@ trait HistogramPropSyntax {
     // syntax
     def modifyCounter(f: HCounter => HCounter): Histogram[A] = Histogram.modifyCounter(hist, f)
     def barPlot: DensityPlot = Histogram.rangeSampling(hist)
+    def scanUpdate(as: List[(A, Count)]): Histogram[A] = Histogram.scanUpdate(hist, as)
   }
 
 }

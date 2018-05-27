@@ -70,7 +70,7 @@ trait PointPlotLaws[P <: PointPlot] { self: PointPlotOps[P] =>
           Fitting((x1, y1) :: (x2, y2) :: Nil, x)
         } else Some(records(i2)._2)
     }
-    lazy val intp3 = if(plot.records.length > 0) {
+    lazy val intp3 = if (plot.records.length > 0) {
       val (x2, y2) = plot.records.apply(0)
       val (x3, y3) = plot.records.apply(plot.records.length - 1)
       if (x <= x2) Some(y2) else if (x >= x3) Some(y3) else None
@@ -82,18 +82,17 @@ trait PointPlotLaws[P <: PointPlot] { self: PointPlotOps[P] =>
   /**
     * @param i Referencial index for the records of the plot.
     * */
-  def referencialInterpolation(plot: P, x: Double, i: Int): Double = {
+  def referencialInterpolation(plot: P, x: Double, i: Int): Option[Double] = {
     val records = plot.records
-    def refs(j: Int): Option[List[(Double, Double)]] =
+    def refsForShift(j: Int): Option[((Double, Double), (Double, Double))] =
       if (i + j < records.length && i + j - 1 >= 0) {
-        Some(records.apply(i + j - 1) :: records.apply(i + j) :: Nil)
+        Some((records.apply(i + j - 1), records.apply(i + j)))
       } else if (i + j - 1 < records.length && i + j - 2 >= 0) {
-        Some(records.apply(i + j - 2) :: records.apply(i + j - 1) :: Nil)
+        Some((records.apply(i + j - 2), records.apply(i + j - 1)))
       } else None
 
-    (refs(1).flatMap(refs1 => Fitting(refs1, x)) orElse
-      refs(0).flatMap(refs0 => Fitting(refs0, x)))
-      .getOrElse(interpolation(plot, x))
+    (refsForShift(1) orElse refsForShift(0))
+      .flatMap { case (ref1, ref2) => if (ref1._1 <= x && ref2._1 >= x) Fitting(ref1 :: ref2 :: Nil, x) else None }
   }
 
   def add(plots: NonEmptyList[(Double, P)]): P =
@@ -127,7 +126,7 @@ trait PointPlotLaws[P <: PointPlot] { self: PointPlotOps[P] =>
             val (w, _plot) = _plots.apply(k)
             val idx = idxs(k)
             val ref = if (idx < _plot.records.length) idx else _plot.records.length - 1
-            y2 += w * referencialInterpolation(_plot, xMin, ref)
+            y2 += w * referencialInterpolation(_plot, xMin, ref).getOrElse(interpolation(_plot, xMin))
             k += 1
           }
 
@@ -270,8 +269,8 @@ object PointPlot extends PointPlotOps[PointPlot] {
     unsafe(records)
   }
 
-  def cumulative(ds: List[(Prim, Count)]): PointPlot = {
-    val records = ds.sortBy(_._1)
+  def unsafeCumulative(ds: List[(Prim, Count)]): PointPlot = {
+    val records = ds.toArray
     var i = 0
     var cum = 0.0
     val records1 = Array.ofDim[(Prim, Count)](records.length)
@@ -284,8 +283,12 @@ object PointPlot extends PointPlotOps[PointPlot] {
     unsafe(records1)
   }
 
-  def normalizedCumulative(ds: List[(Prim, Count)]): PointPlot = {
-    val records = ds.sortBy(_._1)
+  def cumulative(ds: List[(Prim, Count)]): PointPlot = {
+    unsafeCumulative(ds.sortBy(_._1))
+  }
+
+  def unsafeNormalizedCumulative(ds: List[(Prim, Count)]): PointPlot = {
+    val records = ds.toArray
     var i = 0
     var sum = 0.0
     while (i < records.length) {
@@ -302,6 +305,10 @@ object PointPlot extends PointPlotOps[PointPlot] {
       j += 1
     }
     unsafe(records1)
+  }
+
+  def normalizedCumulative(ds: List[(Prim, Count)]): PointPlot = {
+    unsafeNormalizedCumulative(ds.sortBy(_._1))
   }
 
   def modifyRecords(plot: PointPlot, f: Array[(Double, Double)] => Array[(Double, Double)]): PointPlot =

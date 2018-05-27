@@ -66,7 +66,7 @@ class DividerCmapSpec extends Specification with ScalaCheck {
       }.setArbitrary(dividerGen)
     }
 
-    "bin" in {
+    "bins" in {
 
       "divider" in {
 //        implicit val dividerGen: Arbitrary[List[Double]] = DividerCmapGen.dividerA
@@ -87,6 +87,18 @@ class DividerCmapSpec extends Specification with ScalaCheck {
 
       "uniform" in {
         todo
+      }
+
+    }
+
+    "binsArr" in {
+
+      "bins == binsArr" in {
+        val cmap = DividerCmap.apply(1.0 :: 2.0 :: Nil)
+        val cond = cmap.bins == cmap.binsArr.toList
+
+        if(!cond) ko(s"bins: ${cmap.bins}, bins(array): ${cmap.binsArr.toList}")
+        else ok
       }
 
     }
@@ -130,6 +142,8 @@ class DividerCmapSpec extends Specification with ScalaCheck {
       }
 
     }
+
+    // Ends
 
   }
 

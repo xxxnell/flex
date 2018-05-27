@@ -25,7 +25,9 @@ trait CmapOps[C <: Cmap] extends CmapLaws[C] {
 
   val max: Prim = Double.MaxValue
 
-  def bin(cmap: C): List[RangeP]
+  def bins(cmap: C): List[RangeP]
+
+  def binsArr(cmap: C): Array[RangeP]
 
   def size(cmap: C): Int
 
@@ -52,7 +54,8 @@ trait CmapLaws[C <: Cmap] { self: CmapOps[C] =>
 trait CmapSyntax {
 
   implicit class CmapSyntaxImpl(cmap: Cmap) {
-    def bin: List[RangeP] = Cmap.bin(cmap)
+    def bins: List[RangeP] = Cmap.bins(cmap)
+    def binsArr: Array[RangeP] = Cmap.binsArr(cmap)
     def size: Int = Cmap.size(cmap)
     def range(hdim: HDim): RangeP = Cmap.range(cmap, hdim)
     def ranges: List[(HDim, RangeP)] = Cmap.ranges(cmap)
@@ -73,8 +76,12 @@ object Cmap extends CmapOps[Cmap] {
 
   def divider(divider: List[Prim]): DividerCmap = DividerCmap(divider)
 
-  def bin(cmap: Cmap): List[RangeP] = cmap match {
-    case cmap: DividerCmap => DividerCmap.bin(cmap)
+  def bins(cmap: Cmap): List[RangeP] = cmap match {
+    case cmap: DividerCmap => DividerCmap.bins(cmap)
+  }
+
+  def binsArr(cmap: Cmap): Array[RangeP] = cmap match {
+    case cmap: DividerCmap => DividerCmap.binsArr(cmap)
   }
 
   def size(cmap: Cmap): Int = cmap match {
