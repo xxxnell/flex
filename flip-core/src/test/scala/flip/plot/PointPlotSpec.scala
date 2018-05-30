@@ -118,6 +118,19 @@ class PointPlotSpec extends Specification with ScalaCheck {
         else ok
       }
 
+      "normal(-1, 1) + normal(1, 1)" in {
+        val n1 = NormalDist(-1.0, 1.0).cdfSampling
+        val n2 = NormalDist(1.0, 1.0).cdfSampling
+        val sum = (0.5, n1) :+ (0.5, n2)
+
+        val cond1 = sum.records.head._2 ~= 0.0
+        val cond2 = sum.records.last._2 ~= 1.0
+
+        if(!cond1) ko(s"first point: ${sum.records.head}")
+        else if (!cond2) ko(s"last point: ${sum.records.last}")
+        else ok
+      }
+
     }
 
     "inverse" in todo

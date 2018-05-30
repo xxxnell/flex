@@ -47,7 +47,8 @@ trait SmoothDistPropLaws[D[_] <: SmoothDist[_]] { self: SmoothDistPropOps[D] =>
     while (i < domain.length) {
       val p = domain.apply(i)
       val a = measure.from(p)
-      if (i == 0 || i == domain.length - 1) records.update(i, (p, 0.0))
+      if (i == 0) records.update(i, (p, 0.0))
+      else if (i == domain.length - 1) records.update(i, (p, 1.0))
       else records.update(i, (p, cdf(dist, a)))
       i += 1
     }
