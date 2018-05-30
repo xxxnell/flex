@@ -10,7 +10,7 @@ trait SmoothDistPropSyntax {
 
   implicit class SmoothDistPropSyntaxImpl[A](dist: SmoothDist[A]) {
     def samplingDist(implicit measure: Measure[A], conf: SamplingDistConf): PlottedDist[A] =
-      PlottedDist.pointPlot[A](dist.pdfSampling)
+      PlottedDist.forPdfSampling[A](dist.pdfSampling)
   }
 
 //  implicit class PlottedDistPropSyntaxImpl[A](dist: PlottedDist[A]) {

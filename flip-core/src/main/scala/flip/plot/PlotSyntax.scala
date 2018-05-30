@@ -44,6 +44,8 @@ trait PointPlotSyntax {
     def map(f: (Double, Double) => (Double, Double)): PointPlot = PointPlot.map(pPlot, f)
     def referencialInterpolation(x: Double, ref: Int): Option[Double] =
       PointPlot.referencialInterpolation(pPlot, x, ref)
+    def isEmpty: Boolean = PointPlot.isEmpty(pPlot)
+    def nonEmpty: Boolean = !PointPlot.isEmpty(pPlot)
     def csv: String = ShowPlot.dsvPointPlot(plot, ", ")
     def dsv(delimiter: String): String = ShowPlot.dsvPointPlot(plot, delimiter)
   }

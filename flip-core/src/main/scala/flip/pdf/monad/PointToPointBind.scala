@@ -10,22 +10,17 @@ import scala.collection.mutable.ArrayBuffer
 
 object PointToPointBind { self =>
 
-  val cutoff = 1E300 // TODO CUTOFF is hacky approach
-
   def bind[A, B](dist: Dist[A], f: A => Dist[B], measureB: Measure[B], conf: DistConf): Dist[B] = {
-    val wcs = weightCum(dist, f, measureB, conf)
-    val cum = PointPlot.add(NonEmptyList.fromListUnsafe(wcs))
-    val pdf = PointPlot.unsafe(cum.changeRate.records.filter { case (x, _) => math.abs(x) < cutoff })
+    val wcs = weightCdfs(dist, f, measureB, conf)
+    val cdf = PointPlot.add(NonEmptyList.fromListUnsafe(wcs))
 
-    PlottedDist.pointPlot(pdf)(measureB, SamplingDistConf.forDistConf(conf))
+    PlottedDist.forCdfSampling(cdf)(measureB, SamplingDistConf.forDistConf(conf))
   }
 
-  def weightCum[A, B](dist: Dist[A],
-                      f: A => Dist[B],
-                      measureB: Measure[B],
-                      conf: DistConf): List[(Double, PointPlot)] = {
-    val measure = dist.measure
-    val ε = dist.conf.delta
+  def weightCdfs[A, B](dist: Dist[A],
+                       f: A => Dist[B],
+                       measureB: Measure[B],
+                       conf: DistConf): List[(Double, PointPlot)] = {
     val cum1 = dist.cdfSampling.records
     val array = new ArrayBuffer[(Double, PointPlot)]
     var i = 1
@@ -34,8 +29,7 @@ object PointToPointBind { self =>
       val (x1, y1) = cum1.apply(i)
       val cum2 = f(dist.measure.from(x0)) match {
         case delta: DeltaDist[A] =>
-          val pole = measure.to(delta.pole)
-          PointPlot.unsafe(Array((pole, 0), (pole + pole * ε, 1)))
+          UniformDist.apply(delta.pole, x1 - x0)(measureB, SmoothDistConf.forDistConf(conf)).cdfSampling
         case _dist => _dist.cdfSampling
       }
       array.append((y1 - y0, cum2))

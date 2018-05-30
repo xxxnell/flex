@@ -214,6 +214,8 @@ trait PointPlotLaws[P <: PointPlot] { self: PointPlotOps[P] =>
     else RangeP(x1, x2).roughLength * (y2 / 2 + y1 / 2)
   }
 
+  def isEmpty(plot: P): Boolean = plot.records.isEmpty
+
 }
 
 object PointPlot extends PointPlotOps[PointPlot] {
