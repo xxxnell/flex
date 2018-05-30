@@ -29,7 +29,7 @@ trait DistPropOps[D[_] <: Dist[_]] extends DistPropLaws[D] {
 
   def modifyRng[A](dist: D[A], f: IRng => IRng): D[A]
 
-  def sampling[A](dist: D[A]): PointPlot
+  def cdfSampling[A](dist: D[A]): PointPlot
 
 }
 
@@ -60,16 +60,16 @@ trait DistPropLaws[D[_] <: Dist[_]] { self: DistPropOps[D] =>
     (_dist, acc.toList)
   }
 
-  def cdfPlot[A](dist: D[A]): PointPlot = {
-    sampling(dist).normalizedCumulative
+  def pdfSampling[A](dist: D[A]): PointPlot = {
+    cdfSampling(dist).changeRate
   }
 
-  def icdfPlot[A](dist: D[A]): PointPlot = {
-    sampling(dist).inverseNormalizedCumulative
+  def icdfSampling[A](dist: D[A]): PointPlot = {
+    cdfSampling(dist).inverse
   }
 
   def interpolationPdf[A](dist: D[A], a: A): Double = {
-    val plot = sampling(dist)
+    val plot = pdfSampling(dist)
     val p = dist.measure.asInstanceOf[Measure[A]].to(a)
     plot.interpolation(p)
   }
@@ -77,7 +77,7 @@ trait DistPropLaws[D[_] <: Dist[_]] { self: DistPropOps[D] =>
   def pdf[A](dist: D[A], a: A): Double = interpolationPdf(dist, a: A)
 
   def interpolationCdf[A](dist: D[A], a: A): Double = {
-    val cdf = cdfPlot(dist)
+    val cdf = cdfSampling(dist)
     val p = dist.measure.asInstanceOf[Measure[A]].to(a)
     cdf.interpolation(p)
   }
@@ -85,7 +85,7 @@ trait DistPropLaws[D[_] <: Dist[_]] { self: DistPropOps[D] =>
   def cdf[A](dist: D[A], a: A): Double = interpolationCdf(dist, a)
 
   def interpolationIcdf[A](dist: D[A], p: Double): A = {
-    val icdf = icdfPlot(dist)
+    val icdf = icdfSampling(dist)
     val measure = dist.measure.asInstanceOf[Measure[A]]
 
     measure.from(icdf.interpolation(p))
@@ -138,10 +138,16 @@ object Dist extends DistPropOps[Dist] { self =>
     case combination: CombinationDist[A] => CombinationDist.modifyRng(combination, f)
   }
 
-  def sampling[A](dist: Dist[A]): PointPlot = dist match {
-    case smooth: SmoothDist[A] => SmoothDist.sampling(smooth)
-    case sampling: SamplingDist[A] => SamplingDist.sampling(sampling)
-    case combination: CombinationDist[A] => CombinationDist.sampling(combination)
+  override def pdfSampling[A](dist: Dist[A]): PointPlot = dist match {
+    case smooth: SmoothDist[A] => SmoothDist.pdfSampling(smooth)
+    case sampling: SamplingDist[A] => SamplingDist.pdfSampling(sampling)
+    case combination: CombinationDist[A] => CombinationDist.pdfSampling(combination)
+  }
+
+  def cdfSampling[A](dist: Dist[A]): PointPlot = dist match {
+    case smooth: SmoothDist[A] => SmoothDist.cdfSampling(smooth)
+    case sampling: SamplingDist[A] => SamplingDist.cdfSampling(sampling)
+    case combination: CombinationDist[A] => CombinationDist.cdfSampling(combination)
   }
 
   override def sample[A](dist: Dist[A]): (Dist[A], A) = dist match {

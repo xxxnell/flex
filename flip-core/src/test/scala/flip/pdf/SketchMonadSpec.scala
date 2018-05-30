@@ -26,9 +26,9 @@ class SketchMonadSpec extends Specification with ScalaCheck {
           val sketch1 = sketch0.updateInOrder(datas)
           val sketch2 = sketch1.map(i => -1 * i)
 
-          val cond = sketch2.sampling.records.forall { case (_, value) => !value.isNaN }
+          val cond = sketch2.pdfSampling.records.forall { case (_, value) => !value.isNaN }
 
-          if (!cond) ko(s"The result of map contains NaN: \n${sketch2.sampling}")
+          if (!cond) ko(s"The result of map contains NaN: \n${sketch2.pdfSampling}")
           else ok
         }
 
@@ -60,9 +60,9 @@ class SketchMonadSpec extends Specification with ScalaCheck {
           val sketch1 = sketch0.updateInOrder(datas)
           val sketch2 = sketch1.flatMap(x => NumericDist.normal(x, 2))
 
-          val cond = sketch2.sampling.records.forall { case (_, value) => !value.isNaN }
+          val cond = sketch2.pdfSampling.records.forall { case (_, value) => !value.isNaN }
 
-          if (!cond) ko(s"The result of flatMap contains NaN: \n${sketch2.sampling}")
+          if (!cond) ko(s"The result of flatMap contains NaN: \n${sketch2.pdfSampling}")
           else ok
         }
 

@@ -21,10 +21,17 @@ trait SmoothDistPropOps[D[_] <: SmoothDist[_]] extends DistPropOps[D] with Smoot
 
 trait SmoothDistPropLaws[D[_] <: SmoothDist[_]] { self: SmoothDistPropOps[D] =>
 
-  def sampling[A](dist: D[A]): PointPlot = {
+  override def pdfSampling[A](dist: D[A]): PointPlot = {
     val icdf: Double => A = p => self.icdf(dist, p)
     val measure = dist.measure.asInstanceOf[Measure[A]]
     val records = IcdfSampling.sampling(icdf, measure, dist.conf.sampling).map(p => (measure.to(p), pdf(dist, p)))
+    PointPlot.unsafe(records.toArray)
+  }
+
+  override def cdfSampling[A](dist: D[A]): PointPlot = {
+    val icdf: Double => A = p => self.icdf(dist, p)
+    val measure = dist.measure.asInstanceOf[Measure[A]]
+    val records = IcdfSampling.sampling(icdf, measure, dist.conf.sampling).map(p => (measure.to(p), cdf(dist, p)))
     PointPlot.unsafe(records.toArray)
   }
 
@@ -59,9 +66,14 @@ object SmoothDist extends SmoothDistPropOps[SmoothDist] {
     case numeric: NumericDist[A] => NumericDist.icdf(numeric, p)
   }
 
-  override def sampling[A](dist: SmoothDist[A]): PointPlot = dist match {
-    case dist: NumericDist[A] => NumericDist.sampling(dist)
-    case _ => super.sampling(dist)
+  override def pdfSampling[A](dist: SmoothDist[A]): PointPlot = dist match {
+    case dist: NumericDist[A] => NumericDist.pdfSampling(dist)
+    case _ => super.pdfSampling(dist)
+  }
+
+  override def cdfSampling[A](dist: SmoothDist[A]): PointPlot = dist match {
+    case dist: NumericDist[A] => NumericDist.cdfSampling(dist)
+    case _ => super.cdfSampling(dist)
   }
 
 }

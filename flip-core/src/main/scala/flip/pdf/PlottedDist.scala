@@ -13,7 +13,7 @@ import scala.language.higherKinds
   * */
 trait PlottedDist[A] extends SamplingDist[A] {
 
-  def sampling: PointPlot
+  def pdfSampling: PointPlot
 
 }
 
@@ -21,11 +21,13 @@ trait PlottedDistPropOps[D[_] <: PlottedDist[_]] extends SamplingDistPropOps[D] 
 
   def modifySampling[A](dist: D[A], f: PointPlot => PointPlot): D[A]
 
-  def sampling[A](dist: D[A]): PointPlot = dist.sampling
+  override def pdfSampling[A](dist: D[A]): PointPlot = dist.pdfSampling
+
+  def cdfSampling[A](dist: D[A]): PointPlot = dist.pdfSampling.normalizedCumulative
 
   def probability[A](dist: D[A], start: A, end: A): Double = {
     val measure = dist.measure.asInstanceOf[Measure[A]]
-    val cum = dist.sampling.normalizedCumulative
+    val cum = cdfSampling(dist)
     cum.interpolation(measure.to(end)) - cum.interpolation(measure.to(start))
   }
 
@@ -33,7 +35,7 @@ trait PlottedDistPropOps[D[_] <: PlottedDist[_]] extends SamplingDistPropOps[D] 
 
 object PlottedDist extends PlottedDistPropOps[PlottedDist] {
 
-  private case class PlottedDistImpl[A](measure: Measure[A], rng: IRng, sampling: PointPlot, conf: SamplingDistConf)
+  private case class PlottedDistImpl[A](measure: Measure[A], rng: IRng, pdfSampling: PointPlot, conf: SamplingDistConf)
       extends PlottedDist[A]
 
   def bare[A](measure: Measure[A], rng: IRng, sampling: PointPlot, conf: SamplingDistConf): PlottedDist[A] =
@@ -43,9 +45,9 @@ object PlottedDist extends PlottedDistPropOps[PlottedDist] {
     bare(measure, IRng(sampling.hashCode()), sampling, conf)
 
   def modifyRng[A](dist: PlottedDist[A], f: IRng => IRng): PlottedDist[A] =
-    bare(dist.measure, f(dist.rng), dist.sampling, dist.conf)
+    bare(dist.measure, f(dist.rng), dist.pdfSampling, dist.conf)
 
   def modifySampling[A](dist: PlottedDist[A], f: PointPlot => PointPlot): PlottedDist[A] =
-    bare(dist.measure, dist.rng, f(dist.sampling), dist.conf)
+    bare(dist.measure, dist.rng, f(dist.pdfSampling), dist.conf)
 
 }

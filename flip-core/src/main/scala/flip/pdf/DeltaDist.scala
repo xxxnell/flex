@@ -29,12 +29,19 @@ trait DeltaDistOps extends NumericDistOps[DeltaDist] {
 
   override def icdf[A](dist: DeltaDist[A], p: Double): A = dist.pole
 
-  override def sampling[A](dist: DeltaDist[A]): PointPlot = {
+  override def pdfSampling[A](dist: DeltaDist[A]): PointPlot = {
     val window = dist.conf.delta
     val measure = dist.measure
     val poleP = measure.to(dist.pole)
 
     PointPlot.deltas((poleP, 1.0) :: Nil, window)
+  }
+
+  override def cdfSampling[A](dist: DeltaDist[A]): PointPlot = {
+    val measure = dist.measure
+    val poleP = measure.to(dist.pole)
+
+    PointPlot.unsafeCumulative((poleP, 1.0) :: Nil)
   }
 
 }

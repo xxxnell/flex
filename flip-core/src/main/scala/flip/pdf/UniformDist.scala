@@ -46,7 +46,7 @@ trait UniformDistOps extends NumericDistOps[UniformDist] { self =>
     } else throw new IllegalArgumentException(s"$p is forbidden.")
   }
 
-  override def sampling[A](dist: UniformDist[A]): PointPlot = {
+  override def pdfSampling[A](dist: UniformDist[A]): PointPlot = {
     val measure = dist.measure
     val delta = dist.conf.delta
     val width = dist.width
@@ -56,6 +56,16 @@ trait UniformDistOps extends NumericDistOps[UniformDist] { self =>
     val pdf = self.pdf(dist, measure.from(x1 / 2 + x2 / 2))
 
     PointPlot.unsafe(Array.apply((x1 - delta, 0), (x1, pdf), (x2, pdf), (x2 + delta, 0)))
+  }
+
+  override def cdfSampling[A](dist: UniformDist[A]): PointPlot = {
+    val measure = dist.measure
+    val width = dist.width
+    val scale = measure.to(dist.scale)
+    val x1 = scale - width / 2
+    val x2 = scale + width / 2
+
+    PointPlot.unsafe(Array.apply((x1, 0), (x2, 1)))
   }
 
 }

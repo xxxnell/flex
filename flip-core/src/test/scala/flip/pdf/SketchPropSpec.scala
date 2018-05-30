@@ -164,49 +164,54 @@ class SketchPropSpec extends Specification with ScalaCheck {
         val dist = NumericDist.normal(0.0, 1.0)
         val expected = dist.probability(start, end)
         val sampleNo = 3000
-        val (cmapSize, cmapNo, cmapStart, cmapEnd) = (20, 2, Some(-10.0), Some(10.0))
 
         implicit val conf: SketchConf = SketchConf(
-          cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd
+          cmapSize = 20, cmapNo = 2, cmapStart = Some(-10.0), cmapEnd = Some(10.0)
         )
         val (_, samples) = dist.samples(sampleNo)
         val sketch0 = Sketch.empty[Double]
 
         val sketch1 = sketch0.updateInOrder(samples)
         val prob = sketch1.probability(start, end)
+        val cond1 = similar(prob, expected, error)
 
-        if(similar(prob, expected, error)) ok
-        else ko(s"Estimated probability for [$start, $end]: $prob. expected: $expected")
-      }
-
-    }
-
-    "sampling" in {
-
-      "basic" in {
-        val cmapStart = Some(-10d)
-        val cmapEnd = Some(10d)
-        implicit val conf: SketchConf = SketchConf(
-          cmapSize = 3, cmapNo = 5, cmapStart = cmapStart, cmapEnd = cmapEnd,
-          counterSize = 70, counterNo = 2
-        )
-        val sketch0 = Sketch.empty[Double]
-
-        val plot = sketch0.sampling
-
-        val cond1 = plot.records.nonEmpty
-        val cond2 = plot.records.forall { case (_, value) => !value.isNaN }
-        val cond3 = plot.records.drop(1).headOption.forall { case (p, _) => p ~= cmapStart.value }
-        val cond4 = plot.records.dropRight(1).lastOption.forall { case (p, _) => p ~= cmapEnd.value }
-
-        if(!cond1) ko("Plot record is empty.")
-        else if(!cond2) ko("Some value is NaN")
-        else if(!cond3) ko(s"${plot.records.drop(1).headOption} is first range. cmapStart: $cmapStart")
-        else if(!cond4) ko(s"${plot.records.dropRight(1).lastOption} is last range. cmapEnd: $cmapEnd")
+        if(!cond1) ko(s"Estimated probability for [$start, $end]: $prob. expected: $expected")
         else ok
       }
 
     }
+
+    "cdfSampling" in {
+
+      "basic" in {
+        val cmapStart = Some(-10.0)
+        val cmapEnd = Some(10.0)
+        implicit val conf: SketchConf = SketchConf(
+          cmapSize = 4, cmapNo = 5, cmapStart = cmapStart, cmapEnd = cmapEnd,
+          counterSize = 70, counterNo = 2
+        )
+        val sketch1 = Sketch.empty[Double].updateInOrder(1.0 :: Nil)
+        val cdfSampling = sketch1.cdfSampling
+
+        val cond1 = cdfSampling.records.nonEmpty
+        val cond2 = cdfSampling.records.forall { case (_, value) => !value.isNaN }
+        val cond3 = cdfSampling.records.headOption.forall { case (p, _) => p ~= cmapStart.value }
+        val cond4 = cdfSampling.records.headOption.forall { case (_, cum) => cum ~= 0.0 }
+        val cond5 = cdfSampling.records.lastOption.forall { case (p, _) => p ~= cmapEnd.value }
+        val cond6 = cdfSampling.records.lastOption.forall { case (_, cum) => cum ~= 1.0 }
+
+        if(!cond1) ko("Plot record is empty.")
+        else if(!cond2) ko("Some value is NaN")
+        else if(!cond3) ko(s"${cdfSampling.records.headOption} is first range. cmapStart: $cmapStart")
+        else if(!cond4) ko(s"${cdfSampling.records.headOption} is first range.")
+        else if(!cond5) ko(s"${cdfSampling.records.lastOption} is last range. cmapEnd: $cmapEnd")
+        else if(!cond6) ko(s"${cdfSampling.records.lastOption} is last range.")
+        else ok
+      }
+
+    }
+
+    "pdfSampling" in todo
 
     "deepUpdate" in {
 

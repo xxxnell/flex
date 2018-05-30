@@ -22,7 +22,8 @@ trait DistPropSyntax {
     def icdf(p: Double): A = Dist.icdf(dist, p)
     def sample: (Dist[A], A) = Dist.sample(dist)
     def samples(n: Int): (Dist[A], List[A]) = Dist.samples(dist, n)
-    def sampling: PointPlot = Dist.sampling(dist)
+    def pdfSampling: PointPlot = Dist.pdfSampling(dist)
+    def cdfSampling: PointPlot = Dist.cdfSampling(dist)
   }
 
 }

@@ -35,7 +35,7 @@ object EqUpdate {
   }
 
   def updateCmapForSketch[A](sketch: Sketch[A], ps: List[(Prim, Count)]): Cmap = {
-    val sampling = sketch.pointSampling
+    val sampling = sketch.pointPdfSampling
     val mixingRatio = sketch.conf.mixingRatio
     val window = sketch.conf.dataKernelWindow
     val measure = sketch.measure

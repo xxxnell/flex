@@ -11,7 +11,7 @@ object PointToPointSketchBind extends SketchBind[Sketch, Dist, Sketch, SketchCon
   def bind[A, B](sketch: Sketch[A], f: A => Dist[B], measure: Measure[B], conf: SketchConf): Sketch[B] = {
     val bindedDist = PointToPointBind.bind(sketch, f, measure, conf)
     val sum = sketch.sum
-    val cum = bindedDist.sampling.normalizedCumulative.records
+    val cum = bindedDist.cdfSampling.records
     val ps = new ListBuffer[(B, Count)]
     var i = 1
     while (i < cum.length) {

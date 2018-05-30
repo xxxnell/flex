@@ -8,7 +8,7 @@ object PointToPointDistBind extends DistBind[Dist, Dist, SamplingDist, SamplingD
 
   def bind[A, B](dist: Dist[A], f: A => Dist[B], measure: Measure[B], conf: SamplingDistConf): SamplingDist[B] = {
     val binded = PointToPointBind.bind(dist, f, measure, conf)
-    PlottedDist.pointPlot(binded.sampling)(measure, conf)
+    PlottedDist.pointPlot(binded.pdfSampling)(measure, conf)
   }
 
 }

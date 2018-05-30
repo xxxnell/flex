@@ -94,22 +94,30 @@ trait HistogramLaws[H[_] <: Histogram[_]] { self: HistogramOps[H] =>
 
   def sum(hist: H[_]): Count = hist.counter.sum
 
-  def probability[A](dist: Histogram[A], start: A, end: A): Double = ???
+  def effSum(hist: H[_]): Count = {
+    val counter = hist.counter
+    counter.sum - counter.get(0) - counter.get(counter.width - 1)
+  }
 
-  def sampling[A](dist: Histogram[A]): PointPlot = pointSampling(dist)
+  def probability[A](dist: H[A], start: A, end: A): Double = ???
 
-  def rangeSampling[A](hist: Histogram[A]): DensityPlot = ???
+  def rangeSampling[A](hist: H[A]): DensityPlot = ???
 
-  def pointSampling[A](hist: Histogram[A]): PointPlot = {
+  def cdfSampling[A](hist: H[A]): PointPlot = {
     val bins = hist.cmap.binsArr
     var i = 1
     val records = new ArrayBuffer[(Double, Double)]
+    val range1 = bins.apply(1)
+    var cum = 0.0
+    val sum = effSum(hist)
+    records.append((range1.start, cum))
     while (i < bins.length - 1) {
-      val count = hist.counter.get(i)
+      cum += hist.counter.get(i)
       val range = bins.apply(i)
-      if (!range.isPoint) records.append((range.cutoffMiddle, count / range.cutoffLength))
+      if (sum != 0) records.append((range.end, cum / sum))
       i += 1
     }
+
     PointPlot.unsafe(records.toArray)
   }
 

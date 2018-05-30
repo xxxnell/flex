@@ -11,18 +11,18 @@ trait DensitySim {
     simDensity(sampling1, sampling2).integralAll
   }
 
-  def simDensity[A](sampling1: PointPlot, sampling2: PointPlot): PointPlot = {
-    val density1 = sampling1.map { case (x, y) => (x, point(y, sampling2.of(x))) }
-    val density2 = sampling2.map { case (x, y) => (x, point(sampling1.of(x), y)) }
+  def simDensity[A](pdfSampling1: PointPlot, pdfSampling2: PointPlot): PointPlot = {
+    val density1 = pdfSampling1.map { case (x, y) => (x, point(y, pdfSampling2.of(x))) }
+    val density2 = pdfSampling2.map { case (x, y) => (x, point(pdfSampling1.of(x), y)) }
 
-    PointPlot.unsafe((density1.records ++ density2.records).sortBy(_._1))
+    PointPlot.safe(density1.records ++ density2.records)
   }
 
   def simForDist[A](d1: Dist[A], d2: Dist[A]): Double = {
-    sim(d1.sampling, d2.sampling)
+    sim(d1.pdfSampling, d2.pdfSampling)
   }
 
   def simDensityForDist[A](d1: Dist[A], d2: Dist[A]): PointPlot =
-    simDensity(d1.sampling, d2.sampling)
+    simDensity(d1.pdfSampling, d2.pdfSampling)
 
 }

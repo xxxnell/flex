@@ -69,7 +69,7 @@ class SketchOpsBench { self =>
 
   @Benchmark
   def sampling: PointPlot = {
-    sketch.sampling
+    sketch.pdfSampling
   }
 
   @Benchmark

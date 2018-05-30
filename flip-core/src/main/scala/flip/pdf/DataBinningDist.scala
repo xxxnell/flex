@@ -42,11 +42,6 @@ object DataBinningDist extends DataBinningDistOps[DataBinningDist] {
     case hist: Histogram[A] => Histogram.probability(hist, start, end)
   }
 
-  def sampling[A](dist: DataBinningDist[A]): PointPlot = dist match {
-    case (sketch: Sketch[A]) => Sketch.sampling(sketch)
-    case hist: Histogram[A] => Histogram.sampling(hist)
-  }
-
   def update[A](dist: DataBinningDist[A], as: List[(A, Count)]): DataBinningDist[A] = dist match {
     case sketch: Sketch[A] => Sketch.update(sketch, as)
     case hist: Histogram[A] => Histogram.update(hist, as)
@@ -60,6 +55,11 @@ object DataBinningDist extends DataBinningDistOps[DataBinningDist] {
   def sum(dist: DataBinningDist[_]): Count = dist match {
     case sketch: Sketch[_] => Sketch.sum(sketch)
     case hist: Histogram[_] => Histogram.sum(hist)
+  }
+
+  def cdfSampling[A](dist: DataBinningDist[A]): PointPlot = dist match {
+    case (sketch: Sketch[A]) => Sketch.cdfSampling(sketch)
+    case hist: Histogram[A] => Histogram.cdfSampling(hist)
   }
 
   // overrides

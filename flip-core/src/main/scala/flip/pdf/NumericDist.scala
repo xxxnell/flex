@@ -95,10 +95,16 @@ object NumericDist extends NumericDistOps[NumericDist] {
     case dist: UniformDist[A] => UniformDist.icdf(dist, p)
   }
 
-  override def sampling[A](dist: NumericDist[A]): PointPlot = dist match {
-    case dist: DeltaDist[A] => DeltaDist.sampling(dist)
-    case dist: UniformDist[A] => UniformDist.sampling(dist)
-    case _ => super.sampling(dist)
+  override def pdfSampling[A](dist: NumericDist[A]): PointPlot = dist match {
+    case dist: DeltaDist[A] => DeltaDist.pdfSampling(dist)
+    case dist: UniformDist[A] => UniformDist.pdfSampling(dist)
+    case _ => super.pdfSampling(dist)
+  }
+
+  override def cdfSampling[A](dist: NumericDist[A]): PointPlot = dist match {
+    case dist: DeltaDist[A] => DeltaDist.cdfSampling(dist)
+    case dist: UniformDist[A] => UniformDist.cdfSampling(dist)
+    case _ => super.cdfSampling(dist)
   }
 
 }

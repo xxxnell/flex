@@ -27,7 +27,7 @@ trait AdaSelSketchOps[S[_] <: AdaSelSketch[_]] extends AdaptiveSketchOps[S] with
     val bufferPrims = buffer.toList.map { case (a, count) => (measure.to(a), count) }.sortBy(_._1)
     val bufferCdf = PointPlot.unsafeNormalizedCumulative(bufferPrims)
     val youngStr1 = sketch.structures.head.scanUpdate(bufferPrims)
-    val strCdf = youngStr1.sampling.normalizedCumulative
+    val strCdf = youngStr1.cdfSampling
 
     tester.diagnose(bufferCdf, strCdf, threshold)
   }

@@ -44,12 +44,12 @@ trait SketchPropSyntax {
     def counterSize: Int = Sketch.counterSize(sketch)
     def youngCmap: Cmap = Sketch.youngCmap(sketch)
     def domain: RangeM[A] = Sketch.domain(sketch)
-    def cdfPlot: PointPlot = Sketch.cdfPlot(sketch)
     def median: A = Sketch.median(sketch)
-    def pointSampling: PointPlot = Sketch.pointSampling(sketch)
-    def rangeSampling: DensityPlot = Sketch.rangeSampling(sketch)
-    def barPlot: DensityPlot = Sketch.rangeSampling(sketch)
-    def rangePlot: DensityPlot = Sketch.rangeSampling(sketch)
+    def cdfPlot: PointPlot = Sketch.cdfSampling(sketch)
+    def pointPdfSampling: PointPlot = Sketch.pdfSampling(sketch)
+    def rangePdfSampling: DensityPlot = Sketch.rangePdfSampling(sketch)
+    def barPlot: DensityPlot = Sketch.rangePdfSampling(sketch)
+    def rangePlot: DensityPlot = Sketch.rangePdfSampling(sketch)
   }
 
 }

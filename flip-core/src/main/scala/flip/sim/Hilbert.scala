@@ -8,7 +8,7 @@ import flip.plot.PointPlot
   * */
 object Hilbert {
 
-  def norm[A](d1: Dist[A]): Double = normForPlot(d1.sampling)
+  def norm[A](d1: Dist[A]): Double = normForPlot(d1.pdfSampling)
 
   def normForPlot(pdf: PointPlot): Double = {
     val records = pdf.records

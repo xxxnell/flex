@@ -10,10 +10,10 @@ class DistSpec extends Specification with ScalaCheck {
 
     "prop ops" in {
 
-      "sampling" in {
+      "pdfSampling" in {
 
         "NumericDist" in {
-          val sampling = NumericDist.normal(0.0, 1.0).sampling
+          val sampling = NumericDist.normal(0.0, 1.0).pdfSampling
           val cond = sampling.records.map(_._2).forall(value => !value.isNaN && !value.isInfinity)
 
           if(!cond) ko
@@ -21,7 +21,7 @@ class DistSpec extends Specification with ScalaCheck {
         }
 
         "CombinationDist" in {
-          val sampling = ((0.5, NumericDist.normal(-2.0, 1)) + (0.5, NumericDist.normal(2.0, 1))).sampling
+          val sampling = ((0.5, NumericDist.normal(-2.0, 1)) + (0.5, NumericDist.normal(2.0, 1))).pdfSampling
           val cond = sampling.records.map(_._2).forall(value => !value.isNaN && !value.isInfinity)
 
           if(!cond) ko
@@ -29,7 +29,7 @@ class DistSpec extends Specification with ScalaCheck {
         }
 
         "Sketch" in {
-          val sampling = Sketch.empty[Double].sampling
+          val sampling = Sketch.empty[Double].pdfSampling
           val cond = sampling.records.map(_._2).forall(value => !value.isNaN && !value.isInfinity)
 
           if(!cond) ko

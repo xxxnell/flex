@@ -91,7 +91,7 @@ class DiagnoseBench { self =>
 
   @Benchmark
   def youngSamplingCdf: PointPlot = {
-    _youngStructure.sampling.normalizedCumulative
+    _youngStructure.cdfSampling
   }
 
   lazy val _youngSamplingCdf: PointPlot = youngSamplingCdf

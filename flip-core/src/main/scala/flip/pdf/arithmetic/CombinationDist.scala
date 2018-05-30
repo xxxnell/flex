@@ -74,9 +74,9 @@ trait CombinationDistOps[D[_] <: CombinationDist[_]] extends DistPropOps[D] {
     (utdCombi2, sample)
   }
 
-  def sampling[A](combi: D[A]): PointPlot = {
+  def cdfSampling[A](combi: D[A]): PointPlot = {
     val wps = combi.normalizedComponents
-      .map { case (weight, dist) => (weight, dist.sampling) }
+      .map { case (weight, dist) => (weight, dist.cdfSampling) }
 
     PointPlot.add(wps)
   }

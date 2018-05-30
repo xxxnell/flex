@@ -19,7 +19,7 @@ trait CDFDiagnose {
       var y: Option[Double] = None
       while (k < plot.records.length && y.isEmpty) {
         y = plot.referencialInterpolation(x, k)
-        if(y.isEmpty) k += 1
+        if (y.isEmpty) k += 1
       }
       (y.getOrElse(plot.interpolation(x)), k)
     }

@@ -76,10 +76,8 @@ trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
 
   def rebuild[A](sketch: S[A]): S[A] = deepUpdate(sketch, Nil)._1
 
-  def sampling[A](sketch: S[A]): PointPlot = pointSampling(sketch)
-
-  def rangeSampling[A](sketch: S[A]): DensityPlot = {
-    rangeSamplingForRanges(sketch, samplingPoints(sketch))
+  def rangePdfSampling[A](sketch: S[A]): DensityPlot = {
+    rangePdfSamplingForRanges(sketch, samplingPoints(sketch))
   }
 
   def samplingPoints[A](sketch: S[A]): List[RangeM[A]] = {
@@ -89,7 +87,7 @@ trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
     rangePs.map(rangeP => rangeP.modifyMeasure(measure))
   }
 
-  def rangeSamplingForRanges[A](sketch: S[A], ranges: List[RangeM[A]]): DensityPlot = {
+  def rangePdfSamplingForRanges[A](sketch: S[A], ranges: List[RangeM[A]]): DensityPlot = {
     val rangeProbs = ranges.map(range => (range, probability(sketch, range.start, range.end)))
     val rangeDensities = rangeProbs
       .map { case (rangeM, prob) => (RangeP.forRangeM(rangeM), Try(prob / rangeM.roughLength).toOption) }
@@ -97,21 +95,26 @@ trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
     DensityPlot.disjoint(rangeDensities)
   }
 
-  def pointSampling[A](sketch: S[A]): PointPlot = {
+  def cdfSampling[A](sketch: S[A]): PointPlot = {
     val measure = sketch.measure.asInstanceOf[Measure[A]]
     val ranges = sketch.structures.head.cmap.binsArr
     val records = new ArrayBuffer[(Double, Double)]
     var i = 1
+
+    val head = ranges.apply(0).modifyMeasure(measure)
+    val last = ranges.apply(ranges.length - 1).modifyMeasure(measure)
+    val sum = self.sum(sketch) - count(sketch, head.start, head.end) - count(sketch, last.start, last.end)
+    var cum = 0.0
+    records.append((head.primitivize.end, cum))
     while (i < ranges.length - 1) {
       val rangeP = ranges.apply(i)
       val rangeM = rangeP.modifyMeasure(measure)
-      val prob = probability(sketch, rangeM.start, rangeM.end)
-      val pdfO = if (!rangeM.isPoint) Some(prob / rangeM.cutoffLength) else None
-      pdfO.foreach(pdf => records.append((rangeP.cutoffMiddle, pdf)))
+      cum += count(sketch, rangeM.start, rangeM.end)
+      if (sum != 0) records.append((rangeP.end, cum / sum))
       i += 1
     }
 
-    PointPlot.safe(records.toArray)
+    PointPlot.unsafe(records.toArray)
   }
 
 //  def fastPdf[A](sketch: S[A], a: A): Double = {
@@ -129,7 +132,7 @@ trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
 
   def median[A](sketch: S[A]): A = {
     val measure = sketch.measure.asInstanceOf[Measure[A]]
-    measure.from(icdfPlot(sketch).interpolation(0.5))
+    measure.from(icdfSampling(sketch).interpolation(0.5))
   }
 
   def cmapNo(sketch: S[_]): Int = sketch.structures.size.toInt

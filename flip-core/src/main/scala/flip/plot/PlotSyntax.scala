@@ -40,7 +40,7 @@ trait PointPlotSyntax {
     def plot: PointPlot = pPlot
     def ops: PointPlotOps[PointPlot] = PointPlot
     def integralAll: Double = PointPlot.integralAll(plot)
-    def avgChangeRate: PointPlot = PointPlot.avgChangeRate(pPlot)
+    def changeRate: PointPlot = PointPlot.changeRate(pPlot)
     def map(f: (Double, Double) => (Double, Double)): PointPlot = PointPlot.map(pPlot, f)
     def referencialInterpolation(x: Double, ref: Int): Option[Double] =
       PointPlot.referencialInterpolation(pPlot, x, ref)

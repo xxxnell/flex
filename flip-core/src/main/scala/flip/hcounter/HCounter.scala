@@ -56,7 +56,7 @@ trait HCounterOps[HC <: HCounter] {
       val (hmap, counter) = strs.apply(i)
       val cdim = hmap.apply(hdim, counter.counts.size)
       val count = Counter.get(counter, cdim)
-      min = if(min < count) min else count
+      min = if (min < count) min else count
       i += 1
     }
     min
