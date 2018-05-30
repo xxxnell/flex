@@ -24,15 +24,35 @@ trait SmoothDistPropLaws[D[_] <: SmoothDist[_]] { self: SmoothDistPropOps[D] =>
   override def pdfSampling[A](dist: D[A]): PointPlot = {
     val icdf: Double => A = p => self.icdf(dist, p)
     val measure = dist.measure.asInstanceOf[Measure[A]]
-    val records = IcdfSampling.sampling(icdf, measure, dist.conf.sampling).map(p => (measure.to(p), pdf(dist, p)))
-    PointPlot.unsafe(records.toArray)
+    val domain = IcdfSampling.sampling(icdf, measure, dist.conf.sampling).map(a => measure.to(a)).toArray
+    var i = 0
+    val records = Array.ofDim[(Double, Double)](domain.length)
+    while (i < domain.length) {
+      val p = domain.apply(i)
+      val a = measure.from(p)
+      if (i == 0 || i == domain.length - 1) records.update(i, (p, 0.0))
+      else records.update(i, (p, pdf(dist, a)))
+      i += 1
+    }
+
+    PointPlot.unsafe(records)
   }
 
   override def cdfSampling[A](dist: D[A]): PointPlot = {
     val icdf: Double => A = p => self.icdf(dist, p)
     val measure = dist.measure.asInstanceOf[Measure[A]]
-    val records = IcdfSampling.sampling(icdf, measure, dist.conf.sampling).map(p => (measure.to(p), cdf(dist, p)))
-    PointPlot.unsafe(records.toArray)
+    val domain = IcdfSampling.sampling(icdf, measure, dist.conf.sampling).map(a => measure.to(a)).toArray
+    var i = 0
+    val records = Array.ofDim[(Double, Double)](domain.length)
+    while (i < domain.length) {
+      val p = domain.apply(i)
+      val a = measure.from(p)
+      if (i == 0 || i == domain.length - 1) records.update(i, (p, 0.0))
+      else records.update(i, (p, cdf(dist, a)))
+      i += 1
+    }
+
+    PointPlot.unsafe(records)
   }
 
 }
