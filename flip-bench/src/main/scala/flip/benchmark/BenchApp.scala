@@ -1,5 +1,6 @@
 package flip.benchmark
 
+import flip.Params
 import flip.benchmark.ops.BenchOutOps
 import org.openjdk.jmh.runner.Runner
 import org.openjdk.jmh.runner.options._
@@ -14,9 +15,10 @@ object BenchApp {
     // confs
     val opts0 = BenchAppConfs.envOptions(args.toList)
     val opts1 = BenchAppConfs.expIterateSize(opts0, 1, 1000, 2)
+    val opts2 = BenchAppConfs.params(opts1)
 
     // run
-    val results = new Runner(opts1.build()).run().asScala
+    val results = new Runner(opts2.build()).run().asScala
 
     // results
     val path = "benchmarks"
@@ -56,6 +58,14 @@ object BenchAppConfs {
     builder.param(
       "iterateBenchSize",
       (0 to (log(end / start) / log(base)).toInt).map(a => (start * pow(base, a).toInt).toString).toArray: _*)
+  }
+
+  def params(builder: ChainedOptionsBuilder): ChainedOptionsBuilder = {
+    builder.param("cmapSizeLS", Params.cmapSizes.map(_.toString).toArray: _*)
+    builder.param("cmapNoLS", Params.cmapNos.map(_.toString).toArray: _*)
+    builder.param("bufferSizeLS", Params.bufferSizes.map(_.toString).toArray: _*)
+    builder.param("decayFactorLS", Params.decayFactors.map(_.toString).toArray: _*)
+    builder.param("rebuildThresholdLS", Params.rebuildThresholds.map(_.toString).toArray: _*)
   }
 
 }

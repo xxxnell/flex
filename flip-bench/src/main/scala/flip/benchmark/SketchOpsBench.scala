@@ -15,17 +15,23 @@ class SketchOpsBench { self =>
 
   // parameters
 
-  @Param(Array("0", "50"))
-  var bufferSize: Int = _
-
-  @Param(Array("3"))
-  var cmapNo: Int = _
+  @Param(Array("1"))
+  var counterNo: Int = _
 
   @Param(Array("20", "2000"))
   var cmapSize: Int = _
 
-  @Param(Array("1"))
-  var counterNo: Int = _
+  @Param(Array("3"))
+  var cmapNo: Int = _
+
+  @Param(Array("0", "50"))
+  var bufferSize: Int = _
+
+  @Param(Array("1.0", "2.0"))
+  var decayFactor: Double = _
+
+  @Param(Array("0.0", "0.2"))
+  var rebuildThreshold: Double = _
 
   // variables
 
@@ -36,13 +42,14 @@ class SketchOpsBench { self =>
   @Setup
   def setupSketch(): Unit = {
     implicit val conf: SketchConf = SketchConf(
-      startThreshold = 50,
-      thresholdPeriod = 100,
       cmapSize = cmapSize,
       cmapNo = cmapNo,
-      cmapStart = Some(-10d),
-      cmapEnd = Some(10d),
-      counterNo = counterNo
+      cmapStart = Some(-20),
+      cmapEnd = Some(20),
+      bufferSize = bufferSize,
+      thresholdPeriod = bufferSize,
+      decayFactor = decayFactor,
+      rebuildThreshold = rebuildThreshold
     )
     val (_, samples) = NumericDist.normal(0.0, 1).samples(bufferSize)
     val sketch0 = Sketch.empty[Double]
