@@ -1,18 +1,16 @@
 package flip
 
-import flip.implicits._
-
 object Params {
 
-  val cmapSizes = List(20)
+  val cmapSizes: List[Int] = (SketchConf.default.cmap.size :: List(100)).distinct.sorted
 
-  val cmapNos = List(3, 10)
+  val cmapNos: List[Int] = (SketchConf.default.cmap.no :: List(10)).distinct.sorted
 
-  val bufferSizes = List(10, 100)
+  val bufferSizes: List[Int] = (SketchConf.default.bufferSize :: List(100)).distinct.sorted
 
-  val decayFactors = List(1.0, 2.0)
+  val decayFactors: List[Double] = (SketchConf.default.decayFactor :: List(2.0)).distinct.sorted
 
-  val rebuildThresholds = List(0.0, 0.2)
+  val rebuildThresholds: List[Double] = (SketchConf.default.rebuildThreshold :: List(1.0)).distinct.sorted
 
   def toConfs: List[SketchConf] =
     for {
@@ -34,5 +32,3 @@ object Params {
       )
 
 }
-
-
