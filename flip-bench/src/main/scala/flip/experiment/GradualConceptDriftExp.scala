@@ -35,9 +35,9 @@ object GradualConceptDriftExp {
 
     implicit val conf: SketchConf = SketchConf(
       decayFactor = 1,
-      cmapNo = 5,
-      cmapStart = Some(-10d),
-      cmapEnd = Some(10)
+      cmapStart = Some(-20.0),
+      cmapEnd = Some(20.0),
+      rebuildThreshold = 0.2
     )
     val sketch0 = Sketch.empty[Double]
     val sketchTraces = sketch0 :: sketch0.updateTrace(datas)

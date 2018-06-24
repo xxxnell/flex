@@ -4,6 +4,6 @@ trait DefaultPeriodicSketchConf extends PeriodicSketchConf with DefaultSketchCon
 
   val startThreshold: Double = 50
 
-  val thresholdPeriod: Double = 100
+  val thresholdPeriod: Double = 50
 
 }

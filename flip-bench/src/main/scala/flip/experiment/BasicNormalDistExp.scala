@@ -10,15 +10,16 @@ object BasicNormalDistExp {
     val dataNo = 1000
 
     implicit val conf: SketchConf = SketchConf(
-      cmapStart = Some(-10),
-      cmapEnd = Some(10)
+      cmapStart = Some(-20),
+      cmapEnd = Some(20),
+      rebuildThreshold = 0.2
     )
     val sketch0 = Sketch.empty[Double]
     val underlying = NumericDist.normal(0.0, 1)
     val (_, datas) = underlying.samples(dataNo)
     val sketchTraces = sketch0 :: sketch0.updateTrace(datas)
     val idxSketches = sketchTraces.indices.zip(sketchTraces).toList.filter { case (idx, _) => idx % 10 == 0 }
-    val idxPdf = idxSketches.map { case (idx, sketch) => (idx, sketch.barPlot.csv) }
+    val idxPdf = idxSketches.map { case (idx, sketch) => (idx, sketch.rangePdfSampling.csv) }
     val idxCdf = idxSketches.map { case (idx, sketch) => (idx, sketch.cdfSampling.csv) }
     val idxKld = idxSketches.map { case (idx, sketch) => (idx, KLD(underlying, sketch)) }
     val idxCos = idxSketches.map { case (idx, sketch) => (idx, Cosine(underlying, sketch)) }
