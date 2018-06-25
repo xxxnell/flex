@@ -11,10 +11,10 @@ import org.openjdk.jmh.infra.Blackhole
 /**
   * Large scale benchmark for Update of Sketch
   * */
-@BenchmarkMode(Array(Mode.AverageTime))
-@OutputTimeUnit(TimeUnit.NANOSECONDS)
+@BenchmarkMode(Array(Mode.Throughput))
+@OutputTimeUnit(TimeUnit.SECONDS)
 @State(Scope.Thread)
-class SketchUpdateLSBench { self =>
+class ConfBench { self =>
 
   // parameters
 

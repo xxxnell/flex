@@ -61,11 +61,12 @@ object BenchAppConfs {
   }
 
   def params(builder: ChainedOptionsBuilder): ChainedOptionsBuilder = {
-    builder.param("cmapSizeLS", Params.cmapSizes.map(_.toString).toArray: _*)
-    builder.param("cmapNoLS", Params.cmapNos.map(_.toString).toArray: _*)
-    builder.param("bufferSizeLS", Params.bufferSizes.map(_.toString).toArray: _*)
-    builder.param("decayFactorLS", Params.decayFactors.map(_.toString).toArray: _*)
-    builder.param("rebuildThresholdLS", Params.rebuildThresholds.map(_.toString).toArray: _*)
+    val params = Params.reducedBy(2)
+    builder.param("cmapSizeLS", params.cmapSizes.map(_.toString).toArray: _*)
+    builder.param("cmapNoLS", params.cmapNos.map(_.toString).toArray: _*)
+    builder.param("bufferSizeLS", params.bufferSizes.map(_.toString).toArray: _*)
+    builder.param("decayFactorLS", params.decayFactors.map(_.toString).toArray: _*)
+    builder.param("rebuildThresholdLS", params.rebuildThresholds.map(_.toString).toArray: _*)
   }
 
 }
