@@ -38,7 +38,9 @@ class ConfBench { self =>
 
   // variables
 
-  var signals: Array[Double] = _
+  var normalSignals: Array[Double] = _
+
+  var incrDriftSignals: Array[Double] = _
 
   var sketch: Sketch[Double] = _
 
@@ -55,17 +57,29 @@ class ConfBench { self =>
       rebuildThreshold = rebuildThresholdLS
     )
 
-    signals = SignalOps.normalSignals(iterateBenchSizeLS).toArray
+    normalSignals = SignalOps.normalSignals(iterateBenchSizeLS).toArray
+    incrDriftSignals = SignalOps.incrDriftSignals(iterateBenchSizeLS, 0.01).toArray
     sketch = Sketch.empty[Double]
   }
 
   @Benchmark
-  def iterate(bh: Blackhole): Unit = bh.consume {
+  def normal(bh: Blackhole): Unit = bh.consume {
     var i = 0
     var sketch: Sketch[Double] = self.sketch
-    while (i < signals.length) {
-      sketch = sketch.update(signals(i))
+    while (i < normalSignals.length) {
+      sketch = sketch.update(normalSignals(i))
       i += 1
     }
   }
+
+  @Benchmark
+  def incrDrift(bh: Blackhole): Unit = bh.consume {
+    var i = 0
+    var sketch: Sketch[Double] = self.sketch
+    while (i < incrDriftSignals.length) {
+      sketch = sketch.update(incrDriftSignals(i))
+      i += 1
+    }
+  }
+
 }
