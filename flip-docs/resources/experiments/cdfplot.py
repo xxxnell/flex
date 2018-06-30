@@ -12,8 +12,12 @@ def pdfframe(ax, xmin, xmax, ymin, ymax):
     ax.set_xlabel("x")
 
 
-def empty_pdf_expected_dataframe(ax):
+def empty_expected_dataframe(ax):
     return ax.plot([], [], '--', color='orange')
+
+
+def empty_delta_dataframe(ax):
+    return ax.plot([], [], ':', color='red')
 
 
 def setline_for_expected(lines, expected, xmin, xmax):
@@ -24,7 +28,7 @@ def setline_for_expected(lines, expected, xmin, xmax):
     line.set_data(x, y)
 
 
-def empty_pdf_observed_dataframe(ax):
+def empty_observed_dataframe(ax):
     return ax.plot([], [])
 
 
@@ -36,19 +40,29 @@ def setline_for_observed(lines, data_loc):
     line.set_data(x, y)
 
 
+def setline_for_delta(lines, data_loc):
+    data = prep.data(data_loc, 2)
+    x = list(map(lambda d: d[0], data))
+    y = list(map(lambda d: abs(d[1]), data))
+    line, = lines
+    line.set_data(x, y)
+
+
 # Animated
 
-def animated_cdfplot(data_loc, start, end, step, expected, xmin, xmax, ymin, ymax):
+def animated_cdfplot(cdf_data_loc, delta_data_loc, start, end, step, expected, xmin, xmax, ymin, ymax):
     fig, ax = plt.subplots()
 
-    init_data_loc = data_loc(start)
+    init_data_loc = cdf_data_loc(start)
     pdfframe(ax, xmin, xmax, ymin, ymax)
-    expectedax = empty_pdf_expected_dataframe(ax)
-    observedax = empty_pdf_observed_dataframe(ax)
+    expectedax = empty_expected_dataframe(ax)
+    observedax = empty_observed_dataframe(ax)
+    deltaax = empty_delta_dataframe(ax)
 
     def animate(i):
         setline_for_expected(expectedax, lambda x: expected(x, i), xmin, xmax)
-        setline_for_observed(observedax, data_loc(i))
+        setline_for_observed(observedax, cdf_data_loc(i))
+        setline_for_delta(deltaax, delta_data_loc(i))
         ax.set_title("estimated cdf for update count: " + str(i))
         return observedax, expectedax
 

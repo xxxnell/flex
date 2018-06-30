@@ -216,6 +216,8 @@ trait PointPlotLaws[P <: PointPlot] { self: PointPlotOps[P] =>
 
   def isEmpty(plot: P): Boolean = plot.records.isEmpty
 
+  def domain(plot: P): RangeP = RangeP.apply(plot.records.last._1, plot.records.head._1)
+
 }
 
 object PointPlot extends PointPlotOps[PointPlot] {

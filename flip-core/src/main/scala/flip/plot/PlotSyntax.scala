@@ -46,6 +46,7 @@ trait PointPlotSyntax {
       PointPlot.referencialInterpolation(pPlot, x, ref)
     def isEmpty: Boolean = PointPlot.isEmpty(pPlot)
     def nonEmpty: Boolean = !PointPlot.isEmpty(pPlot)
+    def domain: RangeP = PointPlot.domain(pPlot)
     def csv: String = ShowPlot.dsvPointPlot(plot, ", ")
     def dsv(delimiter: String): String = ShowPlot.dsvPointPlot(plot, delimiter)
   }

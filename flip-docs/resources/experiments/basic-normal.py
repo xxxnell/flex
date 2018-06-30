@@ -21,6 +21,9 @@ def pdf_expected(x, i = -1):
 def cdf_data_loc(i):
     return dir + "basic-normal-cdf-" + str(i) + ".out"
 
+def delta_data_loc(i):
+    return dir + "basic-normal-delta-" + str(i) + ".out"
+
 def cdf_expected(x, i = -1):
     return norm.cdf(x)
 
@@ -80,5 +83,5 @@ pdf_animation.save(name + '-pdf.gif', writer='imagemagick', fps=fps)
 
 # CDF: Animated
 
-cdf_animation = cdfplt.animated_cdfplot(cdf_data_loc, start, end, step, cdf_expected, xmin, xmax, 0, 1)
+cdf_animation = cdfplt.animated_cdfplot(cdf_data_loc, delta_data_loc, start, end, step, cdf_expected, xmin, xmax, 0, 1)
 cdf_animation.save(name + '-cdf.gif', writer='imagemagick', fps=fps)

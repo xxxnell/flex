@@ -3,7 +3,7 @@ package flip.sim
 import flip.pdf.Dist
 import flip.plot.PointPlot
 
-trait SimSyntax extends ConsineSyntax with KLDSyntax with L2SqSyntax
+trait SimSyntax extends ConsineSyntax with KLDSyntax with L2SqSyntax with EDSyntax
 
 trait ConsineSyntax {
 
@@ -43,5 +43,17 @@ trait L2SqSyntax {
     math.sqrt(L2Sq(d1, d2))
 
   def Euclidean[A](d1: Dist[A], d2: Dist[A]): Double = L2(d1, d2)
+
+}
+
+trait EDSyntax {
+
+  private val ed = flip.sim.ED
+
+  def ED[A](d1: Dist[A], d2: Dist[A]): Double = ed.simForDist(d1, d2)
+
+  def Delta[A](d1: Dist[A], d2: Dist[A]): PointPlot = ed.deltaForDist(d1, d2)
+
+  def AbsDelta[A](d1: Dist[A], d2: Dist[A]): PointPlot = ed.absDeltaForDist(d1, d2)
 
 }
