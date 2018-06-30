@@ -95,7 +95,7 @@ ed_data_loc = dir + "sudden-cd-normal-ed.out"
 
 fig = plt.figure()
 axed = fig.add_subplot(1, 1, 1)
-axed.set_ylabel("E(Δ)")
+axed.set_ylabel("$D_Δ$")
 kldplt.distplot(axed, ed_data_loc, ed_max, countmin, countmax, rearr_start, rearr_period, False)
 axed.axvline(moving_start, color='r', linestyle=':', linewidth=1)
 
@@ -106,6 +106,7 @@ start = 10
 end = 700
 step = 10
 fps = 4
+
 xmin = -2
 xmax = 7
 ymin = 0

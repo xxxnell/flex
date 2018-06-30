@@ -36,30 +36,33 @@ object GradualConceptDriftExp {
     implicit val conf: SketchConf = SketchConf(
       decayFactor = 1,
       cmapStart = Some(-20.0),
-      cmapEnd = Some(20.0),
-      rebuildThreshold = 0.2
+      cmapEnd = Some(20.0)
     )
     val sketch0 = Sketch.empty[Double]
     val sketchTraces = sketch0 :: sketch0.updateTrace(datas)
     val idxSketches = sketchTraces.indices.zip(sketchTraces).toList.filter { case (idx, _) => idx % 10 == 0 }
-    val idxPdf = idxSketches.map { case (idx, skt) => (idx, skt.barPlot) }
-    val idxKld = idxSketches.map { case (idx, utdSkt) => (idx, KLD(underlying(idx), utdSkt)) }
-    val idxCos = idxSketches.map { case (idx, utdSkt) => (idx, Cosine(underlying(idx), utdSkt)) }
-    val idxEuc = idxSketches.map { case (idx, utdSkt) => (idx, Euclidean(underlying(idx), utdSkt)) }
-    val idxSktMedian = idxSketches.map { case (idx, skt) => (idx, skt.median) }
+    val idxPdf = idxSketches.map { case (idx, skt) => (idx, skt.barPlot.csv) }
+    val idxCdf = idxSketches.map { case (idx, sketch) => (idx, sketch.cdfSampling.csv) }
+    val idxDel = idxSketches.map { case (idx, sketch) => (idx, Delta(underlying(idx), sketch).csv) }
+    val idxKld = idxSketches.map { case (idx, sketch) => (idx, KLD(underlying(idx), sketch)) }
+    val idxCos = idxSketches.map { case (idx, sketch) => (idx, Cosine(underlying(idx), sketch)) }
+    val idxEuc = idxSketches.map { case (idx, sketch) => (idx, Euclidean(underlying(idx), sketch)) }
+    val idxED = idxSketches.map { case (idx, sketch) => (idx, ED(underlying(idx), sketch)) }
+    val idxMedian = idxSketches.map { case (idx, sketch) => (idx, sketch.median) }
 
     // out
-
     ExpOutOps.clear(expName)
-
-    ExpOutOps.writePlots(expName, "pdf", idxPdf)
+    ExpOutOps.writeStrs(expName, "pdf", idxPdf)
+    ExpOutOps.writeStrs(expName, "cdf", idxCdf)
+    ExpOutOps.writeStrs(expName, "delta", idxDel)
     ExpOutOps.writeStr(expName, "kld", idxKld.map { case (idx, kld) => s"$idx, $kld" }.mkString("\n"))
     ExpOutOps.writeStr(expName, "cosine", idxCos.map { case (idx, cos) => s"$idx, $cos" }.mkString("\n"))
     ExpOutOps.writeStr(expName, "euclidean", idxEuc.map { case (idx, euc) => s"$idx, $euc" }.mkString("\n"))
+    ExpOutOps.writeStr(expName, "ed", idxED.map { case (idx, ed) => s"$idx, $ed" }.mkString("\n"))
     ExpOutOps.writeStr(
       expName,
       "median",
-      idxSktMedian.map { case (idx, sktMed) => s"$idx, ${center(idx)}, $sktMed" }.mkString("\n"))
+      idxMedian.map { case (idx, sktMed) => s"$idx, ${center(idx)}, $sktMed" }.mkString("\n"))
 
     // console print
     val avgSize = 10
