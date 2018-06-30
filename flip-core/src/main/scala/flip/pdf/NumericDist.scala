@@ -41,6 +41,10 @@ object NumericDist extends NumericDistOps[NumericDist] {
                                                       conf: SmoothDistConf): NormalDist[A] =
     NormalDist(mean, variance, rng)
 
+  def normal[A](mean: A, variance: Double, seed: Int)(implicit measure: Measure[A],
+                                                      conf: SmoothDistConf): NormalDist[A] =
+    NormalDist(mean, variance, IRng(seed))
+
   def logNormal[A](scale: A, shape: Double)(implicit measure: Measure[A], conf: SmoothDistConf): LogNormalDist[A] =
     LogNormalDist(scale, shape)
 

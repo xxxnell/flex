@@ -1,18 +1,15 @@
 package flip.experiment
 
-import flip.implicits._
 import flip.experiment.ops.ExpOutOps
+import flip.implicits._
 
-/**
-  * A experiment for sudden concept drift.
-  * https://edouardfouche.com/img/concept-drift/conceptdrift.png
-  * */
-object SuddenConceptDriftExp {
+object BlipConceptDriftExp {
 
   def main(args: Array[String]): Unit = {
-    val expName = "sudden-cd-normal"
+    val expName = "blip-cd-normal"
     val dataNo = 1000
     val draftStart = 300
+    val duration = 20
 
     implicit val conf: SketchConf = SketchConf(
       cmapStart = Some(-10),
@@ -20,7 +17,7 @@ object SuddenConceptDriftExp {
     )
     val sketch0 = Sketch.empty[Double]
     val (mean1, mean2) = (0.0, 5.0)
-    def center(idx: Int) = if (idx < draftStart) mean1 else mean2
+    def center(idx: Int) = if (idx < draftStart) mean1 else if (idx < draftStart + duration) mean2 else mean1
     def underlying(idx: Int) = NumericDist.normal(center(idx), 1, idx)
     val datas = (1 to dataNo).map(idx => underlying(idx).sample._2).toList
     val sketchTraces = sketch0 :: sketch0.updateTrace(datas)
