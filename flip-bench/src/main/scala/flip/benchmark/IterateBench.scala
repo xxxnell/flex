@@ -15,19 +15,19 @@ class IterateBench { self =>
   // params
 
   @Param(Array("30"))
-  var bufferSize: Int = _
+  var bufferSizeL: Int = _
 
   @Param(Array("0"))
   var iterateBenchSize: Int = _
 
   @Param(Array("3"))
-  var cmapNo: Int = _
+  var cmapNoL: Int = _
 
   @Param(Array("20"))
-  var cmapSize: Int = _
+  var cmapSizeL: Int = _
 
-  @Param(Array("0.0"))
-  var rebuildThreshold: Double = _
+  @Param(Array("0.2"))
+  var rebuildThresholdL: Double = _
 
   // variables
 
@@ -38,12 +38,12 @@ class IterateBench { self =>
   @Setup
   def setupSketch(): Unit = {
     implicit val conf: SketchConf = SketchConf(
-      bufferSize = bufferSize,
-      cmapSize = cmapSize,
-      cmapNo = cmapNo,
+      bufferSize = bufferSizeL,
+      cmapSize = cmapSizeL,
+      cmapNo = cmapNoL,
       cmapStart = Some(-3.0),
       cmapEnd = Some(3.0),
-      rebuildThreshold = rebuildThreshold
+      rebuildThreshold = rebuildThresholdL
     )
 
     signals = SignalOps.normalSignals(iterateBenchSize).toArray
