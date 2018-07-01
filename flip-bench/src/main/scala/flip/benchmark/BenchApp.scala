@@ -61,7 +61,7 @@ object BenchAppConfs {
   }
 
   def params(builder: ChainedOptionsBuilder): ChainedOptionsBuilder = {
-    val params = Params.reducedBy(2)
+    val params = Params.reducedBy(1)
     builder.param("cmapSizeLS", params.cmapSizes.map(_.toString).toArray: _*)
     builder.param("cmapNoLS", params.cmapNos.map(_.toString).toArray: _*)
     builder.param("bufferSizeLS", params.bufferSizes.map(_.toString).toArray: _*)
