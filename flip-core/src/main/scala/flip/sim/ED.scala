@@ -30,7 +30,8 @@ object ED {
   }
 
   def sim(cdf1: PointPlot, cdf2: PointPlot): Double = {
-    1 / (1 / avgDelta(cdf1, cdf2) - 1)
+    val Δrep =  avgDelta(cdf1, cdf2)
+    1 / (1 / math.abs(Δrep) - 1)
   }
 
   def simForDist[A](d1: Dist[A], d2: Dist[A]): Double = {
