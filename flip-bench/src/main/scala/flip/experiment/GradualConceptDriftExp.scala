@@ -2,7 +2,6 @@ package flip.experiment
 
 import flip.implicits._
 import flip.experiment.ops.ExpOutOps
-import flip.rand.IRng
 
 /**
   * A experiment for gradual concept drift.
@@ -20,21 +19,10 @@ object GradualConceptDriftExp {
     def center(idx: Int) =
       if (draftStart > idx) draftStartingPoint
       else draftStartingPoint + velocity * (idx - draftStart)
-    val rng: IRng = IRng(0)
-    def underlying(idx: Int, rng: IRng = rng): NumericDist[Double] =
-      if (draftStart > idx) NumericDist.normal(draftStartingPoint, 1.0, rng)
-      else NumericDist.normal(center(idx), 1.0, rng)
-    val datas: List[Double] = {
-      var tempRng = rng
-      (0 to dataNo).toList.map(idx => {
-        val (utdDist, sample) = underlying(idx, tempRng).sample
-        tempRng = utdDist.asInstanceOf[NumericDist[Double]].rng
-        sample
-      })
-    }
+    def underlying(idx: Int): NumericDist[Double] = NumericDist.normal(center(idx), 1.0, idx)
+    val datas: List[Double] = (0 to dataNo).toList.map(idx => underlying(idx).sample._2)
 
     implicit val conf: SketchConf = SketchConf(
-      decayFactor = 1,
       cmapStart = Some(-20.0),
       cmapEnd = Some(20.0)
     )
@@ -69,11 +57,13 @@ object GradualConceptDriftExp {
     val avgKld = idxKld.takeRight(avgSize).map(_._2).sum / avgSize
     val avgCos = idxCos.takeRight(avgSize).map(_._2).sum / avgSize
     val avgEuc = idxEuc.takeRight(avgSize).map(_._2).sum / avgSize
+    val mem = flip.Profiler.serializedMem(idxSketches.last._2)
 
     val str = s"Similarity for gradual concept-drifted data stream with velocity $velocity: \n" +
       s" KLD: $avgKld \n" +
       s" Cosine: $avgCos \n" +
-      s" Euclidean: $avgEuc"
+      s" Euclidean: $avgEuc \n" +
+      s" Memory usage (byte): $mem"
     println(str)
   }
 

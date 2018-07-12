@@ -68,7 +68,7 @@ object Params {
 
   val defaultBufferSizes: List[Int] = (10 :: 30 :: 70 :: 120 :: 150 :: Nil).distinct.sorted
 
-  val defaultDecayFactors: List[Double] = (0.2 :: 0.5 :: 1.0 :: 2.0 :: 2.5 :: Nil).distinct.sorted
+  val defaultDecayFactors: List[Double] = (0.2 :: 0.5 :: 1.0 :: 2.0 :: 2.5 :: 5.0 :: Nil).distinct.sorted
 
   val defaultRebuildThresholds: List[Double] = (0.01 :: 0.09 :: 0.3 :: 0.5 :: 0.7 :: Nil).distinct.sorted
 

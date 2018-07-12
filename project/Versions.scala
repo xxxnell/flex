@@ -16,4 +16,6 @@ object Versions {
 
   val commonsMath3 = "3.6.1"
 
+  val jol = "0.9"
+
 }

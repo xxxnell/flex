@@ -11,7 +11,7 @@ import flip.pdf.Histogram
 @BenchmarkMode(Array(Mode.AverageTime))
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @State(Scope.Thread)
-class SketchOpsBench { self =>
+class SketchDetailOpsBench { self =>
 
   // parameters
 

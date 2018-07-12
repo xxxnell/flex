@@ -7,9 +7,9 @@ object BlipConceptDriftExp {
 
   def main(args: Array[String]): Unit = {
     val expName = "blip-cd-normal"
-    val dataNo = 1000
+    val dataNo = 600
     val draftStart = 300
-    val duration = 20
+    val duration = 3
 
     implicit val conf: SketchConf = SketchConf(
       cmapStart = Some(-10),
@@ -21,7 +21,7 @@ object BlipConceptDriftExp {
     def underlying(idx: Int) = NumericDist.normal(center(idx), 1, idx)
     val datas = (1 to dataNo).map(idx => underlying(idx).sample._2).toList
     val sketchTraces = sketch0 :: sketch0.updateTrace(datas)
-    val idxSketches = sketchTraces.indices.zip(sketchTraces).toList.filter { case (idx, _) => idx % 10 == 0 }
+    val idxSketches = sketchTraces.indices.zip(sketchTraces).toList.filter { case (idx, _) => idx % 2 == 0 }
     val idxPdf = idxSketches.map { case (idx, sketch) => (idx, sketch.barPlot.csv) }
     val idxCdf = idxSketches.map { case (idx, sketch) => (idx, sketch.cdfSampling.csv) }
     val idxDel = idxSketches.map { case (idx, sketch) => (idx, Delta(underlying(idx), sketch).csv) }

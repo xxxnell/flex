@@ -33,10 +33,15 @@ object Dependencies {
     "org.apache.commons" % "commons-math3" % Versions.commonsMath3
   )
 
+  val jol = Seq(
+    "org.openjdk.jol" % "jol-core" % Versions.jol
+  )
+
+
   // project dependencies
 
   val core = libraryDependencies ++= (cats ++ monixs ++ specs ++ tics ++ math)
 
-  val bench = libraryDependencies ++= (specs ++ tics ++ datetime)
+  val bench = libraryDependencies ++= (specs ++ tics ++ datetime ++ jol)
 
 }
