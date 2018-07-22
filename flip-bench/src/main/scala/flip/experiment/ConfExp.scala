@@ -28,11 +28,17 @@ object ConfExp {
         s"${conf.asInstanceOf[AdaSelSketchConf].rebuildThreshold}"
     val normalOut =
       confHeader +
-        confs.map { conf => s"${conf2Str(conf)}, ${normalEds.getOrElse(conf, "")}, ${mems.getOrElse(conf, "")}" }
+        confs
+          .map { conf =>
+            s"${conf2Str(conf)}, ${normalEds.getOrElse(conf, "")}, ${mems.getOrElse(conf, "")}"
+          }
           .mkString("\n")
     val incrDriftOut =
       confHeader +
-        confs.map { conf => s"${conf2Str(conf)}, ${driftEds.getOrElse(conf, "")}, ${mems.getOrElse(conf, "")}" }
+        confs
+          .map { conf =>
+            s"${conf2Str(conf)}, ${driftEds.getOrElse(conf, "")}, ${mems.getOrElse(conf, "")}"
+          }
           .mkString("\n")
     println("(2/2) Results are printed...")
 

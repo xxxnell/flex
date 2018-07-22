@@ -2,6 +2,6 @@ package flip.conf.pdf
 
 trait DefaultAdaptiveSketchConf extends AdaptiveSketchConf with DefaultSketchConf {
 
-  val bufferSize: Int = 50
+  val bufferSize: Int = 30
 
 }

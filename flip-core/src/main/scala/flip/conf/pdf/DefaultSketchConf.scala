@@ -9,6 +9,6 @@ trait DefaultSketchConf extends SketchConf with DefaultDataBinningDistConf {
 
   val dataKernelWindow: Double = 1e-5
 
-  val decayFactor: Double = 1
+  val decayFactor: Double = 2.5
 
 }
