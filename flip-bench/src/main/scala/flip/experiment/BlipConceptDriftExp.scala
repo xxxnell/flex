@@ -19,16 +19,19 @@ object BlipConceptDriftExp {
     val (mean1, mean2) = (0.0, 5.0)
     def center(idx: Int) = if (idx < draftStart) mean1 else if (idx < draftStart + duration) mean2 else mean1
     def underlying(idx: Int) = NumericDist.normal(center(idx), 1, idx)
+    val underlying0 = NumericDist.normal(center(0), 1)
     val datas = (1 to dataNo).map(idx => underlying(idx).sample._2).toList
     val sketchTraces = sketch0 :: sketch0.updateTrace(datas)
-    val idxSketches = sketchTraces.indices.zip(sketchTraces).toList.filter { case (idx, _) => idx % 2 == 0 }
+    val idxSketches = sketchTraces.indices.zip(sketchTraces).toList.filter {
+      case (idx, _) => idx >= draftStart - duration && idx <= draftStart + 2 * duration
+    }
     val idxPdf = idxSketches.map { case (idx, sketch) => (idx, sketch.barPlot.csv) }
     val idxCdf = idxSketches.map { case (idx, sketch) => (idx, sketch.cdfSampling.csv) }
-    val idxDel = idxSketches.map { case (idx, sketch) => (idx, Delta(underlying(idx), sketch).csv) }
-    val idxKld = idxSketches.map { case (idx, sketch) => (idx, KLD(underlying(idx), sketch)) }
-    val idxCos = idxSketches.map { case (idx, sketch) => (idx, Cosine(underlying(idx), sketch)) }
-    val idxEuc = idxSketches.map { case (idx, sketch) => (idx, Euclidean(underlying(idx), sketch)) }
-    val idxED = idxSketches.map { case (idx, sketch) => (idx, ED(underlying(idx), sketch)) }
+    val idxDel = idxSketches.map { case (idx, sketch) => (idx, Delta(underlying0, sketch).csv) }
+    val idxKld = idxSketches.map { case (idx, sketch) => (idx, KLD(underlying0, sketch)) }
+    val idxCos = idxSketches.map { case (idx, sketch) => (idx, Cosine(underlying0, sketch)) }
+    val idxEuc = idxSketches.map { case (idx, sketch) => (idx, Euclidean(underlying0, sketch)) }
+    val idxED = idxSketches.map { case (idx, sketch) => (idx, ED(underlying0, sketch)) }
     val idxMedian = idxSketches.map { case (idx, sketch) => (idx, sketch.median) }
 
     ExpOutOps.clear(expName)
