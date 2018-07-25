@@ -100,28 +100,28 @@ kldplt.distplot(axed, ed_data_loc, ed_max, countmin, countmax, rearr_start, rear
 axed.axvline(moving_start, color='r', linestyle=':', linewidth=1)
 
 
-# # Animated PDF
-#
-# start = 10
-# end = 1000
-# step = 10
-# fps = 4
-#
-# xmin = -1
-# xmax = 8
-# ymin = 0
-# ymax = 1
-#
-#
-# # PDF: Animated
-#
-# utd_animation2 = pdfplt.animated_pdfplot_bar(
-#   pdf_data_loc, countmin, countmax, step, lambda x, i: pdf_expected(x, moving_start, i), xmin, xmax, ymin, ymax)
-# utd_animation2.save(name + '-pdf.gif', writer='imagemagick', fps=fps)
-#
-#
-# # CDF: Animated
-#
-# cdf_animation = cdfplt.animated_cdfplot(
-#   cdf_data_loc, delta_data_loc, start, end, step, lambda x, i: cdf_expected(x, moving_start, i), xmin, xmax, 0, 1)
-# cdf_animation.save(name + '-cdf.gif', writer='imagemagick', fps=fps)
+# Animated PDF
+
+start = 10
+end = 1000
+step = 10
+fps = 4
+
+xmin = -1
+xmax = 8
+ymin = 0
+ymax = 1
+
+
+# PDF: Animated
+
+utd_animation2 = pdfplt.animated_pdfplot_bar(
+  pdf_data_loc, countmin, countmax, step, lambda x, i: pdf_expected(x, moving_start, i), xmin, xmax, ymin, ymax)
+utd_animation2.save(name + '-pdf.gif', writer='imagemagick', fps=fps)
+
+
+# CDF: Animated
+
+cdf_animation = cdfplt.animated_cdfplot(
+  cdf_data_loc, delta_data_loc, start, end, step, lambda x, i: cdf_expected(x, moving_start, i), xmin, xmax, 0, 1)
+cdf_animation.save(name + '-cdf.gif', writer='imagemagick', fps=fps)
