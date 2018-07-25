@@ -8,10 +8,10 @@
 
 *Flip* is *F*ast, *L*ightweight pure-functional library for *I*nformation theory and *P*robability distribution. *Flip* aims to extract and process statistical features of the input data stream in a short time using only small memory. It has the following features:
 
-* Quickly estimate and summarize probability distribution for random variable stream using `Sketch`
+* Quickly estimate and summarize probability distribution for data stream using `Sketch`
 * Combine several probability distributions by probability monad
 * Generate random variables from many predefined and estimated probability disributions 
-* Measure similarity between two probability distribution using Kullback–Leibler divergence
+* Measure similarity between two probability distribution using various (generalized) statistical distances (e.g., Kullback–Leibler divergence)
 
 
 ## Getting Started
@@ -57,7 +57,10 @@ println(
 
 Here is an experiment result for a bimodal probabability density function consisting of two standard normal distributions centered at -2 and 2.
 
-![animated bimodal](./flip-docs/resources/experiments/basic-bimodal-histo.gif)
+<p align="center">
+  <img width="460" height="350" src="./flip-docs/resources/experiments/basic-bimodal-histo.gif">
+</p>
+
 
 In this figure, the dashed orange line is the expected underlying probability distribution, and the blue bar is the probability distribution that `Sketch` estimates. `Sketch` assumes an initial bin with a uniform width, and estimates the first optimal bin at the update count of 50. Then `Sketch` estimates new bins every 100 data updates, for example, 50, 150, 250, and so on.
 
@@ -66,7 +69,9 @@ In this figure, the dashed orange line is the expected underlying probability di
 
 `Sketch` also adapts to any types of concept drift successfully. Here is an experiment result under the situation where the distribution that `Sketch` is supposed to estimate is gradually changing over time. The underlying distribution starts to change when the update count come to 300 and moves by +0.01 per one update count. `Sketch` is good at predicting this moving distribution, although there is some lag. Also this lag can be reduced by adjusting the sensitivity to new data.
 
-![animated gradual concept drift](./flip-docs/resources/experiments/gradual-cd-normal-histo.gif)
+<p align="center">
+  <img width="460" height="350" src="./flip-docs/resources/experiments/gradual-cd-normal-pdf.gif">
+</p>
 
 In all of these experiments, I did not provide any prior knowledge to predict the underlying distirbution accurately. It works precisely with the default configuration. For more example, see the [experiment](./flip-docs/experiment.md) documentation. If you want to learn how to use `Sketch` in a real world, see the [code for these experiments](./flip-bench/src/main/scala/flip/experiment).
 
