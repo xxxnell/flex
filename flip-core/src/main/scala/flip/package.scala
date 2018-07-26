@@ -1,6 +1,6 @@
 import cats.data.Kleisli
 
-package object flip extends AllSyntax {
+package object flip extends AllSyntax { self =>
 
   type Mon[A, B] = Kleisli[Some, A, B]
 
@@ -23,6 +23,15 @@ package object flip extends AllSyntax {
     val result = block
     val t1 = System.nanoTime()
     (result, t1 - t0)
+  }
+
+  def fmt(v: Double, i: Int = 3): String = {
+    import java.math.MathContext
+    if (!v.isNaN && !v.isInfinity) BigDecimal(v).round(new MathContext(i)).toString else v.toString
+  }
+
+  implicit class ShowDouble(v: Double) {
+    def fmt(i: Int = 3): String = self.fmt(v, i)
   }
 
 }

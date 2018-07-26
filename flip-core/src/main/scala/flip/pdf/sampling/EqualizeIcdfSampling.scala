@@ -1,5 +1,5 @@
 package flip.pdf.sampling
-import flip.conf.EqualizeIcdfSamplingConf
+import flip.conf.pdf.EqualizeIcdfSamplingConf
 import flip.measure.Measure
 import flip.range.RangeM
 
@@ -8,24 +8,14 @@ import flip.range.RangeM
   * */
 object EqualizeIcdfSampling extends IcdfSampling[EqualizeIcdfSamplingConf] {
 
-  def sampling[A](icdf: Double => A, measure: Measure[A], conf: EqualizeIcdfSamplingConf): List[RangeM[A]] = {
-    val size = conf.size
+  def sampling[A](icdf: Double => A, measure: Measure[A], conf: EqualizeIcdfSamplingConf): List[A] = {
+    val size = conf.size // todo bucket size (not sampling number)
     val corr = conf.boundaryRatio
     val unit = 1.0 / (size.toDouble - 2 + 2 * corr)
 
-    (0 to size).toList
-      .map {
-        case i if i == 0 => 0
-        case i if i == size => 1
-        case i => unit * corr + unit * (i - 1)
-      }
+    (1 until size).toList
+      .map(i => unit * corr + unit * (i - 1))
       .map(p => icdf(p))
-      .sliding(2)
-      .toList
-      .flatMap {
-        case q1 :: q2 :: Nil => Some(RangeM(q1, q2)(measure))
-        case _ => None
-      }
   }
 
 }

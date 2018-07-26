@@ -1,9 +1,9 @@
 package flip.pdf
 
-import flip.conf.SmoothDistConf
+import flip.conf.pdf.SmoothDistConf
 import flip.measure.Measure
 import flip.pdf.sampling.IcdfSampling
-import flip.plot.DensityPlot
+import flip.plot.PointPlot
 import flip.rand.IRng
 
 import scala.language.higherKinds
@@ -21,14 +21,39 @@ trait SmoothDistPropOps[D[_] <: SmoothDist[_]] extends DistPropOps[D] with Smoot
 
 trait SmoothDistPropLaws[D[_] <: SmoothDist[_]] { self: SmoothDistPropOps[D] =>
 
-  def sampling[A](dist: D[A]): DensityPlot = {
+  override def pdfSampling[A](dist: D[A]): PointPlot = {
     val icdf: Double => A = p => self.icdf(dist, p)
     val measure = dist.measure.asInstanceOf[Measure[A]]
-    val records = IcdfSampling.sampling(icdf, measure, dist.conf.sampling).flatMap { range =>
-      val length = range.roughLength
-      if (length > 0) Some((range.primitivize, probability(dist, range.start, range.end) / length)) else None
+    val domain = IcdfSampling.sampling(icdf, measure, dist.conf.sampling).map(a => measure.to(a)).toArray
+    var i = 0
+    val records = Array.ofDim[(Double, Double)](domain.length)
+    while (i < domain.length) {
+      val p = domain.apply(i)
+      val a = measure.from(p)
+      if (i == 0 || i == domain.length - 1) records.update(i, (p, 0.0))
+      else records.update(i, (p, pdf(dist, a)))
+      i += 1
     }
-    DensityPlot.disjoint(records)
+
+    PointPlot.unsafe(records)
+  }
+
+  override def cdfSampling[A](dist: D[A]): PointPlot = {
+    val icdf: Double => A = p => self.icdf(dist, p)
+    val measure = dist.measure.asInstanceOf[Measure[A]]
+    val domain = IcdfSampling.sampling(icdf, measure, dist.conf.sampling).map(a => measure.to(a)).toArray
+    var i = 0
+    val records = Array.ofDim[(Double, Double)](domain.length)
+    while (i < domain.length) {
+      val p = domain.apply(i)
+      val a = measure.from(p)
+      if (i == 0) records.update(i, (p, 0.0))
+      else if (i == domain.length - 1) records.update(i, (p, 1.0))
+      else records.update(i, (p, cdf(dist, a)))
+      i += 1
+    }
+
+    PointPlot.unsafe(records)
   }
 
 }
@@ -62,9 +87,14 @@ object SmoothDist extends SmoothDistPropOps[SmoothDist] {
     case numeric: NumericDist[A] => NumericDist.icdf(numeric, p)
   }
 
-  override def sampling[A](dist: SmoothDist[A]): DensityPlot = dist match {
-    case dist: NumericDist[A] => NumericDist.sampling(dist)
-    case _ => super.sampling(dist)
+  override def pdfSampling[A](dist: SmoothDist[A]): PointPlot = dist match {
+    case dist: NumericDist[A] => NumericDist.pdfSampling(dist)
+    case _ => super.pdfSampling(dist)
+  }
+
+  override def cdfSampling[A](dist: SmoothDist[A]): PointPlot = dist match {
+    case dist: NumericDist[A] => NumericDist.cdfSampling(dist)
+    case _ => super.cdfSampling(dist)
   }
 
 }

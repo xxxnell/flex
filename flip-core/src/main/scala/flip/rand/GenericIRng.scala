@@ -3,16 +3,18 @@ package flip.rand
 import cats.data.State
 
 import scala.util.Random
+import scala.util.hashing.byteswap64
 
 trait GenericIRng[S <: Seed, A <: Out] extends Rng[S, A]
 
 trait IRngOps extends RngOps[Seed, Out, GenericIRng] {
 
   def nextS: State[IRng, Out] = State { rng =>
-    val seed = new Random(rng.seed).nextLong()
-    val rand = new Random(rng.seed).nextDouble()
+    val seed1 = byteswap64(rng.seed)
+    val seed2 = new Random(seed1).nextLong()
+    val rand = new Random(seed1).nextDouble()
 
-    (IRng.bare(seed), rand)
+    (IRng.bare(seed2), rand)
   }
 
 }

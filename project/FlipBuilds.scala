@@ -7,7 +7,7 @@ import Resolvers._
 object FlipBuilds {
 
   val buildSettings = Seq(
-    scalaVersion := "2.12.4",
+    scalaVersion := "2.12.6",
     organization := "com.xxxnell"
   )
 

@@ -20,30 +20,32 @@ object SuddenConceptDriftExp {
     )
     val sketch0 = Sketch.empty[Double]
     val (mean1, mean2) = (0.0, 5.0)
-    val underlying1 = NumericDist.normal(mean1, 1)
-    val (_, datas1) = underlying1.samples(draftStart)
-    val underlying2 = NumericDist.normal(mean2, 1)
-    val (_, datas2) = underlying2.samples(dataNo)
-    def underlying(idx: Int) = if (idx < draftStart) underlying1 else underlying2
     def center(idx: Int) = if (idx < draftStart) mean1 else mean2
-    val datas = datas1 ++ datas2
+    def underlying(idx: Int) = NumericDist.normal(center(idx), 1, idx)
+    val datas = (1 to dataNo).map(idx => underlying(idx).sample._2).toList
     val sketchTraces = sketch0 :: sketch0.updateTrace(datas)
     val idxSketches = sketchTraces.indices.zip(sketchTraces).toList.filter { case (idx, _) => idx % 10 == 0 }
-    val idxDensityPlots = idxSketches.map { case (idx, utdSkt) => (idx, utdSkt.pdfPlot) }
-    val idxKld = idxSketches.map { case (idx, utdSkt) => (idx, KLD(underlying(idx), utdSkt)) }
-    val idxCos = idxSketches.map { case (idx, utdSkt) => (idx, Cosine(underlying(idx), utdSkt)) }
-    val idxEuc = idxSketches.map { case (idx, utdSkt) => (idx, Euclidean(underlying(idx), utdSkt)) }
-    val idxSktMedian = idxSketches.map { case (idx, skt) => (idx, skt.median) }
+    val idxPdf = idxSketches.map { case (idx, sketch) => (idx, sketch.barPlot.csv) }
+    val idxCdf = idxSketches.map { case (idx, sketch) => (idx, sketch.cdfSampling.csv) }
+    val idxDel = idxSketches.map { case (idx, sketch) => (idx, Delta(underlying(idx), sketch).csv) }
+    val idxKld = idxSketches.map { case (idx, sketch) => (idx, KLD(underlying(idx), sketch)) }
+    val idxCos = idxSketches.map { case (idx, sketch) => (idx, Cosine(underlying(idx), sketch)) }
+    val idxEuc = idxSketches.map { case (idx, sketch) => (idx, Euclidean(underlying(idx), sketch)) }
+    val idxED = idxSketches.map { case (idx, sketch) => (idx, ED(underlying(idx), sketch)) }
+    val idxMedian = idxSketches.map { case (idx, sketch) => (idx, sketch.median) }
 
     ExpOutOps.clear(expName)
-    ExpOutOps.writePlots(expName, "pdf", idxDensityPlots)
+    ExpOutOps.writeStrs(expName, "pdf", idxPdf)
+    ExpOutOps.writeStrs(expName, "cdf", idxCdf)
+    ExpOutOps.writeStrs(expName, "delta", idxDel)
     ExpOutOps.writeStr(expName, "kld", idxKld.map { case (idx, kld) => s"$idx, $kld" }.mkString("\n"))
     ExpOutOps.writeStr(expName, "cosine", idxCos.map { case (idx, cos) => s"$idx, $cos" }.mkString("\n"))
     ExpOutOps.writeStr(expName, "euclidean", idxEuc.map { case (idx, euc) => s"$idx, $euc" }.mkString("\n"))
+    ExpOutOps.writeStr(expName, "ed", idxED.map { case (idx, ed) => s"$idx, $ed" }.mkString("\n"))
     ExpOutOps.writeStr(
       expName,
       "median",
-      idxSktMedian.map { case (idx, sktMed) => s"$idx, ${center(idx)}, $sktMed" }.mkString("\n"))
+      idxMedian.map { case (idx, sktMed) => s"$idx, ${center(idx)}, $sktMed" }.mkString("\n"))
   }
 
 }

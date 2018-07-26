@@ -4,9 +4,9 @@ import flip.plot.syntax._
 import flip.range
 import flip.range.RangeP
 
-trait CountPlot extends Plot
+trait CountPlot extends RangePlot
 
-trait CountPlotOps extends PlotOps[CountPlot] {
+trait CountPlotOps extends RangePlotOps[CountPlot] {
 
   def split(record: Record, p: Double): Option[(Record, Record)] = {
     val (range, value) = record

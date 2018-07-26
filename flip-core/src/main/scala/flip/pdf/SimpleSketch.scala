@@ -1,6 +1,6 @@
 package flip.pdf
 
-import flip.conf.SketchConf
+import flip.conf.pdf.SketchConf
 import flip.measure.Measure
 import flip.rand.IRng
 
@@ -29,7 +29,7 @@ object SimpleSketch extends SimpleSketchOps {
   def modifyRng[A](sketch: SimpleSketch[A], f: IRng => IRng): SimpleSketch[A] =
     SimpleSketch(sketch.measure, f(sketch.rng), sketch.conf, sketch.structures)
 
-  def modifyStructure[A](sketch: SimpleSketch[A], f: Structures => Structures): SimpleSketch[A] =
+  def modifyStructures[A](sketch: SimpleSketch[A], f: Structures => Structures): SimpleSketch[A] =
     SimpleSketch(sketch.measure, sketch.rng, sketch.conf, f(sketch.structures))
 
   def update[A](sketch: SimpleSketch[A], as: List[(A, Count)]): SimpleSketch[A] =

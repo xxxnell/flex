@@ -1,7 +1,8 @@
 package flip.pdf
 
-import flip.conf.SmoothDistConf
+import flip.conf.pdf.SmoothDistConf
 import flip.measure.Measure
+import flip.plot.PointPlot
 import flip.rand.IRng
 
 /**
@@ -15,14 +16,14 @@ trait UniformDist[A] extends NumericDist[A] {
   val width: Double
 }
 
-trait UniformDistOps extends NumericDistOps[UniformDist] {
+trait UniformDistOps extends NumericDistOps[UniformDist] { self =>
 
   override def pdf[A](dist: UniformDist[A], a: A): Prim = {
     val measure = dist.measure
     val p = measure.to(a)
     val pScale = measure.to(dist.scale)
 
-    if ((pScale - dist.width / 2) < p && (pScale + dist.width / 2) > p) {
+    if ((pScale - dist.width / 2) <= p && (pScale + dist.width / 2) >= p) {
       1.0 / dist.width
     } else 0.0
   }
@@ -43,6 +44,28 @@ trait UniformDistOps extends NumericDistOps[UniformDist] {
 
       measure.from(dist.width * p + pScale - (dist.width / 2))
     } else throw new IllegalArgumentException(s"$p is forbidden.")
+  }
+
+  override def pdfSampling[A](dist: UniformDist[A]): PointPlot = {
+    val measure = dist.measure
+    val delta = dist.conf.delta
+    val width = dist.width
+    val scale = measure.to(dist.scale)
+    val x1 = scale - width / 2
+    val x2 = scale + width / 2
+    val pdf = self.pdf(dist, measure.from(x1 / 2 + x2 / 2))
+
+    PointPlot.unsafe(Array.apply((x1 - delta, 0), (x1, pdf), (x2, pdf), (x2 + delta, 0)))
+  }
+
+  override def cdfSampling[A](dist: UniformDist[A]): PointPlot = {
+    val measure = dist.measure
+    val width = dist.width
+    val scale = measure.to(dist.scale)
+    val x1 = scale - width / 2
+    val x2 = scale + width / 2
+
+    PointPlot.unsafe(Array.apply((x1, 0), (x2, 1)))
   }
 
 }

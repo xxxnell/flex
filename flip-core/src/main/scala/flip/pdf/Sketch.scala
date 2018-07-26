@@ -2,18 +2,17 @@ package flip.pdf
 
 import cats.data.NonEmptyList
 import cats.implicits._
-import flip._
 import flip.cmap.Cmap
-import flip.conf.{PeriodicSketchConf, SketchConf}
+import flip.conf.pdf._
 import flip.hcounter.HCounter
 import flip.measure.Measure
-import flip.pdf.Sketch.fastPdf
 import flip.pdf.sampling.IcdfSampling
-import flip.pdf.update.EqualSpaceCdfUpdate
-import flip.plot.DensityPlot
-import flip.range.{RangeM, RangeP}
+import flip.pdf.update.EqUpdate
+import flip.plot.{DensityPlot, PointPlot}
 import flip.rand.IRng
+import flip.range.{RangeM, RangeP}
 
+import scala.collection.mutable.ArrayBuffer
 import scala.language.higherKinds
 import scala.util.Try
 
@@ -38,28 +37,32 @@ trait Sketch[A] extends DataBinningDist[A] {
 
 trait SketchPropOps[S[_] <: Sketch[_]] extends DataBinningDistOps[S] with SketchPropLaws[S] {
 
-  // read ops
-
-  /**
-    * Get the number of effective elements be memorized.
-    * */
-  def count[A](sketch: S[A], from: A, to: A): Count
-
-  def sum(sketch: S[_]): Count
-
   // update ops
 
-  def modifyStructure[A](sketch: S[A], f: Structures => Structures): S[A]
+  def modifyStructures[A](sketch: S[A], f: Structures => Structures): S[A]
 
   def narrowUpdate[A](sketch: S[A], as: List[(A, Count)]): S[A]
 
-  def deepUpdate[A](sketch: S[A], as: List[(A, Count)]): (S[A], Option[Structure])
-
-  //  def clear(sketch: S): S
+  def deepUpdate[A](sketch: S[A], as: List[(A, Count)]): (S[A], Option[Histogram[Double]])
 
 }
 
 trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
+
+  def modifyEffStructure[A](sketch: S[A], f: Histogram[Double] => Histogram[Double]): S[A] = modifyStructures(
+    sketch,
+    strs => {
+      val cmapNo = sketch.conf.cmap.no
+      val effNo = if (cmapNo > 1) cmapNo - 1 else cmapNo
+      var i = 0
+      strs.map { hist =>
+        if (i < effNo) {
+          i += 1
+          f(hist)
+        } else hist
+      }
+    }
+  )
 
   def flatDensity: Double = (1 / Cmap.max) * (1 / (1 - Cmap.min / Cmap.max))
 
@@ -71,20 +74,20 @@ trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
     if (sum > 0) count / sum else flatDensity * RangeM.bare(start, end, measure).roughLength
   }
 
-  def rearrange[A](sketch: S[A]): S[A] = deepUpdate(sketch, Nil)._1
+  def rebuild[A](sketch: S[A]): S[A] = deepUpdate(sketch, Nil)._1
 
-  def sampling[A](sketch: S[A]): DensityPlot = {
-    samplingForRanges(sketch, samplingPoints(sketch))
+  def rangePdfSampling[A](sketch: S[A]): DensityPlot = {
+    rangePdfSamplingForRanges(sketch, samplingPoints(sketch))
   }
 
   def samplingPoints[A](sketch: S[A]): List[RangeM[A]] = {
     val cmap = youngCmap(sketch)
-    val rangePs = cmap.bin
+    val rangePs = cmap.bins
     val measure = sketch.measure.asInstanceOf[Measure[A]]
     rangePs.map(rangeP => rangeP.modifyMeasure(measure))
   }
 
-  def samplingForRanges[A](sketch: S[A], ranges: List[RangeM[A]]): DensityPlot = {
+  def rangePdfSamplingForRanges[A](sketch: S[A], ranges: List[RangeM[A]]): DensityPlot = {
     val rangeProbs = ranges.map(range => (range, probability(sketch, range.start, range.end)))
     val rangeDensities = rangeProbs
       .map { case (rangeM, prob) => (RangeP.forRangeM(rangeM), Try(prob / rangeM.roughLength).toOption) }
@@ -92,38 +95,59 @@ trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
     DensityPlot.disjoint(rangeDensities)
   }
 
-  def fastPdf[A](sketch: S[A], a: A): Double = {
-    val cmap = youngCmap(sketch)
-    val p = sketch.measure.asInstanceOf[Measure[A]].to(a)
-    val idx = cmap(p)
-    val rangePs = cmap.range(idx - 1) :: cmap.range(idx) :: cmap.range(idx + 1) :: Nil
-    val rangeMs = rangePs.map(rangeP => rangeP.modifyMeasure(sketch.measure.asInstanceOf[Measure[A]]))
-    val sampling = samplingForRanges(sketch, rangeMs)
+  def cdfSampling[A](sketch: S[A]): PointPlot = {
+    val measure = sketch.measure.asInstanceOf[Measure[A]]
+    val ranges = sketch.structures.head.cmap.binsArr
+    val records = new ArrayBuffer[(Double, Double)]
+    var i = 1
 
-    sampling.interpolation(p)
+    val head = ranges.apply(0).modifyMeasure(measure)
+    val last = ranges.apply(ranges.length - 1).modifyMeasure(measure)
+    val sum = self.sum(sketch) - count(sketch, head.start, head.end) - count(sketch, last.start, last.end)
+    var cum = 0.0
+    records.append((head.primitivize.end, cum))
+    while (i < ranges.length - 1) {
+      val rangeP = ranges.apply(i)
+      val rangeM = rangeP.modifyMeasure(measure)
+      cum += count(sketch, rangeM.start, rangeM.end)
+      if (sum != 0) records.append((rangeP.end, cum / sum))
+      i += 1
+    }
+
+    PointPlot.unsafe(records.toArray)
   }
 
-  override def pdf[A](dist: S[A], a: A): Count = fastPdf(dist, a)
+//  def fastPdf[A](sketch: S[A], a: A): Double = {
+//    val cmap = youngCmap(sketch)
+//    val p = sketch.measure.asInstanceOf[Measure[A]].to(a)
+//    val idx = cmap(p)
+//    val rangePs = cmap.range(idx - 1) :: cmap.range(idx) :: cmap.range(idx + 1) :: Nil
+//    val rangeMs = rangePs.map(rangeP => rangeP.modifyMeasure(sketch.measure.asInstanceOf[Measure[A]]))
+//    val sampling = rangeSamplingForRanges(sketch, rangeMs)
+//
+//    sampling.interpolation(p)
+//  }
+
+  override def pdf[A](dist: S[A], a: A): Count = interpolationPdf(dist, a) // fastPdf(dist, a)
 
   def median[A](sketch: S[A]): A = {
     val measure = sketch.measure.asInstanceOf[Measure[A]]
-
-    measure.from(icdfPlot(sketch).interpolation(0.5))
+    measure.from(icdfSampling(sketch).interpolation(0.5))
   }
 
   def cmapNo(sketch: S[_]): Int = sketch.structures.size.toInt
 
   def cmapSize(sketch: S[_]): Int =
-    sketch.structures.head._1.size
+    sketch.structures.head.cmap.size
 
   def counterNo(sketch: S[_]): Int =
-    sketch.structures.head._2.depth
+    sketch.structures.head.counter.depth
 
   def counterSize(sketch: S[_]): Int =
-    sketch.structures.head._2.width
+    sketch.structures.head.counter.width
 
   def youngCmap(sketch: S[_]): Cmap =
-    sketch.structures.head._1
+    sketch.structures.head.cmap
 
   def domain[A](sketch: S[A]): RangeM[A] = {
     val youngCmap = self.youngCmap(sketch)
@@ -141,12 +165,12 @@ trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
     else HCounter.emptyUncompressed(conf.cmap.size)
 
   def structures(conf: SketchConf): Structures =
-    NonEmptyList.of((Cmap(conf.cmap), counter(conf, -1)))
+    NonEmptyList.of(Histogram.empty(flip.doubleMeasure, conf))
 
   def concatStructures[A](as: List[(A, Count)], measure: Measure[A], conf: SketchConf): Structures = {
     val ps = as.map { case (a, c) => (measure.to(a), c) }
-    val cmap = EqualSpaceCdfUpdate.updateCmap(
-      DensityPlot.empty,
+    val cmap = EqUpdate.updateCmap(
+      PointPlot.empty,
       ps,
       1000,
       conf.dataKernelWindow,
@@ -154,7 +178,7 @@ trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
       measure
     )
 
-    NonEmptyList.of((cmap, counter(conf, -1)))
+    NonEmptyList.of(Histogram.forCmap(cmap)(flip.doubleMeasure, conf))
   }
 
 }
@@ -169,17 +193,17 @@ object Sketch extends SketchPrimPropOps[Sketch] { self =>
     case _ => SimpleSketch.empty(measure, conf)
   }
 
-  def concat[A](ps: List[(A, Count)])(implicit measure: Measure[A], conf: SketchConf): Sketch[A] = conf match {
-    case conf: PeriodicSketchConf => PeriodicSketch.concat(ps)(measure, conf)
-    case _ => SimpleSketch.concat(ps)(measure, conf)
+  def concat[A](as: List[(A, Count)])(implicit measure: Measure[A], conf: SketchConf): Sketch[A] = conf match {
+    case conf: PeriodicSketchConf => PeriodicSketch.concat(as)(measure, conf)
+    case _ => SimpleSketch.concat(as)(measure, conf)
   }
 
   // mapping ops
 
-  def modifyStructure[A](sketch: Sketch[A], f: Structures => Structures): Sketch[A] = sketch match {
-    case sketch: RecurSketch[_] => RecurSketch.modifyStructure(sketch, f)
-    case sketch: AdaptiveSketch[_] => AdaptiveSketch.modifyStructure(sketch, f)
-    case _ => SimpleSketch.modifyStructure(sketch, f)
+  def modifyStructures[A](sketch: Sketch[A], f: Structures => Structures): Sketch[A] = sketch match {
+    case sketch: RecurSketch[_] => RecurSketch.modifyStructures(sketch, f)
+    case sketch: AdaptiveSketch[_] => AdaptiveSketch.modifyStructures(sketch, f)
+    case _ => SimpleSketch.modifyStructures(sketch, f)
   }
 
   def modifyRng[A](sketch: Sketch[A], f: IRng => IRng): Sketch[A] = sketch match {
@@ -215,9 +239,9 @@ object Sketch extends SketchPrimPropOps[Sketch] { self =>
     case _ => super.narrowUpdate(sketch, as)
   }
 
-  override def rearrange[A](sketch: Sketch[A]): Sketch[A] = sketch match {
-    case (sketch: AdaptiveSketch[A]) => AdaptiveSketch.rearrange(sketch)
-    case _ => super.rearrange(sketch)
+  override def rebuild[A](sketch: Sketch[A]): Sketch[A] = sketch match {
+    case (sketch: AdaptiveSketch[A]) => AdaptiveSketch.rebuild(sketch)
+    case _ => super.rebuild(sketch)
   }
 
 }

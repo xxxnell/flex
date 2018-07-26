@@ -1,7 +1,9 @@
 package flip.counter
 
 trait VectorCounter extends Counter {
+
   def counts: Vector[Double]
+
 }
 
 trait VectorCounterOps extends CounterOps[VectorCounter] {

@@ -1,6 +1,7 @@
 package flip.pdf.monad
 
-import flip.conf.{SketchConf, SketchConfB}
+import flip.conf.pdf.SketchConf
+import flip.conf.pdf.SketchConfB
 import flip.pdf.{Dist, Sketch}
 
 import scala.language.higherKinds

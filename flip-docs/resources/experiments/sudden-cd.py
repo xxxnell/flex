@@ -4,6 +4,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import preprocessing as prep
 import pdfplot as pdfplt
+import cdfplot as cdfplt
 import kldplot as kldplt
 
 name = "sudden-cd-normal"
@@ -19,14 +20,26 @@ countmax = 700
 moving_start = 300
 dest = 5
 
-def data_loc(i):
+def pdf_data_loc(i):
     return dir + "sudden-cd-normal-pdf-" + str(i) + ".out"
 
-def expected(x, start, i):
+def cdf_data_loc(i):
+    return dir + "sudden-cd-normal-cdf-" + str(i) + ".out"
+
+def delta_data_loc(i):
+    return dir + "sudden-cd-normal-delta-" + str(i) + ".out"
+
+def pdf_expected(x, start, i):
     if i <= start:
         return norm.pdf(x)
     else:
         return norm.pdf(np.array(x) - dest)
+
+def cdf_expected(x, start, i):
+    if i <= start:
+        return norm.cdf(x)
+    else:
+        return norm.cdf(np.array(x) - dest)
 
 
 # Median
@@ -72,15 +85,43 @@ plt.savefig(name + '.pdf')
 plt.savefig(name + '.png')
 
 
-# Animated PDF
+# ED
 
+rearr_start = 50
+rearr_period = 100
+ed_max = 1.2
+
+ed_data_loc = dir + "sudden-cd-normal-ed.out"
+
+fig = plt.figure()
+axed = fig.add_subplot(1, 1, 1)
+axed.set_ylabel("$D_Δ$")
+kldplt.distplot(axed, ed_data_loc, ed_max, countmin, countmax, rearr_start, rearr_period, False)
+axed.axvline(moving_start, color='r', linestyle=':', linewidth=1)
+
+
+# Animated
+
+start = 10
+end = 700
 step = 10
 fps = 4
+
 xmin = -2
 xmax = 7
 ymin = 0
 ymax = 1
 
+
+# PDF: Animated
+
 utd_animation2 = pdfplt.animated_pdfplot_bar(
-  data_loc, countmin, countmax, step, lambda x, i: expected(x, moving_start, i), xmin, xmax, ymin, ymax)
-utd_animation2.save(name + '-histo.gif', writer='imagemagick', fps=fps)
+  pdf_data_loc, countmin, countmax, step, lambda x, i: pdf_expected(x, moving_start, i), xmin, xmax, ymin, ymax)
+utd_animation2.save(name + '-pdf.gif', writer='imagemagick', fps=fps)
+
+
+# CDF: Animated
+
+cdf_animation = cdfplt.animated_cdfplot(
+  cdf_data_loc, delta_data_loc, start, end, step, lambda x, i: cdf_expected(x, moving_start, i), xmin, xmax, 0, 1)
+cdf_animation.save(name + '-cdf.gif', writer='imagemagick', fps=fps)

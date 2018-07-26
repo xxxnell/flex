@@ -1,6 +1,6 @@
 package flip.sim
 
-import flip.conf.{DistConf, SamplingDistConf}
+import flip.conf.pdf.SamplingDistConf
 import flip.pdf.{Dist, PlottedDist, SamplingDist}
 import flip.plot.DensityPlot
 
@@ -24,8 +24,8 @@ object Cosine {
   private case class CosineImpl(norm1: Double, norm2: Double) extends Cosine
 
   def apply[A](d1: Dist[A], d2: Dist[A]): Cosine = {
-    val norm1 = Hilbert.normForSamplingDist(d1)
-    val norm2 = Hilbert.normForSamplingDist(d2)
+    val norm1 = Hilbert.norm(d1)
+    val norm2 = Hilbert.norm(d2)
 
     CosineImpl(norm1, norm2)
   }

@@ -1,6 +1,6 @@
 # Experiment
 
-`Sketch` of *Flip* estimates density from data stream under various conditions. When the data follows stationary statistical properties such as normal, bimodal, log-normal, and pareto, it can be reasonably estimated. Even if the concept drift that is varying statistical properties of the data stream occurs suddenly or gradually, `Sketch` can successfully estimate the probability density. 
+`Sketch` of *Flip* estimates density from data stream under various conditions. When the data follows stationary statistical properties such as normal, bimodal, log-normal, and pareto, it can be reasonably estimated. Even if the concept drift that is varying statistical properties of the data stream occurs suddenly or incrementally, `Sketch` can successfully estimate the probability density. 
 
 
 ## Standard normal distribution
@@ -30,13 +30,13 @@ Here is a result for a bimodal probabability density function consisting of two 
 
 ![estimation snapshots for pareto distribution](resources/experiments/basic-pareto.png)
 
-## Gradual concept drift
+## Incremental concept drift
 
-Here is a experiment result under the situation where the distribution that `Sketch` should estimate is gradually changing over time. The underlying distribution starts to change when the update count is 300 and moves by +0.01 per update count. Sketch is predicting this moving distribution well including some lag.
+Here is a experiment result under the situation where the distribution that `Sketch` should estimate is incrementally changing over time. The underlying distribution starts to change when the update count is 300 and moves by +0.01 per update count. Sketch is predicting this moving distribution well including some lag.
 
-![animated estimation for standard normal distribution with gradual concept drift](resources/experiments/gradual-cd-normal-histo.gif)
+![animated estimation for standard normal distribution with incremental concept drift](resources/experiments/incremental-cd-normal-histo.gif)
 
-![estimated median and KLD for standard normal distribution with gradual concept drift](resources/experiments/gradual-cd-normal.png)
+![estimated median and KLD for standard normal distribution with incremental concept drift](resources/experiments/incremental-cd-normal.png)
 
 This figure shows the estimated median and KL-divergence by using `Sketch`.
 

@@ -1,13 +1,13 @@
 package flip.hcounter
 
 import cats.data.NonEmptyList
-import flip.conf.CounterConf
 import flip.counter.Counter
 import flip.hmap.{HDim, Hmap}
 import flip.pdf.Count
 
 import scala.util.hashing.byteswap32
 import cats.implicits._
+import flip.conf.counter.CounterConf
 
 /**
   * The HCounter, or Hashing Counter, is a probabilistic data structure that
@@ -19,6 +19,8 @@ import cats.implicits._
 trait HCounter {
 
   def structures: NonEmptyList[(Hmap, Counter)]
+
+  private[hcounter] lazy val structuresArr = structures.toList.toArray
 
   def sum: Double
 
@@ -42,15 +44,22 @@ trait HCounterOps[HC <: HCounter] {
     HCounter(updated, hc.sum + count)
   }
 
-  def updates(hc: HCounter, as: List[(HDim, Count)]): HCounter =
+  def updates(hc: HCounter, as: List[(HDim, Count)]): HCounter = {
     as.foldLeft(hc) { case (hcAcc, (hdim, count)) => hcAcc.update(hdim, count) }
+  }
 
   def get(hc: HCounter, hdim: HDim): Double = {
-    hc.structures.toList.map {
-      case (hmap, counter) =>
-        val cdim = hmap.apply(hdim, counter.counts.size)
-        Counter.get(counter, cdim)
-    }.min
+    var i = 0
+    var min = Double.MaxValue
+    val strs = hc.structuresArr
+    while (i < strs.length) {
+      val (hmap, counter) = strs.apply(i)
+      val cdim = hmap.apply(hdim, counter.counts.size)
+      val count = Counter.get(counter, cdim)
+      min = if (min < count) min else count
+      i += 1
+    }
+    min
   }
 
   def sum(hc: HCounter): Double = hc.sum
@@ -67,7 +76,7 @@ trait HCounterOps[HC <: HCounter] {
 
   def depth(hc: HCounter): Int = hc.structures.size.toInt
 
-  def width(hc: HCounter): Int = hc.structures.head._2.size.toInt
+  def width(hc: HCounter): Int = hc.structures.head._2.size
 
 }
 

@@ -1,9 +1,10 @@
 package flip.pdf
 
+import flip.conf.SketchConfGen
 import org.scalacheck.Gen
 import org.specs2.ScalaCheck
 import org.specs2.mutable._
-import flip.conf._
+import flip.implicits._
 import flip.measure.Measure
 import flip.measure.syntax._
 
@@ -15,7 +16,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
 
       "structure size" in {
         val cmapSize = 10
-        implicit val conf: CustomSketchConf = CustomSketchConf(
+        implicit val conf: SketchConf = SketchConf(
           cmapSize = cmapSize, cmapNo = 2, cmapStart = Some(0d), cmapEnd = Some(10d),
           counterSize = 10, counterNo = 2
         )
@@ -26,16 +27,6 @@ class SketchPropSpec extends Specification with ScalaCheck {
         else ok
       }
 
-      "SimpleSketch" in {
-        implicit val conf: CustomSketchConf = CustomSimpleSketchConf(
-          binNo = 10, start = 0d, end = 10d,
-          counterSize = 10, counterNo = 2
-        )
-        val sketch0 = Sketch.empty[Double]
-
-        sketch0 must beAnInstanceOf[SimpleSketch[Double]]
-      }
-
     }
 
     "count" in {
@@ -43,7 +34,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
       "basic 1" in {
         val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 2, Some(0d), Some(10d))
         val (counterSize, counterNo) = (8, 2)
-        implicit val conf: CustomSketchConf = CustomSketchConf(
+        implicit val conf: SketchConf = SketchConf(
           cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
           counterSize = counterSize, counterNo = counterNo
         )
@@ -59,7 +50,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
       "basic 2" in {
         val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 2, Some(0d), Some(10d))
         val (counterSize, counterNo) = (100, 2)
-        implicit val conf: CustomSketchConf = CustomSketchConf(
+        implicit val conf: SketchConf = SketchConf(
           cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
           counterSize = counterSize, counterNo = counterNo
         )
@@ -75,7 +66,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
       "count smaller space then cmap bound" in {
         val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 2, Some(0d), Some(10d))
         val (counterSize, counterNo) = (8, 2)
-        implicit val conf: CustomSketchConf = CustomSketchConf(
+        implicit val conf: SketchConf = SketchConf(
           cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
           counterSize = counterSize, counterNo = counterNo
         )
@@ -112,14 +103,16 @@ class SketchPropSpec extends Specification with ScalaCheck {
     "narrowUpdate" in {
 
       "basic" in {
-        implicit val conf: CustomSketchConf = CustomSketchConf(
+        implicit val conf: SketchConf = SketchConf(
+          bufferSize = 100,
           cmapSize = 10, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
           counterSize = 8, counterNo = 2
         )
         val sketch0 = Sketch.empty[Double]
 
-        val sketch = sketch0.narrowUpdate(0)
-        val count = sketch.count(-1, 1)
+        val sketch1 = sketch0.narrowUpdate(List.fill(100)(0.0): _*)
+        val sketch11 = sketch1.narrowUpdate(0)
+        val count = sketch1.count(-1, 1)
 
         if(count > 0) ok
         else ko(s"count: $count, expected: 0<x<1")
@@ -132,7 +125,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
       "empty" in {
         val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 2, Some(-10d), Some(10d))
         val (counterSize, counterNo) = (8, 2)
-        implicit val conf: CustomSketchConf = CustomSketchConf(
+        implicit val conf: SketchConf = SketchConf(
           cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
           counterSize = counterSize, counterNo = counterNo
         )
@@ -147,7 +140,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
       "from min to 0 after updated" in {
         val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 2, Some(0d), Some(10d))
         val (counterSize, counterNo) = (100, 2)
-        implicit val conf: CustomSketchConf = CustomSketchConf(
+        implicit val conf: SketchConf = SketchConf(
           cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
           counterSize = counterSize, counterNo = counterNo
         )
@@ -171,49 +164,54 @@ class SketchPropSpec extends Specification with ScalaCheck {
         val dist = NumericDist.normal(0.0, 1.0)
         val expected = dist.probability(start, end)
         val sampleNo = 3000
-        val (cmapSize, cmapNo, cmapStart, cmapEnd) = (1000, 2, Some(-10.0), Some(10.0))
 
-        implicit val conf: CustomSketchConf = CustomSketchConf(
-          cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd
+        implicit val conf: SketchConf = SketchConf(
+          cmapSize = 20, cmapNo = 2, cmapStart = Some(-10.0), cmapEnd = Some(10.0)
         )
         val (_, samples) = dist.samples(sampleNo)
         val sketch0 = Sketch.empty[Double]
 
         val sketch1 = sketch0.updateInOrder(samples)
         val prob = sketch1.probability(start, end)
+        val cond1 = similar(prob, expected, error)
 
-        if(similar(prob, expected, error)) ok
-        else ko(s"Estimated probability for [$start, $end]: $prob. expected: $expected")
-      }
-
-    }
-
-    "sampling" in {
-
-      "basic" in {
-        val cmapStart = Some(-10d)
-        val cmapEnd = Some(10d)
-        implicit val conf: CustomSketchConf = CustomSketchConf(
-          cmapSize = 3, cmapNo = 5, cmapStart = cmapStart, cmapEnd = cmapEnd,
-          counterSize = 70, counterNo = 2
-        )
-        val sketch0 = Sketch.empty[Double]
-
-        val plot = sketch0.sampling
-
-        val cond1 = plot.records.nonEmpty
-        val cond2 = plot.records.forall { case (_, value) => !value.isNaN }
-        val cond3 = plot.records.headOption.forall { case (range, _) => range.end ~= cmapStart.value }
-        val cond4 = plot.records.lastOption.forall { case (range, _) => range.start ~= cmapEnd.value }
-
-        if(!cond1) ko("Plot record is empty.")
-        else if(!cond2) ko("Some value is NaN")
-        else if(!cond3) ko(s"${plot.records.headOption} is first range. cmapStart: $cmapStart")
-        else if(!cond4) ko(s"${plot.records.lastOption} is last range. cmapEnd: $cmapEnd")
+        if(!cond1) ko(s"Estimated probability for [$start, $end]: $prob. expected: $expected")
         else ok
       }
 
     }
+
+    "cdfSampling" in {
+
+      "basic" in {
+        val cmapStart = Some(-10.0)
+        val cmapEnd = Some(10.0)
+        implicit val conf: SketchConf = SketchConf(
+          cmapSize = 4, cmapNo = 5, cmapStart = cmapStart, cmapEnd = cmapEnd,
+          counterSize = 70, counterNo = 2
+        )
+        val sketch1 = Sketch.empty[Double].updateInOrder(1.0 :: Nil)
+        val cdfSampling = sketch1.cdfSampling
+
+        val cond1 = cdfSampling.records.nonEmpty
+        val cond2 = cdfSampling.records.forall { case (_, value) => !value.isNaN }
+        val cond3 = cdfSampling.records.headOption.forall { case (p, _) => p ~= cmapStart.value }
+        val cond4 = cdfSampling.records.headOption.forall { case (_, cum) => cum ~= 0.0 }
+        val cond5 = cdfSampling.records.lastOption.forall { case (p, _) => p ~= cmapEnd.value }
+        val cond6 = cdfSampling.records.lastOption.forall { case (_, cum) => cum ~= 1.0 }
+
+        if(!cond1) ko("Plot record is empty.")
+        else if(!cond2) ko("Some value is NaN")
+        else if(!cond3) ko(s"${cdfSampling.records.headOption} is first range. cmapStart: $cmapStart")
+        else if(!cond4) ko(s"${cdfSampling.records.headOption} is first range.")
+        else if(!cond5) ko(s"${cdfSampling.records.lastOption} is last range. cmapEnd: $cmapEnd")
+        else if(!cond6) ko(s"${cdfSampling.records.lastOption} is last range.")
+        else ok
+      }
+
+    }
+
+    "pdfSampling" in todo
 
     "deepUpdate" in {
 
@@ -222,7 +220,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
         "basic" in {
           val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 3, Some(-1d), Some(10d))
           val (counterSize, counterNo) = (8, 2)
-          implicit val conf: CustomSketchConf = CustomSketchConf(
+          implicit val conf: SketchConf = SketchConf(
             cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
             counterSize = counterSize, counterNo = counterNo
           )
@@ -240,7 +238,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
         }
 
         "2 times" in {
-          implicit val conf: CustomSketchConf = CustomSketchConf(
+          implicit val conf: SketchConf = SketchConf(
             cmapSize = 10, cmapNo = 2, cmapStart = Some(-1d), cmapEnd = Some(10d),
             counterSize = 8, counterNo = 2
           )
@@ -268,7 +266,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
       "structure size" in {
 
         "increasing" in {
-          implicit val conf: CustomSketchConf = CustomSketchConf(
+          implicit val conf: SketchConf = SketchConf(
             cmapSize = 10, cmapNo = 2, cmapStart = Some(-1d), cmapEnd = Some(10d),
             counterSize = 8, counterNo = 2
           )
@@ -286,7 +284,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
         }
 
         "bounded" in {
-          implicit val conf: CustomSketchConf = CustomSketchConf(
+          implicit val conf: SketchConf = SketchConf(
             cmapSize = 10, cmapNo = 2, cmapStart = Some(-1d), cmapEnd = Some(10d),
             counterSize = 8, counterNo = 2
           )
@@ -308,17 +306,17 @@ class SketchPropSpec extends Specification with ScalaCheck {
 
     }
 
-    "rearrange" in {
+    "rebuild" in {
 
       "basic" in {
-        implicit val conf: CustomSketchConf = CustomSketchConf(
+        implicit val conf: SketchConf = SketchConf(
           cmapSize = 1000, cmapNo = 5, cmapStart = Some(0d), cmapEnd = Some(10d),
           counterSize = 500, counterNo = 2
         )
         val sketch0 = Sketch.empty[Double]
 
         val sketch1 = sketch0.narrowUpdate(0.0 to 100.0 by 0.1: _*)
-        val sketch2 = sketch1.rearrange
+        val sketch2 = sketch1.rebuild
 
         ok
       }
@@ -328,7 +326,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
     "count" in {
 
       "basic" in {
-        implicit val conf: CustomSketchConf = CustomSketchConf(
+        implicit val conf: SketchConf = SketchConf(
           cmapSize = 10, cmapNo = 2, cmapStart = Some(0d), cmapEnd = Some(10d),
           counterSize = 8, counterNo = 2
         )
@@ -343,11 +341,11 @@ class SketchPropSpec extends Specification with ScalaCheck {
       "empty" in {
         val (cmapSize, cmapNo, cmapStart, cmapEnd) = (10, 2, Some(0d), Some(10d))
         val (counterSize, counterNo) = (8, 2)
-        implicit val conf: CustomSketchConf = CustomSketchConf(
+        implicit val conf: SketchConf = SketchConf(
           cmapSize = cmapSize, cmapNo = cmapNo, cmapStart = cmapStart, cmapEnd = cmapEnd,
           counterSize = counterSize, counterNo = counterNo
         )
-        val sketch0 = Sketch.empty[Double](doubleMeasure, conf)
+        val sketch0 = Sketch.empty[Double](implicitly[Measure[Double]], conf)
 
         val count = sketch0.count(0, 10)
 
@@ -359,7 +357,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
     "sum" in {
 
       "basic" in {
-        implicit val conf: CustomSketchConf = CustomSketchConf(
+        implicit val conf: SketchConf = SketchConf(
           cmapSize = 10, cmapNo = 2, cmapStart = Some(0d), cmapEnd = Some(10d),
           counterSize = 100, counterNo = 2
         )
@@ -372,7 +370,7 @@ class SketchPropSpec extends Specification with ScalaCheck {
       }
 
       "after updated" in {
-        implicit val conf: CustomSketchConf = CustomSketchConf(
+        implicit val conf: SketchConf = SketchConf(
           cmapSize = 10, cmapNo = 2, cmapStart = Some(0d), cmapEnd = Some(10d),
           counterSize = 100, counterNo = 2
         )
@@ -384,48 +382,54 @@ class SketchPropSpec extends Specification with ScalaCheck {
         if(sum ~= 5) ok else ko(s"sum: $sum, expected: 5")
       }
 
-      "after rearrange with 2 cmap" in {
-        implicit val conf: CustomSketchConf = CustomSketchConf(
+      "after rebuild with 2 cmap" in {
+        implicit val conf: SketchConf = SketchConf(
           cmapSize = 10, cmapNo = 2, cmapStart = Some(0d), cmapEnd = Some(10d),
-          counterSize = 100, counterNo = 2
+          counterSize = 100, counterNo = 2,
+          decayFactor = 1
         )
         val sketch0 = Sketch.empty[Double]
         val expected = 5 / (1 + math.exp(-1))
 
         val sketch1 = sketch0.update(1, 2, 3, 4, 5)
-        val sketch2 = sketch1.rearrange
+        val sketch2 = sketch1.rebuild
         val sum = sketch2.sum
 
-        if(sum ~= expected) ok else ko(s"sum: $sum, expected: $expected")
+        val cond1 = sum ~= expected
+
+        if(!cond1) ko(s"sum: $sum, expected: $expected")
+        else ok
       }
 
-      "after rearrange update" in {
-        implicit val conf: CustomSketchConf = CustomSketchConf(
+      "after rebuild update" in {
+        implicit val conf: SketchConf = SketchConf(
           cmapSize = 10, cmapNo = 2, cmapStart = Some(0d), cmapEnd = Some(10d),
-          counterSize = 100, counterNo = 2
+          counterSize = 100, counterNo = 2,
+          decayFactor = 1
         )
         val sketch0 = Sketch.empty[Double]
         val expected = 10 / (1 + math.exp(-1))
 
         val sketch1 = sketch0.update(1, 2, 3, 4, 5)
-        val sketch2 = sketch1.rearrange
+        val sketch2 = sketch1.rebuild
         val sketch3 = sketch2.update(1, 2, 3, 4, 5)
         val sum = sketch3.sum
 
         if(sum ~= expected) ok else ko(s"sum: $sum, expected: $expected")
       }
 
-      "after 2 rearrange and update with 3 cmap" in {
-        implicit val conf: CustomSketchConf = CustomSketchConf(
+      "after 2 rebuildw and update with 3 cmap" in {
+        implicit val conf: SketchConf = SketchConf(
           cmapSize = 10, cmapNo = 3, cmapStart = Some(0d), cmapEnd = Some(10d),
-          counterSize = 100, counterNo = 2
+          counterSize = 100, counterNo = 2,
+          decayFactor = 1
         )
         val sketch0 = Sketch.empty[Double]
         val expected = (10 * math.exp(-1) + 5) / (1 + math.exp(-1))
 
         val sketch1 = sketch0.update(1, 2, 3, 4, 5)
-        val sketch2 = sketch1.rearrange
-        val sketch3 = sketch2.rearrange
+        val sketch2 = sketch1.rebuild
+        val sketch3 = sketch2.rebuild
         val sketch4 = sketch3.update(1, 2, 3, 4, 5)
         val sum = sketch4.sum
 
@@ -434,62 +438,70 @@ class SketchPropSpec extends Specification with ScalaCheck {
 
     }
 
-    "fastPdf" in {
+//    "fastPdf" in {
+//
+//      "basic" in {
+//        implicit val conf: SketchConf = SketchConf(
+//          cmapSize = 10, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
+//          counterSize = 10, counterNo = 2
+//        )
+//        val sketch0 = Sketch.empty[Double]
+//        val sketch1 = sketch0.update(0, 1, 1, 2, 3)
+//
+//        val interpPdf = SamplingDist.interpolationPdf(sketch1, 1d)
+//        val fastPdf = Sketch.fastPdf(sketch1, 1d)
+//
+//        if(interpPdf ~= fastPdf) ok else ko(s"interpPdf: $interpPdf, fastPdf: $fastPdf")
+//      }
+//
+//      "boundary" in {
+//
+//        "least" in {
+//          implicit val conf: SketchConf = SketchConf(
+//            cmapSize = 10, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
+//            counterSize = 10, counterNo = 2
+//          )
+//          val sketch0 = Sketch.empty[Double]
+//          val sketch1 = sketch0.update(0, 1, 1, 2, 3)
+//          val fastPdf = Sketch.fastPdf(sketch1, Double.MinValue)
+//
+//          ok
+//        }
+//
+//        "largest" in {
+//          implicit val conf: SketchConf = SketchConf(
+//            cmapSize = 10, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
+//            counterSize = 10, counterNo = 2
+//          )
+//          val sketch0 = Sketch.empty[Double]
+//          val sketch1O = sketch0.update(0, 1, 1, 2, 3)
+//
+//          val sketch1 = sketch1O
+//          val fastPdf = Sketch.fastPdf(sketch1, Double.MaxValue)
+//
+//          ok
+//        }
+//
+//      }
+//
+//    }
+
+    "sample & samples" in {
 
       "basic" in {
-        implicit val conf: CustomSketchConf = CustomSketchConf(
-          cmapSize = 10, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
-          counterSize = 10, counterNo = 2
-        )
-        val sketch0 = Sketch.empty[Double]
-        val sketch1 = sketch0.update(0, 1, 1, 2, 3)
+        val (_, samples0) = NumericDist.normal(0.0, 1).samples(200)
+        val sketch0 = Sketch.empty[Double].updateInOrder(samples0)
+        val (sketch1, samples1) = sketch0.samples(200)
+        val sketch2 = Sketch.empty[Double].updateInOrder(samples1)
+        val kld = KLD(sketch1, sketch2)
 
-        val interpPdf = SamplingDist.interpolationPdf(sketch1, 1d)
-        val fastPdf = Sketch.fastPdf(sketch1, 1d)
+        val cond1 = samples1.forall(sample => !sample.isNaN)
+        val cond2 = samples1.forall(sample => !sample.isInfinite)
+        val cond3 = kld < 1
 
-        if(interpPdf ~= fastPdf) ok else ko(s"interpPdf: $interpPdf, fastPdf: $fastPdf")
-      }
-
-      "boundary" in {
-
-        "least" in {
-          implicit val conf: CustomSketchConf = CustomSketchConf(
-            cmapSize = 10, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
-            counterSize = 10, counterNo = 2
-          )
-          val sketch0 = Sketch.empty[Double]
-          val sketch1 = sketch0.update(0, 1, 1, 2, 3)
-          val fastPdf = Sketch.fastPdf(sketch1, Double.MinValue)
-
-          ok
-        }
-
-        "largest" in {
-          implicit val conf: CustomSketchConf = CustomSketchConf(
-            cmapSize = 10, cmapNo = 2, cmapStart = Some(-10d), cmapEnd = Some(10d),
-            counterSize = 10, counterNo = 2
-          )
-          val sketch0 = Sketch.empty[Double]
-          val sketch1O = sketch0.update(0, 1, 1, 2, 3)
-
-          val sketch1 = sketch1O
-          val fastPdf = Sketch.fastPdf(sketch1, Double.MaxValue)
-
-          ok
-        }
-
-      }
-
-    }
-
-    "sample" in {
-
-      "basic" in {
-        val (_, samples) = NumericDist.normal(0.0, 1).samples(100)
-        val sketch0 = Sketch.empty[Double].updateInOrder(samples)
-        val (sketch1, sample) = sketch0.sample
-
-        if(sample.isNaN || sample.isInfinite) ko(s"sample: $sample") else ok
+        if(!cond1 || !cond2) ko(s"samples: $samples1")
+        else if(!cond3) ko(s"KLD: $kld")
+        else ok
       }
 
       "empty" in {

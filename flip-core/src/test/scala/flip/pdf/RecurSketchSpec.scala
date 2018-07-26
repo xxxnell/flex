@@ -10,15 +10,15 @@ class RecurSketchSpec extends Specification with ScalaCheck {
 
   "PeroidicSketch" should {
 
-    "rearranged" in {
+    "rebuild" in {
 
       todo
 
 //      (for {
 //        sketch <- PeriodicSketchGen.periodicSketchSample
 //        utdSketch <- PeriodicSketch.primUpdate(sketch, 1.0)
-//        rearranged <- PeriodicSketch.rearrange(utdSketch)
-//      } yield rearranged)
+//        rebuilded <- PeriodicSketch.rebuild(utdSketch)
+//      } yield rebuilded)
 //        .fold(ko)(sketch => ok)
     }
 

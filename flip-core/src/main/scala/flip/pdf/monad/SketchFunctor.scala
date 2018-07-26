@@ -1,7 +1,6 @@
 package flip.pdf.monad
 
-import flip.conf.{SketchConf, SketchConfB, SmoothDistConf}
-import flip.measure.Measure
+import flip.conf.pdf.{SketchConf, SketchConfB}
 import flip.pdf.Sketch
 
 import scala.language.higherKinds

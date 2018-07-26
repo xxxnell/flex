@@ -1,6 +1,6 @@
 package flip.pdf
 
-import flip.conf.AdaPerSketchConf
+import flip.conf.pdf.AdaPerSketchConf
 import flip.measure.Measure
 import flip.rand.IRng
 
@@ -16,7 +16,11 @@ trait AdaPerSketch[A] extends AdaptiveSketch[A] with PeriodicSketch[A] {
 
 }
 
-trait AdaPerSketchOps[S[_] <: AdaPerSketch[_]] extends AdaptiveSketchOps[S] with PeriodicSketchOps[S] {}
+trait AdaPerSketchOps[S[_] <: AdaPerSketch[_]] extends AdaptiveSketchOps[S] with PeriodicSketchOps[S] {
+
+  def diagnose[A](sketch: S[A]): Boolean = true
+
+}
 
 object AdaPerSketch extends AdaPerSketchOps[AdaPerSketch] {
 
@@ -24,7 +28,7 @@ object AdaPerSketch extends AdaPerSketchOps[AdaPerSketch] {
                                          rng: IRng,
                                          conf: AdaPerSketchConf,
                                          structures: Structures,
-                                         queue: List[(A, Count)],
+                                         buffer: Buffer[A],
                                          thresholds: Stream[Count],
                                          count: Count)
       extends AdaPerSketch[A]
@@ -33,10 +37,10 @@ object AdaPerSketch extends AdaPerSketchOps[AdaPerSketch] {
               rng: IRng,
               conf: AdaPerSketchConf,
               structures: Structures,
-              queue: List[(A, Count)],
+              buffer: Buffer[A],
               thresholds: Stream[Count],
               count: Count): AdaPerSketch[A] =
-    AdaPerSketchImpl(measure, rng, conf, structures, queue, thresholds, count)
+    AdaPerSketchImpl(measure, rng, conf, structures, buffer, thresholds, count)
 
   def empty[A](implicit measure: Measure[A], conf: AdaPerSketchConf): AdaPerSketch[A] =
     bare(
@@ -44,8 +48,8 @@ object AdaPerSketch extends AdaPerSketchOps[AdaPerSketch] {
       IRng(-1),
       conf,
       structures(conf),
-      List.empty[(A, Count)],
-      thresholds(conf.startThreshold, conf.thresholdPeriod),
+      Buffer.empty[A],
+      periodicThresholds(conf.startThreshold, conf.thresholdPeriod),
       0)
 
   def concat[A](as: List[(A, Count)])(implicit measure: Measure[A], conf: AdaPerSketchConf): AdaPerSketch[A] = {
@@ -54,26 +58,26 @@ object AdaPerSketch extends AdaPerSketchOps[AdaPerSketch] {
       IRng(-1),
       conf,
       concatStructures(as, measure, conf),
-      List.empty[(A, Count)],
-      thresholds(conf.startThreshold, conf.thresholdPeriod),
+      Buffer.empty[A],
+      periodicThresholds(conf.startThreshold, conf.thresholdPeriod),
       0)
 
     narrowUpdate(emptySketch, as)
   }
 
   def modifyRng[A](sketch: AdaPerSketch[A], f: IRng => IRng): AdaPerSketch[A] =
-    bare(sketch.measure, f(sketch.rng), sketch.conf, sketch.structures, sketch.queue, sketch.thresholds, sketch.count)
+    bare(sketch.measure, f(sketch.rng), sketch.conf, sketch.structures, sketch.buffer, sketch.thresholds, sketch.count)
 
-  def modifyStructure[A](sketch: AdaPerSketch[A], f: Structures => Structures): AdaPerSketch[A] =
-    bare(sketch.measure, sketch.rng, sketch.conf, f(sketch.structures), sketch.queue, sketch.thresholds, sketch.count)
+  def modifyStructures[A](sketch: AdaPerSketch[A], f: Structures => Structures): AdaPerSketch[A] =
+    bare(sketch.measure, sketch.rng, sketch.conf, f(sketch.structures), sketch.buffer, sketch.thresholds, sketch.count)
 
-  def modifyQueue[A](sketch: AdaPerSketch[A], f: List[(A, Count)] => List[(A, Count)]): AdaPerSketch[A] =
-    bare(sketch.measure, sketch.rng, sketch.conf, sketch.structures, f(sketch.queue), sketch.thresholds, sketch.count)
+  def modifyBuffer[A](sketch: AdaPerSketch[A], f: Buffer[A] => Buffer[A]): AdaPerSketch[A] =
+    bare(sketch.measure, sketch.rng, sketch.conf, sketch.structures, f(sketch.buffer), sketch.thresholds, sketch.count)
 
   def modifyThresholds[A](sketch: AdaPerSketch[A], f: Stream[Count] => Stream[Count]): AdaPerSketch[A] =
-    bare(sketch.measure, sketch.rng, sketch.conf, sketch.structures, sketch.queue, f(sketch.thresholds), sketch.count)
+    bare(sketch.measure, sketch.rng, sketch.conf, sketch.structures, sketch.buffer, f(sketch.thresholds), sketch.count)
 
   def modifyCount[A](sketch: AdaPerSketch[A], f: Count => Count): AdaPerSketch[A] =
-    bare(sketch.measure, sketch.rng, sketch.conf, sketch.structures, sketch.queue, sketch.thresholds, f(sketch.count))
+    bare(sketch.measure, sketch.rng, sketch.conf, sketch.structures, sketch.buffer, sketch.thresholds, f(sketch.count))
 
 }

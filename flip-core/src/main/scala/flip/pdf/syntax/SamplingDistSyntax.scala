@@ -1,10 +1,10 @@
 package flip.pdf.syntax
 
-import flip.conf.{SamplingDistConf, SamplingDistConfB, SketchConf}
+import flip.conf.pdf.{SamplingDistConf, SamplingDistConfB, SketchConf}
 import flip.measure.Measure
 import flip.pdf.monad.{SamplingDistBind, SamplingDistFunctor}
 import flip.pdf.{Dist, SamplingDist, Sketch}
-import flip.plot.DensityPlot
+import flip.plot.PointPlot
 
 import scala.language.higherKinds
 
@@ -16,9 +16,6 @@ trait SamplingDistPropSyntax {
     def sample: (SamplingDist[A], A) = SamplingDist.sample(dist)
     def pdf(a: A): Double = SamplingDist.pdf(dist, a)
     def samples(n: Int): (SamplingDist[A], List[A]) = SamplingDist.samples(dist, n)
-    def sampling: DensityPlot = SamplingDist.sampling(dist)
-    def densityPlot: DensityPlot = SamplingDist.sampling(dist)
-    def pdfPlot: DensityPlot = SamplingDist.sampling(dist)
   }
 
 }

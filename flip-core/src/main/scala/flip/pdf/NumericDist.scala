@@ -1,8 +1,8 @@
 package flip.pdf
 
-import flip.conf.SmoothDistConf
+import flip.conf.pdf.SmoothDistConf
 import flip.measure.Measure
-import flip.plot.DensityPlot
+import flip.plot.PointPlot
 import flip.rand.IRng
 
 import scala.language.higherKinds
@@ -40,6 +40,10 @@ object NumericDist extends NumericDistOps[NumericDist] {
   def normal[A](mean: A, variance: Double, rng: IRng)(implicit measure: Measure[A],
                                                       conf: SmoothDistConf): NormalDist[A] =
     NormalDist(mean, variance, rng)
+
+  def normal[A](mean: A, variance: Double, seed: Int)(implicit measure: Measure[A],
+                                                      conf: SmoothDistConf): NormalDist[A] =
+    NormalDist(mean, variance, IRng(seed))
 
   def logNormal[A](scale: A, shape: Double)(implicit measure: Measure[A], conf: SmoothDistConf): LogNormalDist[A] =
     LogNormalDist(scale, shape)
@@ -95,9 +99,16 @@ object NumericDist extends NumericDistOps[NumericDist] {
     case dist: UniformDist[A] => UniformDist.icdf(dist, p)
   }
 
-  override def sampling[A](dist: NumericDist[A]): DensityPlot = dist match {
-    case dist: DeltaDist[A] => DeltaDist.sampling(dist)
-    case _ => super.sampling(dist)
+  override def pdfSampling[A](dist: NumericDist[A]): PointPlot = dist match {
+    case dist: DeltaDist[A] => DeltaDist.pdfSampling(dist)
+    case dist: UniformDist[A] => UniformDist.pdfSampling(dist)
+    case _ => super.pdfSampling(dist)
+  }
+
+  override def cdfSampling[A](dist: NumericDist[A]): PointPlot = dist match {
+    case dist: DeltaDist[A] => DeltaDist.cdfSampling(dist)
+    case dist: UniformDist[A] => UniformDist.cdfSampling(dist)
+    case _ => super.cdfSampling(dist)
   }
 
 }

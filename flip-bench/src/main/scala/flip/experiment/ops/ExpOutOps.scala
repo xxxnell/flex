@@ -2,7 +2,7 @@ package flip.experiment.ops
 
 import java.io.{File, FileOutputStream}
 
-import flip.plot.Plot
+import flip.plot.RangePlot
 
 import scala.util.Try
 
@@ -17,14 +17,15 @@ object ExpOutOps {
   def writeStr(name: String, affix: String, str: String): Unit =
     writeStr(defaultPath, name, affix, str)
 
-  def writePlot(name: String, affix: String, plot: Plot): Unit =
+  def writeStrs(name: String, subname: String, strs: List[(Int, String)]): Unit =
+    writeStrs(defaultPath, name, subname, strs)
+
+  @Deprecated
+  def writePlot(name: String, affix: String, plot: RangePlot): Unit =
     writePlot(defaultPath, name, affix, plot)
 
-  @deprecated
-  def writePlots(name: String, plots: List[(Int, Plot)]): Unit =
-    writePlotsForDetails(defaultPath, name, plots)
-
-  def writePlots(name: String, subname: String, plots: List[(Int, Plot)]): Unit =
+  @Deprecated
+  def writePlots(name: String, subname: String, plots: List[(Int, RangePlot)]): Unit =
     writePlotsForDetailsSubname(defaultPath, name, subname, plots)
 
   // ops
@@ -35,28 +36,34 @@ object ExpOutOps {
       new File(s"$path/$name").delete()
     }.getOrElse(())
 
-  def writeStr(path: String, name: String, affix: String, c: String): Unit = {
+  def writeStr(path: String, name: String, affix: String, str: String): Unit = {
     val f = new File(s"$path/$name/$name-$affix.out")
     f.getParentFile.getParentFile.mkdirs()
     f.getParentFile.mkdirs()
     val fs = new FileOutputStream(f)
 
-    fs.write(c.getBytes("UTF-8"))
+    fs.write(str.getBytes("UTF-8"))
     fs.close()
   }
 
-  def writePlot(path: String, name: String, affix: String, plot: Plot): Unit = {
+  def writeStrs(path: String, name: String, subname: String, strs: List[(Int, String)]): Unit =
+    strs.foreach { case (idx, str) => writeStr(path, name, s"$subname-$idx", str) }
+
+  @Deprecated
+  def writePlot(path: String, name: String, affix: String, plot: RangePlot): Unit = {
     writeStr(path, name, affix, plot.csv)
   }
 
-  def writePlotsForDetails(path: String, name: String, plots: List[(Int, Plot)]): Unit = {
+  @Deprecated
+  def writePlotsForDetails(path: String, name: String, plots: List[(Int, RangePlot)]): Unit = {
     for (idxPlot <- plots) {
       val (idx, plot) = idxPlot
       writePlot(path, name, s"$idx", plot)
     }
   }
 
-  def writePlotsForDetailsSubname(path: String, name: String, subname: String, plots: List[(Int, Plot)]): Unit = {
+  @Deprecated
+  def writePlotsForDetailsSubname(path: String, name: String, subname: String, plots: List[(Int, RangePlot)]): Unit = {
     for (idxPlot <- plots) {
       val (idx, plot) = idxPlot
       writePlot(path, name, s"$subname-$idx", plot)

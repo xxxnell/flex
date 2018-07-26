@@ -1,12 +1,11 @@
 package flip.pdf.syntax
 
-import flip.conf._
+import flip.conf.pdf._
 import flip.measure.Measure
 import flip.pdf.arithmetic.CombinationDist
 import flip.pdf.monad.{DistBind, DistFunctor}
-import flip.pdf.{Dist, PlottedDist, SamplingDist, Sketch}
-import flip.plot.{AsciiArtPlot, DensityPlot}
-import flip.range.RangeM
+import flip.pdf.{Dist, SamplingDist, Sketch}
+import flip.plot.PointPlot
 
 import scala.language.higherKinds
 
@@ -23,7 +22,8 @@ trait DistPropSyntax {
     def icdf(p: Double): A = Dist.icdf(dist, p)
     def sample: (Dist[A], A) = Dist.sample(dist)
     def samples(n: Int): (Dist[A], List[A]) = Dist.samples(dist, n)
-    def sampling: DensityPlot = Dist.sampling(dist)
+    def pdfSampling: PointPlot = Dist.pdfSampling(dist)
+    def cdfSampling: PointPlot = Dist.cdfSampling(dist)
   }
 
 }

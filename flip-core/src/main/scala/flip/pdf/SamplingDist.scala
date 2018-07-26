@@ -1,9 +1,7 @@
 package flip.pdf
 
-import flip.conf.SamplingDistConf
-import flip.measure.Measure
-import flip.plot.DensityPlot
-import flip.range.RangeM
+import flip.conf.pdf.SamplingDistConf
+import flip.plot.PointPlot
 import flip.rand.IRng
 
 import scala.language.higherKinds
@@ -38,9 +36,15 @@ object SamplingDist extends SamplingDistPropOps[SamplingDist] {
     case _ => ???
   }
 
-  def sampling[A](dist: SamplingDist[A]): DensityPlot = dist match {
-    case dataBinning: DataBinningDist[A] => DataBinningDist.sampling(dataBinning)
-    case plotted: PlottedDist[A] => PlottedDist.sampling(plotted)
+  def cdfSampling[A](dist: SamplingDist[A]): PointPlot = dist match {
+    case dataBinning: DataBinningDist[A] => DataBinningDist.cdfSampling(dataBinning)
+    case plotted: PlottedDist[A] => PlottedDist.cdfSampling(plotted)
+    case _ => ???
+  }
+
+  override def pdfSampling[A](dist: SamplingDist[A]): PointPlot = dist match {
+    case dataBinning: DataBinningDist[A] => DataBinningDist.pdfSampling(dataBinning)
+    case plotted: PlottedDist[A] => PlottedDist.pdfSampling(plotted)
     case _ => ???
   }
 

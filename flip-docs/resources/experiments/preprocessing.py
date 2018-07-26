@@ -1,4 +1,6 @@
 import numpy as np
+import math
+import decimal
 
 def data_str(name):
     with open(name, 'r') as f:
@@ -45,3 +47,17 @@ def data_loc_to_data(data_loc, xmin, xmax, margin = 10):
     raw_dat = data(data_loc, 3)
     dat = transform(raw_dat, xmin - margin, xmax + margin)
     return unzip(dat)
+
+
+def precision(x, s):
+    if x != 0:
+        dgt = math.floor(math.log10(abs(x)))
+        round_dgt = -int(dgt - (s - 1))
+        resn = round(x, round_dgt)
+        if resn < 1:
+            ress = ("%." + str(round_dgt) + "f") % resn
+        else:
+            ress = str(resn)
+        return ress
+    else:
+        return "0." + "0"*(s-1)

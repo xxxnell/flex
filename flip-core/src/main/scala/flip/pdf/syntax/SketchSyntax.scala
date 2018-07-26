@@ -1,11 +1,11 @@
 package flip.pdf.syntax
 
 import flip.cmap.Cmap
-import flip.conf.SketchConf
+import flip.conf.pdf.SketchConf
 import flip.measure.Measure
 import flip.pdf.monad.{SketchBind, SketchFunctor}
-import flip.pdf.{Count, Dist, Sketch, Structure}
-import flip.plot.DensityPlot
+import flip.pdf.{Count, Dist, Histogram, Sketch}
+import flip.plot.{DensityPlot, PointPlot}
 import flip.range.RangeM
 
 trait SketchSyntax extends SketchPropSyntax with SketchMonadSyntax
@@ -30,23 +30,26 @@ trait SketchPropSyntax {
     }
     def narrowUpdate(as: A*): Sketch[A] =
       Sketch.narrowUpdate(sketch, as.toList.map(a => (a, 1d)))
-    def deepUpdate(as: A*): (Sketch[A], Option[Structure]) =
+    def deepUpdate(as: A*): (Sketch[A], Option[Histogram[Double]]) =
       Sketch.deepUpdate(sketch, as.toList.map(a => (a, 1d)))
     def count(from: A, to: A): Double = Sketch.count(sketch, from, to)
     def sum: Double = Sketch.sum(sketch)
-    //    def clear: Sketch = Sketch.clear(sketch)
     def probability(from: A, to: A): Double =
       Sketch.probability(sketch, from, to)
-    def rearrange: Sketch[A] =
-      Sketch.rearrange(sketch)
+    def rebuild: Sketch[A] =
+      Sketch.rebuild(sketch)
     def cmapNo: Int = Sketch.cmapNo(sketch)
     def cmapSize: Int = Sketch.cmapSize(sketch)
     def counterNo: Int = Sketch.counterNo(sketch)
     def counterSize: Int = Sketch.counterSize(sketch)
     def youngCmap: Cmap = Sketch.youngCmap(sketch)
     def domain: RangeM[A] = Sketch.domain(sketch)
-    def cdfPlot: DensityPlot = Sketch.cdfPlot(sketch)
     def median: A = Sketch.median(sketch)
+    def cdfPlot: PointPlot = Sketch.cdfSampling(sketch)
+    def pointPdfSampling: PointPlot = Sketch.pdfSampling(sketch)
+    def rangePdfSampling: DensityPlot = Sketch.rangePdfSampling(sketch)
+    def barPlot: DensityPlot = Sketch.rangePdfSampling(sketch)
+    def rangePlot: DensityPlot = Sketch.rangePdfSampling(sketch)
   }
 
 }

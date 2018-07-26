@@ -1,8 +1,8 @@
 package flip.pdf.monad
 
-import flip.conf.SamplingDistConf
+import flip.conf.pdf.SamplingDistConf
 import flip.measure.Measure
-import flip.pdf.{Dist, PlottedDist, SamplingDist}
+import flip.pdf.{Dist, SamplingDist}
 
 object PointToPointSamplingDistBind extends SamplingDistBind[SamplingDist, Dist, SamplingDist, SamplingDistConf] {
 
@@ -10,8 +10,10 @@ object PointToPointSamplingDistBind extends SamplingDistBind[SamplingDist, Dist,
                  f: A => Dist[B],
                  measure: Measure[B],
                  conf: SamplingDistConf): SamplingDist[B] = {
-    val binded = PointToPointBind.bind(dist, f, measure, conf)
-    PlottedDist.densityPlot(binded.sampling)(measure, conf)
+//    val binded = PointToPointBind.bind(dist, f, measure, conf)
+//    PlottedDist.densityPlot(binded.sampling)(measure, conf)
+
+    ???
   }
 
 }

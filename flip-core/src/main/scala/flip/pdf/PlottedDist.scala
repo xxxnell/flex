@@ -1,9 +1,8 @@
 package flip.pdf
 
-import flip.conf.SamplingDistConf
+import flip.conf.pdf.SamplingDistConf
 import flip.measure.Measure
-import flip.plot.DensityPlot
-import flip.range.syntax._
+import flip.plot.PointPlot
 import flip.rand.IRng
 
 import scala.language.higherKinds
@@ -14,41 +13,42 @@ import scala.language.higherKinds
   * */
 trait PlottedDist[A] extends SamplingDist[A] {
 
-  def sampling: DensityPlot
+  def cdfSampling: PointPlot
 
 }
 
 trait PlottedDistPropOps[D[_] <: PlottedDist[_]] extends SamplingDistPropOps[D] {
 
-  def modifySampling[A](dist: D[A], f: DensityPlot => DensityPlot): D[A]
+  def modifySampling[A](dist: D[A], f: PointPlot => PointPlot): D[A]
 
-  def sampling[A](dist: D[A]): DensityPlot = dist.sampling
-
-  def filter[A](dist: D[A], f: RangeP => Boolean): D[A] =
-    modifySampling(dist, sampling => DensityPlot.disjoint(sampling.records.filter { case (range, _) => f(range) }))
+  def cdfSampling[A](dist: D[A]): PointPlot = dist.cdfSampling
 
   def probability[A](dist: D[A], start: A, end: A): Double = {
     val measure = dist.measure.asInstanceOf[Measure[A]]
-    dist.sampling.integral(measure.to(start), measure.to(end))
+    val cum = cdfSampling(dist)
+    cum.interpolation(measure.to(end)) - cum.interpolation(measure.to(start))
   }
 
 }
 
 object PlottedDist extends PlottedDistPropOps[PlottedDist] {
 
-  private case class PlottedDistImpl[A](measure: Measure[A], rng: IRng, sampling: DensityPlot, conf: SamplingDistConf)
+  private case class PlottedDistImpl[A](measure: Measure[A], rng: IRng, cdfSampling: PointPlot, conf: SamplingDistConf)
       extends PlottedDist[A]
 
-  def bare[A](measure: Measure[A], rng: IRng, densityPlot: DensityPlot, conf: SamplingDistConf): PlottedDist[A] =
-    PlottedDistImpl(measure, rng, densityPlot, conf)
+  def bare[A](measure: Measure[A], rng: IRng, sampling: PointPlot, conf: SamplingDistConf): PlottedDist[A] =
+    PlottedDistImpl(measure, rng, sampling, conf)
 
-  def densityPlot[A](densityPlot: DensityPlot)(implicit measure: Measure[A], conf: SamplingDistConf): PlottedDist[A] =
-    bare(measure, IRng(densityPlot.hashCode()), densityPlot, conf)
+  def forPdfSampling[A](pdfSampling: PointPlot)(implicit measure: Measure[A], conf: SamplingDistConf): PlottedDist[A] =
+    bare(measure, IRng(pdfSampling.hashCode()), pdfSampling.normalizedCumulative, conf)
+
+  def forCdfSampling[A](cdfSampling: PointPlot)(implicit measure: Measure[A], conf: SamplingDistConf): PlottedDist[A] =
+    bare(measure, IRng(cdfSampling.hashCode()), cdfSampling, conf)
 
   def modifyRng[A](dist: PlottedDist[A], f: IRng => IRng): PlottedDist[A] =
-    bare(dist.measure, f(dist.rng), dist.sampling, dist.conf)
+    bare(dist.measure, f(dist.rng), dist.pdfSampling, dist.conf)
 
-  def modifySampling[A](dist: PlottedDist[A], f: DensityPlot => DensityPlot): PlottedDist[A] =
-    bare(dist.measure, dist.rng, f(dist.sampling), dist.conf)
+  def modifySampling[A](dist: PlottedDist[A], f: PointPlot => PointPlot): PlottedDist[A] =
+    bare(dist.measure, dist.rng, f(dist.pdfSampling), dist.conf)
 
 }

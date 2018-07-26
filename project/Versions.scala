@@ -4,9 +4,9 @@ object Versions {
 
   val snapshot = "-SNAPSHOT"
 
-  val cats = "0.9.0"
+  val cats = "1.1.0"
 
-  val monix = "2.2.2"
+  val monix = "2.3.3"
 
   val scalactic = "3.0.3"
 
@@ -15,5 +15,7 @@ object Versions {
   val specs2 = "3.9.1"
 
   val commonsMath3 = "3.6.1"
+
+  val jol = "0.9"
 
 }

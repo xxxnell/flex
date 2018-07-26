@@ -1,6 +1,6 @@
 package flip.pdf.monad
 
-import flip.conf.SamplingDistConfB
+import flip.conf.pdf.SamplingDistConfB
 import flip.pdf.{Dist, SamplingDist, SmoothDist}
 
 import scala.language.higherKinds

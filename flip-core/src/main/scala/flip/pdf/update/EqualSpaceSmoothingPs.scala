@@ -1,6 +1,6 @@
 package flip.pdf.update
 
-import flip.conf.SmoothDistConf
+import flip.conf.pdf.SmoothDistConf
 import flip.pdf.{Count, Dist, NumericDist, PredefinedDist, Prim}
 import flip.plot.DensityPlot
 import flip.range.RangeP
@@ -11,11 +11,11 @@ object EqualSpaceSmoothingPs extends SmoothingPs {
   def apply(ps: List[(Prim, Count)], scale: Double): Dist[Prim] = {
     lazy val conf = SmoothDistConf.default
     lazy val plot = smoothingPsPlotForEqualSpaceCumulative(ps)
-    lazy val cdf = plot.normalizeCumulative
+    lazy val cdf = plot.normalizedCumulative
     def probability(start: Prim, end: Prim): Double = cdf.interpolation(end) - cdf.interpolation(start)
 
     if (ps.nonEmpty) {
-      PredefinedDist.probability((start: Prim, end: Prim) => probability(start, end))
+      PredefinedDist.probability((start: Prim, end: Prim) => probability(start, end))(doubleMeasure, conf)
     } else NumericDist.uniform(0.0, Double.PositiveInfinity)(doubleMeasure, conf)
   }
 
