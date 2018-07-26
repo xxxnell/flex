@@ -19,7 +19,7 @@
 *Flip* is published to Maven Central and built for Scala 2.12, so you can add the following to your `build.sbt`:
 
 ``` scala
-libraryDependencies += "com.xxxnell" %% "flip" % "0.0.3"
+libraryDependencies += "com.xxxnell" %% "flip" % "0.0.4"
 ```
 
 
