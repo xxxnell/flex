@@ -63,7 +63,7 @@ class AdaSelSketchSpec extends Specification with ScalaCheck {
       "broad" in {
         val bufferSize = 50
         implicit val conf: CustomAdaSelSketchConf = CustomAdaSelSketchConf(
-          cmapSize = 20, cmapNo = 2, cmapStart = Some(-10.0), cmapEnd = Some(10.0),
+          cmapSize = 20, cmapNo = 2, cmapStart = Some(-100.0), cmapEnd = Some(100.0),
           counterSize = 20, counterNo = 2,
           bufferSize = bufferSize,
           startThreshold = Integer.MAX_VALUE

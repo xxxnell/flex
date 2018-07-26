@@ -11,7 +11,7 @@ class KLDSpec extends Specification with ScalaCheck {
   "KLD" should {
 
     "basic" in {
-      implicit val conf: SmoothDistConf = SmoothDistConf(samplingSize = 300, samplingBoundaryRatio = 0.01)
+      implicit val conf: SmoothDistConf = SmoothDistConf(samplingSize = 500, samplingBoundaryRatio = 0.01)
       val normal1 = Dist.normal(0.0, 1)
       val normal2 = Dist.normal(0.5, 1)
       val expected = 0.125
