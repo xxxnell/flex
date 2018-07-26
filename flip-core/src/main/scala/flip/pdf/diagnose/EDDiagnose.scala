@@ -18,7 +18,6 @@ object EDDiagnose extends CDFDiagnose {
           1 / (1 / acc - 1) >= threshold
       }
     )
-    println(s"card: $card, Δ: $acc, d: ${1 / (1 / acc - 1)}, diagnose: $res")
     res
   }
 

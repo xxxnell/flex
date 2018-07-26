@@ -385,7 +385,8 @@ class SketchPropSpec extends Specification with ScalaCheck {
       "after rebuild with 2 cmap" in {
         implicit val conf: SketchConf = SketchConf(
           cmapSize = 10, cmapNo = 2, cmapStart = Some(0d), cmapEnd = Some(10d),
-          counterSize = 100, counterNo = 2
+          counterSize = 100, counterNo = 2,
+          decayFactor = 1
         )
         val sketch0 = Sketch.empty[Double]
         val expected = 5 / (1 + math.exp(-1))
@@ -403,7 +404,8 @@ class SketchPropSpec extends Specification with ScalaCheck {
       "after rebuild update" in {
         implicit val conf: SketchConf = SketchConf(
           cmapSize = 10, cmapNo = 2, cmapStart = Some(0d), cmapEnd = Some(10d),
-          counterSize = 100, counterNo = 2
+          counterSize = 100, counterNo = 2,
+          decayFactor = 1
         )
         val sketch0 = Sketch.empty[Double]
         val expected = 10 / (1 + math.exp(-1))
@@ -419,7 +421,8 @@ class SketchPropSpec extends Specification with ScalaCheck {
       "after 2 rebuildw and update with 3 cmap" in {
         implicit val conf: SketchConf = SketchConf(
           cmapSize = 10, cmapNo = 3, cmapStart = Some(0d), cmapEnd = Some(10d),
-          counterSize = 100, counterNo = 2
+          counterSize = 100, counterNo = 2,
+          decayFactor = 1
         )
         val sketch0 = Sketch.empty[Double]
         val expected = (10 * math.exp(-1) + 5) / (1 + math.exp(-1))

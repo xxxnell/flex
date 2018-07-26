@@ -29,8 +29,6 @@ class HCounterSpec extends Specification with ScalaCheck {
           val hcounter1 = hcounter0.update(index, count)
           val cond = hcounter1.get(index) == count
 
-          println(hcounter1)
-
           if(!cond) ko(s"count: ${hcounter1.get(index)}, expected: $count") else ok
         }
 
