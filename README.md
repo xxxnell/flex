@@ -8,8 +8,8 @@
 
 *Flip* is *F*ast, *L*ightweight pure-functional library for *I*nformation theory and *P*robability distribution. *Flip* aims to extract and process statistical features of the input data stream in a short time using only small memory. It has the following features:
 
-* Quickly estimate and summarize probability distribution for data stream using `Sketch`
-* Combine several probability distributions by probability monad
+* Estimate and summarize probability distributions with high speed and high accuracy using only limited memory for both stationary and non-stationary data streams
+* Combine several probability distributions by using probability monad
 * Generate random variables from many predefined and estimated probability disributions 
 * Measure similarity between two probability distribution using various (generalized) statistical distances (e.g., Kullback–Leibler divergence)
 
