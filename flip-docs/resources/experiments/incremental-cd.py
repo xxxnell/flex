@@ -7,8 +7,8 @@ import pdfplot as pdfplt
 import cdfplot as cdfplt
 import kldplot as kldplt
 
-name = "gradual-cd-normal"
-dir = "../../../flip-bench/experiments/gradual-cd-normal/"
+name = "incremental-cd-normal"
+dir = "../../../flip-bench/experiments/incremental-cd-normal/"
 
 fig = plt.figure(figsize=(10, 5))
 
@@ -21,13 +21,13 @@ moving_start = 300
 velocity = 0.01
 
 def pdf_data_loc(i):
-    return dir + "gradual-cd-normal-pdf-" + str(i) + ".out"
+    return dir + "incremental-cd-normal-pdf-" + str(i) + ".out"
 
 def cdf_data_loc(i):
-    return dir + "gradual-cd-normal-cdf-" + str(i) + ".out"
+    return dir + "incremental-cd-normal-cdf-" + str(i) + ".out"
 
 def delta_data_loc(i):
-    return dir + "gradual-cd-normal-delta-" + str(i) + ".out"
+    return dir + "incremental-cd-normal-delta-" + str(i) + ".out"
 
 def pdf_expected(x, start, i):
     if i < start:
@@ -47,7 +47,7 @@ def cdf_expected(x, start, i):
 medianmin = -0.5
 medianmax = 8
 
-median_data_loc = dir + "gradual-cd-normal-median.out"
+median_data_loc = dir + "incremental-cd-normal-median.out"
 
 median_data = prep.data(median_data_loc, 3)
 
@@ -71,7 +71,7 @@ rearr_start = 50
 rearr_period = 100
 kld_max = 0.8
 
-kld_data_loc = dir + "gradual-cd-normal-kld.out"
+kld_data_loc = dir + "incremental-cd-normal-kld.out"
 
 ax2 = plt.subplot(nrows, ncols, 2)
 kldplt.kldplot(ax2, kld_data_loc, kld_max, countmin, countmax, rearr_start, rearr_period, False)
@@ -91,7 +91,7 @@ rearr_start = 50
 rearr_period = 100
 ed_max = 0.25
 
-ed_data_loc = dir + "gradual-cd-normal-ed.out"
+ed_data_loc = dir + "incremental-cd-normal-ed.out"
 
 fig = plt.figure()
 axed = fig.add_subplot(1, 1, 1)
@@ -100,28 +100,28 @@ kldplt.distplot(axed, ed_data_loc, ed_max, countmin, countmax, rearr_start, rear
 axed.axvline(moving_start, color='r', linestyle=':', linewidth=1)
 
 
-# # Animated PDF
-#
-# start = 10
-# end = 1000
-# step = 10
-# fps = 4
-#
-# xmin = -1
-# xmax = 8
-# ymin = 0
-# ymax = 1
-#
-#
-# # PDF: Animated
-#
-# utd_animation2 = pdfplt.animated_pdfplot_bar(
-#   pdf_data_loc, countmin, countmax, step, lambda x, i: pdf_expected(x, moving_start, i), xmin, xmax, ymin, ymax)
-# utd_animation2.save(name + '-pdf.gif', writer='imagemagick', fps=fps)
-#
-#
-# # CDF: Animated
-#
-# cdf_animation = cdfplt.animated_cdfplot(
-#   cdf_data_loc, delta_data_loc, start, end, step, lambda x, i: cdf_expected(x, moving_start, i), xmin, xmax, 0, 1)
-# cdf_animation.save(name + '-cdf.gif', writer='imagemagick', fps=fps)
+# Animated PDF
+
+start = 10
+end = 1000
+step = 10
+fps = 4
+
+xmin = -1
+xmax = 8
+ymin = 0
+ymax = 1
+
+
+# PDF: Animated
+
+utd_animation2 = pdfplt.animated_pdfplot_bar(
+  pdf_data_loc, countmin, countmax, step, lambda x, i: pdf_expected(x, moving_start, i), xmin, xmax, ymin, ymax)
+utd_animation2.save(name + '-pdf.gif', writer='imagemagick', fps=fps)
+
+
+# CDF: Animated
+
+cdf_animation = cdfplt.animated_cdfplot(
+  cdf_data_loc, delta_data_loc, start, end, step, lambda x, i: cdf_expected(x, moving_start, i), xmin, xmax, 0, 1)
+cdf_animation.save(name + '-cdf.gif', writer='imagemagick', fps=fps)

@@ -4,13 +4,13 @@ import flip.implicits._
 import flip.experiment.ops.ExpOutOps
 
 /**
-  * A experiment for gradual concept drift.
+  * A experiment for incremental concept drift.
   * https://edouardfouche.com/img/concept-drift/conceptdrift.png
   * */
-object GradualConceptDriftExp {
+object IncrementalConceptDriftExp {
 
   def main(args: Array[String]): Unit = {
-    val expName = "gradual-cd-normal"
+    val expName = "incremental-cd-normal"
     val dataNo = 1000
     val draftStart = 300
     val draftStartingPoint = 0.0
@@ -59,7 +59,7 @@ object GradualConceptDriftExp {
     val avgEuc = idxEuc.takeRight(avgSize).map(_._2).sum / avgSize
     val mem = flip.Profiler.serializedMem(idxSketches.last._2)
 
-    val str = s"Similarity for gradual concept-drifted data stream with velocity $velocity: \n" +
+    val str = s"Similarity for incremental concept-drifted data stream with velocity $velocity: \n" +
       s" KLD: $avgKld \n" +
       s" Cosine: $avgCos \n" +
       s" Euclidean: $avgEuc \n" +
