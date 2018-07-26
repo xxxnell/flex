@@ -37,7 +37,6 @@ object Dependencies {
     "org.openjdk.jol" % "jol-core" % Versions.jol
   )
 
-
   // project dependencies
 
   val core = libraryDependencies ++= (cats ++ monixs ++ specs ++ tics ++ math)
