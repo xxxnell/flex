@@ -1,7 +1,8 @@
 package flip.experiment
 
 import flip.experiment.ops.ExpOutOps
-import flip.implicits.{NumericDist, Sketch, SketchConf}
+import flip.implicits._
+import flip.chain.implicits._
 
 object AvgBindExp {
 

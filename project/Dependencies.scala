@@ -41,6 +41,8 @@ object Dependencies {
 
   val core = libraryDependencies ++= (cats ++ monixs ++ specs ++ tics ++ math)
 
+  val chain = libraryDependencies ++= (cats ++ monixs ++ specs ++ tics ++ math)
+
   val bench = libraryDependencies ++= (specs ++ tics ++ datetime ++ jol)
 
 }

@@ -1,6 +1,7 @@
 package flip.experiment
 
 import flip.implicits._
+import flip.chain.implicits._
 import flip.experiment.ops.ExpOutOps
 
 object BasicMapExp {

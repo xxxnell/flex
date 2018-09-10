@@ -2,6 +2,7 @@ package flip.experiment
 
 import flip.experiment.ops.ExpOutOps
 import flip.implicits._
+import flip.chain.implicits._
 
 /**
   * A basic experiment to bind lognormal with normal distribution.

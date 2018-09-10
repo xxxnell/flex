@@ -2,11 +2,10 @@ package flip.benchmark
 
 import java.util.concurrent.TimeUnit
 
-import org.openjdk.jmh.annotations._
 import flip.implicits._
-import flip.cmap.Cmap
-import flip.hcounter.HCounter
+import flip.chain.implicits._
 import flip.pdf.Histogram
+import org.openjdk.jmh.annotations._
 
 @BenchmarkMode(Array(Mode.AverageTime))
 @OutputTimeUnit(TimeUnit.NANOSECONDS)

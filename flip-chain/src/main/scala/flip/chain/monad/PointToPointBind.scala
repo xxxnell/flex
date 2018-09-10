@@ -1,4 +1,4 @@
-package flip.pdf.monad
+package flip.chain.monad
 
 import cats.data.NonEmptyList
 import flip.conf.pdf.{DistConf, SamplingDistConf, SmoothDistConf}

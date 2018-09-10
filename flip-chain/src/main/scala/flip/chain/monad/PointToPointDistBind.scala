@@ -1,4 +1,4 @@
-package flip.pdf.monad
+package flip.chain.monad
 
 import flip.conf.pdf.SamplingDistConf
 import flip.measure.Measure

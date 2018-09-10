@@ -1,14 +1,11 @@
 package flip.pdf.syntax
 
 import flip.cmap.Cmap
-import flip.conf.pdf.SketchConf
-import flip.measure.Measure
-import flip.pdf.monad.{SketchBind, SketchFunctor}
-import flip.pdf.{Count, Dist, Histogram, Sketch}
+import flip.pdf.{Count, Histogram, Sketch}
 import flip.plot.{DensityPlot, PointPlot}
 import flip.range.RangeM
 
-trait SketchSyntax extends SketchPropSyntax with SketchMonadSyntax
+trait SketchSyntax extends SketchPropSyntax
 
 trait SketchPropSyntax {
 
@@ -51,27 +48,5 @@ trait SketchPropSyntax {
     def barPlot: DensityPlot = Sketch.rangePdfSampling(sketch)
     def rangePlot: DensityPlot = Sketch.rangePdfSampling(sketch)
   }
-
-}
-
-trait SketchMonadSyntax extends SketchMonadSyntax1 {
-
-  implicit class SketchMonadSyntaxImpl[A](sketch: Sketch[A]) {
-    def map[B](f: A => B)(implicit functor: SketchFunctor[Sketch, Sketch, SketchConf],
-                          measureB: Measure[B],
-                          conf: SketchConf): Sketch[B] =
-      functor.map(sketch, f, measureB, conf)
-    def flatMap[B](f: A => Dist[B])(implicit bind: SketchBind[Sketch, Dist, Sketch, SketchConf],
-                                    measureB: Measure[B],
-                                    conf: SketchConf): Sketch[B] =
-      bind.bind(sketch, f, measureB, conf)
-  }
-
-}
-
-trait SketchMonadSyntax1 {
-
-  implicit def sketchFunctor: SketchFunctor[Sketch, Sketch, SketchConf] = SketchFunctor.default
-  implicit def sketchBind: SketchBind[Sketch, Dist, Sketch, SketchConf] = SketchBind.default
 
 }

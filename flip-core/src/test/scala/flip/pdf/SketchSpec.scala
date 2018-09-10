@@ -8,7 +8,7 @@ import flip.implicits._
 import flip.measure.Measure
 import flip.measure.syntax._
 
-class SketchPropSpec extends Specification with ScalaCheck {
+class SketchSpec extends Specification with ScalaCheck {
 
   "Sketch" should {
 

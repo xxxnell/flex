@@ -1,10 +1,12 @@
-package flip.pdf
+package flip.chain.monad
 
 import flip.implicits._
+import flip.chain.implicits._
+import flip.pdf.{NumericDist, Sketch}
 import org.specs2.ScalaCheck
 import org.specs2.mutable._
 
-class SketchMonadSpec extends Specification with ScalaCheck {
+class SketchSpec extends Specification with ScalaCheck {
 
   "Sketch" should {
 

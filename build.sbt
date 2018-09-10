@@ -11,16 +11,21 @@ lazy val root = project
   .settings(Releases.publishSettings)
   .settings(Releases.noPublishSettings)
   .settings(Tasks.benchTaskSettings(flipBench))
-  .aggregate(flipCore, flipBench)
+  .aggregate(flipCore, flipChain, flipBench)
 
 lazy val flipCore = flipModule("flip-core")
   .settings(moduleName := "flip", name := "Flip core")
   .settings(Releases.publishSettings)
 
+lazy val flipChain = flipModule("flip-chain")
+  .settings(moduleName := "flip", name := "Flip core")
+  .settings(Releases.publishSettings)
+  .dependsOn(flipCore)
+
 lazy val flipBench = flipModule("flip-bench")
   .settings(moduleName := "flip-bench", name := "Flip benchmarks")
   .settings(Releases.noPublishSettings)
-  .dependsOn(flipCore)
+  .dependsOn(flipCore, flipChain)
 
 def flipModule(name: String): Project =
   Project(id = name, base = file(name))
