@@ -10,7 +10,7 @@ def bar_label(ax, rects, margin, fontsize):
     for rect in rects:
         height = rect.get_height()
         ax.text(rect.get_x() + rect.get_width() / 2., height + margin,
-                prep.precision(height, 3),
+                prep.precision(height, 2),
                 ha='center', va='bottom', fontsize=fontsize)
 
 
@@ -18,7 +18,7 @@ def bar_width(size):
     return 1 / (size + 1.0)
 
 
-def bar_plot(ax, datas, label, color, ylim, fontsize=18, opacity=0.8, legend=True):
+def bar_plot(ax, datas, label, color, ylim, fontsize=18, opacity=0.8, legend=True, legendloc=0):
     index = np.arange(len(datas))
     datast = np.transpose(datas)
 
@@ -31,7 +31,7 @@ def bar_plot(ax, datas, label, color, ylim, fontsize=18, opacity=0.8, legend=Tru
     ax.tick_params(axis='x', which='both', bottom=False, top=False)
     ax.tick_params(axis='y', labelsize=fontsize * 0.85)
     if legend:
-        legend = ax.legend(edgecolor='black', fancybox=False)
+        legend = ax.legend(edgecolor='black', fancybox=False, loc=legendloc)
     ax.set_ylim(ylim)
 
     return ax

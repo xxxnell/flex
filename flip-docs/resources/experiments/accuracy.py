@@ -11,8 +11,9 @@ import barplot
 """
 # Constants
 """
-fontsize = 18
-figsize = (6,5)
+fontsize = 20
+figsizex1 = (6,5)
+figsizex2 = (14,5.5)
 margin = 0.2
 inp_prefix = 'data/'
 out_prefix = 'accuracy/'
@@ -21,6 +22,7 @@ rcParams.update({'font.size': fontsize})
 plt.set_cmap('viridis')
 norm = colors.Normalize(vmin=0, vmax=256.0)
 m = cm.ScalarMappable(norm=norm, cmap=plt.get_cmap('viridis') )
+# rcParams.update({'figure.autolayout': True})
 
 """
 # Stationary
@@ -34,7 +36,7 @@ color = [m.to_rgba(210), m.to_rgba(190), m.to_rgba(120), m.to_rgba(50)]
 normal_ed = [0.00910, 0.0145, 0.0393, 0.0122]
 data = [normal_ed]
 
-fig, ax = plt.subplots(figsize=figsize)
+fig, ax = plt.subplots(figsize=figsizex1)
 barplot.bar_plot(ax, data, label, color, (0, 0.055), fontsize=fontsize)
 
 bw = barplot.bar_width(len(data[0]))
@@ -60,7 +62,7 @@ data = [bimodal_ed]
 label = ['oKDE', 'SPDT', 'SPDTw', 'D-Sketch']
 color = [m.to_rgba(210), m.to_rgba(190), m.to_rgba(120), m.to_rgba(50)]
 
-fig, ax = plt.subplots(figsize=figsize)
+fig, ax = plt.subplots(figsize=figsizex1)
 barplot.bar_plot(ax, data, label, color, (0, 0.055), fontsize=fontsize)
 
 bw = barplot.bar_width(len(data[0]))
@@ -83,7 +85,7 @@ data = [lognormal_ed]
 label = ['oKDE', 'SPDT', 'SPDTw', 'D-Sketch']
 color = [m.to_rgba(210), m.to_rgba(190), m.to_rgba(120), m.to_rgba(50)]
 
-fig, ax = plt.subplots(figsize=figsize)
+fig, ax = plt.subplots(figsize=figsizex1)
 barplot.bar_plot(ax, data, label, color, (0, 0.055), fontsize=fontsize)
 
 bw = barplot.bar_width(len(data[0]))
@@ -99,14 +101,14 @@ plt.savefig(out_prefix + lognormal_name + '.pdf')
 plt.savefig(out_prefix + lognormal_name + '.png')
 
 """
-# Combinde Stationary
+# Combined Stationary
 """
 label = ['oKDE', 'SPDT', 'SPDTw', 'D-Sketch']
 color = [m.to_rgba(210), m.to_rgba(190), m.to_rgba(120), m.to_rgba(50)]
 data = [normal_ed, bimodal_ed, lognormal_ed]
 
-fig, ax = plt.subplots(figsize=figsize)
-barplot.bar_plot(ax, data, label, color, (0, 0.055), fontsize=fontsize)
+fig, ax = plt.subplots(figsize=figsizex2)
+barplot.bar_plot(ax, data, label, color, (0, 0.055), fontsize=fontsize, legendloc=2)
 
 bw = barplot.bar_width(len(data[0]))
 ax.set_ylabel('Statistical distance ($D_{\Delta}$)')
@@ -158,17 +160,18 @@ ck = [ed / speed for ed in incr_ed]
 
 
 """
-  Plot
+  Incremental Concept Drift: Index
 """
 label = ['oKDE', 'SPDTw', 'D-Sketch']
 color = [m.to_rgba(210), m.to_rgba(120), m.to_rgba(50)]
 data = [ck]
 
-fig, ax = plt.subplots(figsize=figsize)
+fig, ax = plt.subplots(figsize=figsizex1)
 ax = barplot.bar_plot(ax, data, label, color, (0, 210), fontsize=fontsize)
 
 bw = barplot.bar_width(len(data[0]))
-ax.set_ylabel('$c/k$')
+ax.set_ylabel('Lag ($c/k$)')
+ax.set_xlabel(' ')
 ax.tick_params(axis='x', which='both', bottom=False, top=False)
 ax.tick_params(axis='y', labelsize=fontsize * 0.85)
 ax.set_xticks(np.arange(len(data)) + bw * (len(data[0]) / 2 - 0.5))
@@ -177,8 +180,8 @@ ax.set_xlim((-bw / 2 - margin, bw * (len(data[0]) - 0.5) + margin))
 
 fig.tight_layout()
 incr_cd_name = 'incr-cd-coeff'
-plt.savefig(out_prefix + incr_cd_name + '.pdf')
-plt.savefig(out_prefix + incr_cd_name + '.png')
+plt.savefig(out_prefix + incr_cd_name + '.pdf', bbox_inches='tight')
+plt.savefig(out_prefix + incr_cd_name + '.png', bbox_inches='tight')
 plt.show()
 
 """
@@ -202,20 +205,20 @@ sketch_ed_data = [[dt[0], dt[1]] for dt in prep.data(data_loc, 2) if dt[0] >= st
 sketch_tdata = list(map(lambda d: d[0], sketch_ed_data))
 sketch_ddata = list(map(lambda d: d[1] , sketch_ed_data))
 
-fig, ax = plt.subplots(figsize=figsize)
+fig, ax = plt.subplots(figsize=figsizex1)
 distplot(ax, [okde_tdata, spdt_tdata, sketch_tdata], [okde_ddata, spdt_ddata, sketch_ddata], color, label, ['--', '-.', '-'])
 
 ax.set_xlim(xmin=start, xmax=end)
 ax.set_ylim(ymin=0)
 ax.set_ylabel('Statistical distance ($D_{\Delta}$)')
-ax.set_xlabel('timestamp ($t$)')
+ax.set_xlabel('Timestamp ($t$)')
 ax.tick_params(axis='x', labelsize=fontsize * 0.85)
 ax.tick_params(axis='y', labelsize=fontsize * 0.85)
 ax.legend(edgecolor='black', fancybox=False)
 
 update_name = 'incr-cd-dist'
-plt.savefig(out_prefix + update_name + '.pdf')
-plt.savefig(out_prefix + update_name + '.png')
+plt.savefig(out_prefix + update_name + '.pdf', bbox_inches='tight')
+plt.savefig(out_prefix + update_name + '.png', bbox_inches='tight')
 plt.show()
 
 
@@ -313,7 +316,7 @@ plt.plot(tdata, ddata, 'r-')
 plt.show()
 
 """
-# Sudden Concept Drift Index Plot
+# Sudden Concept Drift: Index
 """
 label = ['oKDE', 'SPDTw', 'D-Sketch']
 color = [m.to_rgba(210), m.to_rgba(120), m.to_rgba(50)]
@@ -330,24 +333,27 @@ print("om: " + ', '.join(str(x) for x in om))
 print("tau1: " + ', '.join(str(x) for x in tau1))
 print("tau2: " + ', '.join(str(x) for x in tau2))
 
-fig, (ax1, ax2) = plt.subplots(figsize=(8, 5), ncols=2)
+fig, (ax1, ax2) = plt.subplots(figsize=(5.5, 5), ncols=2)
 plt.subplots_adjust(wspace=0.0, hspace=0.0)
 
-barplot.bar_plot(ax1, data1, label, color, (0, 50.0), fontsize=fontsize, legend=False)
-ax1.set_ylabel('$t_{1/2}$')
+barplot.bar_plot(ax1, data1, label, color, (0, 90.0), fontsize=fontsize, legend=True, legendloc=1)
+ax1.set_ylabel('Half-life ($t_{1/2}$)')
+ax1.set_xlabel(' ')
 ax1.set_xticklabels([])
 ax1.set_xlim((-bw / 2 - margin, bw * (len(data[0]) - 0.5) + margin))
 
-barplot.bar_plot(ax2, data2, label, color, (0, 300.0), fontsize=fontsize)
-ax2.set_ylabel('$\\tau$')
+barplot.bar_plot(ax2, data2, label, color, (0, 230.0), fontsize=fontsize, legend=False)
+ax2.set_ylabel('Lifetime ($\\tau$)')
+ax2.set_xlabel(' ')
 ax2.set_xticklabels([])
 ax2.set_xlim((-bw / 2 - margin, bw * (len(data[0]) - 0.5) + margin))
 ax2.yaxis.set_label_position("right")
 ax2.yaxis.tick_right()
 
 sudden_cd_name = 'sudden-cd-coeff'
-plt.savefig(out_prefix + sudden_cd_name + '.pdf')
-plt.savefig(out_prefix + sudden_cd_name + '.png')
+# fig.tight_layout()
+plt.savefig(out_prefix + sudden_cd_name + '.pdf', bbox_inches='tight')
+plt.savefig(out_prefix + sudden_cd_name + '.png', bbox_inches='tight')
 plt.show()
 
 """
@@ -371,7 +377,7 @@ spdt_ed_data = [[dt[0], dt[1]] for dt in prep.data(data_loc, 2) if dt[0] >= star
 spdt_tdata = list(map(lambda d: d[0], spdt_ed_data))
 spdt_ddata = list(map(lambda d: d[1] - 0.8 * normal_ed[1], spdt_ed_data))
 
-fig, (ax1, ax2) = plt.subplots(figsize=(8, 5), ncols=2)
+fig, (ax1, ax2) = plt.subplots(figsize=(5.5, 5), ncols=2)
 plt.subplots_adjust(wspace=0.05, hspace=0.0)
 distplot(ax1, [okde_tdata, spdt_tdata, sketch_tdata], [okde_ddata, spdt_ddata, sketch_ddata], color, label, ['--', '-.', '-'])
 distplot(ax2, [okde_tdata, spdt_tdata, sketch_tdata], [okde_ddata, spdt_ddata, sketch_ddata], color, label, ['--', '-.', '-'])
@@ -381,7 +387,7 @@ ax1.set_ylim(ymin=0, ymax=1.3)
 ax2.set_xlim(xmin=650, xmax=800)
 ax2.set_ylim(ymin=0, ymax=0.1)
 ax1.set_ylabel("Statistical distance ($D_{\Delta})$")
-fig.text(0.5, 0.02, 'timestamp ($t$)', ha='center')
+fig.text(0.5, 0.02, 'Timestamp ($t$)', ha='center')
 ax1.xaxis.set_ticks([300, 400])
 ax2.xaxis.set_ticks([700, 800])
 ax2.yaxis.set_label_position("right")
@@ -400,8 +406,9 @@ ax2.spines['left'].set_visible(False)
 
 
 update_name = 'sudden-cd-dist'
-plt.savefig(out_prefix + update_name + '.pdf')
-plt.savefig(out_prefix + update_name + '.png')
+# fig.tight_layout()
+plt.savefig(out_prefix + update_name + '.pdf', bbox_inches='tight')
+plt.savefig(out_prefix + update_name + '.png', bbox_inches='tight')
 plt.show()
 
 
@@ -420,7 +427,7 @@ sketch_data_raw = { d[0]: d[1] for d in prep.data(data_loc, 2) }
 
 
 """
-# Plot
+# Blip Concept Drift: Index Plot
 """
 label = ['oKDE', 'SPDTw', 'D-Sketch']
 color = [m.to_rgba(210), m.to_rgba(120), m.to_rgba(50)]
@@ -431,10 +438,11 @@ vols = [((edfn[i] - edst[i]) / dur) for i in range(len(edst))]
 
 print("volatility: " + ', '.join(map(str, vols)))
 
-fig, ax = plt.subplots(figsize=figsize)
+fig, ax = plt.subplots(figsize=figsizex1)
 barplot.bar_plot(ax, [vols], label, color, (0, 0.35), fontsize=fontsize)
 
-ax.set_ylabel('$\sigma$')
+ax.set_ylabel('Volatility ($\sigma$)')
+ax.set_xlabel(' ')
 ax.tick_params(axis='x', which='both', bottom=False, top=False)
 ax.tick_params(axis='y', labelsize=fontsize * 0.85)
 ax.set_xticklabels([])
@@ -442,8 +450,8 @@ ax.set_xlim((-bw / 2 - margin, bw * (len(data[0]) - 0.5) + margin))
 
 fig.tight_layout()
 update_name = 'blip-cd-coeff'
-plt.savefig(out_prefix + update_name + '.pdf')
-plt.savefig(out_prefix + update_name + '.png')
+plt.savefig(out_prefix + update_name + '.pdf', bbox_inches='tight')
+plt.savefig(out_prefix + update_name + '.png', bbox_inches='tight')
 plt.show()
 
 """
@@ -464,18 +472,18 @@ sketch_ed_data = [[i, dist] for i, dist in sketch_data_raw.items() if i >= start
 sketch_tdata = list(map(lambda d: d[0], sketch_ed_data))
 sketch_ddata = list(map(lambda d: d[1], sketch_ed_data))
 
-fig, ax = plt.subplots(figsize=figsize)
+fig, ax = plt.subplots(figsize=figsizex1)
 distplot(ax, [okde_tdata, spdt_tdata, sketch_tdata], [okde_ddata, spdt_ddata, sketch_ddata], color, label, ['--', '-.', '-'])
 
 plt.xlim(xmin=start, xmax=end)
 plt.ylim(ymin=0)
 plt.ylabel('Statistical distance ($D_{\Delta})$')
-plt.xlabel('timestamp ($t$)')
+plt.xlabel('Timestamp ($t$)')
 ax.tick_params(axis='x', which='both', top=False, labelsize=fontsize * 0.85)
 ax.tick_params(axis='y', labelsize=fontsize * 0.85)
-ax.legend(edgecolor='black', fancybox=False)
+ax.legend(edgecolor='black', fancybox=False, loc=2)
 
 update_name = 'blip-cd-dist'
-plt.savefig(out_prefix + update_name + '.pdf')
-plt.savefig(out_prefix + update_name + '.png')
+plt.savefig(out_prefix + update_name + '.pdf', bbox_inches='tight')
+plt.savefig(out_prefix + update_name + '.png', bbox_inches='tight')
 plt.show()

@@ -9,7 +9,7 @@ import barplot
 """
 # Constants
 """
-fontsize = 18
+fontsize = 20
 figsize=(8, 5)
 prefix = 'performance/'
 rcParams['font.family'] = 'serif'
@@ -26,14 +26,14 @@ label = ['oKDE', 'SPDT', 'SPDTw', 'D-Sketch']
 color = [m.to_rgba(210), m.to_rgba(180), m.to_rgba(120), m.to_rgba(50)]
 stat_update_thrp = [69.0, 65.5, 0.590, 1081]
 nonstat_update_thrp = [64.9, 65.3, 0.654, 374]
-stat_update_thrp_k = [score / 1000 for score in stat_update_thrp]
-nonstat_update_thrp_k = [score / 1000 for score in nonstat_update_thrp]
-data = [stat_update_thrp, nonstat_update_thrp]
+stat_update_thrp_m = [score / 1000 for score in stat_update_thrp]
+nonstat_update_thrp_m = [score / 1000 for score in nonstat_update_thrp]
+data = [stat_update_thrp_m, nonstat_update_thrp_m]
 
 fig, ax = plt.subplots(figsize=figsize)
-barplot.bar_plot(ax, data, label, color, (0, 1200), fontsize=fontsize)
+barplot.bar_plot(ax, data, label, color, (0, 1.200), fontsize=fontsize)
 
-ax.set_ylabel('Throughput (Kops/sec)')
+ax.set_ylabel('Throughput (Mops/s)')
 ax.set_xticks(np.arange(len(data)) + barplot.bar_width(len(data[0])) * 3/2)
 ax.set_xticklabels(['Stationary', 'Non-stationary'])
 ax.tick_params(axis='x', which='both', bottom=False, top=False)
@@ -52,14 +52,14 @@ margin = 0.2
 label = ['oKDE', 'SPDT', 'SPDTw', 'D-Sketch', 'D-Sketch + cache']
 color = [m.to_rgba(210), m.to_rgba(180), m.to_rgba(120), m.to_rgba(50), m.to_rgba(30)]
 prob_thrp = [3546, 448, 442, 466, 4131]
-prob_thrp_k = [score / 1000 for score in prob_thrp]
-data = [prob_thrp]
+prob_thrp_m = [score / 1000 for score in prob_thrp]
+data = [prob_thrp_m]
 
 fig, ax = plt.subplots(figsize=figsize)
-barplot.bar_plot(ax, data, label, color, (0, 5000), fontsize=fontsize)
+barplot.bar_plot(ax, data, label, color, (0, 5.000), fontsize=fontsize)
 
 bw = barplot.bar_width(len(data[0]))
-ax.set_ylabel('Throughput (Kops/sec)')
+ax.set_ylabel('Throughput (Mops/s)')
 ax.set_xticks(np.arange(len(data)) + bw * (len(data[0]) / 2 - 0.5))
 ax.set_xticklabels([])
 ax.tick_params(axis='x', which='both', bottom=False, top=False)
