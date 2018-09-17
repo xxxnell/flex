@@ -2,7 +2,7 @@
 
 This guide is for people who would like to be involved in building *Flip*.
 
-*Flip* welcomes contributions from everyone. Any kind of contribution is helpful: writing  a unit test, documentation, fixing bugs, advicing on work-in-progress, developing a new feature, implementing [the algorithm of `Sketch`](./flip-docs/algorithm.md) in another language, and so on. It is also good to refer to the [Waffle](https://waffle.io/xxxnell/flip) to find open issues.
+*Flip* welcomes contributions from everyone. Any kind of contribution is helpful: writing  a unit test, documentation, fixing bugs, advicing on work-in-progress, developing a new feature, implementing the algorithm of `Sketch` in another language, and so on. It is also good to refer to the [Waffle](https://waffle.io/xxxnell/flip) to find open issues.
 
 
 ## Submitting a pull request

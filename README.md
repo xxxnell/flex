@@ -58,7 +58,7 @@ println(
 Here is an experiment result for a bimodal probabability density function consisting of two standard normal distributions centered at -2 and 2.
 
 <p align="center">
-  <img width="460" height="350" src="./flip-docs/resources/experiments/basic-bimodal-histo.gif">
+  <img width="460" height="350" src="https://xxxnell.github.io/flip/img/experiments/basic-bimodal-histo.gif">
 </p>
 
 
@@ -70,24 +70,24 @@ In this figure, the dashed orange line is the expected underlying probability di
 `Sketch` also adapts to any types of concept drift successfully. Here is an experiment result under the situation where the distribution that `Sketch` is supposed to estimate is incrementally changing over time. The underlying distribution starts to change when the update count come to 300 and moves by +0.01 per one update count. `Sketch` is good at predicting this moving distribution, although there is some lag. Also this lag can be reduced by adjusting the sensitivity to new data.
 
 <p align="center">
-  <img width="460" height="350" src="./flip-docs/resources/experiments/incremental-cd-normal-pdf.gif">
+  <img width="460" height="350" src="https://xxxnell.github.io/flip/experiments/incremental-cd-normal-pdf.gif">
 </p>
 
-In all of these experiments, I did not provide any prior knowledge to predict the underlying distirbution accurately. It works precisely with the default configuration. For more example, see the [experiment](./flip-docs/experiment.md) documentation. If you want to learn how to use `Sketch` in a real world, see the [code for these experiments](./flip-bench/src/main/scala/flip/experiment).
+In all of these experiments, I did not provide any prior knowledge to predict the underlying distirbution accurately. It works precisely with the default configuration. For more example, see the experiment documentation. If you want to learn how to use `Sketch` in a real world, see the [code for these experiments](https://github.com/xxxnell/flip/tree/master/flip-bench/src/main/scala/flip/experiment).
 
 
 ## Contributing
 
-Contributions are always welcome. Any kind of contribution, such as writing a unit test, documentation, bug fix, or implementing [the density estimation algorithm of `Sketch`](./flip-docs/algorithm.md) in another language, is helpful. If you need some help, please contact me via [email](mailto:xxxxxnell@gmail.com) or [twitter](https://twitter.com/xxxnell).
+Contributions are always welcome. Any kind of contribution, such as writing a unit test, documentation, bug fix, or implementing the density estimation algorithm of `Sketch` in another language, is helpful. If you need some help, please contact me via [email](mailto:xxxxxnell@gmail.com) or [twitter](https://twitter.com/xxxnell).
 
 The `master` branch of this repository contains the latest stable release of *Flip*. In general, pull requests should be submitted from a separate `feature` branch starting from the `develop` branch. 
 
-Fo more detail, see the [contributing](./CONTRIBUTING.md) documentation.
+Fo more detail, see the contributing documentation.
 
 
 ## License
 
-All code of *Flip* is available to you under the [MIT license](./LICENSE). 
+All code of *Flip* is available to you under the MIT license. 
 
 Copyright the maintainers.
 
