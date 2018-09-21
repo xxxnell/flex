@@ -1,4 +1,4 @@
-# Contributing to *Flip*
+# Contributing to Flip
 
 This guide is for people who would like to be involved in building *Flip*.
 

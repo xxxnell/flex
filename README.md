@@ -6,7 +6,7 @@
 [![Latest version](https://index.scala-lang.org/xxxnell/flip/flip/latest.svg)](https://index.scala-lang.org/xxxnell/flip/flip)
 
 
-*Flip* is *F*ast, *L*ightweight pure-functional library for *I*nformation theory and *P*robability distribution. *Flip* aims to extract and process statistical features of the input data stream in a short time using only small memory. It has the following features:
+*Flip* is *F*ast, *L*ightweight pure-functional library for *I*nformation theory and *P*robability distribution. Flip aims to extract and process statistical features of the input data stream in a short time using only small memory. It has the following features:
 
 * Estimate and summarize probability distributions with high speed and high accuracy using only limited memory for both stationary and non-stationary data streams
 * Combine several probability distributions by using probability monad
@@ -16,16 +16,16 @@
 
 ## Getting Started
 
-*Flip* is published to Maven Central and built for Scala 2.12, so you can add the following to your `build.sbt`:
+Flip is published to Maven Central and built for Scala 2.12, so you can add the following to your `build.sbt`:
 
 ``` scala
 libraryDependencies += "com.xxxnell" %% "flip" % "0.0.4"
 ```
 
 
-## Summarizing Random Variable Stream using `Sketch`
+## Summarizing a Data Stream
 
-`Sketch` is the probablistic data structure that quickly measures the probalility density for the real number random variable data stream with limited memory without prior knowledge. Simply put, `Sketch` is a special histogram in which the width of each bin is adaptively adjusted to the input data stream, unlike conventional histograms, which require the user to specify the width and start/end point of the bin. It follows the change of probability distribution, and adapts to the sudden/incremental [concept drift](https://en.wikipedia.org/wiki/Concept_drift). Also, more than two `Sketch` can be combined in monadic way. This is what we call the probability monad in functional programming. `Sketch` is a better alternative to [kernel density estimation](https://en.wikipedia.org/wiki/Kernel_density_estimation) and [histogram](https://en.wikipedia.org/wiki/Histogram) in most cases.
+`Sketch`of Flip is the probablistic data structure that quickly measures the probalility density for the real number random variable data stream with limited memory without prior knowledge. Simply put, `Sketch` is a special histogram in which the width of each bin is adaptively adjusted to the input data stream, unlike conventional histograms, which require the user to specify the width and start/end point of the bin. It follows the change of probability distribution, and adapts to the sudden/incremental [concept drift](https://en.wikipedia.org/wiki/Concept_drift). Also, more than two `Sketch` can be combined in monadic way. This is what we call the probability monad in functional programming. `Sketch` is a better alternative to [kernel density estimation](https://en.wikipedia.org/wiki/Kernel_density_estimation) and [histogram](https://en.wikipedia.org/wiki/Histogram) in most cases.
 
 Here is an example of how `Sketch` estimates the density using the dataset sampled from the standard normal distribution.
 
@@ -58,7 +58,7 @@ println(
 Here is an experiment result for a bimodal probabability density function consisting of two standard normal distributions centered at -2 and 2.
 
 <p align="center">
-  <img width="460" height="350" src="https://xxxnell.github.io/flip/img/experiments/basic-bimodal-histo.gif">
+<img src="https://xxxnell.github.io/flip/img/experiments/basic-bimodal-histo.gif" style="max-width: 600px; width: 100%;">
 </p>
 
 
@@ -70,7 +70,7 @@ In this figure, the dashed orange line is the expected underlying probability di
 `Sketch` also adapts to any types of concept drift successfully. Here is an experiment result under the situation where the distribution that `Sketch` is supposed to estimate is incrementally changing over time. The underlying distribution starts to change when the update count come to 300 and moves by +0.01 per one update count. `Sketch` is good at predicting this moving distribution, although there is some lag. Also this lag can be reduced by adjusting the sensitivity to new data.
 
 <p align="center">
-  <img width="460" height="350" src="https://xxxnell.github.io/flip/experiments/incremental-cd-normal-pdf.gif">
+<img src="https://xxxnell.github.io/flip/img/experiments/incremental-cd-normal-pdf.gif" style="max-width: 600px; width: 100%;"/>
 </p>
 
 In all of these experiments, I did not provide any prior knowledge to predict the underlying distirbution accurately. It works precisely with the default configuration. For more example, see the experiment documentation. If you want to learn how to use `Sketch` in a real world, see the [code for these experiments](https://github.com/xxxnell/flip/tree/master/flip-bench/src/main/scala/flip/experiment).
@@ -80,14 +80,14 @@ In all of these experiments, I did not provide any prior knowledge to predict th
 
 Contributions are always welcome. Any kind of contribution, such as writing a unit test, documentation, bug fix, or implementing the density estimation algorithm of `Sketch` in another language, is helpful. If you need some help, please contact me via [email](mailto:xxxxxnell@gmail.com) or [twitter](https://twitter.com/xxxnell).
 
-The `master` branch of this repository contains the latest stable release of *Flip*. In general, pull requests should be submitted from a separate `feature` branch starting from the `develop` branch. 
+The `master` branch of this repository contains the latest stable release of Flip. In general, pull requests should be submitted from a separate `feature` branch starting from the `develop` branch. 
 
 Fo more detail, see the contributing documentation.
 
 
 ## License
 
-All code of *Flip* is available to you under the MIT license. 
+All code of Flip is available to you under the MIT license. 
 
 Copyright the maintainers.
 

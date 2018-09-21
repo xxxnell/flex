@@ -1,7 +1,8 @@
 ---
 layout: docs
-title:  "Documentation"
-section: "documentation"
+title:  "Quick Start"
+section: "docs"
+permalink: /docs/
 position: 20
 ---
 
