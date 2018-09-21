@@ -1,0 +1,62 @@
+<html><head><title>Flip: Stationary Case</title><meta charset="utf-8" /><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Flip contributors" /><meta name="description" content="Fast and lightweight probability tools for a dataset and a data stream" /><meta name="og:image" content="/flip/img/poster.png" /><meta name="og:title" content="Flip: Stationary Case" /><meta name="og:site_name" content="Flip" /><meta name="og:url" content="" /><meta name="og:type" content="website" /><meta name="og:description" content="Fast and lightweight probability tools for a dataset and a data stream" /><link rel="icon" type="image/png" href="/flip/img/favicon.png" /><meta name="twitter:title" content="Flip: Stationary Case" /><meta name="twitter:image" content="img/poster.png" /><meta name="twitter:description" content="Fast and lightweight probability tools for a dataset and a data stream" /><meta name="twitter:card" content="summary_large_image" /><meta name="twitter:creator" content="@xxxnell" /><link rel="icon" type="image/png" sizes="16x16" href="/flip/img/favicon16x16.png" /><link rel="icon" type="image/png" sizes="24x24" href="/flip/img/favicon24x24.png" /><link rel="icon" type="image/png" sizes="32x32" href="/flip/img/favicon32x32.png" /><link rel="icon" type="image/png" sizes="48x48" href="/flip/img/favicon48x48.png" /><link rel="icon" type="image/png" sizes="57x57" href="/flip/img/favicon57x57.png" /><link rel="icon" type="image/png" sizes="60x60" href="/flip/img/favicon60x60.png" /><link rel="icon" type="image/png" sizes="64x64" href="/flip/img/favicon64x64.png" /><link rel="icon" type="image/png" sizes="70x70" href="/flip/img/favicon70x70.png" /><link rel="icon" type="image/png" sizes="72x72" href="/flip/img/favicon72x72.png" /><link rel="icon" type="image/png" sizes="76x76" href="/flip/img/favicon76x76.png" /><link rel="icon" type="image/png" sizes="96x96" href="/flip/img/favicon96x96.png" /><link rel="icon" type="image/png" sizes="114x114" href="/flip/img/favicon114x114.png" /><link rel="icon" type="image/png" sizes="120x120" href="/flip/img/favicon120x120.png" /><link rel="icon" type="image/png" sizes="128x128" href="/flip/img/favicon128x128.png" /><link rel="icon" type="image/png" sizes="144x144" href="/flip/img/favicon144x144.png" /><link rel="icon" type="image/png" sizes="150x150" href="/flip/img/favicon150x150.png" /><link rel="icon" type="image/png" sizes="152x152" href="/flip/img/favicon152x152.png" /><link rel="icon" type="image/png" sizes="196x196" href="/flip/img/favicon196x196.png" /><link rel="icon" type="image/png" sizes="310x310" href="/flip/img/favicon310x310.png" /><link rel="icon" type="image/png" sizes="310x150" href="/flip/img/favicon310x150.png" /><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" /><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" /><link rel="stylesheet" href="/flip/highlight/styles/atom-one-light.css" /><link rel="stylesheet" href="/flip/css/style.css" /><link rel="stylesheet" href="/flip/css/palette.css" /><link rel="stylesheet" href="/flip/css/codemirror.css" /></head><body class="docs"><div id="wrapper"><div id="sidebar-wrapper"><ul id="sidebar" class="sidebar-nav"><li class="sidebar-brand"><a href="/flip/" class="brand"><div class="brand-wrapper"><span>Flip</span></div></a></li>    <li><a href="/flip/experiments/" class="">Experiments</a></li> <li><a href="/flip/experiments/parameters.html" class="">Performance on Parameters</a></li> <li><a href="/flip/experiments/benchmark.html" class="">Benchmark</a></li> <li><a href="/flip/experiments/accuracy.html" class="">Accuracy on Data Streams</a> <ul class="sub_section"> <li><a href="/flip/experiments/accuracyonstat.html" class=" active ">Stationary Case</a></li> <li><a href="/flip/experiments/accuracyonnonstat.html" class="">Non-stationary Case</a></li></ul></li></ul></div><div id="page-content-wrapper"><div class="nav"><div class="container-fluid"><div class="row"><div class="col-lg-12"><div class="action-menu pull-left clearfix"><a href="#menu-toggle" id="menu-toggle"><i class="fa fa-bars" aria-hidden="true"></i></a></div><ul class="pull-right"><li id="gh-eyes-item" class="hidden-xs"><a href="https://github.com/xxxnell/flip"><i class="fa fa-eye"></i><span>WATCH<span id="eyes" class="label label-default">--</span></span></a></li><li id="gh-stars-item" class="hidden-xs"><a href="https://github.com/xxxnell/flip"><i class="fa fa-star-o"></i><span>STARS<span id="stars" class="label label-default">--</span></span></a></li><li><a href="#" onclick="shareSiteTwitter('Flip Fast and lightweight probability tools for a dataset and a data stream');"><i class="fa fa-twitter"></i></a></li><li><a href="#" onclick="shareSiteFacebook('Flip Fast and lightweight probability tools for a dataset and a data stream');"><i class="fa fa-facebook"></i></a></li><li><a href="#" onclick="shareSiteGoogle();"><i class="fa fa-google-plus"></i></a></li></ul></div></div></div></div><div id="content" data-github-owner="xxxnell" data-github-repo="flip"><div class="content-wrapper"><section>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/javascript" charset="utf-8" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+<script type="text/javascript" charset="utf-8" src="https://vincenttam.github.io/javascripts/MathJaxLocal.js">
+</script>
+
+<h1 id="accuracy-on-stationary-data-streams">Accuracy on Stationary Data Streams</h1>
+
+<p>We measure the statistical distance between the underlying distribution of various stationary data streams and the distributions estimated by using <code class="highlighter-rouge">Sketch</code> and its alternatives, oKDE and SPDTw. Three distributions of data streams are used. The first is a normal distribution, which appears frequently. The second is a bimodal distribution, which is used in order to test if the density estimation algorithms can recognize various modes. The third is a log-normal distribution, which is used in order to test if it can estimate a long tail. For all experiments, one thousand data are used, and the arithmetic mean of the statistical distance is calculated excluding the first three hundreds results in order to evaluate only in a stable phase. The parameters of <code class="highlighter-rouge">Sketch</code> are selected to have a similar statistical distance as oKDE and SPDTw.</p>
+
+<h2 id="normal-distribution">Normal Distribution</h2>
+
+<p>In the experiment for normal distribution, we use $\mathcal{N}(0, 1)$ as the underlying distribution of the data stream. The statistical distance of <code class="highlighter-rouge">Sketch</code> for a normal distribution is 0.012, which is 0.75$\times$, 1.2$\times$ and 3.2$\times$ less than that of oKDE, SPDT, and SPDTw, respectively.</p>
+
+<p>It is intuitive that oKDE records the lowest statistical
+distance. This is because oKDE estimates the distribution
+by using a mixture of Gaussian distributions. SPDTw is
+less accurate than <code class="highlighter-rouge">Sketch</code> since the number of data
+updated by SPDTw is limited to a fixed size due to its
+window.</p>
+
+<p align="center">
+<img src="/flip/img/experiments/basic-normal-pdf.gif" alt="infographic" style="max-width: 400px; width: 100%;" />
+<img src="/flip/img/experiments/accuracy/normal-accuracy.png" alt="infographic" style="max-width: 400px; width: 100%;" />
+</p>
+
+<h2 id="bimodal-distribution">Bimodal Distribution</h2>
+
+<p>In the experiment for bimodal distribution, we use ${1}/{2} \cdot \mathcal{N}(-2, 1) + {1}/{2} \cdot \mathcal{N}(2, 1)$ as the underlying distribution of the data stream. The statistical distance of <code class="highlighter-rouge">Sketch</code> for a bimodal distribution is 0.018, which is 0.98$\times$, 1.2$\times$ and 2.5$\times$ less than that of
+oKDE, SPDT and SPDTw, respectively.</p>
+
+<p>The results for bimodal distribution show that it is intuitive that oKDE, which uses a Gaussian kernel, has the best result, as in the case of normal distribution. However, it is observed that the result of <code class="highlighter-rouge">Sketch</code> is similar to that of oKDE within the margin of error. This indicates that the <code class="highlighter-rouge">majorUpdate</code> algorithm builds a new model that recognizes various modes well. SPDTw is less accurate than <code class="highlighter-rouge">Sketch</code> for the same reason mentioned above.</p>
+
+<p align="center">
+<img src="/flip/img/experiments/basic-bimodal-histo.gif" alt="infographic" style="max-width: 400px; width: 100%;" />
+<img src="/flip/img/experiments/accuracy/bimodal-accuracy.png" alt="infographic" style="max-width: 400px; width: 100%;" />
+</p>
+
+<h2 id="log-normal-distribution">Log-normal Distribution</h2>
+
+<p>In the experiment for log-normal distribution, we use $\ln \mathcal{N}(0, 1)$ as the underlying distribution of the data stream. The statistical distance of <code class="highlighter-rouge">Sketch</code> for a log-normal distribution is 0.025, which is 1.4$\times$, 0.93$\times$ and 2.0$\times$ less than that of oKDE, SPDT, and SPDTw respectively.</p>
+
+<p>Contrary to the result for normal and bimodal distributions, this result shows that <code class="highlighter-rouge">Sketch</code> and SPDT, which have a high degree of freedom, have lower statistical distance than oKDE, which uses a Gaussian kernel. SPDTw is less accurate than <code class="highlighter-rouge">Sketch</code> for the same reason mentioned above.</p>
+
+<p align="center">
+<img src="/flip/img/experiments/basic-lognormal-histo.gif" alt="infographic" style="max-width: 400px; width: 100%;" />
+<img src="/flip/img/experiments/accuracy/lognormal-accuracy.png" alt="infographic" style="max-width: 400px; width: 100%;" />
+</p>
+
+</section></div></div></div></div><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script><script src="/flip/highlight/highlight.pack.js"></script><script>hljs.configure({languages:['scala','java','bash']});
+hljs.initHighlighting();
+              </script><script src="/flip/js/main.js"></script></body></html>

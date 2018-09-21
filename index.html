@@ -1,0 +1,88 @@
+<html><head><title>Flip: Home</title><meta charset="utf-8" /><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Flip contributors" /><meta name="description" content="Fast and lightweight probability tools for a dataset and a data stream" /><meta name="og:image" content="/flip/img/poster.png" /><meta name="og:title" content="Flip: Home" /><meta name="og:site_name" content="Flip" /><meta name="og:url" content="" /><meta name="og:type" content="website" /><meta name="og:description" content="Fast and lightweight probability tools for a dataset and a data stream" /><link rel="icon" type="image/png" href="/flip/img/favicon.png" /><meta name="twitter:title" content="Flip: Home" /><meta name="twitter:image" content="img/poster.png" /><meta name="twitter:description" content="Fast and lightweight probability tools for a dataset and a data stream" /><meta name="twitter:card" content="summary_large_image" /><meta name="twitter:creator" content="@xxxnell" /><link rel="icon" type="image/png" sizes="16x16" href="/flip/img/favicon16x16.png" /><link rel="icon" type="image/png" sizes="24x24" href="/flip/img/favicon24x24.png" /><link rel="icon" type="image/png" sizes="32x32" href="/flip/img/favicon32x32.png" /><link rel="icon" type="image/png" sizes="48x48" href="/flip/img/favicon48x48.png" /><link rel="icon" type="image/png" sizes="57x57" href="/flip/img/favicon57x57.png" /><link rel="icon" type="image/png" sizes="60x60" href="/flip/img/favicon60x60.png" /><link rel="icon" type="image/png" sizes="64x64" href="/flip/img/favicon64x64.png" /><link rel="icon" type="image/png" sizes="70x70" href="/flip/img/favicon70x70.png" /><link rel="icon" type="image/png" sizes="72x72" href="/flip/img/favicon72x72.png" /><link rel="icon" type="image/png" sizes="76x76" href="/flip/img/favicon76x76.png" /><link rel="icon" type="image/png" sizes="96x96" href="/flip/img/favicon96x96.png" /><link rel="icon" type="image/png" sizes="114x114" href="/flip/img/favicon114x114.png" /><link rel="icon" type="image/png" sizes="120x120" href="/flip/img/favicon120x120.png" /><link rel="icon" type="image/png" sizes="128x128" href="/flip/img/favicon128x128.png" /><link rel="icon" type="image/png" sizes="144x144" href="/flip/img/favicon144x144.png" /><link rel="icon" type="image/png" sizes="150x150" href="/flip/img/favicon150x150.png" /><link rel="icon" type="image/png" sizes="152x152" href="/flip/img/favicon152x152.png" /><link rel="icon" type="image/png" sizes="196x196" href="/flip/img/favicon196x196.png" /><link rel="icon" type="image/png" sizes="310x310" href="/flip/img/favicon310x310.png" /><link rel="icon" type="image/png" sizes="310x150" href="/flip/img/favicon310x150.png" /><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" /><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" /><link rel="stylesheet" href="/flip/highlight/styles/atom-one-light.css" /><link rel="stylesheet" href="/flip/css/style.css" /><link rel="stylesheet" href="/flip/css/palette.css" /><link rel="stylesheet" href="/flip/css/codemirror.css" /></head><body><header id="site-header"><div class="navbar-wrapper"><div class="container"><div class="row"><div class="col-xs-6"><a href="/flip/" class="brand"><div class="icon-wrapper"><span>Flip</span></div></a></div><div class="col-xs-6"><nav class="text-right"><ul class=""><li><a href="https://github.com/xxxnell/flip"><i class="fa fa-github"></i><span class="hidden-xs">GitHub</span></a></li></ul></nav></div></div></div></div><div class="jumbotron"><div class="container"><h1 class="text-center">Fast and lightweight probability tools for a dataset and a data stream</h1><h2></h2><p class="text-center"><a href="https://github.com/xxxnell/flip" class="btn btn-outline-inverse">View on GitHub</a></p></div></div><div><ul class="horizontalNav">                   <li><a class=" active " href="/flip/">Home</a></li>  <li><a class="" href="/flip/docs/">Quick Start</a></li>  <li><a class="" href="/flip/experiments/">Experiments</a></li>  <li><a class="" href="/flip/contributing.html">Contributing</a></li> </ul></div></header><main id="site-main"><section class="use"><div class="container"><div id="content"><h1 id="flip-">Flip 🎲</h1>
+
+<p><a href="https://travis-ci.org/xxxnell/flip"><img src="https://travis-ci.org/xxxnell/flip.svg?branch=master" alt="Build Status" /></a>
+<a href="https://codecov.io/gh/xxxnell/flip"><img src="https://codecov.io/gh/xxxnell/flip/branch/master/graph/badge.svg" alt="codecov" /></a>
+<a href="https://waffle.io/xxxnell/flip"><img src="https://badge.waffle.io/xxxnell/flip.svg?columns=to%20do" alt="Waffle.io - Columns and their card count" /></a>
+<a href="https://index.scala-lang.org/xxxnell/flip/flip"><img src="https://index.scala-lang.org/xxxnell/flip/flip/latest.svg" alt="Latest version" /></a></p>
+
+<p><em>Flip</em> is <em>F</em>ast, <em>L</em>ightweight pure-functional library for <em>I</em>nformation theory and <em>P</em>robability distribution. Flip aims to extract and process statistical features of the input data stream in a short time using only small memory. It has the following features:</p>
+
+<ul>
+  <li>Estimate and summarize probability distributions with high speed and high accuracy using only limited memory for both stationary and non-stationary data streams</li>
+  <li>Combine several probability distributions by using probability monad</li>
+  <li>Generate random variables from many predefined and estimated probability disributions</li>
+  <li>Measure similarity between two probability distribution using various (generalized) statistical distances (e.g., Kullback–Leibler divergence)</li>
+</ul>
+
+<h2 id="getting-started">Getting Started</h2>
+
+<p>Flip is published to Maven Central and built for Scala 2.12, so you can add the following to your <code class="highlighter-rouge">build.sbt</code>:</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">libraryDependencies</span> <span class="o">+=</span> <span class="s">"com.xxxnell"</span> <span class="o">%%</span> <span class="s">"flip"</span> <span class="o">%</span> <span class="s">"0.0.4"</span>
+</code></pre></div></div>
+
+<h2 id="summarizing-a-data-stream">Summarizing a Data Stream</h2>
+
+<p><code class="highlighter-rouge">Sketch</code>of Flip is the probablistic data structure that quickly measures the probalility density for the real number random variable data stream with limited memory without prior knowledge. Simply put, <code class="highlighter-rouge">Sketch</code> is a special histogram in which the width of each bin is adaptively adjusted to the input data stream, unlike conventional histograms, which require the user to specify the width and start/end point of the bin. It follows the change of probability distribution, and adapts to the sudden/incremental <a href="https://en.wikipedia.org/wiki/Concept_drift">concept drift</a>. Also, more than two <code class="highlighter-rouge">Sketch</code> can be combined in monadic way. This is what we call the probability monad in functional programming. <code class="highlighter-rouge">Sketch</code> is a better alternative to <a href="https://en.wikipedia.org/wiki/Kernel_density_estimation">kernel density estimation</a> and <a href="https://en.wikipedia.org/wiki/Histogram">histogram</a> in most cases.</p>
+
+<p>Here is an example of how <code class="highlighter-rouge">Sketch</code> estimates the density using the dataset sampled from the standard normal distribution.</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">flip.implicits._</span>
+
+<span class="c1">// get 100 random variables from standard normal distribution
+</span><span class="k">val</span> <span class="n">underlying</span> <span class="k">=</span> <span class="nc">NumericDist</span><span class="o">.</span><span class="n">normal</span><span class="o">(</span><span class="mf">0.0</span><span class="o">,</span> <span class="mf">1.0</span><span class="o">)</span>
+<span class="k">val</span> <span class="o">(</span><span class="k">_</span><span class="o">,</span> <span class="n">samples</span><span class="o">)</span> <span class="k">=</span> <span class="n">underlying</span><span class="o">.</span><span class="n">samples</span><span class="o">(</span><span class="mi">100</span><span class="o">)</span>
+
+<span class="c1">// update samples to sketch
+</span><span class="k">val</span> <span class="n">sketch0</span> <span class="k">=</span> <span class="nc">Sketch</span><span class="o">.</span><span class="n">empty</span><span class="o">[</span><span class="kt">Double</span><span class="o">]</span>
+<span class="k">val</span> <span class="n">sketch1</span> <span class="k">=</span> <span class="n">samples</span><span class="o">.</span><span class="n">foldLeft</span><span class="o">(</span><span class="n">sketch0</span><span class="o">)</span> <span class="o">{</span>
+  <span class="k">case</span> <span class="o">(</span><span class="n">sketch</span><span class="o">,</span> <span class="n">sample</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="n">sketch</span><span class="o">.</span><span class="n">update</span><span class="o">(</span><span class="n">sample</span><span class="o">)</span>
+<span class="o">}</span>
+
+<span class="c1">// analyze sketch
+</span><span class="n">println</span><span class="o">(</span>
+  <span class="n">s</span><span class="s">"Estimated Pr(0.0 ≤ x ≤ 1.0): ${sketch1.probability(0.0, 1.0)}, "</span> <span class="o">+</span>
+    <span class="n">s</span><span class="s">"Expected Pr(0.0 ≤ x ≤ 1.0): ${underlying.probability(0.0, 1.0)}\n"</span> <span class="o">+</span>
+    <span class="n">s</span><span class="s">"Estimated median: ${sketch1.median}, expected median: 0.0 \n"</span> <span class="o">+</span>
+    <span class="n">s</span><span class="s">"Sample from sketch: ${sketch1.sample._2} \n"</span> <span class="o">+</span>
+    <span class="n">s</span><span class="s">"KL-divergence: ${KLD(underlying, sketch1)}"</span>
+<span class="o">)</span>
+</code></pre></div></div>
+
+<h3 id="the-case-of-bimodal-distribution">The case of bimodal distribution</h3>
+
+<p>Here is an experiment result for a bimodal probabability density function consisting of two standard normal distributions centered at -2 and 2.</p>
+
+<p align="center">
+<img src="https://xxxnell.github.io/flip/img/experiments/basic-bimodal-histo.gif" style="max-width: 600px; width: 100%;" />
+</p>
+
+<p>In this figure, the dashed orange line is the expected underlying probability distribution, and the blue bar is the probability distribution that <code class="highlighter-rouge">Sketch</code> estimates. <code class="highlighter-rouge">Sketch</code> assumes an initial bin with a uniform width, and estimates the first optimal bin at the update count of 50. Then <code class="highlighter-rouge">Sketch</code> estimates new bins every 100 data updates, for example, 50, 150, 250, and so on.</p>
+
+<h3 id="the-case-of-concept-drift">The case of concept drift</h3>
+
+<p><code class="highlighter-rouge">Sketch</code> also adapts to any types of concept drift successfully. Here is an experiment result under the situation where the distribution that <code class="highlighter-rouge">Sketch</code> is supposed to estimate is incrementally changing over time. The underlying distribution starts to change when the update count come to 300 and moves by +0.01 per one update count. <code class="highlighter-rouge">Sketch</code> is good at predicting this moving distribution, although there is some lag. Also this lag can be reduced by adjusting the sensitivity to new data.</p>
+
+<p align="center">
+<img src="https://xxxnell.github.io/flip/img/experiments/incremental-cd-normal-pdf.gif" style="max-width: 600px; width: 100%;" />
+</p>
+
+<p>In all of these experiments, I did not provide any prior knowledge to predict the underlying distirbution accurately. It works precisely with the default configuration. For more example, see the experiment documentation. If you want to learn how to use <code class="highlighter-rouge">Sketch</code> in a real world, see the <a href="https://github.com/xxxnell/flip/tree/master/flip-bench/src/main/scala/flip/experiment">code for these experiments</a>.</p>
+
+<h2 id="contributing">Contributing</h2>
+
+<p>Contributions are always welcome. Any kind of contribution, such as writing a unit test, documentation, bug fix, or implementing the density estimation algorithm of <code class="highlighter-rouge">Sketch</code> in another language, is helpful. If you need some help, please contact me via <a href="mailto:xxxxxnell@gmail.com">email</a> or <a href="https://twitter.com/xxxnell">twitter</a>.</p>
+
+<p>The <code class="highlighter-rouge">master</code> branch of this repository contains the latest stable release of Flip. In general, pull requests should be submitted from a separate <code class="highlighter-rouge">feature</code> branch starting from the <code class="highlighter-rouge">develop</code> branch.</p>
+
+<p>Fo more detail, see the contributing documentation.</p>
+
+<h2 id="license">License</h2>
+
+<p>All code of Flip is available to you under the MIT license.</p>
+
+<p>Copyright the maintainers.</p>
+
+</div></div></section><section class="technologies"><div class="container"><div class="row"></div></div></section></main><footer id="site-footer"><div class="container"><div class="row"><div class="col-xs-6"><p>Flip is designed and developed by <a href="" target="_blank">Flip contributors</a></p></div><div class="col-xs-6"><p class="text-right"><a href="https://github.com/xxxnell/flip"><span class="fa fa-github"></span>View on GitHub</a></p></div></div></div></footer><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script><script src="/flip/highlight/highlight.pack.js"></script><script>hljs.configure({languages:['scala','java','bash']});
+hljs.initHighlighting();
+              </script></body></html>
