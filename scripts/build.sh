@@ -22,13 +22,8 @@ fi
 
 # cmd
 
-if [[ $branch == "master" && $(cat version.sbt) =~ "-SNAPSHOT" ]]; then
-  release_cmd="sbt ++$scala_version && sbt 'release with-defaults'"
-  cmd="$release_cmd"
-else
-  no_release_cmd="sbt ++$scala_version && bash scripts/test.sh"
-  cmd="$no_release_cmd"
-fi
+no_release_cmd="sbt ++$scala_version && bash scripts/test.sh"
+cmd="$no_release_cmd"
 
 echo $cmd
 eval $cmd
