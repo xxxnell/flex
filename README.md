@@ -22,6 +22,12 @@ Flip is published to Maven Central and built for Scala 2.12, so you can add the 
 libraryDependencies += "com.xxxnell" %% "flip" % "0.0.4"
 ```
 
+Then, you need to `import` the context of Flip.
+
+``` scala
+import flip.implicits._
+```
+
 
 ## Summarizing a Data Stream
 

@@ -2,7 +2,7 @@ options:
 
   # Documentation Menu
 
-  - title: Quick Start
+  - title: Documentation
     url: docs/
     menu_type: docs
 
