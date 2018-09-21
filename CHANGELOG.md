@@ -4,6 +4,12 @@
 
 This version is a experimental section to try various features and interfaces of Flip. 
 
+### [0.0.4](https://github.com/xxxnell/flip/tree/v0.0.4)
+
+> 2018-07-26
+
+We mainly use computation resources flexibly by operating `deepUpdate` selectively. At this time, the algorithm measures the statistical distance between the recent data stream and the the estimated PDF. This method improves throughput up to 4 times.
+
 
 ### [0.0.3](https://github.com/xxxnell/flip/tree/v0.0.3)
 
