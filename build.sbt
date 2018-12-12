@@ -1,31 +1,31 @@
 import sbt.Keys._
-import flip.FlipBuilds
-import flip.Releases
-import flip.Tasks
+import flex.flexBuilds
+import flex.Releases
+import flex.Tasks
 
-name := "flip"
+name := "flex"
 
 lazy val root = project
   .in(file("."))
   .settings(moduleName := "root")
   .settings(Releases.publishSettings)
   .settings(Releases.noPublishSettings)
-  .settings(Tasks.benchTaskSettings(flipBench))
-  .aggregate(flipCore, flipBench, flipDocs)
+  .settings(Tasks.benchTaskSettings(flexBench))
+  .aggregate(flexCore, flexBench, flexDocs)
 
-lazy val flipCore = flipModule("flip-core")
-  .settings(moduleName := "flip", name := "Flip core")
+lazy val flexCore = flexModule("flex-core")
+  .settings(moduleName := "flex", name := "flex core")
   .settings(Releases.publishSettings)
 
-lazy val flipBench = flipModule("flip-bench")
-  .settings(moduleName := "flip-bench", name := "Flip benchmarks")
+lazy val flexBench = flexModule("flex-bench")
+  .settings(moduleName := "flex-bench", name := "flex benchmarks")
   .settings(Releases.noPublishSettings)
-  .dependsOn(flipCore)
+  .dependsOn(flexCore)
 
-lazy val flipDocs = flipModule("flip-docs")
-  .settings(moduleName := "flip-docs", name := "Flip docs")
+lazy val flexDocs = flexModule("flex-docs")
+  .settings(moduleName := "flex-docs", name := "flex docs")
   .settings(Releases.noPublishSettings)
 
-def flipModule(name: String): Project =
+def flexModule(name: String): Project =
   Project(id = name, base = file(name))
-    .settings(FlipBuilds.buildSettings)
+    .settings(flexBuilds.buildSettings)

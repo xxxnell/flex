@@ -1,4 +1,4 @@
-package flip
+package flex
 
 import sbt.Keys._
 import sbt.{Def, _}
@@ -35,7 +35,7 @@ object Tasks {
       args
         .map(arg => mains.filter(main => arg.r.findFirstIn(main).nonEmpty))
         .foldLeft(Seq.empty[String])((acc, targets) => acc ++ targets)
-    } else mains.filter(main => main.startsWith("flip.experiment"))
+    } else mains.filter(main => main.startsWith("flex.experiment"))
 
     targets.foreach(main => r.run(main, classpath, Seq(), logger))
   }

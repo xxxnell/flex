@@ -1,4 +1,4 @@
-package flip
+package flex
 
 import sbt._
 import sbt.Keys._
@@ -103,12 +103,12 @@ object Releases extends ReleaseProcess {
     pomIncludeRepository := { _ =>
       false
     },
-    homepage := Some(url("https://github.com/xxxnell/flip")),
+    homepage := Some(url("https://github.com/xxxnell/flex")),
     licenses := Seq("MIT" -> url("http://opensource.org/licenses/MIT")),
     scmInfo := Some(
       ScmInfo(
-        url("https://github.com/xxxnell/flip"),
-        "scm:git:git@github.com:xxxnell/flip.git"
+        url("https://github.com/xxxnell/flex"),
+        "scm:git:git@github.com:xxxnell/flex.git"
       )
     ),
     developers := List(

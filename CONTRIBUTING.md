@@ -1,15 +1,15 @@
-# Contributing to Flip
+# Contributing to flex
 
-This guide is for people who would like to be involved in building *Flip*.
+This guide is for people who would like to be involved in building *flex*.
 
-*Flip* welcomes contributions from everyone. Any kind of contribution is helpful: writing  a unit test, documentation, fixing bugs, advicing on work-in-progress, developing a new feature, implementing the algorithm of `Sketch` in another language, and so on. It is also good to refer to the [Waffle](https://waffle.io/xxxnell/flip) to find open issues.
+*flex* welcomes contributions from everyone. Any kind of contribution is helpful: writing  a unit test, documentation, fixing bugs, advicing on work-in-progress, developing a new feature, implementing the algorithm of `Sketch` in another language, and so on. It is also good to refer to the [Waffle](https://waffle.io/xxxnell/flex) to find open issues.
 
 
 ## Submitting a pull request
 
 This project follows a standard [fork and pull](https://help.github.com/articles/about-pull-requests/) model for contributions via GitHub pull requests.
  
-* Pull requests should be submitted from a separate `feature` branch starting from the `develop` branch (e.g. `using git checkout -b "feature/username/fix-123"`). Especially, note that the `master` branch of this repository contains the latest stable release of *Flip*. For more detail, see [git-flow cheatsheet](https://danielkummer.github.io/git-flow-cheatsheet/index.html).
+* Pull requests should be submitted from a separate `feature` branch starting from the `develop` branch (e.g. `using git checkout -b "feature/username/fix-123"`). Especially, note that the `master` branch of this repository contains the latest stable release of *flex*. For more detail, see [git-flow cheatsheet](https://danielkummer.github.io/git-flow-cheatsheet/index.html).
 * Commit messages should general use the present tense, normal sentence capitalization, and no final punctuation.
 * The commit message should be written like a mini changelog. The commit message should have the following prefix: `*` when the code or functionality changes. `+` when new code or functionality is added. `-` when redundant or unnecessary code or functionality is removed.
 * It is recommended that the first line of the commit message should not exceed 72 characters.
@@ -18,7 +18,7 @@ This project follows a standard [fork and pull](https://help.github.com/articles
 
 ## Creating a third party project as a standalone library
 
-If you have created a new project using *Flip*, simply reporting the use case to the [maintainer](mailto:xxxxxnell@gmail.com) will help the project.
+If you have created a new project using *flex*, simply reporting the use case to the [maintainer](mailto:xxxxxnell@gmail.com) will help the project.
 
 
 ## Maintainers

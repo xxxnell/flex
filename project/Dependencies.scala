@@ -1,4 +1,4 @@
-package flip
+package flex
 
 import sbt._
 import sbt.Keys.libraryDependencies

@@ -1,10 +1,10 @@
-package flip
+package flex
 
 import sbt.Keys._
 import Dependencies._
 import Resolvers._
 
-object FlipBuilds {
+object flexBuilds {
 
   val buildSettings = Seq(
     scalaVersion := "2.12.8",
