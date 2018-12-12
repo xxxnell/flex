@@ -18,7 +18,7 @@ exp_dir = "data/"
 normal_out = "conf-normal.out"
 incr_drift_out = "conf-incr-drift.out"
 rcParams['font.family'] = 'serif'
-fontsize = 20
+fontsize = 35
 rcParams.update({'font.size': fontsize})
 
 """
@@ -336,8 +336,8 @@ def performance_diag(dist, thro, mem, data=False, figsize=(10,10), alpha=0.8):
     cb.set_label("Memory (KB)")
     plt.xlim(xlim)
     plt.ylim(ylim)
-    plt.ylabel("Throughput (Mops/sec)")
-    plt.xlabel("Statistical Distance ($D_{\Delta}$)")
+    plt.ylabel("Throughput (Mops)")
+    plt.xlabel("Error ($\delta$)")
     ax.tick_params(axis='both', labelsize=fontsize * 0.85)
     return f, ax
 

@@ -29,9 +29,9 @@ object BenchApp {
 
 object BenchAppConfs {
 
-  val warmup = 5
+  val warmup = 20
   val warmupTime: TimeValue = TimeValue.seconds(1)
-  val measurement = 10
+  val measurement = 30
   val measurementTime: TimeValue = TimeValue.seconds(1)
   val thread = 1
   val fork = 1

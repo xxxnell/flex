@@ -26,12 +26,12 @@ def bar_plot(ax, datas, label, color, ylim, fontsize=18, opacity=0.8, legend=Tru
         bw = bar_width(len(datast))
         rects = ax.bar(index + i * bw, datast[i], bw,
             alpha=opacity, label=label[i], edgecolor='black', linewidth=1.0, color=color[i])
-        bar_label(ax, rects, (ylim[1] - ylim[0]) * 0.01, fontsize * 0.80)
+        bar_label(ax, rects, (ylim[1] - ylim[0]) * 0.01, fontsize*0.8)
 
     ax.tick_params(axis='x', which='both', bottom=False, top=False)
-    ax.tick_params(axis='y', labelsize=fontsize * 0.85)
+    ax.tick_params(axis='y', labelsize=fontsize)
     if legend:
-        legend = ax.legend(edgecolor='black', fancybox=False, loc=legendloc)
+        legend = ax.legend(edgecolor='black', fancybox=False, loc=legendloc, fontsize=fontsize*0.9)
     ax.set_ylim(ylim)
 
     return ax

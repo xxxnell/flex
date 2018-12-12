@@ -18,4 +18,6 @@ object Versions {
 
   val jol = "0.9"
 
+  val csv = "1.3.5"
+
 }

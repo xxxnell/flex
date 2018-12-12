@@ -11,7 +11,7 @@ object IncrementalConceptDriftExp {
 
   def main(args: Array[String]): Unit = {
     val expName = "incremental-cd-normal"
-    val dataNo = 1000
+    val dataNo = 3000
     val draftStart = 300
     val draftStartingPoint = 0.0
     val velocity = 0.01
@@ -36,6 +36,7 @@ object IncrementalConceptDriftExp {
     val idxCos = idxSketches.map { case (idx, sketch) => (idx, Cosine(underlying(idx), sketch)) }
     val idxEuc = idxSketches.map { case (idx, sketch) => (idx, Euclidean(underlying(idx), sketch)) }
     val idxED = idxSketches.map { case (idx, sketch) => (idx, ED(underlying(idx), sketch)) }
+    val idxED2 = idxSketches.map { case (idx, sketch) => (idx, ED(underlying(0), sketch)) }
     val idxMedian = idxSketches.map { case (idx, sketch) => (idx, sketch.median) }
 
     // out
@@ -47,6 +48,7 @@ object IncrementalConceptDriftExp {
     ExpOutOps.writeStr(expName, "cosine", idxCos.map { case (idx, cos) => s"$idx, $cos" }.mkString("\n"))
     ExpOutOps.writeStr(expName, "euclidean", idxEuc.map { case (idx, euc) => s"$idx, $euc" }.mkString("\n"))
     ExpOutOps.writeStr(expName, "ed", idxED.map { case (idx, ed) => s"$idx, $ed" }.mkString("\n"))
+    ExpOutOps.writeStr(expName, "ed2", idxED2.map { case (idx, ed) => s"$idx, $ed" }.mkString("\n"))
     ExpOutOps.writeStr(
       expName,
       "median",

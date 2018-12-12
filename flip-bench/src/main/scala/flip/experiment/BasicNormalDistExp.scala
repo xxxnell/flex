@@ -19,7 +19,7 @@ object BasicNormalDistExp {
     val underlying = NumericDist.normal(0.0, 1)
     val (_, datas) = underlying.samples(dataNo)
     val sketchTraces = sketch0 :: sketch0.updateTrace(datas)
-    val idxSketches = sketchTraces.indices.zip(sketchTraces).toList.filter { case (idx, _) => idx % 10 == 0 }
+    val idxSketches = sketchTraces.indices.zip(sketchTraces).toList.filter { case (idx, _) => idx % 1 == 0 }
     val idxPdf = idxSketches.map { case (idx, sketch) => (idx, sketch.barPlot.csv) }
     val idxCdf = idxSketches.map { case (idx, sketch) => (idx, sketch.cdfSampling.csv) }
     val idxDel = idxSketches.map { case (idx, sketch) => (idx, Delta(underlying, sketch).csv) }

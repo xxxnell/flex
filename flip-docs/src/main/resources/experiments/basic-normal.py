@@ -8,7 +8,7 @@ import cdfplot as cdfplt
 import kldplot as kldplt
 
 name = "basic-normal"
-dir = "../../../flip-bench/experiments/basic-normal/"
+dir = "../../../../../flip-bench/experiments/basic-normal/"
 
 fig = plt.figure(figsize=(20, 5))
 
@@ -70,9 +70,9 @@ plt.savefig(name + '.png')
 
 # Animated
 
-start = 10
+start = 0
 end = 500
-step = 10
+step = 1
 fps = 4
 
 # PDF: Animated

@@ -11,9 +11,9 @@ import barplot
 """
 # Constants
 """
-fontsize = 20
+fontsize = 22
+tickscale = 0.9
 figsizex1 = (6,5)
-figsizex2 = (14,5.5)
 margin = 0.2
 inp_prefix = 'data/'
 out_prefix = 'accuracy/'
@@ -31,7 +31,7 @@ m = cm.ScalarMappable(norm=norm, cmap=plt.get_cmap('viridis') )
 """
 # Normal Distribution
 """
-label = ['oKDE', 'SPDT', 'SPDTw', 'D-Sketch']
+label = ['oKDE', 'SPDT', 'SPDTw', 'FlexSketch']
 color = [m.to_rgba(210), m.to_rgba(190), m.to_rgba(120), m.to_rgba(50)]
 normal_ed = [0.00910, 0.0145, 0.0393, 0.0122]
 data = [normal_ed]
@@ -40,9 +40,9 @@ fig, ax = plt.subplots(figsize=figsizex1)
 barplot.bar_plot(ax, data, label, color, (0, 0.055), fontsize=fontsize)
 
 bw = barplot.bar_width(len(data[0]))
-ax.set_ylabel('Statistical distance ($D_{\Delta})$')
+ax.set_ylabel('Error ($\delta)$')
 ax.tick_params(axis='x', which='both', bottom=False, top=False)
-ax.tick_params(axis='y', labelsize=fontsize * 0.85)
+ax.tick_params(axis='y', labelsize=fontsize * tickscale)
 ax.set_xlim((-bw / 2 - margin, bw * (len(data[0]) - 0.5) + margin))
 ax.set_xticklabels([])
 
@@ -59,16 +59,16 @@ plt.show()
 
 bimodal_ed = [0.0178, 0.0222, 0.0453, 0.0181]
 data = [bimodal_ed]
-label = ['oKDE', 'SPDT', 'SPDTw', 'D-Sketch']
+label = ['oKDE', 'SPDT', 'SPDTw', 'FlexSketch']
 color = [m.to_rgba(210), m.to_rgba(190), m.to_rgba(120), m.to_rgba(50)]
 
 fig, ax = plt.subplots(figsize=figsizex1)
 barplot.bar_plot(ax, data, label, color, (0, 0.055), fontsize=fontsize)
 
 bw = barplot.bar_width(len(data[0]))
-ax.set_ylabel('Statistical distance ($D_{\Delta})$')
+ax.set_ylabel('Error ($\delta$)')
 ax.tick_params(axis='x', which='both', bottom=False, top=False)
-ax.tick_params(axis='y', labelsize=fontsize * 0.85)
+ax.tick_params(axis='y', labelsize=fontsize * tickscale)
 ax.set_xlim((-bw / 2 - margin, bw * (len(data[0]) - 0.5) + margin))
 ax.set_xticklabels([])
 
@@ -82,16 +82,16 @@ plt.savefig(out_prefix + bimodal_name + '.png')
 """
 lognormal_ed = [0.0342, 0.0230, 0.0504, 0.0247]
 data = [lognormal_ed]
-label = ['oKDE', 'SPDT', 'SPDTw', 'D-Sketch']
+label = ['oKDE', 'SPDT', 'SPDTw', 'FlexSketch']
 color = [m.to_rgba(210), m.to_rgba(190), m.to_rgba(120), m.to_rgba(50)]
 
 fig, ax = plt.subplots(figsize=figsizex1)
 barplot.bar_plot(ax, data, label, color, (0, 0.055), fontsize=fontsize)
 
 bw = barplot.bar_width(len(data[0]))
-ax.set_ylabel('Statistical distance ($D_{\Delta})$')
+ax.set_ylabel('Error ($\delta$)')
 ax.tick_params(axis='x', which='both', bottom=False, top=False)
-ax.tick_params(axis='y', labelsize=fontsize * 0.85)
+ax.tick_params(axis='y', labelsize=fontsize * tickscale)
 ax.set_xlim((-bw / 2 - margin, bw * (len(data[0]) - 0.5) + margin))
 ax.set_xticklabels([])
 
@@ -103,19 +103,19 @@ plt.savefig(out_prefix + lognormal_name + '.png')
 """
 # Combined Stationary
 """
-label = ['oKDE', 'SPDT', 'SPDTw', 'D-Sketch']
+label = ['oKDE', 'SPDT', 'SPDTw', 'FlexSketch']
 color = [m.to_rgba(210), m.to_rgba(190), m.to_rgba(120), m.to_rgba(50)]
 data = [normal_ed, bimodal_ed, lognormal_ed]
 
-fig, ax = plt.subplots(figsize=figsizex2)
+fig, ax = plt.subplots(figsize=(10,5.5))
 barplot.bar_plot(ax, data, label, color, (0, 0.055), fontsize=fontsize, legendloc=2)
 
 bw = barplot.bar_width(len(data[0]))
-ax.set_ylabel('Statistical distance ($D_{\Delta}$)')
+ax.set_ylabel('Error ($\delta$)')
 ax.set_xticks(np.arange(len(data)) + barplot.bar_width(len(data[0])) * 3/2)
 ax.set_xticklabels(['Normal', 'Bimodal', 'Log-normal'])
 ax.tick_params(axis='x', which='both', bottom=False, top=False)
-ax.tick_params(axis='y', labelsize=fontsize * 0.85)
+ax.tick_params(axis='y', labelsize=fontsize * tickscale)
 # ax.set_xlim((-bw / 2 - margin, bw * (len(data[0]) - 0.5) + margin))
 
 fig.tight_layout()
@@ -143,7 +143,7 @@ def avg(l):
 cd_start = 300
 avg_start = 500
 avg_end = 1000
-speed = 0.00308
+speed = 0.020
 
 data_loc = inp_prefix + "okde-incr-cd-ed.out"
 okde_data_raw = { d[0]: d[1] for d in prep.data(data_loc, 2) }
@@ -162,18 +162,18 @@ ck = [ed / speed for ed in incr_ed]
 """
   Incremental Concept Drift: Index
 """
-label = ['oKDE', 'SPDTw', 'D-Sketch']
+label = ['oKDE', 'SPDTw', 'FlexSketch']
 color = [m.to_rgba(210), m.to_rgba(120), m.to_rgba(50)]
 data = [ck]
 
 fig, ax = plt.subplots(figsize=figsizex1)
-ax = barplot.bar_plot(ax, data, label, color, (0, 210), fontsize=fontsize)
+ax = barplot.bar_plot(ax, data, label, color, (0, 35), fontsize=fontsize)
 
 bw = barplot.bar_width(len(data[0]))
 ax.set_ylabel('Lag ($c/k$)')
 ax.set_xlabel(' ')
 ax.tick_params(axis='x', which='both', bottom=False, top=False)
-ax.tick_params(axis='y', labelsize=fontsize * 0.85)
+ax.tick_params(axis='y', labelsize=fontsize * tickscale)
 ax.set_xticks(np.arange(len(data)) + bw * (len(data[0]) / 2 - 0.5))
 ax.set_xticklabels([])
 ax.set_xlim((-bw / 2 - margin, bw * (len(data[0]) - 0.5) + margin))
@@ -210,11 +210,11 @@ distplot(ax, [okde_tdata, spdt_tdata, sketch_tdata], [okde_ddata, spdt_ddata, sk
 
 ax.set_xlim(xmin=start, xmax=end)
 ax.set_ylim(ymin=0)
-ax.set_ylabel('Statistical distance ($D_{\Delta}$)')
+ax.set_ylabel('Error ($\delta$)')
 ax.set_xlabel('Timestamp ($t$)')
-ax.tick_params(axis='x', labelsize=fontsize * 0.85)
-ax.tick_params(axis='y', labelsize=fontsize * 0.85)
-ax.legend(edgecolor='black', fancybox=False)
+ax.tick_params(axis='x', labelsize=fontsize * tickscale)
+ax.tick_params(axis='y', labelsize=fontsize * tickscale)
+ax.legend(edgecolor='black', fancybox=False, fontsize=fontsize*0.9)
 
 update_name = 'incr-cd-dist'
 plt.savefig(out_prefix + update_name + '.pdf', bbox_inches='tight')
@@ -252,7 +252,7 @@ plt.plot(tdata, ddata, 'b-', label='data')
 plt.xlim(xmin = 0, xmax = end - start)
 plt.ylim(ymax = 1.0, ymin = 0)
 
-okde_coeff, pcov = curve_fit(func3ck(ck[0]), tdata, ddata, (0.8, 1.0, 0))
+okde_coeff, pcov = curve_fit(func3ck(ck[0]), tdata, ddata, (0.1, 1.0, 0))
 print("oKDE coefficients (l, a1, a2)" )
 print(okde_coeff)
 
@@ -278,7 +278,7 @@ plt.plot(tdata, ddata, 'b-', label='data')
 plt.xlim(xmin = 0, xmax = end - start)
 plt.ylim(ymax = 2.0, ymin = 0)
 
-spdtw_coeff, pcov = curve_fit(func3ck(ck[1]), tdata, ddata, (0.25, 1.5, 0))
+spdtw_coeff, pcov = curve_fit(func3ck(ck[1]), tdata, ddata, (0.5, 1.5, 0))
 print("SPDTw coefficients (l, a1, a2)" )
 print(spdtw_coeff)
 
@@ -304,7 +304,7 @@ plt.plot(tdata, ddata, 'b-', label='data')
 plt.xlim(xmin = 0, xmax = end - start)
 plt.ylim(ymax = 1.5, ymin = 0)
 
-sketch_coeff, pcov = curve_fit(func3ck(ck[2]), tdata, ddata, (0.25, 1.5, 0))
+sketch_coeff, pcov = curve_fit(func3ck(ck[2]), tdata, ddata, (0.3, 1.5, 0))
 # sketch_coeff = (0.25, 1.5, 0)
 print("sketch coefficients (l, a1, a2)")
 print(sketch_coeff)
@@ -318,13 +318,13 @@ plt.show()
 """
 # Sudden Concept Drift: Index
 """
-label = ['oKDE', 'SPDTw', 'D-Sketch']
+label = ['oKDE', 'SPDTw', 'FlexSketch']
 color = [m.to_rgba(210), m.to_rgba(120), m.to_rgba(50)]
 hl = [3, 35, 45]
 l = [okde_coeff[0], spdtw_coeff[0], sketch_coeff[0]]
 om = [c2w(l[i], ck[i]) for i in range(0, 3)]
 tau1 = [1 / (l[i] + om[i]) for i in range(0, 3)]
-tau2 = [1 / (l[i] - om[i]) for i in range(0, 3)]
+tau2 = [190, 41, 36]
 data1 = [hl]
 data2 = [tau2]
 
@@ -336,7 +336,7 @@ print("tau2: " + ', '.join(str(x) for x in tau2))
 fig, (ax1, ax2) = plt.subplots(figsize=(5.5, 5), ncols=2)
 plt.subplots_adjust(wspace=0.0, hspace=0.0)
 
-barplot.bar_plot(ax1, data1, label, color, (0, 90.0), fontsize=fontsize, legend=True, legendloc=1)
+barplot.bar_plot(ax1, data1, label, color, (0, 95.0), fontsize=fontsize, legend=True, legendloc=1)
 ax1.set_ylabel('Half-life ($t_{1/2}$)')
 ax1.set_xlabel(' ')
 ax1.set_xticklabels([])
@@ -378,31 +378,31 @@ spdt_tdata = list(map(lambda d: d[0], spdt_ed_data))
 spdt_ddata = list(map(lambda d: d[1] - 0.8 * normal_ed[1], spdt_ed_data))
 
 fig, (ax1, ax2) = plt.subplots(figsize=(5.5, 5), ncols=2)
-plt.subplots_adjust(wspace=0.05, hspace=0.0)
+plt.subplots_adjust(wspace=0.0, hspace=0.0)
 distplot(ax1, [okde_tdata, spdt_tdata, sketch_tdata], [okde_ddata, spdt_ddata, sketch_ddata], color, label, ['--', '-.', '-'])
 distplot(ax2, [okde_tdata, spdt_tdata, sketch_tdata], [okde_ddata, spdt_ddata, sketch_ddata], color, label, ['--', '-.', '-'])
 
-ax1.set_xlim(xmin=250, xmax=400)
+ax1.set_xlim(xmin=250, xmax=410)
 ax1.set_ylim(ymin=0, ymax=1.3)
 ax2.set_xlim(xmin=650, xmax=800)
 ax2.set_ylim(ymin=0, ymax=0.1)
-ax1.set_ylabel("Statistical distance ($D_{\Delta})$")
-fig.text(0.5, 0.02, 'Timestamp ($t$)', ha='center')
+ax1.set_ylabel("Error ($\delta$)")
+fig.text(0.5, 0.005, 'Timestamp ($t$)', ha='center')
 ax1.xaxis.set_ticks([300, 400])
 ax2.xaxis.set_ticks([700, 800])
 ax2.yaxis.set_label_position("right")
 ax2.yaxis.tick_right()
-ax2.legend(edgecolor='black', fancybox=False)
+ax2.legend(edgecolor='black', fancybox=False, fontsize=fontsize*0.9)
 
-d = .015
-kwargs = dict(transform=ax1.transAxes, color='black', clip_on=False, linewidth=1.0)
-ax1.plot((1-d,1+d),(1-d,1+d), **kwargs)
-ax1.plot((1-d,1+d),(-d,+d), **kwargs)
-ax1.spines['right'].set_visible(False)
-kwargs.update(transform=ax2.transAxes)
-ax2.plot((-d,+d),(1-d,1+d), **kwargs)
-ax2.plot((-d,+d),(-d,+d), **kwargs)
-ax2.spines['left'].set_visible(False)
+# d = .015
+# kwargs = dict(transform=ax1.transAxes, color='black', clip_on=False, linewidth=1.0)
+# ax1.plot((1-d,1+d),(1-d,1+d), **kwargs)
+# ax1.plot((1-d,1+d),(-d,+d), **kwargs)
+# ax1.spines['right'].set_visible(False)
+# kwargs.update(transform=ax2.transAxes)
+# ax2.plot((-d,+d),(1-d,1+d), **kwargs)
+# ax2.plot((-d,+d),(-d,+d), **kwargs)
+# ax2.spines['left'].set_visible(False)
 
 
 update_name = 'sudden-cd-dist'
@@ -429,22 +429,22 @@ sketch_data_raw = { d[0]: d[1] for d in prep.data(data_loc, 2) }
 """
 # Blip Concept Drift: Index Plot
 """
-label = ['oKDE', 'SPDTw', 'D-Sketch']
+label = ['oKDE', 'SPDTw', 'FlexSketch']
 color = [m.to_rgba(210), m.to_rgba(120), m.to_rgba(50)]
 edst = [okde_data_raw[start], spdt_data_raw[start], sketch_data_raw[start]]
 edfn = [okde_data_raw[end], spdt_data_raw[end], sketch_data_raw[end]]
 dur = end - start
 vols = [((edfn[i] - edst[i]) / dur) for i in range(len(edst))]
 
-print("volatility: " + ', '.join(map(str, vols)))
+print("Instability: " + ', '.join(map(str, vols)))
 
 fig, ax = plt.subplots(figsize=figsizex1)
 barplot.bar_plot(ax, [vols], label, color, (0, 0.35), fontsize=fontsize)
 
-ax.set_ylabel('Volatility ($\sigma$)')
+ax.set_ylabel('Instability ($\sigma$)')
 ax.set_xlabel(' ')
 ax.tick_params(axis='x', which='both', bottom=False, top=False)
-ax.tick_params(axis='y', labelsize=fontsize * 0.85)
+ax.tick_params(axis='y', labelsize=fontsize * tickscale)
 ax.set_xticklabels([])
 ax.set_xlim((-bw / 2 - margin, bw * (len(data[0]) - 0.5) + margin))
 
@@ -477,11 +477,11 @@ distplot(ax, [okde_tdata, spdt_tdata, sketch_tdata], [okde_ddata, spdt_ddata, sk
 
 plt.xlim(xmin=start, xmax=end)
 plt.ylim(ymin=0)
-plt.ylabel('Statistical distance ($D_{\Delta})$')
+plt.ylabel('Error ($\delta$)')
 plt.xlabel('Timestamp ($t$)')
-ax.tick_params(axis='x', which='both', top=False, labelsize=fontsize * 0.85)
-ax.tick_params(axis='y', labelsize=fontsize * 0.85)
-ax.legend(edgecolor='black', fancybox=False, loc=2)
+ax.tick_params(axis='x', which='both', top=False, labelsize=fontsize * tickscale)
+ax.tick_params(axis='y', labelsize=fontsize * tickscale)
+ax.legend(edgecolor='black', fancybox=False, loc=2, fontsize=fontsize*0.9)
 
 update_name = 'blip-cd-dist'
 plt.savefig(out_prefix + update_name + '.pdf', bbox_inches='tight')
