@@ -1,4 +1,4 @@
-package flip
+package flex
 
 import sbt._
 import sbt.Keys.libraryDependencies
@@ -37,12 +37,16 @@ object Dependencies {
     "org.openjdk.jol" % "jol-core" % Versions.jol
   )
 
+  val csv = Seq(
+    "com.github.tototoshi" %% "scala-csv" % Versions.csv
+  )
+
   // project dependencies
 
   val core = libraryDependencies ++= (cats ++ monixs ++ specs ++ tics ++ math)
 
   val chain = libraryDependencies ++= (cats ++ monixs ++ specs ++ tics ++ math)
 
-  val bench = libraryDependencies ++= (specs ++ tics ++ datetime ++ jol)
+  val bench = libraryDependencies ++= (specs ++ tics ++ datetime ++ jol ++ csv)
 
 }

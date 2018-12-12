@@ -1,0 +1,42 @@
+options:
+
+  # Documentation Menu
+
+  - title: Documentation
+    url: docs/
+    menu_type: docs
+
+  - title: Numeric Distributions
+    url: docs/numericdistributions.html
+    menu_type: docs
+
+  - title: Sketch
+    url: docs/sketch.html
+    menu_type: docs
+
+  # Experiment Menu
+
+  - title: Experiments
+    url: experiments/
+    menu_type: experiments
+
+  - title: Performance on Parameters
+    url: experiments/parameters.html
+    menu_type: experiments
+
+  - title: Benchmark
+    url: experiments/benchmark.html
+    menu_type: experiments
+
+  - title: Accuracy on Data Streams
+    url: experiments/accuracy.html
+    menu_type: experiments
+    menu_section: accuracy
+
+    nested_options:
+     - title: Stationary Case
+       url: experiments/accuracyonstat.html
+       menu_section: accuracy
+     - title: Non-stationary Case
+       url: experiments/accuracyonnonstat.html
+       menu_section: accuracy

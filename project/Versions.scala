@@ -1,4 +1,4 @@
-package flip
+package flex
 
 object Versions {
 
@@ -17,5 +17,7 @@ object Versions {
   val commonsMath3 = "3.6.1"
 
   val jol = "0.9"
+
+  val csv = "1.3.5"
 
 }

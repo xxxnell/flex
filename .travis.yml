@@ -1,10 +1,10 @@
 language: scala
 
 scala:
-  - 2.12.4
+  - 2.12.8
 
 jdk:
-  - oraclejdk8
+  - openjdk8
 
 env:
   global:
@@ -20,6 +20,7 @@ script:
   - bash scripts/build.sh
 
 after_success:
+  - bash scripts/publish.sh
   - bash <(curl -s https://codecov.io/bash)
 
 notifications:

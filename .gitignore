@@ -4,5 +4,5 @@ __pycache__
 *.log
 *.plist
 target
-flip-bench/benchmarks
-flip-bench/experiments
+flex-bench/benchmarks
+flex-bench/experiments

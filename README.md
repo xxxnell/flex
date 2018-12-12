@@ -1,12 +1,12 @@
-# Flip 🎲
+# Flex
 
-[![Build Status](https://travis-ci.org/xxxnell/flip.svg?branch=master)](https://travis-ci.org/xxxnell/flip)
-[![codecov](https://codecov.io/gh/xxxnell/flip/branch/master/graph/badge.svg)](https://codecov.io/gh/xxxnell/flip)
-[![Waffle.io - Columns and their card count](https://badge.waffle.io/xxxnell/flip.svg?columns=to%20do)](https://waffle.io/xxxnell/flip)
-[![Latest version](https://index.scala-lang.org/xxxnell/flip/flip/latest.svg)](https://index.scala-lang.org/xxxnell/flip/flip)
+[![Build Status](https://travis-ci.org/xxxnell/flex.svg?branch=master)](https://travis-ci.org/xxxnell/flex)
+[![codecov](https://codecov.io/gh/xxxnell/flex/branch/master/graph/badge.svg)](https://codecov.io/gh/xxxnell/flex)
+[![Waffle.io - Columns and their card count](https://badge.waffle.io/xxxnell/flex.svg?columns=to%20do)](https://waffle.io/xxxnell/flex)
+[![Latest version](https://index.scala-lang.org/xxxnell/flex/flex/latest.svg)](https://index.scala-lang.org/xxxnell/flex/flex)
 
 
-*Flip* is *F*ast, *L*ightweight pure-functional library for *I*nformation theory and *P*robability distribution. *Flip* aims to extract and process statistical features of the input data stream in a short time using only small memory. It has the following features:
+*Flex* is fast and lightweight probability tools for a dataset and a data stream. Flex aims to extract and process statistical features of the input data stream in a short time using only small memory. It has the following features:
 
 * Estimate and summarize probability distributions with high speed and high accuracy using only limited memory for both stationary and non-stationary data streams
 * Combine several probability distributions by using probability monad
@@ -16,21 +16,27 @@
 
 ## Getting Started
 
-*Flip* is published to Maven Central and built for Scala 2.12, so you can add the following to your `build.sbt`:
+Flex is published to Maven Central and built for Scala 2.12, so you can add the following to your `build.sbt`:
 
 ``` scala
-libraryDependencies += "com.xxxnell" %% "flip" % "0.0.4"
+libraryDependencies += "com.xxxnell" %% "flex" % "0.0.4"
+```
+
+Then, you need to `import` the context of Flex.
+
+``` scala
+import flex.implicits._
 ```
 
 
-## Summarizing Random Variable Stream using `Sketch`
+## Summarizing a Data Stream
 
-`Sketch` is the probablistic data structure that quickly measures the probalility density for the real number random variable data stream with limited memory without prior knowledge. Simply put, `Sketch` is a special histogram in which the width of each bin is adaptively adjusted to the input data stream, unlike conventional histograms, which require the user to specify the width and start/end point of the bin. It follows the change of probability distribution, and adapts to the sudden/incremental [concept drift](https://en.wikipedia.org/wiki/Concept_drift). Also, more than two `Sketch` can be combined in monadic way. This is what we call the probability monad in functional programming. `Sketch` is a better alternative to [kernel density estimation](https://en.wikipedia.org/wiki/Kernel_density_estimation) and [histogram](https://en.wikipedia.org/wiki/Histogram) in most cases.
+`Sketch`of Flex is the probablistic data structure that quickly measures the probalility density for the real number random variable data stream with limited memory without prior knowledge. Simply put, `Sketch` is a special histogram in which the width of each bin is adaptively adjusted to the input data stream, unlike conventional histograms, which require the user to specify the width and start/end point of the bin. It follows the change of probability distribution, and adapts to the sudden/incremental [concept drift](https://en.wikipedia.org/wiki/Concept_drift). Also, more than two `Sketch` can be combined in monadic way. This is what we call the probability monad in functional programming. `Sketch` is a better alternative to [kernel density estimation](https://en.wikipedia.org/wiki/Kernel_density_estimation) and [histogram](https://en.wikipedia.org/wiki/Histogram) in most cases.
 
 Here is an example of how `Sketch` estimates the density using the dataset sampled from the standard normal distribution.
 
 ``` scala 
-import flip.implicits._
+import flex.implicits._
 
 // get 100 random variables from standard normal distribution
 val underlying = NumericDist.normal(0.0, 1.0)
@@ -58,7 +64,7 @@ println(
 Here is an experiment result for a bimodal probabability density function consisting of two standard normal distributions centered at -2 and 2.
 
 <p align="center">
-  <img width="460" height="350" src="./flip-docs/resources/experiments/basic-bimodal-histo.gif">
+<img src="https://xxxnell.github.io/flex/img/experiments/basic-bimodal-histo.gif" style="max-width: 600px; width: 100%;">
 </p>
 
 
@@ -70,24 +76,24 @@ In this figure, the dashed orange line is the expected underlying probability di
 `Sketch` also adapts to any types of concept drift successfully. Here is an experiment result under the situation where the distribution that `Sketch` is supposed to estimate is incrementally changing over time. The underlying distribution starts to change when the update count come to 300 and moves by +0.01 per one update count. `Sketch` is good at predicting this moving distribution, although there is some lag. Also this lag can be reduced by adjusting the sensitivity to new data.
 
 <p align="center">
-  <img width="460" height="350" src="./flip-docs/resources/experiments/incremental-cd-normal-pdf.gif">
+<img src="https://xxxnell.github.io/flex/img/experiments/incremental-cd-normal-pdf.gif" style="max-width: 600px; width: 100%;"/>
 </p>
 
-In all of these experiments, I did not provide any prior knowledge to predict the underlying distirbution accurately. It works precisely with the default configuration. For more example, see the [experiment](./flip-docs/experiment.md) documentation. If you want to learn how to use `Sketch` in a real world, see the [code for these experiments](./flip-bench/src/main/scala/flip/experiment).
+In all of these experiments, I did not provide any prior knowledge to predict the underlying distirbution accurately. It works precisely with the default configuration. For more example, see the experiment documentation. If you want to learn how to use `Sketch` in a real world, see the [code for these experiments](https://github.com/xxxnell/flex/tree/master/flex-bench/src/main/scala/flex/experiment).
 
 
 ## Contributing
 
-Contributions are always welcome. Any kind of contribution, such as writing a unit test, documentation, bug fix, or implementing [the density estimation algorithm of `Sketch`](./flip-docs/algorithm.md) in another language, is helpful. If you need some help, please contact me via [email](mailto:xxxxxnell@gmail.com) or [twitter](https://twitter.com/xxxnell).
+Contributions are always welcome. Any kind of contribution, such as writing a unit test, documentation, bug fix, or implementing the density estimation algorithm of `Sketch` in another language, is helpful. If you need some help, please contact me via [email](mailto:xxxxxnell@gmail.com) or [twitter](https://twitter.com/xxxnell).
 
-The `master` branch of this repository contains the latest stable release of *Flip*. In general, pull requests should be submitted from a separate `feature` branch starting from the `develop` branch. 
+The `master` branch of this repository contains the latest stable release of Flex. In general, pull requests should be submitted from a separate `feature` branch starting from the `develop` branch. 
 
-Fo more detail, see the [contributing](./CONTRIBUTING.md) documentation.
+Fo more detail, see the contributing documentation.
 
 
 ## License
 
-All code of *Flip* is available to you under the [MIT license](./LICENSE). 
+All code of Flex is available to you under the MIT license. 
 
 Copyright the maintainers.
 
