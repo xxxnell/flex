@@ -1,4 +1,4 @@
-package flex.experiment
+package flex.experiment.core
 
 object GettingStartedExp {
 

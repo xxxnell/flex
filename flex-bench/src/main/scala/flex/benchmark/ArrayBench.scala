@@ -20,14 +20,14 @@ class ArrayBench {
 
   // variables
 
-  var rowNdarray: INDArray = _
+  var x: INDArray = _
 
-  var colNdarray: INDArray = _
+  var xt: INDArray = _
 
   @Setup
   def setup(): Unit = {
-    rowNdarray = Nd4j.ones(dim)
-    colNdarray = rowNdarray.transpose()
+    x = Nd4j.ones(dim)
+    xt = x.transpose()
 
     NativeOpsHolder.getInstance.getDeviceNativeOps.setElementThreshold(16384)
     NativeOpsHolder.getInstance.getDeviceNativeOps.setTADThreshold(64)
@@ -35,12 +35,12 @@ class ArrayBench {
 
   @Benchmark
   def add: INDArray = {
-    rowNdarray.add(1)
+    x.add(1)
   }
 
   @Benchmark
   def mul: INDArray = {
-    rowNdarray.mul(colNdarray)
+    x.mul(xt)
   }
 
 }
