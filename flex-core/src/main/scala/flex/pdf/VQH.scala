@@ -49,7 +49,6 @@ trait VQHSyntax {
     def expUpdate(xs: List[(VQH#Codebook, Float)]): (VQH, List[VQH#Codebook], List[VQH#Codebook]) =
       VQH.expUpdate(vqh, xs)
     def parSearch(x: INDArray, i: Int): VQH#Codebook = VQH.parSearch(vqh, x, i)
-    def diagnose: Float = VQH.diagnose(vqh)
   }
 
 }
