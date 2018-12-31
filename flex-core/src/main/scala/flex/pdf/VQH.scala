@@ -4,10 +4,12 @@ import org.nd4j.linalg.api.ndarray.INDArray
 
 trait VQH {
 
+  type Codebook = List[INDArray]
+
   /**
     * codebook-vectors
     * */
-  val cs: Vector[INDArray]
+  val cs: Vector[Codebook]
 
   /**
     * counts
@@ -21,21 +23,32 @@ trait VQH {
 
 }
 
-trait VQHOps {
+trait VQHOps extends VQHLaws {
 
-  def update(vqh: VQH, xs: List[(INDArray, Float)]): VQH = ???
+  /**
+    * Update partial input vectors with its indices.
+    * @return (Updated VQH, new codebook-vectors, out codebook-vectors)
+    * */
+  def parUpdate(vqh: VQH, xs: List[(INDArray, Int, Float)]): (VQH, List[VQH#Codebook], List[VQH#Codebook]) = ???
 
-  def search(vqh: VQH, x: INDArray): INDArray = ???
+  def expUpdate(vqh: VQH, xs: List[(VQH#Codebook, Float)]): (VQH, List[VQH#Codebook], List[VQH#Codebook]) = ???
 
-  def diagnose(vqh: VQH): Float = ???
+  def parSearch(vqh: VQH, x: INDArray, i: Int): VQH#Codebook = ???
+
+}
+
+trait VQHLaws { self: VQHOps =>
 
 }
 
 trait VQHSyntax {
 
   implicit class VQHSyntaxImpl(vqh: VQH) {
-    def update(xs: List[(INDArray, Float)]): VQH = VQH.update(vqh, xs)
-    def search(x: INDArray): INDArray = VQH.search(vqh, x)
+    def parUpdate(xs: List[(INDArray, Int, Float)]): (VQH, List[VQH#Codebook], List[VQH#Codebook]) =
+      VQH.parUpdate(vqh, xs)
+    def expUpdate(xs: List[(VQH#Codebook, Float)]): (VQH, List[VQH#Codebook], List[VQH#Codebook]) =
+      VQH.expUpdate(vqh, xs)
+    def parSearch(x: INDArray, i: Int): VQH#Codebook = VQH.parSearch(vqh, x, i)
     def diagnose: Float = VQH.diagnose(vqh)
   }
 
@@ -45,7 +58,7 @@ object VQH extends VQHOps {
 
   object syntax extends VQHSyntax
 
-  private case class VQHImpl(cs: Vector[INDArray], ns: Vector[Float], ps: Vector[Float]) extends VQH
+  private case class VQHImpl(cs: Vector[List[INDArray]], ns: Vector[Float], ps: Vector[Float]) extends VQH
 
   def apply(): VQH = ???
 

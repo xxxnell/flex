@@ -2,8 +2,8 @@ package flex.chain.monad
 
 import flex.implicits._
 import flex.pdf.NormalDist
-import flex.chain.{Fiber, Model, Sink}
-import flex.chain.Fiber.syntax._
+import flex.chain.{Complex, Model, Sink}
+import flex.chain.Complex.syntax._
 import org.specs2.mutable._
 import org.specs2.ScalaCheck
 

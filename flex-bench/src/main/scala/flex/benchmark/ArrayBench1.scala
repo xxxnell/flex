@@ -11,7 +11,7 @@ import org.openjdk.jmh.annotations._
 @BenchmarkMode(Array(Mode.AverageTime))
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @State(Scope.Thread)
-class ArrayBench {
+class ArrayBench1 {
 
   // parameters
 
@@ -31,8 +31,8 @@ class ArrayBench {
     x = Nd4j.ones(dim)
     xt = x.transpose()
 
-    NativeOpsHolder.getInstance.getDeviceNativeOps.setElementThreshold(16384)
-    NativeOpsHolder.getInstance.getDeviceNativeOps.setTADThreshold(64)
+//    NativeOpsHolder.getInstance.getDeviceNativeOps.setElementThreshold(16384)
+//    NativeOpsHolder.getInstance.getDeviceNativeOps.setTADThreshold(64)
   }
 
   @Benchmark
