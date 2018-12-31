@@ -41,9 +41,14 @@ object Dependencies {
     "com.github.tototoshi" %% "scala-csv" % Versions.csv
   )
 
+  val nd4j = Seq(
+    "org.nd4j" % "nd4j-native-platform" % Versions.nd4j
+//    "org.nd4j" % "nd4j-cuda-9.2-platform" % Versions.nd4j
+  )
+
   // project dependencies
 
-  val core = libraryDependencies ++= (cats ++ monixs ++ specs ++ tics ++ math)
+  val core = libraryDependencies ++= (cats ++ monixs ++ specs ++ tics ++ math ++ nd4j)
 
   val chain = libraryDependencies ++= (cats ++ monixs ++ specs ++ tics ++ math)
 

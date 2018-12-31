@@ -1,4 +1,4 @@
-package flex.experiment
+package flex.experiment.core
 
 import flex.experiment.ops.ExpOutOps
 import flex.implicits._

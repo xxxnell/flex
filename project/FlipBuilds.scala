@@ -12,7 +12,9 @@ object FlexBuilds {
   )
 
   val defaultSettings = Seq(
-    resolvers ++= typesafeRepo
+    resolvers ++= typesafeRepo,
+    javaOptions in run += "-Dorg.bytedeco.javacpp.openblas.load=mkl_rt",
+    javaOptions in test += "-Dorg.bytedeco.javacpp.openblas.load=mkl_rt"
   )
 
 }

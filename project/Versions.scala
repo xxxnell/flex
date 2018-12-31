@@ -20,4 +20,6 @@ object Versions {
 
   val csv = "1.3.5"
 
+  val nd4j = "1.0.0-beta3"
+
 }

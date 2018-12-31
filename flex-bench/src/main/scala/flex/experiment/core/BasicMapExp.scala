@@ -1,8 +1,8 @@
-package flex.experiment
+package flex.experiment.core
 
-import flex.implicits._
 import flex.chain.implicits._
 import flex.experiment.ops.ExpOutOps
+import flex.implicits._
 
 object BasicMapExp {
 

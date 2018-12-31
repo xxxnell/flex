@@ -1,10 +1,10 @@
-package flex.experiment
+package flex.experiment.core
 
-import flex.{Params, Profiler}
 import flex.conf.pdf.AdaSelSketchConf
 import flex.experiment.ops._
 import flex.implicits._
 import flex.rand.IRng
+import flex.{Params, Profiler}
 
 object ConfExp {
 

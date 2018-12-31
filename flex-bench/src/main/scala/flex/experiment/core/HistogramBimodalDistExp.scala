@@ -1,38 +1,40 @@
-package flex.experiment
+package flex.experiment.core
 
 import flex.conf.pdf.{CustomDataBinningDistConf, DataBinningDistConf}
-import flex.implicits._
 import flex.experiment.ops.ExpOutOps
+import flex.implicits._
 import flex.pdf.Histogram
 
 /**
   * A experiment to compare with sketch and histogram.
   * */
-object HistogramLognormalDistExp { self =>
+object HistogramBimodalDistExp { self =>
 
   def main(args: Array[String]): Unit = {
-    val expName = "histogram-lognormal"
+    val expName = "histogram-bimodal"
     val sampleNo = 1000
-    val underlying = NumericDist.logNormal(0.0, 1)
+    val underlying = { (0.5, NumericDist.normal(-2.0, 1)) + (0.5, NumericDist.normal(2.0, 1)) }
     val (_, datas) = underlying.samples(sampleNo)
-    val start = 0.0
+    val start = underlying.icdf(0.05)
     val end = underlying.icdf(0.95)
 
-    implicit val histoConf: DataBinningDistConf = CustomDataBinningDistConf(
-      cmapStart = Some(start),
-      cmapEnd = Some(end)
-    )
-    val emptyHisto = Histogram.empty[Double]
+    val emptyHisto = {
+      implicit val histoConf: DataBinningDistConf = CustomDataBinningDistConf(
+        cmapStart = Some(start),
+        cmapEnd = Some(end)
+      )
+      Histogram.empty[Double]
+    }
 
     // update datas
     val histoTraces = emptyHisto :: emptyHisto.updateTrace(datas)
     val idxHistos = histoTraces.indices.zip(histoTraces).toList.filter { case (idx, _) => idx % 10 == 0 }
 
     // histogram results
-    val idxPdf = idxHistos.map { case (idx, hist) => (idx, hist.barPlot) }
-    val idxKld = idxHistos.map { case (idx, hist) => (idx, KLD(underlying, hist)) }
-    val idxCos = idxHistos.map { case (idx, hist) => (idx, Cosine(underlying, hist)) }
-    val idxEuc = idxHistos.map { case (idx, hist) => (idx, Euclidean(underlying, hist)) }
+    val idxPdf = idxHistos.map { case (idx, histo) => (idx, histo.barPlot) }
+    val idxKld = idxHistos.map { case (idx, utdSkt) => (idx, KLD(underlying, utdSkt)) }
+    val idxCos = idxHistos.map { case (idx, utdSkt) => (idx, Cosine(underlying, utdSkt)) }
+    val idxEuc = idxHistos.map { case (idx, utdSkt) => (idx, Euclidean(underlying, utdSkt)) }
 
     ExpOutOps.clear(expName)
 
