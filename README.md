@@ -1,4 +1,4 @@
-# Flex
+# Chain
 
 [![Build Status](https://travis-ci.org/xxxnell/flex.svg?branch=master)](https://travis-ci.org/xxxnell/flex)
 [![codecov](https://codecov.io/gh/xxxnell/flex/branch/master/graph/badge.svg)](https://codecov.io/gh/xxxnell/flex)
@@ -6,94 +6,62 @@
 [![Latest version](https://index.scala-lang.org/xxxnell/flex/flex/latest.svg)](https://index.scala-lang.org/xxxnell/flex/flex)
 
 
-*Flex* is fast and lightweight probability tools for a dataset and a data stream. Flex aims to extract and process statistical features of the input data stream in a short time using only small memory. It has the following features:
+Chain is a probabilistic deep learning library for data streams. Neural networks has been widely used for solving problems in many areas. However, classical neural networks have some limitations when you want to include uncertainties in the model. For example, if input data and training data contain a lot of noise, and if false-positive or false-negative needs to be detected, the model should represent how reliable the input and the output are. Probabilistic deep learning, also known as the Bayesian neural network, is a way to treat both input and output as a probability distribution and it is one of  the best approach to represent uncertainties. However, the Bayesian neural network is computationally slow, which is a significant drawback. Chain is fast enough to apply the Bayesian neural network to real-world problems. It has the following features:
 
-* Estimate and summarize probability distributions with high speed and high accuracy using only limited memory for both stationary and non-stationary data streams
-* Combine several probability distributions by using probability monad
-* Generate random variables from many predefined and estimated probability disributions 
-* Measure similarity between two probability distribution using various (generalized) statistical distances (e.g., Kullback–Leibler divergence)
+* Feedforward propagation
+* Fast and lightweight probability tools for a dataset and a data stream
+	* Pre-defined numeric probabilities (e.g. normal distribution, log-normal distribution)
+	* Density estimation for high-dimensional datasets and data streams
 
 
 ## Getting Started
 
-Flex is published to Maven Central and built for Scala 2.12, so you can add the following to your `build.sbt`:
+**WIP**. Chain is published to Maven Central and built for Scala 2.12, so you can add the following to your `build.sbt`:
 
 ``` scala
-libraryDependencies += "com.xxxnell" %% "flex" % "0.0.4"
+libraryDependencies += "com.xxxnell" %% "flex-core" % "0.0.5"
+libraryDependencies += "com.xxxnell" %% "flex-chain" % "0.0.5"
 ```
 
-Then, you need to `import` the context of Flex.
+Then, you need to `import` the context of Chain.
 
 ``` scala
 import flex.implicits._
+import flex.chain.implicits._
 ```
 
 
-## Summarizing a Data Stream
+## Building a Model
 
-`Sketch`of Flex is the probablistic data structure that quickly measures the probalility density for the real number random variable data stream with limited memory without prior knowledge. Simply put, `Sketch` is a special histogram in which the width of each bin is adaptively adjusted to the input data stream, unlike conventional histograms, which require the user to specify the width and start/end point of the bin. It follows the change of probability distribution, and adapts to the sudden/incremental [concept drift](https://en.wikipedia.org/wiki/Concept_drift). Also, more than two `Sketch` can be combined in monadic way. This is what we call the probability monad in functional programming. `Sketch` is a better alternative to [kernel density estimation](https://en.wikipedia.org/wiki/Kernel_density_estimation) and [histogram](https://en.wikipedia.org/wiki/Histogram) in most cases.
+We will use 3 hiddel layers with 10 neurons each.
 
-Here is an example of how `Sketch` estimates the density using the dataset sampled from the standard normal distribution.
-
-``` scala 
-import flex.implicits._
-
-// get 100 random variables from standard normal distribution
-val underlying = NumericDist.normal(0.0, 1.0)
-val (_, samples) = underlying.samples(100)
-
-// update samples to sketch
-val sketch0 = Sketch.empty[Double]
-val sketch1 = samples.foldLeft(sketch0) {
-  case (sketch, sample) => sketch.update(sample)
-}
-
-// analyze sketch
-println(
-  s"Estimated Pr(0.0 ≤ x ≤ 1.0): ${sketch1.probability(0.0, 1.0)}, " +
-    s"Expected Pr(0.0 ≤ x ≤ 1.0): ${underlying.probability(0.0, 1.0)}\n" +
-    s"Estimated median: ${sketch1.median}, expected median: 0.0 \n" +
-    s"Sample from sketch: ${sketch1.sample._2} \n" +
-    s"KL-divergence: ${KLD(underlying, sketch1)}"
-)
+``` scala
+val (d0, l1, l2, l3) = (784, 10, 10, 1)
+val model = Complex.empty
+  .add(Nd4j.zeros(d0), Nd4j.ones(d0))
+  .add(Nd4j.zeros(d0 * l1), Nd4j.ones(d0 * l1))
+  .add(Nd4j.zeros(l1 * l2), Nd4j.ones(l1 * l2))
+  .add(Nd4j.zeros(l2 * l3), Nd4j.ones(l2 * l3))
+  .map { case x1 :: z1 :: rem => x1.mmul(z1.reshape(d0, l1)).tanh :: rem }
+  .map { case h1 :: z2 :: rem => h1.mmul(z2.reshape(l1, l2)).tanh :: rem }
+  .map { case h2 :: z3 :: rem => h2.mmul(z3.reshape(l2, l3)) :: rem }
 ```
 
-
-### The case of bimodal distribution
-
-Here is an experiment result for a bimodal probabability density function consisting of two standard normal distributions centered at -2 and 2.
-
-<p align="center">
-<img src="https://xxxnell.github.io/flex/img/experiments/basic-bimodal-histo.gif" style="max-width: 600px; width: 100%;">
-</p>
-
-
-In this figure, the dashed orange line is the expected underlying probability distribution, and the blue bar is the probability distribution that `Sketch` estimates. `Sketch` assumes an initial bin with a uniform width, and estimates the first optimal bin at the update count of 50. Then `Sketch` estimates new bins every 100 data updates, for example, 50, 150, 250, and so on.
-
-
-### The case of concept drift
-
-`Sketch` also adapts to any types of concept drift successfully. Here is an experiment result under the situation where the distribution that `Sketch` is supposed to estimate is incrementally changing over time. The underlying distribution starts to change when the update count come to 300 and moves by +0.01 per one update count. `Sketch` is good at predicting this moving distribution, although there is some lag. Also this lag can be reduced by adjusting the sensitivity to new data.
-
-<p align="center">
-<img src="https://xxxnell.github.io/flex/img/experiments/incremental-cd-normal-pdf.gif" style="max-width: 600px; width: 100%;"/>
-</p>
-
-In all of these experiments, I did not provide any prior knowledge to predict the underlying distirbution accurately. It works precisely with the default configuration. For more example, see the experiment documentation. If you want to learn how to use `Sketch` in a real world, see the [code for these experiments](https://github.com/xxxnell/flex/tree/master/flex-bench/src/main/scala/flex/experiment).
+First, construct an empty model using `Complex.empty`. Second, `add` the variables to be used for this neural network. Here, a prior probabilities of these variables are normal distributions with a mean of zero and a variance of one. Third, define a transformation of each layers using `map` operation. In this example, `tanh` was used as the activator.
 
 
 ## Contributing
 
-Contributions are always welcome. Any kind of contribution, such as writing a unit test, documentation, bug fix, or implementing the density estimation algorithm of `Sketch` in another language, is helpful. If you need some help, please contact me via [email](mailto:xxxxxnell@gmail.com) or [twitter](https://twitter.com/xxxnell).
+Contributions are always welcome. Any kind of contribution, such as writing a unit test, documentation, bug fix, or implementing the algorithm of Chain in another language, is helpful. If you need some help, please contact me via [email](mailto:xxxxxnell@gmail.com) or [twitter](https://twitter.com/xxxnell).
 
-The `master` branch of this repository contains the latest stable release of Flex. In general, pull requests should be submitted from a separate `feature` branch starting from the `develop` branch. 
+The `master` branch of this repository contains the latest stable release of Chain. In general, pull requests should be submitted from a separate `feature` branch starting from the `develop` branch. 
 
 Fo more detail, see the contributing documentation.
 
 
 ## License
 
-All code of Flex is available to you under the MIT license. 
+All code of Chain is available to you under the MIT license. 
 
 Copyright the maintainers.
 
