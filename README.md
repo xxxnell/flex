@@ -6,7 +6,7 @@
 [![Latest version](https://index.scala-lang.org/xxxnell/flex/flex/latest.svg)](https://index.scala-lang.org/xxxnell/flex/flex)
 
 
-Chain is a probabilistic deep learning library for data streams. Neural networks has been widely used for solving problems in many areas. However, classical neural networks have some limitations when you want to include uncertainties in the model. For example, if input data and training data contain a lot of noise, and if false-positive or false-negative needs to be detected, the model should represent how reliable the input and the output are. Probabilistic deep learning, also known as the Bayesian neural network, is a way to treat both input and output as a probability distribution and it is one of  the best approach to represent uncertainties. However, the Bayesian neural network is computationally slow, which is a significant drawback. Chain is fast enough to apply the Bayesian neural network to real-world problems. It has the following features:
+Chain is a probabilistic deep learning library for data streams. Today, neural networks have been widely used for solving problems in many areas. However, classical neural networks have some limitations when you want to include uncertainties in the model. For example, suppose that input data and training data contain a lot of noise. If you need to detect whether the data contains false-positive or false-negative, the model should represent how reliable the input and the output are. To deal with this issue, probabilistic deep learning, also known as the Bayesian neural network, can be used. It is a way to treat both input and output as a probability distribution and it is one of the best approaches to represent uncertainties. However, the Bayesian neural network is so computationally slow that it cannot be readily applied to the real-world problems. Chain is fast enough to make it possible to apply the Bayesian neural network to the real-world problems. It has the following features:
 
 * Feedforward propagation
 * Fast and lightweight probability tools for a dataset and a data stream
@@ -19,8 +19,10 @@ Chain is a probabilistic deep learning library for data streams. Neural networks
 **WIP**. Chain is published to Maven Central and built for Scala 2.12, so you can add the following to your `build.sbt`:
 
 ``` scala
-libraryDependencies += "com.xxxnell" %% "flex-core" % "0.0.5"
-libraryDependencies += "com.xxxnell" %% "flex-chain" % "0.0.5"
+libraryDependencies ++= Seq(
+  "com.xxxnell" %% "flex-core",
+  "com.xxxnell" %% "flex-chain"
+).map(_ % "0.0.5")
 ```
 
 Then, you need to `import` the context of Chain.
