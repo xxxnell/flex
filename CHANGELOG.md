@@ -2,7 +2,14 @@
 
 ## 0.0.x
 
-This version is a experimental section to try various features and interfaces of flex. 
+This version is a experimental section to try various features and interfaces of Flex. 
+
+### 0.0.5
+
+We mainly focused to build `flex-chain` in this version. The `flex-chain` computes Bayesian neural network (a.k.a. probabilistic deep learning) at high speed for the data stream.
+
+* Change the name of the project from Flip to Flex
+
 
 ### [0.0.4](https://github.com/xxxnell/flex/tree/v0.0.4)
 
