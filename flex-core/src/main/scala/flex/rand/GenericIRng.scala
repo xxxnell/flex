@@ -35,7 +35,7 @@ trait IRngSyntax {
 
 object IRng extends IRngOps {
 
-  case class IRngImpl(seed: Seed) extends IRng
+  private case class IRngImpl(seed: Seed) extends IRng
 
   def apply(seed: Int): IRng = bare(seed.toLong)
 
