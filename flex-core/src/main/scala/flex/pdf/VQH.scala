@@ -44,10 +44,13 @@ trait VQHOps {
   def parUpdate(vqh: VQH, xps: List[(INDArray, Int, Float)]): (VQH, List[VQH#Codebook], List[VQH#Codebook]) = {
     xps.foldLeft((vqh, List.empty[VQH#Codebook], List.empty[VQH#Codebook])) {
       case ((_vqh, _newcs, _outcs), (x, a, w)) =>
-        val (vqh1, newcs1, outcs1) = parSearch(vqh, x, a).map { case (c, n, i) =>
-          lazy val cnew = c.zipWithIndex.map { case (cp, b) => if (a == b) x else diffusion(cp) }
-          singleUpdate(_vqh, c, n, i, cnew, w)
-        }.getOrElse(vqh, List.empty[VQH#Codebook], List.empty[VQH#Codebook])
+        val (vqh1, newcs1, outcs1) = parSearch(vqh, x, a)
+          .map {
+            case (c, n, i) =>
+              lazy val cnew = c.zipWithIndex.map { case (cp, b) => if (a == b) x else diffusion(cp) }
+              singleUpdate(_vqh, c, i, n, cnew, w)
+          }
+          .getOrElse(vqh, List.empty[VQH#Codebook], List.empty[VQH#Codebook])
         (vqh1, newcs1 ++ _newcs, outcs1 ++ _outcs)
     }
   }
@@ -59,16 +62,19 @@ trait VQHOps {
   def expUpdate(vqh: VQH, xs: List[(VQH#Codebook, Float)]): (VQH, List[VQH#Codebook], List[VQH#Codebook]) = {
     xs.foldLeft((vqh, List.empty[VQH#Codebook], List.empty[VQH#Codebook])) {
       case ((_vqh, _newcs, _outcs), (x, w)) =>
-        val (vqh1, newcs1, outcs1) = expSearch(vqh, x).map { case (c, n, i) =>
-          singleUpdate(_vqh, c, n, i, x, w)
-        }.getOrElse(vqh, List.empty[VQH#Codebook], List.empty[VQH#Codebook])
+        val (vqh1, newcs1, outcs1) = expSearch(vqh, x)
+          .map { case (c, n, i) => singleUpdate(_vqh, c, i, n, x, w) }
+          .getOrElse(vqh, List.empty[VQH#Codebook], List.empty[VQH#Codebook])
         (vqh1, newcs1 ++ _newcs, outcs1 ++ _outcs)
     }
   }
 
   def singleUpdate(vqh: VQH,
-                   c: VQH#Codebook, n: Float, i: Int,
-                   cnew: => VQH#Codebook, w: Float): (VQH, List[VQH#Codebook], List[VQH#Codebook]) = {
+                   c: VQH#Codebook,
+                   i: Int,
+                   n: Float,
+                   cnew: => VQH#Codebook,
+                   w: Float): (VQH, List[VQH#Codebook], List[VQH#Codebook]) = {
     // Step A. Increase the count
     val vqh1 = patch(vqh, i, (c, n + w))
 
