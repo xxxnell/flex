@@ -9,8 +9,8 @@ import scala.collection.immutable.NumericRange
 import scala.language.{higherKinds, implicitConversions, reflectiveCalls}
 
 /**
-  * Range for measurable value.
-  */
+ * Range for measurable value.
+ */
 trait RangeM[A] {
   def measure: Measure[A]
   def start: A
@@ -42,32 +42,28 @@ trait RangeMOps[Γ, R[_] <: RangeM[_]] {
 
   def rangeP[A <: Γ](range: R[A]): (Prim, Prim) = (startP(range), endP(range))
 
-  def containsP(start: Prim, end: Prim, p: Prim): Boolean = {
+  def containsP(start: Prim, end: Prim, p: Prim): Boolean =
     ((start >= p) && (end <= p)) ||
-    ((start <= p) && (end >= p))
-  }
+      ((start <= p) && (end >= p))
 
-  def contains[A <: Γ](range: R[A], a: A): Boolean = {
+  def contains[A <: Γ](range: R[A], a: A): Boolean =
     containsP(startP(range), endP(range), range.measure.asInstanceOf[Measure[A]].to(a))
-  }
 
   def greater[A <: Γ](range: R[A], a: A): Boolean = startP(range) > range.measure.asInstanceOf[Measure[A]].to(a)
 
   def less[A <: Γ](range: R[A], a: A): Boolean = endP(range) < range.measure.asInstanceOf[Measure[A]].to(a)
 
-  def divMiddleP(start: Prim, end: Prim): Prim = {
+  def divMiddleP(start: Prim, end: Prim): Prim =
     if (start.isNegInfinity && end.isNegInfinity) Double.NegativeInfinity
     else if (start.isPosInfinity && end.isPosInfinity) Double.PositiveInfinity
     else if (start.isNegInfinity && end.isPosInfinity) Double.NaN
     else start + (end / 2 - start / 2)
-  }
 
-  def cutoffMiddleP(start: Prim, end: Prim): Prim = {
+  def cutoffMiddleP(start: Prim, end: Prim): Prim =
     if (start.isNegInfinity && end.isNegInfinity) Double.NegativeInfinity
     else if (start.isPosInfinity && end.isPosInfinity) Double.PositiveInfinity
     else if (start.isNegInfinity && end.isPosInfinity) Double.NaN
     else start.cutoff + (end.cutoff / 2 - start.cutoff / 2)
-  }
 
   def divMiddle[A <: Γ](range: R[A]): A =
     range.measure.asInstanceOf[Measure[A]].from(divMiddleP(startP(range), endP(range)))
@@ -79,13 +75,11 @@ trait RangeMOps[Γ, R[_] <: RangeM[_]] {
 
   def isPoint(range: R[_]): Boolean = if (range.start == range.end) true else false
 
-  def length[A <: Γ](range: R[A]): BigDecimal = {
+  def length[A <: Γ](range: R[A]): BigDecimal =
     BigDecimal(endP(range)) - BigDecimal(startP(range))
-  }
 
-  def divLength[A <: Γ](range: R[A]): Double = {
+  def divLength[A <: Γ](range: R[A]): Double =
     endP(range) - startP(range)
-  }
 
   def cutoffLength[A <: Γ](range: R[A]): Double = {
     val roughLength = endP(range) - startP(range)
@@ -106,7 +100,7 @@ trait RangeMOps[Γ, R[_] <: RangeM[_]] {
       .toList
       .flatMap {
         case p1 :: p2 :: Nil => Some(setRange(range, measure.from(p1), measure.from(p2)))
-        case _ => None
+        case _               => None
       }
   }
 
@@ -118,9 +112,8 @@ object RangeM extends RangeMOps[Any, RangeM] {
 
   def apply[A](start: A, end: A)(implicit measure: Measure[A]): RangeM[A] = bare(start, end, measure)
 
-  def bare[A](start: A, end: A, measure: Measure[A]): RangeM[A] = {
+  def bare[A](start: A, end: A, measure: Measure[A]): RangeM[A] =
     if (measure(start) < measure(end)) RangeMImpl(start, end, measure) else RangeMImpl(end, start, measure)
-  }
 
   def modifyRange[A](range: RangeM[A], f: (A, A) => (A, A)): RangeM[A] = {
     val (start, end) = f(range.start, range.end)

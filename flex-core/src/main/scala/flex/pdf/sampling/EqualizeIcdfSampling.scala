@@ -4,8 +4,8 @@ import flex.measure.Measure
 import flex.range.RangeM
 
 /**
-  * @see <a href="https://en.wikipedia.org/wiki/Histogram_equalization">Histogram equalization</a>
-  * */
+ * @see <a href="https://en.wikipedia.org/wiki/Histogram_equalization">Histogram equalization</a>
+ * */
 object EqualizeIcdfSampling extends IcdfSampling[EqualizeIcdfSamplingConf] {
 
   def sampling[A](icdf: Double => A, measure: Measure[A], conf: EqualizeIcdfSamplingConf): List[A] = {

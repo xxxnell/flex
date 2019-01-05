@@ -5,8 +5,8 @@ import flex.experiment.ops.ExpOutOps
 import flex.implicits._
 
 /**
-  * A basic experiment to bind lognormal with normal distribution.
-  * */
+ * A basic experiment to bind lognormal with normal distribution.
+ * */
 object BasicBindExp {
 
   def main(args: Array[String]): Unit = {

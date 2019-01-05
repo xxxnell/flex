@@ -40,28 +40,23 @@ class PointPlotOpsBench { self =>
   }
 
   @Benchmark
-  def interpolation: Double = {
+  def interpolation: Double =
     pointPlot.interpolation(recordsNo / 2)
-  }
 
   @Benchmark
-  def add(): PointPlot = {
+  def add(): PointPlot =
     (1.0, pointPlot) :+ (1.0, pointPlot)
-  }
 
   @Benchmark
-  def inverse: PointPlot = {
+  def inverse: PointPlot =
     pointPlot.inverse
-  }
 
   @Benchmark
-  def normalizedCumulative: PointPlot = {
+  def normalizedCumulative: PointPlot =
     pointPlot.normalizedCumulative
-  }
 
   @Benchmark
-  def inverseNormalizedCumulative: PointPlot = {
+  def inverseNormalizedCumulative: PointPlot =
     pointPlot.inverseNormalizedCumulative
-  }
 
 }

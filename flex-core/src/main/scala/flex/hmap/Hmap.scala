@@ -5,14 +5,14 @@ import flex.{Epi, Mon}
 import flex.counter.CDim
 
 /**
-  * Hmap, or Hashing Map is hashing function.
-  */
+ * Hmap, or Hashing Map is hashing function.
+ */
 trait Hmap {
 
   /**
-    * @param size size of destination counter
-    * @return cdim
-    * */
+   * @param size size of destination counter
+   * @return cdim
+   * */
   def apply(hdim: HDim, size: Int): CDim
 
 }

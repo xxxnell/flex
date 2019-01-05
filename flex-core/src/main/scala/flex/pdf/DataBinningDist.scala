@@ -7,9 +7,9 @@ import flex.rand.IRng
 import scala.language.higherKinds
 
 /**
-  * Data binning distribution is Sampling distribution, and it ensures that you
-  * can update the dataset.
-  * */
+ * Data binning distribution is Sampling distribution, and it ensures that you
+ * can update the dataset.
+ * */
 trait DataBinningDist[A] extends SamplingDist[A] {
 
   def conf: DataBinningDistConf
@@ -33,39 +33,39 @@ trait DataBinningDistLaws[D[_] <: DataBinningDist[_]]
 object DataBinningDist extends DataBinningDistOps[DataBinningDist] {
 
   def modifyRng[A](dist: DataBinningDist[A], f: IRng => IRng): DataBinningDist[A] = dist match {
-    case sketch: Sketch[A] => Sketch.modifyRng(sketch, f)
+    case sketch: Sketch[A]  => Sketch.modifyRng(sketch, f)
     case hist: Histogram[A] => Histogram.modifyRng(hist, f)
   }
 
   def probability[A](dist: DataBinningDist[A], start: A, end: A): Double = dist match {
     case (sketch: Sketch[A]) => Sketch.probability(sketch, start, end)
-    case hist: Histogram[A] => Histogram.probability(hist, start, end)
+    case hist: Histogram[A]  => Histogram.probability(hist, start, end)
   }
 
   def update[A](dist: DataBinningDist[A], as: List[(A, Count)]): DataBinningDist[A] = dist match {
-    case sketch: Sketch[A] => Sketch.update(sketch, as)
+    case sketch: Sketch[A]  => Sketch.update(sketch, as)
     case hist: Histogram[A] => Histogram.update(hist, as)
   }
 
   def count[A](dist: DataBinningDist[A], start: A, end: A): Count = dist match {
-    case sketch: Sketch[A] => Sketch.count(sketch, start, end)
+    case sketch: Sketch[A]  => Sketch.count(sketch, start, end)
     case hist: Histogram[A] => Histogram.count(hist, start, end)
   }
 
   def sum(dist: DataBinningDist[_]): Count = dist match {
-    case sketch: Sketch[_] => Sketch.sum(sketch)
+    case sketch: Sketch[_]  => Sketch.sum(sketch)
     case hist: Histogram[_] => Histogram.sum(hist)
   }
 
   def cdfSampling[A](dist: DataBinningDist[A]): PointPlot = dist match {
     case (sketch: Sketch[A]) => Sketch.cdfSampling(sketch)
-    case hist: Histogram[A] => Histogram.cdfSampling(hist)
+    case hist: Histogram[A]  => Histogram.cdfSampling(hist)
   }
 
   // overrides
 
   override def pdf[A](dist: DataBinningDist[A], a: A): Double = dist match {
-    case sketch: Sketch[A] => Sketch.pdf(sketch, a)
+    case sketch: Sketch[A]  => Sketch.pdf(sketch, a)
     case hist: Histogram[A] => Histogram.pdf(hist, a)
   }
 

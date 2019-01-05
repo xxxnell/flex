@@ -7,9 +7,9 @@ import flex.rand.IRng
 import scala.language.higherKinds
 
 /**
-  * AdaPerSketch, or Adaptive and Periodic Sketch is both AdaptiveSketch and
-  * PeriodicSketch.
-  * */
+ * AdaPerSketch, or Adaptive and Periodic Sketch is both AdaptiveSketch and
+ * PeriodicSketch.
+ * */
 trait AdaPerSketch[A] extends AdaptiveSketch[A] with PeriodicSketch[A] {
 
   def conf: AdaPerSketchConf
@@ -43,24 +43,22 @@ object AdaPerSketch extends AdaPerSketchOps[AdaPerSketch] {
     AdaPerSketchImpl(measure, rng, conf, structures, buffer, thresholds, count)
 
   def empty[A](implicit measure: Measure[A], conf: AdaPerSketchConf): AdaPerSketch[A] =
-    bare(
-      measure,
-      IRng(-1),
-      conf,
-      structures(conf),
-      Buffer.empty[A],
-      periodicThresholds(conf.startThreshold, conf.thresholdPeriod),
-      0)
+    bare(measure,
+         IRng(-1),
+         conf,
+         structures(conf),
+         Buffer.empty[A],
+         periodicThresholds(conf.startThreshold, conf.thresholdPeriod),
+         0)
 
   def concat[A](as: List[(A, Count)])(implicit measure: Measure[A], conf: AdaPerSketchConf): AdaPerSketch[A] = {
-    val emptySketch = bare(
-      measure,
-      IRng(-1),
-      conf,
-      concatStructures(as, measure, conf),
-      Buffer.empty[A],
-      periodicThresholds(conf.startThreshold, conf.thresholdPeriod),
-      0)
+    val emptySketch = bare(measure,
+                           IRng(-1),
+                           conf,
+                           concatStructures(as, measure, conf),
+                           Buffer.empty[A],
+                           periodicThresholds(conf.startThreshold, conf.thresholdPeriod),
+                           0)
 
     narrowUpdate(emptySketch, as)
   }

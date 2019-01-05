@@ -2,8 +2,8 @@ package flex.pdf.diagnose
 import flex.plot.PointPlot
 
 /**
-  * Kolmogorov–Smirnov test
-  * */
+ * Kolmogorov–Smirnov test
+ * */
 object KSDiagnose extends CDFDiagnose {
 
   def diagnose(cdf1: PointPlot, cdf2: PointPlot, threshold: Double): Boolean = {

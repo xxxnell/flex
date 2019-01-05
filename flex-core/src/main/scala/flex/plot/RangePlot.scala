@@ -13,8 +13,8 @@ import scala.math._
 import scala.util.Try
 
 /**
-  * Plot is disjoint and sorted set of range and value.
-  */
+ * Plot is disjoint and sorted set of range and value.
+ */
 trait RangePlot extends Plot {
 
   def records: List[Record]
@@ -25,7 +25,7 @@ trait RangePlot extends Plot {
     .toList
     .flatMap {
       case p1 :: p2 :: Nil => Some((p1, p2))
-      case _ => None
+      case _               => None
     }
 
   lazy val startIndexedBlocks: TreeMap[Prim, List[Block]] =
@@ -46,16 +46,16 @@ trait RangePlotOps[P <: RangePlot] extends PlotOps[P] with RangePlotLaws[P] {
   def modifyRecords(plot: P, f: List[Record] => List[Record]): P
 
   /**
-    * Modify records without planarization.
-    * It is only for performance enhancement, so please be careful to call this operation.
-    * */
+   * Modify records without planarization.
+   * It is only for performance enhancement, so please be careful to call this operation.
+   * */
   private[plot] def unsafeModifyRecords(plot: P, f: List[Record] => List[Record]): P
 
   def modifyValue(plot: P, f: Record => Double): P
 
   /**
-    * @return Some of tuple (record with given range, remaining record) or None if <code>p</code> is not in record
-    * */
+   * @return Some of tuple (record with given range, remaining record) or None if <code>p</code> is not in record
+   * */
   def split(record: Record, p: Double): Option[(Record, Record)]
 
 }
@@ -67,11 +67,10 @@ trait RangePlotLaws[P <: RangePlot] { self: RangePlotOps[P] =>
       records.map { case (range, value) => (RangeP.point(value), range.middle) }
     })
 
-  def image(plot: P, argument: Double): Option[Double] = {
+  def image(plot: P, argument: Double): Option[Double] =
     plot.records
       .find { case (range, value) => range.contains(argument) }
       .map { case (range, value) => value }
-  }
 
   def interpolation(plot: P, x: Double): Double = {
     lazy val midInterp = for {
@@ -96,13 +95,13 @@ trait RangePlotLaws[P <: RangePlot] { self: RangePlotOps[P] =>
       .filter { case (range, _) => range.end <= x }
       .map { case (_, value) => value }
 
-    (midInterp orElse headExt orElse tailExt).getOrElse(0)
+    midInterp.orElse(headExt).orElse(tailExt).getOrElse(0)
   }
 
   /**
-    * Plalarize records that is transforming overlapped records to disjointed records.
-    * e.g. {[0..2] -> 1, [1..3] -> 2} => {[0..1] -> {split(1)}, [1..2] -> {split(1), split(2)}, [2..3] -> split(2)}
-    * */
+   * Plalarize records that is transforming overlapped records to disjointed records.
+   * e.g. {[0..2] -> 1, [1..3] -> 2} => {[0..1] -> {split(1)}, [1..2] -> {split(1), split(2)}, [2..3] -> split(2)}
+   * */
   def planarizeRecords(records: List[Record]): List[(RangeP, List[Double])] = {
     val boundaries: TreeSet[Double] =
       TreeSet(records.flatMap { case (range, _) => range.start :: range.end :: Nil }: _*)
@@ -130,7 +129,7 @@ trait RangePlotLaws[P <: RangePlot] { self: RangePlotOps[P] =>
 
   def domain(plot: P): Option[RangeP] = {
     val startO = Try(plot.records.map { case (range, _) => range.start }.min).toOption
-    val endO = Try(plot.records.map { case (range, _) => range.end }.max).toOption
+    val endO = Try(plot.records.map { case (range, _)   => range.end }.max).toOption
 
     for {
       start <- startO
@@ -240,10 +239,9 @@ trait RangePlotLaws[P <: RangePlot] { self: RangePlotOps[P] =>
 
   def integralAll(plot: P): Double = domain(plot).map(range => integral(plot, range.start, range.end)).getOrElse(0.0)
 
-  def areaPoint(x1: Double, y1: Double, x2: Double, y2: Double): Double = {
+  def areaPoint(x1: Double, y1: Double, x2: Double, y2: Double): Double =
     if (y1 == 0 && y2 == 0) 0
     else RangeP(x1, x2).roughLength * (y2 / 2 + y1 / 2)
-  }
 
   def areaBlock(block: Block): Double = block match {
     case ((x1, y1), (x2, y2)) => areaPoint(x1, y1, x2, y2)
@@ -269,8 +267,9 @@ trait RangePlotLaws[P <: RangePlot] { self: RangePlotOps[P] =>
             (RangeP.point(range.start), startVal) :: (RangeP.point(range.end), endVal) :: Nil
         }
 
-        utdRecord.headOption.fold(utdRecord)(utdHead =>
-          if (utdHead._1 != cumHead._1) cumHead :: utdRecord else utdRecord)
+        utdRecord.headOption.fold(utdRecord)(
+          utdHead => if (utdHead._1 != cumHead._1) cumHead :: utdRecord else utdRecord
+        )
       }
     )
   }
@@ -281,11 +280,11 @@ trait RangePlotLaws[P <: RangePlot] { self: RangePlotOps[P] =>
     multiplyConstant(cum, 1 / max)
   }
 
-  def inverseNormalizedCumulative(plot: P): P = {
+  def inverseNormalizedCumulative(plot: P): P =
     unsafeModifyRecords(
       normalizedCumulative(plot),
-      (records: List[Record]) => records.map { case (range, value) => (RangeP.point(value), range.middle) })
-  }
+      (records: List[Record]) => records.map { case (range, value) => (RangeP.point(value), range.middle) }
+    )
 
 }
 
@@ -295,17 +294,17 @@ object RangePlot extends RangePlotOps[RangePlot] {
 
   def modifyRecords(plot: RangePlot, f: List[Record] => List[Record]): RangePlot = plot match {
     case plot: DensityPlot => DensityPlot.modifyRecords(plot, f)
-    case plot: CountPlot => CountPlot.modifyRecords(plot, f)
+    case plot: CountPlot   => CountPlot.modifyRecords(plot, f)
   }
 
   private[plot] def unsafeModifyRecords(plot: RangePlot, f: List[Record] => List[Record]): RangePlot = plot match {
     case plot: DensityPlot => DensityPlot.unsafeModifyRecords(plot, f)
-    case plot: CountPlot => CountPlot.unsafeModifyRecords(plot, f)
+    case plot: CountPlot   => CountPlot.unsafeModifyRecords(plot, f)
   }
 
   def modifyValue(plot: RangePlot, f: Record => Double): RangePlot = plot match {
     case plot: DensityPlot => DensityPlot.modifyValue(plot, f)
-    case plot: CountPlot => CountPlot.modifyValue(plot, f)
+    case plot: CountPlot   => CountPlot.modifyValue(plot, f)
   }
 
   def split(record: Record, p: Double): Option[(Record, Record)] = DensityPlot.split(record, p)

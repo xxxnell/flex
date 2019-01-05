@@ -12,16 +12,16 @@ import flex.rand.IRng
 import scala.language.higherKinds
 
 /**
-  * Adaptive Sketch has its own buffer to hold recent input streams temporarily.
-  * This buffer retains its maximum length.
-  * The buffer acts as a reference data stream ξ for deepUpdate when Adaptive
-  * Sketch has to rebuild. So, even if the concept drift occurs, rearranging
-  * can constitute the correct strueture of Sketch.
-  *
-  * rebuild(S) = deepUpdate(S, ξ)
-  *  where S is sketch and ξ is recent data stream in the buffer of Adaptive
-  *  Sketch.
-  * */
+ * Adaptive Sketch has its own buffer to hold recent input streams temporarily.
+ * This buffer retains its maximum length.
+ * The buffer acts as a reference data stream ξ for deepUpdate when Adaptive
+ * Sketch has to rebuild. So, even if the concept drift occurs, rearranging
+ * can constitute the correct strueture of Sketch.
+ *
+ * rebuild(S) = deepUpdate(S, ξ)
+ *  where S is sketch and ξ is recent data stream in the buffer of Adaptive
+ *  Sketch.
+ * */
 trait AdaptiveSketch[A] extends Sketch[A] {
 
   val buffer: Buffer[A]
@@ -62,9 +62,8 @@ trait AdaptiveSketchOps[S[_] <: AdaptiveSketch[_]] extends SketchPrimPropOps[S] 
     countStr + queueCorrection(sketch) * countQ
   }
 
-  override def sum(sketch: S[_]): Count = {
+  override def sum(sketch: S[_]): Count =
     sumForStr(sketch) + queueCorrection(sketch) * sumForQueue(sketch)
-  }
 
   override def narrowUpdate[A](sketch: S[A], as: List[(A, Count)]): S[A] = {
     val (sketch1, old) = append(sketch, as)
@@ -122,9 +121,9 @@ trait AdaptiveSketchLaws[S[_] <: AdaptiveSketch[_]] { self: AdaptiveSketchOps[S]
     val queue = sketch.buffer.asInstanceOf[List[(A, Count)]]
     val p = measure.to(a)
     val adim = cmap(p)
-    val filteredQ1 = queue.filter { case (_a, _) => cmap(measure.to(_a)) == adim - 1 }
-    val filteredQ2 = queue.filter { case (_a, _) => cmap(measure.to(_a)) == adim }
-    val filteredQ3 = queue.filter { case (_a, _) => cmap(measure.to(_a)) == adim + 1 }
+    val filteredQ1 = queue.filter { case (_a, _)                    => cmap(measure.to(_a)) == adim - 1 }
+    val filteredQ2 = queue.filter { case (_a, _)                    => cmap(measure.to(_a)) == adim }
+    val filteredQ3 = queue.filter { case (_a, _)                    => cmap(measure.to(_a)) == adim + 1 }
     val count1 = filteredQ1.foldLeft(0.0) { case (acc, (_, _count)) => acc + _count }
     val count2 = filteredQ2.foldLeft(0.0) { case (acc, (_, _count)) => acc + _count }
     val count3 = filteredQ3.foldLeft(0.0) { case (acc, (_, _count)) => acc + _count }
@@ -162,7 +161,7 @@ object AdaptiveSketch extends AdaptiveSketchOps[AdaptiveSketch] {
   def update[A](sketch: AdaptiveSketch[A], as: List[(A, Count)]): AdaptiveSketch[A] = sketch match {
     case sketch: AdaSelSketch[A] => AdaSelSketch.update(sketch, as)
     case sketch: AdaPerSketch[A] => AdaPerSketch.update(sketch, as)
-    case _ => narrowUpdate(sketch, as)
+    case _                       => narrowUpdate(sketch, as)
   }
 
 }

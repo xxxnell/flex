@@ -76,12 +76,12 @@ trait PointPlotLaws[P <: PointPlot] { self: PointPlotOps[P] =>
       if (x <= x2) Some(y2) else if (x >= x3) Some(y3) else None
     } else None
 
-    (intp1 orElse intp2 orElse intp3).getOrElse(Double.NaN)
+    intp1.orElse(intp2).orElse(intp3).getOrElse(Double.NaN)
   }
 
   /**
-    * @param i Referencial index for the records of the plot.
-    * */
+   * @param i Referencial index for the records of the plot.
+   * */
   def referencialInterpolation(plot: P, x: Double, i: Int): Option[Double] = {
     val records = plot.records
     def refsForShift(j: Int): Option[((Double, Double), (Double, Double))] =
@@ -91,7 +91,8 @@ trait PointPlotLaws[P <: PointPlot] { self: PointPlotOps[P] =>
         Some((records.apply(i + j - 2), records.apply(i + j - 1)))
       } else None
 
-    (refsForShift(1) orElse refsForShift(0))
+    refsForShift(1)
+      .orElse(refsForShift(0))
       .flatMap { case (ref1, ref2) => if (ref1._1 <= x && ref2._1 >= x) Fitting(ref1 :: ref2 :: Nil, x) else None }
   }
 
@@ -209,10 +210,9 @@ trait PointPlotLaws[P <: PointPlot] { self: PointPlotOps[P] =>
     acc
   }
 
-  def areaPoint(x1: Double, y1: Double, x2: Double, y2: Double): Double = {
+  def areaPoint(x1: Double, y1: Double, x2: Double, y2: Double): Double =
     if (y1 == 0 && y2 == 0) 0
     else RangeP(x1, x2).roughLength * (y2 / 2 + y1 / 2)
-  }
 
   def isEmpty(plot: P): Boolean = plot.records.isEmpty
 
@@ -287,9 +287,8 @@ object PointPlot extends PointPlotOps[PointPlot] {
     unsafe(records1)
   }
 
-  def cumulative(ds: List[(Prim, Count)]): PointPlot = {
+  def cumulative(ds: List[(Prim, Count)]): PointPlot =
     unsafeCumulative(ds.sortBy(_._1))
-  }
 
   def unsafeNormalizedCumulative(ds: List[(Prim, Count)]): PointPlot = {
     val records = ds.toArray
@@ -311,9 +310,8 @@ object PointPlot extends PointPlotOps[PointPlot] {
     unsafe(records1)
   }
 
-  def normalizedCumulative(ds: List[(Prim, Count)]): PointPlot = {
+  def normalizedCumulative(ds: List[(Prim, Count)]): PointPlot =
     unsafeNormalizedCumulative(ds.sortBy(_._1))
-  }
 
   def modifyRecords(plot: PointPlot, f: Array[(Double, Double)] => Array[(Double, Double)]): PointPlot =
     unsafe(f(plot.records))

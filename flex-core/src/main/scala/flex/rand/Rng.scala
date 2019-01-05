@@ -5,8 +5,8 @@ import cats.data.State
 import scala.language.higherKinds
 
 /**
-  * Random Generator
-  */
+ * Random Generator
+ */
 trait Rng[S, A] {
 
   def seed: S

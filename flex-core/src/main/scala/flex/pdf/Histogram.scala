@@ -135,9 +135,8 @@ object Histogram extends HistogramOps[Histogram] {
   def bare[A](measure: Measure[A], rng: IRng, conf: DataBinningDistConf, cmap: Cmap, counter: HCounter): Histogram[A] =
     HistogramImpl(measure, rng, conf, cmap, counter)
 
-  def empty[A](implicit measure: Measure[A], conf: DataBinningDistConf): Histogram[A] = {
+  def empty[A](implicit measure: Measure[A], conf: DataBinningDistConf): Histogram[A] =
     bare(measure, IRng(-1), conf, Cmap(conf.cmap), counter(conf, -1))
-  }
 
   def forCmap[A](cmap: Cmap)(implicit measure: Measure[A], conf: DataBinningDistConf): Histogram[A] =
     bare(measure, IRng(cmap.hashCode()), conf, cmap, counter(conf, cmap.hashCode))

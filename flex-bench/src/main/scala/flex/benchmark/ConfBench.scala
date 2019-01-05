@@ -9,8 +9,8 @@ import org.openjdk.jmh.annotations._
 import org.openjdk.jmh.infra.Blackhole
 
 /**
-  * Large scale benchmark for Update of Sketch
-  * */
+ * Large scale benchmark for Update of Sketch
+ * */
 @BenchmarkMode(Array(Mode.Throughput))
 @OutputTimeUnit(TimeUnit.SECONDS)
 @State(Scope.Thread)

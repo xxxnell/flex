@@ -6,10 +6,10 @@ import flex.rand._
 import org.apache.commons.math3.distribution.NormalDistribution
 
 /**
-  * Normal distribution.
-  *
-  * @see <a href="https://en.wikipedia.org/wiki/Normal_distribution">Normal distribution - Wikipedia</a>
-  * */
+ * Normal distribution.
+ *
+ * @see <a href="https://en.wikipedia.org/wiki/Normal_distribution">Normal distribution - Wikipedia</a>
+ * */
 trait NormalDist[A] extends NumericDist[A] {
   val mean: Prim
   val variance: Prim

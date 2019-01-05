@@ -5,10 +5,10 @@ import flex.pdf.{Dist, PlottedDist, SamplingDist}
 import flex.plot.DensityPlot
 
 /**
-  * Cosine similarity between two probability density function.
-  *
-  * @see <a href="https://en.wikipedia.org/wiki/Cosine_similarity">Cosine similarity - Wikipedia</a>
-  * */
+ * Cosine similarity between two probability density function.
+ *
+ * @see <a href="https://en.wikipedia.org/wiki/Cosine_similarity">Cosine similarity - Wikipedia</a>
+ * */
 trait Cosine extends DensitySim {
 
   def norm1: Double

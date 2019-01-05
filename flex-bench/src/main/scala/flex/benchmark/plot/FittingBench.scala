@@ -29,8 +29,7 @@ class FittingBench {
   }
 
   @Benchmark
-  def dataFitting: Option[Double] = {
+  def dataFitting: Option[Double] =
     Fitting.dataFitting(as, 1.5)
-  }
 
 }

@@ -6,11 +6,10 @@ trait ListCounter extends Counter {
 
 trait ListCounterOp extends CounterOps[ListCounter] {
 
-  def update(counter: ListCounter, cdim: CDim, count: Double): ListCounter = {
+  def update(counter: ListCounter, cdim: CDim, count: Double): ListCounter =
     if (cdim >= 0 && cdim < size(counter)) {
       ListCounter(counter.counts.updated(cdim, counter.counts.apply(cdim) + count))
     } else throw new IndexOutOfBoundsException
-  }
 
 }
 

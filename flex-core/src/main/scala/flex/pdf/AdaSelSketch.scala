@@ -55,24 +55,22 @@ object AdaSelSketch extends AdaSelSketchOps[AdaSelSketch] {
     AdaSelSketchImpl(measure, rng, conf, structures, buffer, thresholds, count)
 
   def empty[A](implicit measure: Measure[A], conf: AdaSelSketchConf): AdaSelSketch[A] =
-    bare(
-      measure,
-      IRng(-1),
-      conf,
-      structures(conf),
-      Buffer.empty[A],
-      periodicThresholds(conf.startThreshold, conf.thresholdPeriod),
-      0)
+    bare(measure,
+         IRng(-1),
+         conf,
+         structures(conf),
+         Buffer.empty[A],
+         periodicThresholds(conf.startThreshold, conf.thresholdPeriod),
+         0)
 
   def concat[A](as: List[(A, Count)])(implicit measure: Measure[A], conf: AdaSelSketchConf): AdaSelSketch[A] = {
-    val emptySketch = bare(
-      measure,
-      IRng(-1),
-      conf,
-      concatStructures(as, measure, conf),
-      Buffer.empty[A],
-      periodicThresholds(conf.startThreshold, conf.thresholdPeriod),
-      0)
+    val emptySketch = bare(measure,
+                           IRng(-1),
+                           conf,
+                           concatStructures(as, measure, conf),
+                           Buffer.empty[A],
+                           periodicThresholds(conf.startThreshold, conf.thresholdPeriod),
+                           0)
 
     narrowUpdate(emptySketch, as)
   }

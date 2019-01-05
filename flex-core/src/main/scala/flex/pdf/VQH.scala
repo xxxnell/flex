@@ -9,18 +9,18 @@ trait VQH {
   type Codebook = List[INDArray]
 
   /**
-    * (codebook vectors, counts)
-    * */
+   * (codebook vectors, counts)
+   * */
   val cns: Vector[(Codebook, Float)]
 
   /**
-    * total count
-    * */
+   * total count
+   * */
   val ntot: Float
 
   /**
-    * Expected number of codebook vectors
-    * */
+   * Expected number of codebook vectors
+   * */
   val k: Int
 
   val rng: IRng
@@ -29,19 +29,17 @@ trait VQH {
 
 trait VQHOps {
 
-  def add(vqh: VQH, cn: (VQH#Codebook, Float)): VQH = {
+  def add(vqh: VQH, cn: (VQH#Codebook, Float)): VQH =
     VQH(vqh.cns.+:(cn), vqh.ntot + cn._2, vqh.k, vqh.rng)
-  }
 
-  def patch(vqh: VQH, i: Int, cn: (VQH#Codebook, Float)): VQH = {
+  def patch(vqh: VQH, i: Int, cn: (VQH#Codebook, Float)): VQH =
     VQH(vqh.cns.updated(i, cn), vqh.ntot - vqh.cns(i)._2 + cn._2, vqh.k, vqh.rng)
-  }
 
   /**
-    * Update partial input vectors with its indices.
-    * @return (Updated VQH, new codebook-vectors, out codebook-vectors)
-    * */
-  def parUpdate(vqh: VQH, xps: List[(INDArray, Int, Float)]): (VQH, List[VQH#Codebook], List[VQH#Codebook]) = {
+   * Update partial input vectors with its indices.
+   * @return (Updated VQH, new codebook-vectors, out codebook-vectors)
+   * */
+  def parUpdate(vqh: VQH, xps: List[(INDArray, Int, Float)]): (VQH, List[VQH#Codebook], List[VQH#Codebook]) =
     xps.foldLeft((vqh, List.empty[VQH#Codebook], List.empty[VQH#Codebook])) {
       case ((_vqh, _newcs, _outcs), (x, a, w)) =>
         val (vqh1, newcs1, outcs1) = parSearch(vqh, x, a)
@@ -53,13 +51,12 @@ trait VQHOps {
           .getOrElse(vqh, List.empty[VQH#Codebook], List.empty[VQH#Codebook])
         (vqh1, newcs1 ++ _newcs, outcs1 ++ _outcs)
     }
-  }
 
   /**
-    * Update input vectors with its indices.
-    * @return (Updated VQH, new codebook-vectors, out codebook-vectors)
-    * */
-  def expUpdate(vqh: VQH, xs: List[(VQH#Codebook, Float)]): (VQH, List[VQH#Codebook], List[VQH#Codebook]) = {
+   * Update input vectors with its indices.
+   * @return (Updated VQH, new codebook-vectors, out codebook-vectors)
+   * */
+  def expUpdate(vqh: VQH, xs: List[(VQH#Codebook, Float)]): (VQH, List[VQH#Codebook], List[VQH#Codebook]) =
     xs.foldLeft((vqh, List.empty[VQH#Codebook], List.empty[VQH#Codebook])) {
       case ((_vqh, _newcs, _outcs), (x, w)) =>
         val (vqh1, newcs1, outcs1) = expSearch(vqh, x)
@@ -67,7 +64,6 @@ trait VQHOps {
           .getOrElse(vqh, List.empty[VQH#Codebook], List.empty[VQH#Codebook])
         (vqh1, newcs1 ++ _newcs, outcs1 ++ _outcs)
     }
-  }
 
   def singleUpdate(vqh: VQH,
                    c: VQH#Codebook,
@@ -102,13 +98,13 @@ trait VQHOps {
   }
 
   /**
-    * @return (codebook vector, count, index)
-    * */
+   * @return (codebook vector, count, index)
+   * */
   def parSearch(vqh: VQH, xp: INDArray, i: Int): Option[(VQH#Codebook, Float, Int)] = ???
 
   /**
-    * @return (codebook vector, count, index)
-    * */
+   * @return (codebook vector, count, index)
+   * */
   def expSearch(vqh: VQH, x: VQH#Codebook): Option[(VQH#Codebook, Float, Int)] = ???
 
   def sigmoid(x: Float): Float = 1 / (1 + math.exp(-1 * x).toFloat)

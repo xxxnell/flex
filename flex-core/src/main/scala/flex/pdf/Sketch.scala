@@ -17,18 +17,18 @@ import scala.language.higherKinds
 import scala.util.Try
 
 /**
-  * Sketch is a probabilistic summarization data structure that quantizes and
-  * stores data streams. And It is a nonparametric density estimation algorithm.
-  * However, unlike other quantization algorithms such as histogram, Sketch
-  * picks quantization points adaptively for incoming data. Thus, Sketch does
-  * not have distortion without requiring a prior knowledge of the incoming
-  * dataset.
-  */
+ * Sketch is a probabilistic summarization data structure that quantizes and
+ * stores data streams. And It is a nonparametric density estimation algorithm.
+ * However, unlike other quantization algorithms such as histogram, Sketch
+ * picks quantization points adaptively for incoming data. Thus, Sketch does
+ * not have distortion without requiring a prior knowledge of the incoming
+ * dataset.
+ */
 trait Sketch[A] extends DataBinningDist[A] {
 
   /**
-    * Internal structure list of Sketch. Order: young -> old
-    * */
+   * Internal structure list of Sketch. Order: young -> old
+   * */
   def structures: Structures
 
   def conf: SketchConf
@@ -76,9 +76,8 @@ trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
 
   def rebuild[A](sketch: S[A]): S[A] = deepUpdate(sketch, Nil)._1
 
-  def rangePdfSampling[A](sketch: S[A]): DensityPlot = {
+  def rangePdfSampling[A](sketch: S[A]): DensityPlot =
     rangePdfSamplingForRanges(sketch, samplingPoints(sketch))
-  }
 
   def samplingPoints[A](sketch: S[A]): List[RangeM[A]] = {
     val cmap = youngCmap(sketch)
@@ -186,62 +185,62 @@ trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
 object Sketch extends SketchPrimPropOps[Sketch] { self =>
 
   /**
-    * @param measure  measure of Sketch
-    * */
+   * @param measure  measure of Sketch
+   * */
   def empty[A](implicit measure: Measure[A], conf: SketchConf): Sketch[A] = conf match {
     case conf: PeriodicSketchConf => PeriodicSketch.empty(measure, conf)
-    case _ => SimpleSketch.empty(measure, conf)
+    case _                        => SimpleSketch.empty(measure, conf)
   }
 
   def concat[A](as: List[(A, Count)])(implicit measure: Measure[A], conf: SketchConf): Sketch[A] = conf match {
     case conf: PeriodicSketchConf => PeriodicSketch.concat(as)(measure, conf)
-    case _ => SimpleSketch.concat(as)(measure, conf)
+    case _                        => SimpleSketch.concat(as)(measure, conf)
   }
 
   // mapping ops
 
   def modifyStructures[A](sketch: Sketch[A], f: Structures => Structures): Sketch[A] = sketch match {
-    case sketch: RecurSketch[_] => RecurSketch.modifyStructures(sketch, f)
+    case sketch: RecurSketch[_]    => RecurSketch.modifyStructures(sketch, f)
     case sketch: AdaptiveSketch[_] => AdaptiveSketch.modifyStructures(sketch, f)
-    case _ => SimpleSketch.modifyStructures(sketch, f)
+    case _                         => SimpleSketch.modifyStructures(sketch, f)
   }
 
   def modifyRng[A](sketch: Sketch[A], f: IRng => IRng): Sketch[A] = sketch match {
-    case sketch: RecurSketch[_] => RecurSketch.modifyRng(sketch, f)
+    case sketch: RecurSketch[_]    => RecurSketch.modifyRng(sketch, f)
     case sketch: AdaptiveSketch[_] => AdaptiveSketch.modifyRng(sketch, f)
-    case _ => SimpleSketch.modifyRng(sketch, f)
+    case _                         => SimpleSketch.modifyRng(sketch, f)
 
   }
 
   // syntatic sugars
 
   def update[A](sketch: Sketch[A], as: List[(A, Count)]): Sketch[A] = sketch match {
-    case (sketch: RecurSketch[A]) => RecurSketch.update(sketch, as)
+    case (sketch: RecurSketch[A])    => RecurSketch.update(sketch, as)
     case (sketch: AdaptiveSketch[A]) => AdaptiveSketch.update(sketch, as)
-    case (sketch: SimpleSketch[A]) => SimpleSketch.update(sketch, as)
-    case _ => narrowUpdate(sketch, as)
+    case (sketch: SimpleSketch[A])   => SimpleSketch.update(sketch, as)
+    case _                           => narrowUpdate(sketch, as)
   }
 
   // overrides
 
   override def count[A](sketch: Sketch[A], start: A, end: A): Count = sketch match {
     case (sketch: AdaptiveSketch[A]) => AdaptiveSketch.count(sketch, start, end)
-    case _ => super.count(sketch, start, end)
+    case _                           => super.count(sketch, start, end)
   }
 
   override def sum(sketch: Sketch[_]): Count = sketch match {
     case (sketch: AdaptiveSketch[_]) => AdaptiveSketch.sum(sketch)
-    case _ => super.sum(sketch)
+    case _                           => super.sum(sketch)
   }
 
   override def narrowUpdate[A](sketch: Sketch[A], as: List[(A, Count)]): Sketch[A] = sketch match {
     case (sketch: AdaptiveSketch[A]) => AdaptiveSketch.narrowUpdate(sketch, as)
-    case _ => super.narrowUpdate(sketch, as)
+    case _                           => super.narrowUpdate(sketch, as)
   }
 
   override def rebuild[A](sketch: Sketch[A]): Sketch[A] = sketch match {
     case (sketch: AdaptiveSketch[A]) => AdaptiveSketch.rebuild(sketch)
-    case _ => super.rebuild(sketch)
+    case _                           => super.rebuild(sketch)
   }
 
 }

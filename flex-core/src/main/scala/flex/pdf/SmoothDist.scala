@@ -9,8 +9,8 @@ import flex.rand.IRng
 import scala.language.higherKinds
 
 /**
-  * SmoothDist, or Smooth distribution is the opposite of SamplingDist.
-  * */
+ * SmoothDist, or Smooth distribution is the opposite of SamplingDist.
+ * */
 trait SmoothDist[A] extends Dist[A] {
 
   def conf: SmoothDistConf
@@ -62,39 +62,39 @@ object SmoothDist extends SmoothDistPropOps[SmoothDist] {
 
   def modifyRng[A](dist: SmoothDist[A], f: IRng => IRng): SmoothDist[A] = dist match {
     case predefined: PredefinedDist[A] => PredefinedDist.modifyRng(predefined, f)
-    case numeric: NumericDist[A] => NumericDist.modifyRng(numeric, f)
+    case numeric: NumericDist[A]       => NumericDist.modifyRng(numeric, f)
   }
 
   def probability[A](dist: SmoothDist[A], start: A, end: A): Prim = dist match {
     case predefined: PredefinedDist[A] => PredefinedDist.probability(predefined, start, end)
-    case numeric: NumericDist[A] => NumericDist.probability(numeric, start, end)
+    case numeric: NumericDist[A]       => NumericDist.probability(numeric, start, end)
   }
 
   // overrides
 
   override def pdf[A](dist: SmoothDist[A], a: A): Double = dist match {
     case predefined: PredefinedDist[A] => PredefinedDist.pdf(predefined, a)
-    case numeric: NumericDist[A] => NumericDist.pdf(numeric, a)
+    case numeric: NumericDist[A]       => NumericDist.pdf(numeric, a)
   }
 
   override def cdf[A](dist: SmoothDist[A], a: A): Double = dist match {
     case predefined: PredefinedDist[A] => PredefinedDist.cdf(predefined, a)
-    case numeric: NumericDist[A] => NumericDist.cdf(numeric, a)
+    case numeric: NumericDist[A]       => NumericDist.cdf(numeric, a)
   }
 
   override def icdf[A](dist: SmoothDist[A], p: Double): A = dist match {
     case predefined: PredefinedDist[A] => PredefinedDist.icdf(predefined, p)
-    case numeric: NumericDist[A] => NumericDist.icdf(numeric, p)
+    case numeric: NumericDist[A]       => NumericDist.icdf(numeric, p)
   }
 
   override def pdfSampling[A](dist: SmoothDist[A]): PointPlot = dist match {
     case dist: NumericDist[A] => NumericDist.pdfSampling(dist)
-    case _ => super.pdfSampling(dist)
+    case _                    => super.pdfSampling(dist)
   }
 
   override def cdfSampling[A](dist: SmoothDist[A]): PointPlot = dist match {
     case dist: NumericDist[A] => NumericDist.cdfSampling(dist)
-    case _ => super.cdfSampling(dist)
+    case _                    => super.cdfSampling(dist)
   }
 
 }

@@ -22,26 +22,22 @@ class ArrayBench2 {
   var x: INDArray = _
 
   @Setup
-  def setup(): Unit = {
+  def setup(): Unit =
     x = Nd4j.ones(dim)
 
 //    NativeOpsHolder.getInstance.getDeviceNativeOps.setElementThreshold(16384)
 //    NativeOpsHolder.getInstance.getDeviceNativeOps.setTADThreshold(64)
-  }
 
   @Benchmark
-  def getInterval: INDArray = {
+  def getInterval: INDArray =
     x.get(NDArrayIndex.interval(1000, 2000))
-  }
 
   @Benchmark
-  def concat: INDArray = {
+  def concat: INDArray =
     Nd4j.concat(1, x, x)
-  }
 
   @Benchmark
-  def reshape: INDArray = {
+  def reshape: INDArray =
     x.reshape(128, 128)
-  }
 
 }

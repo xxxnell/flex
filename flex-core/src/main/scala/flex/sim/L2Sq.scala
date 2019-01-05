@@ -3,21 +3,20 @@ package flex.sim
 import flex.pdf.{Dist, SamplingDist}
 
 /**
-  * Squared Eucledian Distance, or Minkowski L2 Distance between two pdfs.
-  *
-  * @see <a href="https://en.wikipedia.org/wiki/Euclidean_distance#Squared_Euclidean_distance">
-  *        Squared Euclidean distance - Wikipedia</a>
-  * @see <a href="https://en.wikipedia.org/wiki/Hilbert_space">Hilbert space - Wikipedia</a>
-  * */
+ * Squared Eucledian Distance, or Minkowski L2 Distance between two pdfs.
+ *
+ * @see <a href="https://en.wikipedia.org/wiki/Euclidean_distance#Squared_Euclidean_distance">
+ *        Squared Euclidean distance - Wikipedia</a>
+ * @see <a href="https://en.wikipedia.org/wiki/Hilbert_space">Hilbert space - Wikipedia</a>
+ * */
 trait L2Sq extends DensitySim {
 
   val norm1: Double
 
   val norm2: Double
 
-  def point(value1: Double, value2: Double): Double = {
+  def point(value1: Double, value2: Double): Double =
     math.pow((value1 / norm1) - (value2 / norm2), 2)
-  }
 
 }
 

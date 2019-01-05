@@ -29,9 +29,8 @@ trait ReleaseProcess {
 
   def developBranch = "develop"
 
-  def mainBranch: String = {
+  def mainBranch: String =
     sys.env.getOrElse("TRAVIS_BRANCH", currentBranch)
-  }
 
   def currentBranch: String = {
     val parsed: String = { "git rev-parse --abbrev-ref HEAD".!!.trim }

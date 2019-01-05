@@ -12,17 +12,14 @@ object ED {
     PointPlot.safe(Δ1.records ++ Δ2.records)
   }
 
-  def deltaForDist[A](d1: Dist[A], d2: Dist[A]): PointPlot = {
+  def deltaForDist[A](d1: Dist[A], d2: Dist[A]): PointPlot =
     delta(d1.cdfSampling, d2.cdfSampling)
-  }
 
-  def absDelta(cdf1: PointPlot, cdf2: PointPlot): PointPlot = {
+  def absDelta(cdf1: PointPlot, cdf2: PointPlot): PointPlot =
     delta(cdf1, cdf2).map { case (x, y) => (x, math.abs(y)) }
-  }
 
-  def absDeltaForDist[A](d1: Dist[A], d2: Dist[A]): PointPlot = {
+  def absDeltaForDist[A](d1: Dist[A], d2: Dist[A]): PointPlot =
     absDelta(d1.cdfSampling, d2.cdfSampling)
-  }
 
   def avgDelta(cdf1: PointPlot, cdf2: PointPlot): Double = {
     val Δ = PointPlot.unsafe(absDelta(cdf1, cdf2).records.filter { case (_, y) => y > 0.0 })
@@ -34,8 +31,7 @@ object ED {
     1 / (1 / math.abs(Δrep) - 1)
   }
 
-  def simForDist[A](d1: Dist[A], d2: Dist[A]): Double = {
+  def simForDist[A](d1: Dist[A], d2: Dist[A]): Double =
     sim(d1.cdfSampling, d2.cdfSampling)
-  }
 
 }

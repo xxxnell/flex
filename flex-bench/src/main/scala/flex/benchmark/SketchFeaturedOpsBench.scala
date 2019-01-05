@@ -67,9 +67,8 @@ class SketchFeaturedOpsBench { self =>
 //  }
 
   @Benchmark
-  def probability: Double = {
+  def probability: Double =
     sketch.probability(1, 2)
-  }
 
 //  @Benchmark
 //  def probabilityCached: Double = {

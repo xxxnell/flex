@@ -54,11 +54,11 @@ object BenchAppConfs {
   def linearIterateSize(builder: ChainedOptionsBuilder, start: Int, end: Int, by: Int): ChainedOptionsBuilder =
     builder.param("iterateBenchSize", (start to end by by).map(_.toString).toArray: _*)
 
-  def expIterateSize(builder: ChainedOptionsBuilder, start: Int, end: Int, base: Double): ChainedOptionsBuilder = {
+  def expIterateSize(builder: ChainedOptionsBuilder, start: Int, end: Int, base: Double): ChainedOptionsBuilder =
     builder.param(
       "iterateBenchSize",
-      (0 to (log(end / start) / log(base)).toInt).map(a => (start * pow(base, a).toInt).toString).toArray: _*)
-  }
+      (0 to (log(end / start) / log(base)).toInt).map(a => (start * pow(base, a).toInt).toString).toArray: _*
+    )
 
   def params(builder: ChainedOptionsBuilder): ChainedOptionsBuilder = {
     val params = Params.reducedBy(1)

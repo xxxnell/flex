@@ -10,8 +10,8 @@ object Fitting {
   def apply(as: List[(Double, Double)], x: Double): Option[Double] = dataFitting(as, x)
 
   /**
-    * @param as List of (x, y)
-    * */
+   * @param as List of (x, y)
+   * */
   def dataFitting(as: List[(Double, Double)], x: Double): Option[Double] = {
     lazy val largeCutoff = 1e300
     lazy val smallCutoff = -1e300
@@ -22,7 +22,7 @@ object Fitting {
 
     as match {
       case start :: end :: Nil if start._1 >= x && end._1 <= x => linearFitting(start, end, x)
-      case _ if as.size > 2 && polyValid => polynomialFitting(as, x)
+      case _ if as.size > 2 && polyValid                       => polynomialFitting(as, x)
       case _ =>
         for {
           start <- as.find(_._1 <= x)
@@ -45,7 +45,8 @@ object Fitting {
             (BigDecimal(x1), BigDecimal(y1)),
             (BigDecimal(x2), BigDecimal(y2)),
             BigDecimal(x)
-          ).toDouble)
+          ).toDouble
+        )
       } catch {
         case _: Exception => None
       }

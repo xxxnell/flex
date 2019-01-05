@@ -27,12 +27,10 @@ object AsciiArtPlot {
       range.end.toString.take(rangeLength)
   }
 
-  def asciiForProb(prob: Double): String = {
+  def asciiForProb(prob: Double): String =
     prob * 100 + "%"
-  }
 
-  def asciiProbBarForProb(prob: Double): String = {
+  def asciiProbBarForProb(prob: Double): String =
     ("*" * (prob * 100).toInt).take(150)
-  }
 
 }

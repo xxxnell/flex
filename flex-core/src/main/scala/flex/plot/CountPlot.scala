@@ -38,13 +38,11 @@ object CountPlot extends CountPlotOps {
 
   def disjoint(records: List[Record]): CountPlot = modifyRecords(empty, _ => records)
 
-  def modifyRecords(plot: CountPlot, f: List[Record] => List[Record]): CountPlot = {
+  def modifyRecords(plot: CountPlot, f: List[Record] => List[Record]): CountPlot =
     bare(planarizeRecords(f(plot.records)).map { case (range, values) => (range, values.sum / values.size) })
-  }
 
-  private[plot] def unsafeModifyRecords(plot: CountPlot, f: List[Record] => List[Record]): CountPlot = {
+  private[plot] def unsafeModifyRecords(plot: CountPlot, f: List[Record] => List[Record]): CountPlot =
     bare(f(plot.records))
-  }
 
   def modifyValue(plot: CountPlot, f: Record => Double): CountPlot =
     bare(plot.records.map(record => (record._1, f(record))))

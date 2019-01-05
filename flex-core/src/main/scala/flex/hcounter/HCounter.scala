@@ -10,12 +10,12 @@ import cats.implicits._
 import flex.conf.counter.CounterConf
 
 /**
-  * The HCounter, or Hashing Counter, is a probabilistic data structure that
-  * uses only low memory to count the number of finite countable elements. This
-  * structure is similar to the Count-min Sketch algorithm.
-  *
-  * @see <a href="https://en.wikipedia.org/wiki/Count%E2%80%93min_sketch"></a>
-  * */
+ * The HCounter, or Hashing Counter, is a probabilistic data structure that
+ * uses only low memory to count the number of finite countable elements. This
+ * structure is similar to the Count-min Sketch algorithm.
+ *
+ * @see <a href="https://en.wikipedia.org/wiki/Count%E2%80%93min_sketch"></a>
+ * */
 trait HCounter {
 
   def structures: NonEmptyList[(Hmap, Counter)]
@@ -44,9 +44,8 @@ trait HCounterOps[HC <: HCounter] {
     HCounter(updated, hc.sum + count)
   }
 
-  def updates(hc: HCounter, as: List[(HDim, Count)]): HCounter = {
+  def updates(hc: HCounter, as: List[(HDim, Count)]): HCounter =
     as.foldLeft(hc) { case (hcAcc, (hdim, count)) => hcAcc.update(hdim, count) }
-  }
 
   def get(hc: HCounter, hdim: HDim): Double = {
     var i = 0
@@ -105,8 +104,8 @@ object HCounter extends HCounterOps[HCounter] { self =>
   def bare(structures: NonEmptyList[(Hmap, Counter)], sum: Double): HCounter = HCounterImpl(structures, sum)
 
   /**
-    * @param width Cdim size of the counter
-    * */
+   * @param width Cdim size of the counter
+   * */
   def empty(depth: Int, width: Int, seed: Int): HCounter = {
     val hmapSeed: Int => Int = (i: Int) => byteswap32(seed ^ Int.MaxValue) << i
     val strs = NonEmptyList.fromListUnsafe((0 until depth).toList).map(i => (Hmap(hmapSeed(i)), Counter.empty(width)))

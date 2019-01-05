@@ -81,19 +81,17 @@ class EqUpdateBench { self =>
 
     lazy val mergeC: PointPlot = merge
 
-    def merge: PointPlot = {
+    def merge: PointPlot =
       if (ps.nonEmpty) {
         val c1 = 1 / (mixingRatio + 1)
         val c2 = (mixingRatio / (mixingRatio + 1)) * (1 / ps.map(_._2).sum)
         (c1, samplingC) :+ (c2, PointPlot.deltas(ps, window))
       } else samplingC
-    }
 
     lazy val icdfPlotC: PointPlot = icdfPlot
 
-    def icdfPlot: PointPlot = {
+    def icdfPlot: PointPlot =
       mergeC.inverseNormalizedCumulative
-    }
 
     val dividerC: List[Double] = divider
 

@@ -36,38 +36,31 @@ class RangePlotOpsBench { self =>
   }
 
   @Benchmark
-  def interpolationOfCountplot: Double = {
+  def interpolationOfCountplot: Double =
     countPlot.interpolation(recordsNo / 2)
-  }
 
   @Benchmark
-  def add(): DensityPlot = {
+  def add(): DensityPlot =
     (1.0, densityPlot) :+ (1.0, densityPlot)
-  }
 
   @Benchmark
-  def inverse: DensityPlot = {
+  def inverse: DensityPlot =
     densityPlot.inverse
-  }
 
   @Benchmark
-  def normalizedCumulative: DensityPlot = {
+  def normalizedCumulative: DensityPlot =
     densityPlot.normalizedCumulative
-  }
 
   @Benchmark
-  def inverseNormalizedCumulative: DensityPlot = {
+  def inverseNormalizedCumulative: DensityPlot =
     densityPlot.inverseNormalizedCumulative
-  }
 
   @Benchmark
-  def disjointOfCountplot: CountPlot = {
+  def disjointOfCountplot: CountPlot =
     CountPlot.disjoint(recordsR)
-  }
 
   @Benchmark
-  def planarizeRecordsOfCountplot: List[(RangeP, List[Double])] = {
+  def planarizeRecordsOfCountplot: List[(RangeP, List[Double])] =
     CountPlot.planarizeRecords(recordsR)
-  }
 
 }

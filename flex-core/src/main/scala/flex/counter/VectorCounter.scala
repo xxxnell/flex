@@ -8,11 +8,10 @@ trait VectorCounter extends Counter {
 
 trait VectorCounterOps extends CounterOps[VectorCounter] {
 
-  def update(counter: VectorCounter, cdim: CDim, count: Double): VectorCounter = {
+  def update(counter: VectorCounter, cdim: CDim, count: Double): VectorCounter =
     if (cdim >= 0 && cdim < size(counter)) {
       VectorCounter(counter.counts.updated(cdim, counter.counts.apply(cdim) + count))
     } else throw new IndexOutOfBoundsException
-  }
 
 }
 

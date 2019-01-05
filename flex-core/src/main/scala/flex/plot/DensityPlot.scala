@@ -33,26 +33,22 @@ object DensityPlot extends DensityPlotOps {
     val sum = ds.map(d => d._2).sum
     val utdWindow = if (window <= 0) 1e-100 else window
 
-    modifyRecords(
-      DensityPlot.empty,
-      _ =>
-        ds.map {
-          case (value, count) =>
-            (
-              RangeP(value - (utdWindow / 2), value + (utdWindow / 2)),
-              if (sum * utdWindow > 0) count / (sum * utdWindow) else 0)
-      })
+    modifyRecords(DensityPlot.empty,
+                  _ =>
+                    ds.map {
+                      case (value, count) =>
+                        (RangeP(value - (utdWindow / 2), value + (utdWindow / 2)),
+                         if (sum * utdWindow > 0) count / (sum * utdWindow) else 0)
+                  })
   }
 
   def disjoint(records: List[Record]): DensityPlot = modifyRecords(empty, _ => records)
 
-  def modifyRecords(plot: DensityPlot, f: List[Record] => List[Record]): DensityPlot = {
+  def modifyRecords(plot: DensityPlot, f: List[Record] => List[Record]): DensityPlot =
     bare(planarizeRecords(f(plot.records)).flatMap { case (range, values) => values.map(value => (range, value)) })
-  }
 
-  private[plot] def unsafeModifyRecords(plot: DensityPlot, f: List[Record] => List[Record]): DensityPlot = {
+  private[plot] def unsafeModifyRecords(plot: DensityPlot, f: List[Record] => List[Record]): DensityPlot =
     bare(f(plot.records))
-  }
 
   def modifyValue(plot: DensityPlot, f: Record => Double): DensityPlot =
     bare(plot.records.map(record => (record._1, f(record))))

@@ -4,8 +4,8 @@ import flex.pdf.Dist
 import flex.plot.PointPlot
 
 /**
-  * Set of operations for distribution on Hilbert space.
-  * */
+ * Set of operations for distribution on Hilbert space.
+ * */
 object Hilbert {
 
   def norm[A](d1: Dist[A]): Double = normForPlot(d1.pdfSampling)

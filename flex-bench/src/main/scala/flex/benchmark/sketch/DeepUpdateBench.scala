@@ -78,38 +78,31 @@ class DeepUpdateBench { self =>
   }
 
   @Benchmark
-  def deepUpdate: (Sketch[Count], Option[Histogram[Double]]) = {
+  def deepUpdate: (Sketch[Count], Option[Histogram[Double]]) =
     sketch.deepUpdate()
-  }
 
   @Benchmark
-  def primDeepUpdate: (Sketch[Count], Option[Histogram[Count]]) = {
+  def primDeepUpdate: (Sketch[Count], Option[Histogram[Count]]) =
     Sketch.primDeepUpdate(sketch, sketch.asInstanceOf[AdaptiveSketch[Double]].buffer.toList)
-  }
 
   @Benchmark
-  def rebuild: Sketch[Count] = {
+  def rebuild: Sketch[Count] =
     sketch.rebuild
-  }
 
   @Benchmark
-  def cmap: Cmap = {
+  def cmap: Cmap =
     DeepUpdateAlgorithm.cmap
-  }
 
   @Benchmark
-  def seed: Int = {
+  def seed: Int =
     DeepUpdateAlgorithm.seed
-  }
 
   @Benchmark
-  def emptyCounter: HCounter = {
+  def emptyCounter: HCounter =
     DeepUpdateAlgorithm.emptyCounter
-  }
 
   @Benchmark
-  def updatePs(): Sketch[Count] = {
+  def updatePs(): Sketch[Count] =
     DeepUpdateAlgorithm.updatePs()
-  }
 
 }

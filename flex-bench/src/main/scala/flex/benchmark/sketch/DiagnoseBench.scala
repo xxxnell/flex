@@ -59,40 +59,35 @@ class DiagnoseBench { self =>
   }
 
 //  @Benchmark
-  def diagnose: Boolean = {
+  def diagnose: Boolean =
     SelectiveSketch.diagnose(sketch.asInstanceOf[SelectiveSketch[Double]])
-  }
 
 //  @Benchmark
-  def bufferToList: List[(Prim, Count)] = {
+  def bufferToList: List[(Prim, Count)] =
     sketch
       .asInstanceOf[AdaptiveSketch[Double]]
       .buffer
       .toList
       .map { case (a, count) => (measure.to(a), count) }
       .sortBy(_._1)
-  }
 
   lazy val _bufferToList: List[(Prim, Count)] = bufferToList
 
 //  @Benchmark
-  def bufferCdf: PointPlot = {
+  def bufferCdf: PointPlot =
     PointPlot.unsafeNormalizedCumulative(_bufferToList)
-  }
 
   lazy val _bufferCdf: PointPlot = bufferCdf
 
 //  @Benchmark
-  def youngStructure: Histogram[Double] = {
+  def youngStructure: Histogram[Double] =
     sketch.structures.head.scanUpdate(_bufferToList)
-  }
 
   lazy val _youngStructure: Histogram[Double] = youngStructure
 
 //  @Benchmark
-  def youngSamplingCdf: PointPlot = {
+  def youngSamplingCdf: PointPlot =
     _youngStructure.cdfSampling
-  }
 
   lazy val _youngSamplingCdf: PointPlot = youngSamplingCdf
 

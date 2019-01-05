@@ -21,53 +21,43 @@ class BufferBench { self =>
   var data100: List[(Double, Count)] = List.fill(100)((2.0, 2.0))
 
   @Setup
-  def setupBuffer(): Unit = {
+  def setupBuffer(): Unit =
     self.buffer = Buffer(List.fill(size)((1, 1)))
-  }
 
   @Benchmark
-  def construct: Buffer[Double] = {
+  def construct: Buffer[Double] =
     Buffer.empty[Double]
-  }
 
   @Benchmark
-  def append: Buffer[Double] = {
+  def append: Buffer[Double] =
     buffer :+ (1, 1)
-  }
 
   @Benchmark
-  def appends1: Buffer[Double] = {
+  def appends1: Buffer[Double] =
     buffer ++ data1
-  }
 
   @Benchmark
-  def appends100: Buffer[Double] = {
+  def appends100: Buffer[Double] =
     buffer ++ data100
-  }
 
   @Benchmark
-  def splitAt0: (Buffer[Double], Buffer[Double]) = {
+  def splitAt0: (Buffer[Double], Buffer[Double]) =
     buffer.splitAt(0)
-  }
 
   @Benchmark
-  def splitAt1: (Buffer[Double], Buffer[Double]) = {
+  def splitAt1: (Buffer[Double], Buffer[Double]) =
     buffer.splitAt(1)
-  }
 
   @Benchmark
-  def splitAt10: (Buffer[Double], Buffer[Double]) = {
+  def splitAt10: (Buffer[Double], Buffer[Double]) =
     buffer.splitAt(10)
-  }
 
   @Benchmark
-  def toList: List[(Double, Count)] = {
+  def toList: List[(Double, Count)] =
     buffer.toList
-  }
 
   @Benchmark
-  def sum: Count = {
+  def sum: Count =
     buffer.sum
-  }
 
 }

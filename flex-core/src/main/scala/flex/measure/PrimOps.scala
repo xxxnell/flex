@@ -7,17 +7,15 @@ import org.scalactic.Tolerance._
 
 object PrimOps {
 
-  def similarForError(prim1: Prim, prim2: Prim, error: Double): Boolean = {
+  def similarForError(prim1: Prim, prim2: Prim, error: Double): Boolean =
     if (prim1 == 0) {
       prim1 == prim2
     } else {
       prim1 === (prim2 +- math.abs(prim1 * error))
     }
-  }
 
-  def similarForTolerance(prim1: Prim, prim2: Prim, tol: Prim): Boolean = {
+  def similarForTolerance(prim1: Prim, prim2: Prim, tol: Prim): Boolean =
     prim1 === (prim2 +- tol)
-  }
 
   def cutoff(prim: Prim): Prim =
     if (prim.isNegInfinity) Double.MinValue else if (prim.isPosInfinity) Double.MaxValue else prim

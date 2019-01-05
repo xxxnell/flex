@@ -50,24 +50,21 @@ object ExpOutOps {
     strs.foreach { case (idx, str) => writeStr(path, name, s"$subname-$idx", str) }
 
   @Deprecated
-  def writePlot(path: String, name: String, affix: String, plot: RangePlot): Unit = {
+  def writePlot(path: String, name: String, affix: String, plot: RangePlot): Unit =
     writeStr(path, name, affix, plot.csv)
-  }
 
   @Deprecated
-  def writePlotsForDetails(path: String, name: String, plots: List[(Int, RangePlot)]): Unit = {
+  def writePlotsForDetails(path: String, name: String, plots: List[(Int, RangePlot)]): Unit =
     for (idxPlot <- plots) {
       val (idx, plot) = idxPlot
       writePlot(path, name, s"$idx", plot)
     }
-  }
 
   @Deprecated
-  def writePlotsForDetailsSubname(path: String, name: String, subname: String, plots: List[(Int, RangePlot)]): Unit = {
+  def writePlotsForDetailsSubname(path: String, name: String, subname: String, plots: List[(Int, RangePlot)]): Unit =
     for (idxPlot <- plots) {
       val (idx, plot) = idxPlot
       writePlot(path, name, s"$subname-$idx", plot)
     }
-  }
 
 }

@@ -9,8 +9,8 @@ import scala.collection.immutable.NumericRange
 import scala.language.higherKinds
 
 /**
-  * Range for primitive type of Sketch.
-  */
+ * Range for primitive type of Sketch.
+ */
 trait RangePOps[R[_] <: RangeM[_]] extends RangeMOps[Prim, R] {
 
   def intersection[A <: Prim](range1: R[A], range2: R[A]): R[A] = {
@@ -54,17 +54,15 @@ object RangeP extends RangePOps[RangeM] {
 
   def apply(start: Prim, end: Prim): RangeP = bare(start, end)
 
-  def bare(start: Prim, end: Prim): RangeP = {
+  def bare(start: Prim, end: Prim): RangeP =
     if (start < end) RangePImpl(start, end) else RangePImpl(end, start)
-  }
 
   def point(p: Prim): RangeP = bare(p, p)
 
   def forNumericRange(numRange: NumericRange[Prim]): RangeP = apply(numRange.start, numRange.end)
 
-  def forRangeM[A](rangeM: RangeM[A]): RangeP = {
+  def forRangeM[A](rangeM: RangeM[A]): RangeP =
     bare(rangeM.measure.to(rangeM.start), rangeM.measure.to(rangeM.end))
-  }
 
   def modifyRange[A <: Prim](range: RangeM[A], f: (A, A) => (A, A)): RangeM[A] =
     RangeM.modifyRange(range, f)

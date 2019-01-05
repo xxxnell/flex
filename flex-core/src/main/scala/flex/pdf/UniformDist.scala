@@ -6,11 +6,11 @@ import flex.plot.PointPlot
 import flex.rand.IRng
 
 /**
-  * UniformDist, or Uniform distribution.
-  *
-  * @see <a href="https://en.wikipedia.org/wiki/Uniform_distribution_(continuous)">
-  *        Uniform distribution - Wikipedia</a>
-  * */
+ * UniformDist, or Uniform distribution.
+ *
+ * @see <a href="https://en.wikipedia.org/wiki/Uniform_distribution_(continuous)">
+ *        Uniform distribution - Wikipedia</a>
+ * */
 trait UniformDist[A] extends NumericDist[A] {
   val scale: A
   val width: Double
@@ -37,14 +37,13 @@ trait UniformDistOps extends NumericDistOps[UniformDist] { self =>
     if (q > 1) 1.0 else if (q < 0) 0.0 else q
   }
 
-  override def icdf[A](dist: UniformDist[A], p: Double): A = {
+  override def icdf[A](dist: UniformDist[A], p: Double): A =
     if (p >= 0 && p <= 1) {
       val measure = dist.measure
       val pScale = measure.to(dist.scale)
 
       measure.from(dist.width * p + pScale - (dist.width / 2))
     } else throw new IllegalArgumentException(s"$p is forbidden.")
-  }
 
   override def pdfSampling[A](dist: UniformDist[A]): PointPlot = {
     val measure = dist.measure

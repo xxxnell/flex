@@ -20,7 +20,7 @@ trait RangeSyntax {
       .toList
       .flatMap {
         case a1 :: a2 :: Nil => Some((a1, a2))
-        case _ => None
+        case _               => None
       }
       .map { case (start, end) => RangeM(start, end) }
 

@@ -34,43 +34,37 @@ object BenchOutOps {
 
   object RecordOps {
 
-    def records(result: RunResult): List[String] = {
+    def records(result: RunResult): List[String] =
       metadata2Records(result.getAggregatedResult.getParams) :::
         result2Records(result.getAggregatedResult.getPrimaryResult)
-    }
 
-    def recordLabels: List[String] = {
+    def recordLabels: List[String] =
       paramLabels :::
         resultLabels
-    }
 
-    def metadata2Records(params: BenchmarkParams): List[String] = {
+    def metadata2Records(params: BenchmarkParams): List[String] =
       params.getBenchmark ::
         metadata2Params(params).mkString(" & ") ::
         Nil
-    }
 
-    def metadata2Params(params: BenchmarkParams): Map[String, String] = {
+    def metadata2Params(params: BenchmarkParams): Map[String, String] =
       params.getParamsKeys.asScala.toList
         .map(key => {
           (key, params.getParam(key))
         })
         .toMap
-    }
 
-    def paramLabels: List[String] = {
+    def paramLabels: List[String] =
       "Benchmark" ::
         "Parameters" ::
         Nil
-    }
 
-    def result2Records(result: BenchResult[_]): List[String] = {
+    def result2Records(result: BenchResult[_]): List[String] =
       result.getScore.toString ::
         result.getScoreError.toString ::
         result.getScoreUnit ::
         result.getSampleCount.toString ::
         Nil
-    }
 
     def resultLabels: List[String] = "Score" :: "Error" :: "Unit" :: "Count" :: Nil
 

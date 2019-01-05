@@ -5,10 +5,10 @@ import flex.measure.Measure
 import flex.rand.IRng
 
 /**
-  * SimpleSketch, or Simple Sketch does not update any structures once after it
-  * is initialized. It can also be used as an improved histogram that uses
-  * Sketch's algorithm without deepUpdate.
-  * */
+ * SimpleSketch, or Simple Sketch does not update any structures once after it
+ * is initialized. It can also be used as an improved histogram that uses
+ * Sketch's algorithm without deepUpdate.
+ * */
 case class SimpleSketch[A](measure: Measure[A], rng: IRng, conf: SketchConf, structures: Structures) extends Sketch[A]
 
 trait SimpleSketchOps extends SketchPrimPropOps[SimpleSketch] {

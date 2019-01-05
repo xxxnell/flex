@@ -5,10 +5,10 @@ import flex.rand.IRng
 import scala.language.higherKinds
 
 /**
-  * RecurSketch, or Recurrent Sketch has a stream of thresholds. RecurSketch
-  * consumes the thresholds and rebuild itself when its counter for
-  * number of data exceeds the threshold.
-  * */
+ * RecurSketch, or Recurrent Sketch has a stream of thresholds. RecurSketch
+ * consumes the thresholds and rebuild itself when its counter for
+ * number of data exceeds the threshold.
+ * */
 trait RecurSketch[A] extends Sketch[A] {
 
   def count: Count
@@ -49,24 +49,24 @@ object RecurSketch extends RecurSketchOps[RecurSketch] {
 
   def modifyRng[A](sketch: RecurSketch[A], f: IRng => IRng): RecurSketch[A] =
     sketch match {
-      case periodic: PeriodicSketch[A] => PeriodicSketch.modifyRng(periodic, f)
+      case periodic: PeriodicSketch[A]   => PeriodicSketch.modifyRng(periodic, f)
       case selective: SelectiveSketch[A] => SelectiveSketch.modifyRng(selective, f)
     }
 
   def modifyStructures[A](sketch: RecurSketch[A], f: Structures => Structures): RecurSketch[A] =
     sketch match {
-      case periodic: PeriodicSketch[A] => PeriodicSketch.modifyStructures(periodic, f)
+      case periodic: PeriodicSketch[A]   => PeriodicSketch.modifyStructures(periodic, f)
       case selective: SelectiveSketch[A] => SelectiveSketch.modifyStructures(selective, f)
     }
 
   def modifyThresholds[A](sketch: RecurSketch[A], f: Stream[Double] => Stream[Double]): RecurSketch[A] =
     sketch match {
-      case periodic: PeriodicSketch[A] => PeriodicSketch.modifyThresholds(periodic, f)
+      case periodic: PeriodicSketch[A]   => PeriodicSketch.modifyThresholds(periodic, f)
       case selective: SelectiveSketch[A] => SelectiveSketch.modifyThresholds(selective, f)
     }
 
   def modifyCount[A](sketch: RecurSketch[A], f: Count => Count): RecurSketch[A] = sketch match {
-    case periodic: PeriodicSketch[A] => PeriodicSketch.modifyCount(periodic, f)
+    case periodic: PeriodicSketch[A]   => PeriodicSketch.modifyCount(periodic, f)
     case selective: SelectiveSketch[A] => SelectiveSketch.modifyCount(selective, f)
   }
 
@@ -78,7 +78,7 @@ object RecurSketch extends RecurSketchOps[RecurSketch] {
 
   override def update[A](sketch: RecurSketch[A], as: List[(A, Count)]): RecurSketch[A] = sketch match {
     case (sketch: PeriodicSketch[A]) => PeriodicSketch.update(sketch, as)
-    case _ => super.update(sketch, as)
+    case _                           => super.update(sketch, as)
   }
 
 }

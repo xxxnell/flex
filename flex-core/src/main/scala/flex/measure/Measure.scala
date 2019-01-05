@@ -4,9 +4,9 @@ import flex.pdf.Prim
 import scala.reflect.runtime.universe.{typeOf, TypeTag}
 
 /**
-  * Measure is a bijective map between primitive type of Sketch and arbitrary
-  * type.
-  * */
+ * Measure is a bijective map between primitive type of Sketch and arbitrary
+ * type.
+ * */
 trait Measure[A] {
 
   def apply(a: A): Prim = to(a)

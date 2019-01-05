@@ -36,24 +36,20 @@ class ArrayBench1 {
   }
 
   @Benchmark
-  def add: INDArray = {
+  def add: INDArray =
     x.add(1)
-  }
 
   @Benchmark
-  def mul: INDArray = {
+  def mul: INDArray =
     x.mul(xt)
-  }
 
   @Benchmark
-  def getLast: INDArray = {
+  def getLast: INDArray =
     x.get(NDArrayIndex.indices(dim - 1))
-  }
 
   @Benchmark
-  def concat: INDArray = {
+  def concat: INDArray =
     Nd4j.concat(1, x, scalar)
-  }
 
   def reshape: INDArray = ???
 

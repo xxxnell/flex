@@ -8,9 +8,9 @@ import flex.rand.IRng
 import scala.language.higherKinds
 
 /**
-  * PlottedDist, or Plotted Distribution has a plot with specific quantization
-  * points and their probability densities.
-  * */
+ * PlottedDist, or Plotted Distribution has a plot with specific quantization
+ * points and their probability densities.
+ * */
 trait PlottedDist[A] extends SamplingDist[A] {
 
   def cdfSampling: PointPlot

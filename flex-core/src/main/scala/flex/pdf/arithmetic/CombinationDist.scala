@@ -14,8 +14,8 @@ trait CombinationDist[A] extends Dist[A] {
   lazy val normalizedComponents: NonEmptyList[(Double, Dist[A])] = CombinationDist.normalizing(components)
 
   /**
-    * @return list of (weight, distribution)
-    * */
+   * @return list of (weight, distribution)
+   * */
   def components: NonEmptyList[(Double, Dist[A])]
 
   def rng: IRng
@@ -35,9 +35,8 @@ trait CombinationDistOps[D[_] <: CombinationDist[_]] extends DistPropOps[D] {
   def modifyComponent[A](dist: D[A], idx: Int, f: (Double, Dist[A]) => (Double, Dist[A])): D[A] = {
     val (utdWeight, utdDist) = dist.components.asInstanceOf[Components[A]].toList.apply(idx)
 
-    modifyComponents(
-      dist,
-      components => NonEmptyList.fromList(components.toList.updated(idx, f(utdWeight, utdDist))).get)
+    modifyComponents(dist,
+                     components => NonEmptyList.fromList(components.toList.updated(idx, f(utdWeight, utdDist))).get)
   }
 
   def probability[A](combi: D[A], start: A, end: A): Double = {
@@ -125,19 +124,16 @@ object CombinationDist extends CombinationDistOps[CombinationDist] {
   }
 
   def apply[A](components: NonEmptyList[(Double, Dist[A])])(implicit measure: Measure[A],
-                                                            conf: DistConf): CombinationDist[A] = {
+                                                            conf: DistConf): CombinationDist[A] =
     bare(measure, conf, components, IRng(components.head._1.hashCode()))
-  }
 
   def bare[A](measure: Measure[A], conf: DistConf, components: Components[A], rng: IRng): CombinationDist[A] =
     CombinationDistImpl(measure, conf, components, rng)
 
-  def modifyRng[A](dist: CombinationDist[A], f: IRng => IRng): CombinationDist[A] = {
+  def modifyRng[A](dist: CombinationDist[A], f: IRng => IRng): CombinationDist[A] =
     bare(dist.measure, dist.conf, dist.components, f(dist.rng))
-  }
 
-  def modifyComponents[A](dist: CombinationDist[A], f: Components[A] => Components[A]): CombinationDist[A] = {
+  def modifyComponents[A](dist: CombinationDist[A], f: Components[A] => Components[A]): CombinationDist[A] =
     bare(dist.measure, dist.conf, f(dist.components), dist.rng)
-  }
 
 }

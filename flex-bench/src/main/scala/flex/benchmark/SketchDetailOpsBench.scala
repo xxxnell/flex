@@ -74,53 +74,43 @@ class SketchDetailOpsBench { self =>
   }
 
   @Benchmark
-  def sampling: PointPlot = {
+  def sampling: PointPlot =
     sketch.pdfSampling
-  }
 
   @Benchmark
-  def narrowUpdate: Sketch[Double] = {
+  def narrowUpdate: Sketch[Double] =
     sketch.narrowUpdate(1)
-  }
 
   @Benchmark
-  def deepUpdate: (Sketch[Double], Option[Histogram[Double]]) = {
+  def deepUpdate: (Sketch[Double], Option[Histogram[Double]]) =
     sketch.deepUpdate(1.0 to 10.0 by 1.0: _*)
-  }
 
   @Benchmark
-  def flatMap: Sketch[Double] = {
+  def flatMap: Sketch[Double] =
     sketch.flatMap(a => Dist.delta(a))
-  }
 
   @Benchmark
-  def rebuild: Sketch[Double] = {
+  def rebuild: Sketch[Double] =
     sketch.rebuild
-  }
 
   @Benchmark
-  def probability: Double = {
+  def probability: Double =
     sketch.probability(1, 2)
-  }
 
   @Benchmark
-  def count: Double = {
+  def count: Double =
     sketch.count(1, 2)
-  }
 
   @Benchmark
-  def median: Double = {
+  def median: Double =
     sketch.median
-  }
 
   @Benchmark
-  def sample: (Sketch[Double], Double) = {
+  def sample: (Sketch[Double], Double) =
     sketch.sample
-  }
 
   @Benchmark
-  def fastPdf: Double = {
+  def fastPdf: Double =
     sketch.pdf(1)
-  }
 
 }

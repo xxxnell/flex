@@ -24,14 +24,12 @@ class HCounterOpsBench {
   var hcounter: HCounter = _
 
   @Setup
-  def setupHCounter(): Unit = {
+  def setupHCounter(): Unit =
     hcounter = HCounter.empty(counterNo, counterSize, seed)
-  }
 
   @Benchmark
-  def construct: HCounter = {
+  def construct: HCounter =
     HCounter.empty(counterNo, counterSize, seed)
-  }
 
   @Benchmark
   def update: HCounter = {
@@ -59,9 +57,8 @@ class HCounterOpsBench {
   }
 
   @Benchmark
-  def sum: Double = {
+  def sum: Double =
     hcounter.sum
-  }
 
   @Benchmark
   def count: Double = {

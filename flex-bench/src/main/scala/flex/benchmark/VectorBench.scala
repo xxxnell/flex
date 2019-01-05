@@ -21,33 +21,27 @@ class VectorBench {
   var x: Vector[Int] = _
 
   @Setup
-  def setup(): Unit = {
+  def setup(): Unit =
     x = Vector(1 to dim: _*)
-  }
 
   @Benchmark
-  def updated: Vector[Int] = {
+  def updated: Vector[Int] =
     x.updated(dim - 1, dim)
-  }
 
   @Benchmark
-  def indexOf: Int = {
+  def indexOf: Int =
     x.indexOf(dim)
-  }
 
   @Benchmark
-  def apply: Int = {
+  def apply: Int =
     x.apply(dim - 1)
-  }
 
   @Benchmark
-  def remove1: Vector[Int] = {
+  def remove1: Vector[Int] =
     x.patch(dim - 1, Nil, 1)
-  }
 
   @Benchmark
-  def remove2: Vector[Int] = {
+  def remove2: Vector[Int] =
     x.take(dim / 2) ++ x.takeRight(dim / 2)
-  }
 
 }

@@ -19,9 +19,9 @@ trait CDFDiagnose {
   }
 
   /**
-    * Exists loop for intersaction of cdf1 and cdf2
-    * @param f (x1, x2, cum11, cum12, cum21, cum22)
-    * */
+   * Exists loop for intersaction of cdf1 and cdf2
+   * @param f (x1, x2, cum11, cum12, cum21, cum22)
+   * */
   protected def cdfExistsItc(cdf1: PointPlot,
                              cdf2: PointPlot,
                              f: ((Double, Double, Double, Double, Double, Double)) => Boolean): Boolean = {
@@ -45,9 +45,9 @@ trait CDFDiagnose {
   }
 
   /**
-    * Exists loop for union of cdf1 and cdf2
-    * @param f (x1, x2, cum11, cum12, cum21, cum22)
-    * */
+   * Exists loop for union of cdf1 and cdf2
+   * @param f (x1, x2, cum11, cum12, cum21, cum22)
+   * */
   protected def cdfExistsUni(cdf1: PointPlot,
                              cdf2: PointPlot,
                              f: ((Double, Double, Double, Double, Double, Double)) => Boolean): Boolean =

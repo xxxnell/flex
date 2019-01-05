@@ -6,10 +6,10 @@ import flex.plot.PointPlot
 import flex.rand._
 
 /**
-  * Dirac delta function.
-  *
-  * @see <a href="https://en.wikipedia.org/wiki/Dirac_delta_function">Dirac delta function - Wikipedia</a>
-  */
+ * Dirac delta function.
+ *
+ * @see <a href="https://en.wikipedia.org/wiki/Dirac_delta_function">Dirac delta function - Wikipedia</a>
+ */
 case class DeltaDist[A](measure: Measure[A], conf: SmoothDistConf, pole: A, rng: IRng = IRng(0)) extends NumericDist[A]
 
 trait DeltaDistOps extends NumericDistOps[DeltaDist] {

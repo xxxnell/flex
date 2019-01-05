@@ -6,8 +6,7 @@ import flex.pdf.Dist
 
 object Sum {
 
-  def weightedSum[A](weightDists: List[(Double, Dist[A])], measureB: Measure[A], conf: DistConf): CombinationDist[A] = {
+  def weightedSum[A](weightDists: List[(Double, Dist[A])], measureB: Measure[A], conf: DistConf): CombinationDist[A] =
     CombinationDist(weightDists: _*)(measureB, conf)
-  }
 
 }

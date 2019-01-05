@@ -6,10 +6,10 @@ import flex.rand.IRng
 import org.apache.commons.math3.distribution.LogNormalDistribution
 
 /**
-  * Log-normal distribution.
-  *
-  * @see <a href="https://en.wikipedia.org/wiki/Log-normal_distribution">Log-normal distribution - Wikipedia</a>
-  * */
+ * Log-normal distribution.
+ *
+ * @see <a href="https://en.wikipedia.org/wiki/Log-normal_distribution">Log-normal distribution - Wikipedia</a>
+ * */
 trait LogNormalDist[A] extends NumericDist[A] {
   val scale: A
   val shape: Prim

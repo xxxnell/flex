@@ -16,7 +16,7 @@ trait Memo[K, V] {
 
 trait MemoOps {
 
-  def get[K, V](memo: Memo[K, V], k: K, f: K => V): V = {
+  def get[K, V](memo: Memo[K, V], k: K, f: K => V): V =
     memo.table.get(k) match {
       case Some(value) => value
       case None =>
@@ -24,7 +24,6 @@ trait MemoOps {
         put(memo, k, value)
         value
     }
-  }
 
   def put[K, V](memo: Memo[K, V], k: K, v: V): Unit = {
     memo.queue += k

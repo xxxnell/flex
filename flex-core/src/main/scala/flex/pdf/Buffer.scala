@@ -50,9 +50,8 @@ trait BufferOps {
     (_q1, _q2)
   }
 
-  def toList[A](buffer: Buffer[A]): List[(A, Count)] = {
+  def toList[A](buffer: Buffer[A]): List[(A, Count)] =
     if (buffer.size == 1) buffer.dataset.head :: Nil else buffer.dataset.toList
-  }
 
   def sum[A](buffer: Buffer[A]): Count = buffer.dataset.foldLeft(0.0) { case (acc, (_, count)) => acc + count }
 

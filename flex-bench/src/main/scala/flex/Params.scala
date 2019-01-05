@@ -54,12 +54,11 @@ object Params {
 
   def reducedBy(i: Int): Params = {
     def reduce[A](as: List[A], i: Int): List[A] = as.sliding(i, i).toList.flatMap(ps => ps.headOption)
-    apply(
-      reduce(defaultCmapSizes, i),
-      reduce(defaultCmapNos, i),
-      reduce(defaultBufferSizes, i),
-      reduce(defaultDecayFactors, i),
-      reduce(defaultRebuildThresholds, i))
+    apply(reduce(defaultCmapSizes, i),
+          reduce(defaultCmapNos, i),
+          reduce(defaultBufferSizes, i),
+          reduce(defaultDecayFactors, i),
+          reduce(defaultRebuildThresholds, i))
   }
 
   val defaultCmapSizes: List[Int] = (10 :: 25 :: 40 :: 55 :: 100 :: Nil).distinct.sorted

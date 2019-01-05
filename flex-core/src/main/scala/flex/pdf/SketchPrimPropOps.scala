@@ -11,8 +11,8 @@ import scala.collection.mutable
 import scala.language.{higherKinds, postfixOps}
 
 /**
-  * This Ops introduces the update function with primitive type as a parameter.
-  */
+ * This Ops introduces the update function with primitive type as a parameter.
+ */
 trait SketchPrimPropOps[S[_] <: Sketch[_]] extends SketchPrimPropLaws[S] with SketchPropOps[S] { self =>
 
   def smoothingPs: SmoothingPs = EqualSpaceSmoothingPs
@@ -20,14 +20,14 @@ trait SketchPrimPropOps[S[_] <: Sketch[_]] extends SketchPrimPropLaws[S] with Sk
   // Update ops
 
   /**
-    * Update a list of primitive value <code>p</code> without rearranging process only for structures.
-    * */
+   * Update a list of primitive value <code>p</code> without rearranging process only for structures.
+   * */
   def primNarrowUpdateForStrs[A](sketch: S[A], ps: List[(Prim, Count)]): S[A] =
     modifyEffStructure(sketch, hist => hist.update(ps))
 
   /**
-    * Deep update a list of primitive value <code>p</code> instead of <code>a</code> ∈ <code>A</code>
-    * */
+   * Deep update a list of primitive value <code>p</code> instead of <code>a</code> ∈ <code>A</code>
+   * */
   def primDeepUpdate[A](sketch: S[A], ps: List[(Prim, Count)]): (S[A], Option[Histogram[Double]]) = {
     val cmap1 = EqUpdate.updateCmapForSketch[A](sketch.asInstanceOf[Sketch[A]], ps)
     val (strs1, strs0) = (Histogram.forCmap(cmap1)(flex.doubleMeasure, sketch.conf) :: sketch.structures).toList
@@ -61,7 +61,7 @@ trait SketchPrimPropOps[S[_] <: Sketch[_]] extends SketchPrimPropLaws[S] with Sk
 
   private val decayRateCacheLimit: Int = 100
 
-  def decayRate(decayFactor: Double, i: Int): Double = {
+  def decayRate(decayFactor: Double, i: Int): Double =
     decayRateCache.getOrElse(
       (decayFactor, i), {
         val rate = math.exp(-1 * decayFactor * i)
@@ -70,7 +70,6 @@ trait SketchPrimPropOps[S[_] <: Sketch[_]] extends SketchPrimPropLaws[S] with Sk
         rate
       }
     )
-  }
 
   def primCountForStr(sketch: S[_], pFrom: Prim, pTo: Prim): Double = {
     val counts = sketch.structures.map { hist =>
@@ -78,20 +77,20 @@ trait SketchPrimPropOps[S[_] <: Sketch[_]] extends SketchPrimPropLaws[S] with Sk
     }
     val decayRates = (0 until counts.size.toInt)
       .map(i => decayRate(sketch.conf.decayFactor, i))
-    val weightedCountSum = (counts.toList zip decayRates).map { case (count, r) => count * r }.sum
+    val weightedCountSum = counts.toList.zip(decayRates).map { case (count, r) => count * r }.sum
     val normalization = decayRates.sum
 
     weightedCountSum / normalization
   }
 
   /**
-    * Total number of elements be effective memorized.
-    * */
+   * Total number of elements be effective memorized.
+   * */
   def sumForStr(sketch: S[_]): Double = {
     val sums = sketch.structures.map { _.sum }
 
     val decayRates = (0 until sketch.conf.cmap.no).map(i => decayRate(sketch.conf.decayFactor, i))
-    val weightedSumSum = (sums.toList zip decayRates).map { case (sum, r) => sum * r }.sum
+    val weightedSumSum = sums.toList.zip(decayRates).map { case (sum, r) => sum * r }.sum
     val normalization = decayRates.take(sums.size.toInt).sum
 
     weightedSumSum / normalization

@@ -16,8 +16,8 @@ trait DividerCmap extends Cmap {
   lazy val inverseIndex: TreeMap[HDim, Prim] = DividerCmap.divider2InverseIndexingMap(divider)
 
   /**
-    * @return [x_1, x_2)
-    * */
+   * @return [x_1, x_2)
+   * */
   def apply(a: Double): HDim = index.to(a).lastOption.fold(0) { case (_, idx) => idx + 1 }
 
   override def equals(other: Any): Boolean =
@@ -30,7 +30,7 @@ trait DividerCmap extends Cmap {
         .grouped(2)
         .flatMap {
           case a1 :: a2 :: _ => Some(RangeP(a1, a2))
-          case _ => None
+          case _             => None
         }
         .mkString(", ")
 
@@ -77,9 +77,8 @@ trait DividerCmapOps[DC <: DividerCmap] extends CmapOps[DC] {
     bins
   }
 
-  def size(cmap: DC): Int = {
+  def size(cmap: DC): Int =
     cmap.divider.size + 1
-  }
 
   def range(cmap: DC, hdim: HDim): RangeP = {
     val start = cmap.inverseIndex.getOrElse(hdim - 1, min)

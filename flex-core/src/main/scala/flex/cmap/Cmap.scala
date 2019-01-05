@@ -7,14 +7,14 @@ import flex.pdf._
 import flex.range.syntax._
 
 /**
-  * Cmap, or Characteristic Map is a component of the Sketch algorithm. This is
-  * the projection from the primitive value of Sketch to the index of the Hmap.
-  */
+ * Cmap, or Characteristic Map is a component of the Sketch algorithm. This is
+ * the projection from the primitive value of Sketch to the index of the Hmap.
+ */
 trait Cmap {
 
   /**
-    * @return Prim => HDim. HDim starts from 0.
-    * */
+   * @return Prim => HDim. HDim starts from 0.
+   * */
   def apply(a: Prim): HDim
 
 }
@@ -69,7 +69,7 @@ object Cmap extends CmapOps[Cmap] {
 
   def apply(conf: CmapConf): Cmap = conf match {
     case conf: UniformCmapConf => Cmap.uniform(conf.size, conf.start, conf.end)
-    case _ => ???
+    case _                     => ???
   }
 
   def uniform(n: Int, start: Option[Prim] = None, end: Option[Prim] = None): UniformCmap = UniformCmap(n, start, end)

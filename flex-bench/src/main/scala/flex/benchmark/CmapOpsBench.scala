@@ -21,33 +21,27 @@ class CmapOpsBench {
   var cmap: Cmap = _
 
   @Setup
-  def setupCmap(): Unit = {
+  def setupCmap(): Unit =
     cmap = Cmap.uniform(cmapSize)
-  }
 
   @Benchmark
-  def apply: HDim = {
+  def apply: HDim =
     cmap.apply(cmapSize / 2)
-  }
 
   @Benchmark
-  def bins: List[RangeP] = {
+  def bins: List[RangeP] =
     cmap.bins
-  }
 
   @Benchmark
-  def binsArr: Array[RangeP] = {
+  def binsArr: Array[RangeP] =
     cmap.binsArr
-  }
 
   @Benchmark
-  def size: HDim = {
+  def size: HDim =
     cmap.size
-  }
 
   @Benchmark
-  def range: RangeP = {
+  def range: RangeP =
     cmap.range(cmapSize / 2)
-  }
 
 }
