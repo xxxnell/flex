@@ -10,17 +10,16 @@ trait Complex extends Model {
 
   val outputVqh: VQH
 
-  val op: VQH#Codebook => VQH#Codebook
+  val op: VQH#Codeword => VQH#Codeword
 
-  val t: Map[VQH#Codebook, VQH#Codebook]
+  val t: Map[VQH#Codeword, VQH#Codeword]
 
 }
 
 trait ComplexOps extends ModelOps {
 
-  def map[A](fiber: Complex, f: VQH#Codebook => VQH#Codebook): Complex = {
+  def map[A](fiber: Complex, f: VQH#Codeword => VQH#Codeword): Complex =
     Complex(fiber.inputVqh, fiber.outputVqh, fiber.op.andThen(f), fiber.t)
-  }
 
   def update[A](fiber: Complex, xs: List[(INDArray, Int, Float)]): Complex = {
     val (inputVqh1, cins, couts) = fiber.inputVqh.parUpdate(xs)
@@ -37,7 +36,7 @@ trait ComplexOps extends ModelOps {
 trait ComplexSyntax {
 
   implicit class StreamSyntaxImpl(model: Complex) {
-    def map(f: VQH#Codebook => VQH#Codebook): Complex = Complex.map(model, f)
+    def map(f: VQH#Codeword => VQH#Codeword): Complex = Complex.map(model, f)
     def add(means: INDArray, variances: INDArray): Complex = ???
   }
 
@@ -49,12 +48,13 @@ object Complex extends ComplexOps {
 
   private case class ComplexImpl[A](inputVqh: VQH,
                                     outputVqh: VQH,
-                                    op: VQH#Codebook => VQH#Codebook,
-                                    t: Map[VQH#Codebook, VQH#Codebook]) extends Complex
+                                    op: VQH#Codeword => VQH#Codeword,
+                                    t: Map[VQH#Codeword, VQH#Codeword])
+      extends Complex
 
   def apply(inputVqh: VQH,
             outputVqh: VQH,
-            op: VQH#Codebook => VQH#Codebook,
-            t: Map[VQH#Codebook, VQH#Codebook]): Complex = ComplexImpl(inputVqh, outputVqh, op, t)
+            op: VQH#Codeword => VQH#Codeword,
+            t: Map[VQH#Codeword, VQH#Codeword]): Complex = ComplexImpl(inputVqh, outputVqh, op, t)
 
 }
