@@ -23,7 +23,7 @@ object BasicDeltaDistExp {
     val (_, datas) = Dist.delta(0.1).samples(dataNo)
     val sketchTraces = sketch0 :: sketch0.updateTrace(datas)
     val idxSketches = sketchTraces.indices.zip(sketchTraces).toList.filter { case (idx, _) => idx % 10 == 0 }
-    val idxPlots = idxSketches.map { case (idx, utdSkt)                                    => (idx, utdSkt.barPlot) }
+    val idxPlots = idxSketches.map { case (idx, utdSkt) => (idx, utdSkt.barPlot) }
 
     ExpOutOps.clear(expName)
     ExpOutOps.writePlots(expName, "pdf", idxPlots)

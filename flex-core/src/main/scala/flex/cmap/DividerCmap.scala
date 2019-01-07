@@ -30,7 +30,7 @@ trait DividerCmap extends Cmap {
         .grouped(2)
         .flatMap {
           case a1 :: a2 :: _ => Some(RangeP(a1, a2))
-          case _             => None
+          case _ => None
         }
         .mkString(", ")
 

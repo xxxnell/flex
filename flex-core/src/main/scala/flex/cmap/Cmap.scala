@@ -69,7 +69,7 @@ object Cmap extends CmapOps[Cmap] {
 
   def apply(conf: CmapConf): Cmap = conf match {
     case conf: UniformCmapConf => Cmap.uniform(conf.size, conf.start, conf.end)
-    case _                     => ???
+    case _ => ???
   }
 
   def uniform(n: Int, start: Option[Prim] = None, end: Option[Prim] = None): UniformCmap = UniformCmap(n, start, end)

@@ -121,9 +121,9 @@ trait AdaptiveSketchLaws[S[_] <: AdaptiveSketch[_]] { self: AdaptiveSketchOps[S]
     val queue = sketch.buffer.asInstanceOf[List[(A, Count)]]
     val p = measure.to(a)
     val adim = cmap(p)
-    val filteredQ1 = queue.filter { case (_a, _)                    => cmap(measure.to(_a)) == adim - 1 }
-    val filteredQ2 = queue.filter { case (_a, _)                    => cmap(measure.to(_a)) == adim }
-    val filteredQ3 = queue.filter { case (_a, _)                    => cmap(measure.to(_a)) == adim + 1 }
+    val filteredQ1 = queue.filter { case (_a, _) => cmap(measure.to(_a)) == adim - 1 }
+    val filteredQ2 = queue.filter { case (_a, _) => cmap(measure.to(_a)) == adim }
+    val filteredQ3 = queue.filter { case (_a, _) => cmap(measure.to(_a)) == adim + 1 }
     val count1 = filteredQ1.foldLeft(0.0) { case (acc, (_, _count)) => acc + _count }
     val count2 = filteredQ2.foldLeft(0.0) { case (acc, (_, _count)) => acc + _count }
     val count3 = filteredQ3.foldLeft(0.0) { case (acc, (_, _count)) => acc + _count }
@@ -161,7 +161,7 @@ object AdaptiveSketch extends AdaptiveSketchOps[AdaptiveSketch] {
   def update[A](sketch: AdaptiveSketch[A], as: List[(A, Count)]): AdaptiveSketch[A] = sketch match {
     case sketch: AdaSelSketch[A] => AdaSelSketch.update(sketch, as)
     case sketch: AdaPerSketch[A] => AdaPerSketch.update(sketch, as)
-    case _                       => narrowUpdate(sketch, as)
+    case _ => narrowUpdate(sketch, as)
   }
 
 }

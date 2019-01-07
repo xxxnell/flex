@@ -25,23 +25,23 @@ object BlipConceptDriftExp {
     val idxSketches = sketchTraces.indices.zip(sketchTraces).toList.filter {
       case (idx, _) => idx >= draftStart - duration && idx <= draftStart + 2 * duration
     }
-    val idxPdf = idxSketches.map { case (idx, sketch)    => (idx, sketch.barPlot.csv) }
-    val idxCdf = idxSketches.map { case (idx, sketch)    => (idx, sketch.cdfSampling.csv) }
-    val idxDel = idxSketches.map { case (idx, sketch)    => (idx, Delta(underlying0, sketch).csv) }
-    val idxKld = idxSketches.map { case (idx, sketch)    => (idx, KLD(underlying0, sketch)) }
-    val idxCos = idxSketches.map { case (idx, sketch)    => (idx, Cosine(underlying0, sketch)) }
-    val idxEuc = idxSketches.map { case (idx, sketch)    => (idx, Euclidean(underlying0, sketch)) }
-    val idxED = idxSketches.map { case (idx, sketch)     => (idx, ED(underlying0, sketch)) }
+    val idxPdf = idxSketches.map { case (idx, sketch) => (idx, sketch.barPlot.csv) }
+    val idxCdf = idxSketches.map { case (idx, sketch) => (idx, sketch.cdfSampling.csv) }
+    val idxDel = idxSketches.map { case (idx, sketch) => (idx, Delta(underlying0, sketch).csv) }
+    val idxKld = idxSketches.map { case (idx, sketch) => (idx, KLD(underlying0, sketch)) }
+    val idxCos = idxSketches.map { case (idx, sketch) => (idx, Cosine(underlying0, sketch)) }
+    val idxEuc = idxSketches.map { case (idx, sketch) => (idx, Euclidean(underlying0, sketch)) }
+    val idxED = idxSketches.map { case (idx, sketch) => (idx, ED(underlying0, sketch)) }
     val idxMedian = idxSketches.map { case (idx, sketch) => (idx, sketch.median) }
 
     ExpOutOps.clear(expName)
     ExpOutOps.writeStrs(expName, "pdf", idxPdf)
     ExpOutOps.writeStrs(expName, "cdf", idxCdf)
     ExpOutOps.writeStrs(expName, "delta", idxDel)
-    ExpOutOps.writeStr(expName, "kld", idxKld.map { case (idx, kld)       => s"$idx, $kld" }.mkString("\n"))
-    ExpOutOps.writeStr(expName, "cosine", idxCos.map { case (idx, cos)    => s"$idx, $cos" }.mkString("\n"))
+    ExpOutOps.writeStr(expName, "kld", idxKld.map { case (idx, kld) => s"$idx, $kld" }.mkString("\n"))
+    ExpOutOps.writeStr(expName, "cosine", idxCos.map { case (idx, cos) => s"$idx, $cos" }.mkString("\n"))
     ExpOutOps.writeStr(expName, "euclidean", idxEuc.map { case (idx, euc) => s"$idx, $euc" }.mkString("\n"))
-    ExpOutOps.writeStr(expName, "ed", idxED.map { case (idx, ed)          => s"$idx, $ed" }.mkString("\n"))
+    ExpOutOps.writeStr(expName, "ed", idxED.map { case (idx, ed) => s"$idx, $ed" }.mkString("\n"))
     ExpOutOps.writeStr(expName,
                        "median",
                        idxMedian.map { case (idx, sktMed) => s"$idx, ${center(idx)}, $sktMed" }.mkString("\n"))

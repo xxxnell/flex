@@ -51,7 +51,7 @@ object SelectiveSketch extends SelectiveSketchOps[SelectiveSketch] {
 
   override def update[A](sketch: SelectiveSketch[A], as: List[(A, Count)]): SelectiveSketch[A] = sketch match {
     case (sketch: AdaSelSketch[A]) => AdaSelSketch.update(sketch, as)
-    case _                         => super.update(sketch, as)
+    case _ => super.update(sketch, as)
   }
 
 }

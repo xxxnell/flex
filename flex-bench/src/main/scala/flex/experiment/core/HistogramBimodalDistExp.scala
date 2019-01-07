@@ -31,7 +31,7 @@ object HistogramBimodalDistExp { self =>
     val idxHistos = histoTraces.indices.zip(histoTraces).toList.filter { case (idx, _) => idx % 10 == 0 }
 
     // histogram results
-    val idxPdf = idxHistos.map { case (idx, histo)  => (idx, histo.barPlot) }
+    val idxPdf = idxHistos.map { case (idx, histo) => (idx, histo.barPlot) }
     val idxKld = idxHistos.map { case (idx, utdSkt) => (idx, KLD(underlying, utdSkt)) }
     val idxCos = idxHistos.map { case (idx, utdSkt) => (idx, Cosine(underlying, utdSkt)) }
     val idxEuc = idxHistos.map { case (idx, utdSkt) => (idx, Euclidean(underlying, utdSkt)) }
@@ -40,8 +40,8 @@ object HistogramBimodalDistExp { self =>
 
     // write histo results
     ExpOutOps.writePlots(expName, "histo-pdf", idxPdf)
-    ExpOutOps.writeStr(expName, "histo-kld", idxKld.map { case (idx, kld)       => s"$idx, $kld" }.mkString("\n"))
-    ExpOutOps.writeStr(expName, "histo-cos", idxCos.map { case (idx, cos)       => s"$idx, $cos" }.mkString("\n"))
+    ExpOutOps.writeStr(expName, "histo-kld", idxKld.map { case (idx, kld) => s"$idx, $kld" }.mkString("\n"))
+    ExpOutOps.writeStr(expName, "histo-cos", idxCos.map { case (idx, cos) => s"$idx, $cos" }.mkString("\n"))
     ExpOutOps.writeStr(expName, "histo-euclidean", idxEuc.map { case (idx, cos) => s"$idx, $cos" }.mkString("\n"))
   }
 

@@ -68,47 +68,47 @@ object NumericDist extends NumericDistOps[NumericDist] {
   // pipelining
 
   def modifyRng[A](dist: NumericDist[A], f: IRng => IRng): NumericDist[A] = dist match {
-    case dist: ParetoDist[A]    => ParetoDist.modifyRng(dist, f)
+    case dist: ParetoDist[A] => ParetoDist.modifyRng(dist, f)
     case dist: LogNormalDist[A] => LogNormalDist.modifyRng(dist, f)
-    case dist: NormalDist[A]    => NormalDist.modifyRng(dist, f)
-    case dist: DeltaDist[A]     => DeltaDist.modifyRng(dist, f)
-    case dist: UniformDist[A]   => UniformDist.modifyRng(dist, f)
+    case dist: NormalDist[A] => NormalDist.modifyRng(dist, f)
+    case dist: DeltaDist[A] => DeltaDist.modifyRng(dist, f)
+    case dist: UniformDist[A] => UniformDist.modifyRng(dist, f)
   }
 
   override def pdf[A](dist: NumericDist[A], a: A): Prim = dist match {
-    case dist: ParetoDist[A]    => ParetoDist.pdf(dist, a)
+    case dist: ParetoDist[A] => ParetoDist.pdf(dist, a)
     case dist: LogNormalDist[A] => LogNormalDist.pdf(dist, a)
-    case dist: NormalDist[A]    => NormalDist.pdf(dist, a)
-    case dist: DeltaDist[A]     => DeltaDist.pdf(dist, a)
-    case dist: UniformDist[A]   => UniformDist.pdf(dist, a)
+    case dist: NormalDist[A] => NormalDist.pdf(dist, a)
+    case dist: DeltaDist[A] => DeltaDist.pdf(dist, a)
+    case dist: UniformDist[A] => UniformDist.pdf(dist, a)
   }
 
   override def cdf[A](dist: NumericDist[A], a: A): Double = dist match {
-    case dist: ParetoDist[A]    => ParetoDist.cdf(dist, a)
+    case dist: ParetoDist[A] => ParetoDist.cdf(dist, a)
     case dist: LogNormalDist[A] => LogNormalDist.cdf(dist, a)
-    case dist: NormalDist[A]    => NormalDist.cdf(dist, a)
-    case dist: DeltaDist[A]     => DeltaDist.cdf(dist, a)
-    case dist: UniformDist[A]   => UniformDist.cdf(dist, a)
+    case dist: NormalDist[A] => NormalDist.cdf(dist, a)
+    case dist: DeltaDist[A] => DeltaDist.cdf(dist, a)
+    case dist: UniformDist[A] => UniformDist.cdf(dist, a)
   }
 
   override def icdf[A](dist: NumericDist[A], p: Double): A = dist match {
-    case dist: ParetoDist[A]    => ParetoDist.icdf(dist, p)
+    case dist: ParetoDist[A] => ParetoDist.icdf(dist, p)
     case dist: LogNormalDist[A] => LogNormalDist.icdf(dist, p)
-    case dist: NormalDist[A]    => NormalDist.icdf(dist, p)
-    case dist: DeltaDist[A]     => DeltaDist.icdf(dist, p)
-    case dist: UniformDist[A]   => UniformDist.icdf(dist, p)
+    case dist: NormalDist[A] => NormalDist.icdf(dist, p)
+    case dist: DeltaDist[A] => DeltaDist.icdf(dist, p)
+    case dist: UniformDist[A] => UniformDist.icdf(dist, p)
   }
 
   override def pdfSampling[A](dist: NumericDist[A]): PointPlot = dist match {
-    case dist: DeltaDist[A]   => DeltaDist.pdfSampling(dist)
+    case dist: DeltaDist[A] => DeltaDist.pdfSampling(dist)
     case dist: UniformDist[A] => UniformDist.pdfSampling(dist)
-    case _                    => super.pdfSampling(dist)
+    case _ => super.pdfSampling(dist)
   }
 
   override def cdfSampling[A](dist: NumericDist[A]): PointPlot = dist match {
-    case dist: DeltaDist[A]   => DeltaDist.cdfSampling(dist)
+    case dist: DeltaDist[A] => DeltaDist.cdfSampling(dist)
     case dist: UniformDist[A] => UniformDist.cdfSampling(dist)
-    case _                    => super.cdfSampling(dist)
+    case _ => super.cdfSampling(dist)
   }
 
 }

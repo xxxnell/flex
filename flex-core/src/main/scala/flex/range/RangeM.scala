@@ -100,7 +100,7 @@ trait RangeMOps[Γ, R[_] <: RangeM[_]] {
       .toList
       .flatMap {
         case p1 :: p2 :: Nil => Some(setRange(range, measure.from(p1), measure.from(p2)))
-        case _               => None
+        case _ => None
       }
   }
 

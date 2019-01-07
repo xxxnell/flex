@@ -25,7 +25,7 @@ trait IcdfSamplingLaws[C <: IcdfSamplingConf] { self: IcdfSampling[C] =>
       .toList
       .flatMap {
         case q1 :: q2 :: Nil => Some(RangeM(q1, q2)(measure))
-        case _               => None
+        case _ => None
       }
 
 }

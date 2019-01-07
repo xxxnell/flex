@@ -57,7 +57,7 @@ object ConfExp {
     val datas = (1 to dataNo).toList.map(idx => underlying(idx).sample._2)
     val sketchTraces = sketch0 :: sketch0.updateTrace(datas)
     val idxSketches = sketchTraces.indices.zip(sketchTraces).toList.filter { case (idx, _) => idx % 10 == 0 }
-    val idxEd = idxSketches.map { case (idx, sketch)                                       => (idx, math.abs(ED(underlying(idx), sketch))) }
+    val idxEd = idxSketches.map { case (idx, sketch) => (idx, math.abs(ED(underlying(idx), sketch))) }
 
     mean(idxEd.filter { case (idx, _) => idx >= measureStart && idx <= measureEnd }.unzip._2)
   }

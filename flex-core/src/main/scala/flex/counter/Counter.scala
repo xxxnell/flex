@@ -45,7 +45,7 @@ object Counter extends CounterOps[Counter] {
   def empty(size: Int): VectorCounter = VectorCounter.empty(size)
 
   def update(counter: Counter, cdim: CDim, count: Double): Counter = counter match {
-    case counter: ListCounter   => ListCounter.update(counter, cdim, count)
+    case counter: ListCounter => ListCounter.update(counter, cdim, count)
     case counter: VectorCounter => VectorCounter.update(counter, cdim, count)
   }
 

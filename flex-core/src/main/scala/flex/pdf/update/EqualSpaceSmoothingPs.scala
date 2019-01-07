@@ -25,11 +25,11 @@ object EqualSpaceSmoothingPs extends SmoothingPs {
     val sliding: List[List[(Prim, Count)]] = sorted.sliding(2).toList
     val headAppendingO: Option[(Prim, Count)] = sliding.headOption.flatMap {
       case (p1, _) :: (p2, _) :: Nil => Some((p1 - (p2 - p1), 0d))
-      case _                         => None
+      case _ => None
     }
     val lastAppendingO: Option[(Prim, Count)] = sliding.lastOption.flatMap {
       case (p1, _) :: (p2, _) :: Nil => Some((p2 + (p2 - p1), 0d))
-      case _                         => None
+      case _ => None
     }
 
     val densityRecords = (headAppendingO.toList ::: sorted ::: lastAppendingO.toList)

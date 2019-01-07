@@ -38,8 +38,8 @@ object HistogramLognormalDistExp { self =>
 
     // write histo results
     ExpOutOps.writePlots(expName, "histo-pdf", idxPdf)
-    ExpOutOps.writeStr(expName, "histo-kld", idxKld.map { case (idx, kld)       => s"$idx, $kld" }.mkString("\n"))
-    ExpOutOps.writeStr(expName, "histo-cos", idxCos.map { case (idx, cos)       => s"$idx, $cos" }.mkString("\n"))
+    ExpOutOps.writeStr(expName, "histo-kld", idxKld.map { case (idx, kld) => s"$idx, $kld" }.mkString("\n"))
+    ExpOutOps.writeStr(expName, "histo-cos", idxCos.map { case (idx, cos) => s"$idx, $cos" }.mkString("\n"))
     ExpOutOps.writeStr(expName, "histo-euclidean", idxEuc.map { case (idx, cos) => s"$idx, $cos" }.mkString("\n"))
   }
 

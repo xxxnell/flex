@@ -22,7 +22,7 @@ object Fitting {
 
     as match {
       case start :: end :: Nil if start._1 >= x && end._1 <= x => linearFitting(start, end, x)
-      case _ if as.size > 2 && polyValid                       => polynomialFitting(as, x)
+      case _ if as.size > 2 && polyValid => polynomialFitting(as, x)
       case _ =>
         for {
           start <- as.find(_._1 <= x)

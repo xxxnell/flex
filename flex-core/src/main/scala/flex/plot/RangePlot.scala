@@ -25,7 +25,7 @@ trait RangePlot extends Plot {
     .toList
     .flatMap {
       case p1 :: p2 :: Nil => Some((p1, p2))
-      case _               => None
+      case _ => None
     }
 
   lazy val startIndexedBlocks: TreeMap[Prim, List[Block]] =
@@ -129,7 +129,7 @@ trait RangePlotLaws[P <: RangePlot] { self: RangePlotOps[P] =>
 
   def domain(plot: P): Option[RangeP] = {
     val startO = Try(plot.records.map { case (range, _) => range.start }.min).toOption
-    val endO = Try(plot.records.map { case (range, _)   => range.end }.max).toOption
+    val endO = Try(plot.records.map { case (range, _) => range.end }.max).toOption
 
     for {
       start <- startO
@@ -294,17 +294,17 @@ object RangePlot extends RangePlotOps[RangePlot] {
 
   def modifyRecords(plot: RangePlot, f: List[Record] => List[Record]): RangePlot = plot match {
     case plot: DensityPlot => DensityPlot.modifyRecords(plot, f)
-    case plot: CountPlot   => CountPlot.modifyRecords(plot, f)
+    case plot: CountPlot => CountPlot.modifyRecords(plot, f)
   }
 
   private[plot] def unsafeModifyRecords(plot: RangePlot, f: List[Record] => List[Record]): RangePlot = plot match {
     case plot: DensityPlot => DensityPlot.unsafeModifyRecords(plot, f)
-    case plot: CountPlot   => CountPlot.unsafeModifyRecords(plot, f)
+    case plot: CountPlot => CountPlot.unsafeModifyRecords(plot, f)
   }
 
   def modifyValue(plot: RangePlot, f: Record => Double): RangePlot = plot match {
     case plot: DensityPlot => DensityPlot.modifyValue(plot, f)
-    case plot: CountPlot   => CountPlot.modifyValue(plot, f)
+    case plot: CountPlot => CountPlot.modifyValue(plot, f)
   }
 
   def split(record: Record, p: Double): Option[(Record, Record)] = DensityPlot.split(record, p)

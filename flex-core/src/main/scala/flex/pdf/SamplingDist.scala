@@ -26,31 +26,31 @@ object SamplingDist extends SamplingDistPropOps[SamplingDist] {
 
   def modifyRng[A](dist: SamplingDist[A], f: IRng => IRng): SamplingDist[A] = dist match {
     case dataBinning: DataBinningDist[A] => DataBinningDist.modifyRng(dataBinning, f)
-    case (plotted: PlottedDist[A])       => PlottedDist.modifyRng(plotted, f)
-    case _                               => ???
+    case (plotted: PlottedDist[A]) => PlottedDist.modifyRng(plotted, f)
+    case _ => ???
   }
 
   def probability[A](dist: SamplingDist[A], start: A, end: A): Double = dist match {
     case dataBinning: DataBinningDist[A] => DataBinningDist.probability(dataBinning, start, end)
-    case plotted: PlottedDist[A]         => PlottedDist.probability(plotted, start, end)
-    case _                               => ???
+    case plotted: PlottedDist[A] => PlottedDist.probability(plotted, start, end)
+    case _ => ???
   }
 
   def cdfSampling[A](dist: SamplingDist[A]): PointPlot = dist match {
     case dataBinning: DataBinningDist[A] => DataBinningDist.cdfSampling(dataBinning)
-    case plotted: PlottedDist[A]         => PlottedDist.cdfSampling(plotted)
-    case _                               => ???
+    case plotted: PlottedDist[A] => PlottedDist.cdfSampling(plotted)
+    case _ => ???
   }
 
   override def pdfSampling[A](dist: SamplingDist[A]): PointPlot = dist match {
     case dataBinning: DataBinningDist[A] => DataBinningDist.pdfSampling(dataBinning)
-    case plotted: PlottedDist[A]         => PlottedDist.pdfSampling(plotted)
-    case _                               => ???
+    case plotted: PlottedDist[A] => PlottedDist.pdfSampling(plotted)
+    case _ => ???
   }
 
   override def pdf[A](dist: SamplingDist[A], a: A): Prim = dist match {
     case dataBinning: DataBinningDist[_] => DataBinningDist.pdf(dataBinning, a)
-    case plotted: PlottedDist[_]         => PlottedDist.pdf(plotted, a)
+    case plotted: PlottedDist[_] => PlottedDist.pdf(plotted, a)
   }
 
 }

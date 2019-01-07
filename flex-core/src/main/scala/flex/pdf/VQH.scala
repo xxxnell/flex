@@ -18,12 +18,12 @@ trait VQH {
    * */
   val ntot: Float
 
+  val rng: IRng
+
   /**
    * Expected number of codebook vectors
    * */
   val k: Int
-
-  val rng: IRng
 
 }
 
@@ -45,7 +45,9 @@ trait VQHOps {
         val (vqh1, newcs1, outcs1) = parSearch(vqh, x, a)
           .map {
             case (c, n, i) =>
-              lazy val cnew = c.zipWithIndex.map { case (cp, b) => if (a == b) x else diffusion(cp) }
+              lazy val cnew = c.zipWithIndex.map {
+                case (cp, b) => if (a == b) x else diffusion(cp)
+              }
               singleUpdate(_vqh, c, i, n, cnew, w)
           }
           .getOrElse(vqh, List.empty[VQH#Codebook], List.empty[VQH#Codebook])
@@ -85,10 +87,12 @@ trait VQHOps {
 
     // Step C. Remove old cookbook vectors
     val qtot = vqh2.cns.map { case (_, m) => sigmoid(avgpi - m / vqh2.ntot) }.sum
-    var (berq, q, cns1, cs2) = (berp, 0, Vector.empty[(VQH#Codebook, Float)], List.empty[VQH#Codebook])
+    var (berq, q, cns1, cs2) =
+      (berp, 0, Vector.empty[(VQH#Codebook, Float)], List.empty[VQH#Codebook])
     for (i <- 0 to vqh2.cns.length) {
       val _cns = vqh2.cns.apply(i)
-      val (_berq, _q) = Bernoulli(sigmoid(avgpi - _cns._2 / vqh2.ntot) / qtot, berq.rng).sample
+      val (_berq, _q) =
+        Bernoulli(sigmoid(avgpi - _cns._2 / vqh2.ntot) / qtot, berq.rng).sample
       berq = _berq
       q = _q
       if (q == 0) cns1 = cns1.+:(_cns) else cs2 = _cns._1 :: cs2
@@ -105,7 +109,8 @@ trait VQHOps {
   /**
    * @return (codebook vector, count, index)
    * */
-  def expSearch(vqh: VQH, x: VQH#Codebook): Option[(VQH#Codebook, Float, Int)] = ???
+  def expSearch(vqh: VQH, x: VQH#Codebook): Option[(VQH#Codebook, Float, Int)] =
+    ???
 
   def sigmoid(x: Float): Float = 1 / (1 + math.exp(-1 * x).toFloat)
 
@@ -132,6 +137,7 @@ object VQH extends VQHOps {
 
   def apply(cns: Vector[(VQH#Codebook, Float)], ntot: Float, k: Int, rng: IRng): VQH = VQHImpl(cns, ntot, k, rng)
 
-  def empty(k: Int): VQH = apply(Vector.empty[(VQH#Codebook, Float)], 0, k, IRng(k.hashCode))
+  def empty(k: Int): VQH =
+    apply(Vector.empty[(VQH#Codebook, Float)], 0, k, IRng(k.hashCode))
 
 }
