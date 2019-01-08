@@ -34,8 +34,14 @@ trait VQHOps {
   def add(vqh: VQH, c: VQH#Codeword, n: Float): VQH =
     VQH(vqh.cns.+((c, n)), vqh.ntot + n, vqh.k, vqh.rng)
 
-  def patch(vqh: VQH, c: VQH#Codeword, n: Float): VQH =
+  def remove(vqh: VQH, c: VQH#Codeword): VQH =
+    VQH(vqh.cns.-(c), vqh.ntot - vqh.cns.getOrElse(c, 0f), vqh.k, vqh.rng)
+
+  def patchCount(vqh: VQH, c: VQH#Codeword, n: Float): VQH =
     VQH(vqh.cns.updated(c, n), vqh.ntot - vqh.cns.getOrElse(c, 0f) + n, vqh.k, vqh.rng)
+
+  def patchRng(vqh: VQH, rng: IRng): VQH =
+    VQH(vqh.cns, vqh.ntot, vqh.k, rng)
 
   /**
    * Update partial input vectors with its indices.
@@ -69,30 +75,27 @@ trait VQHOps {
                    w: Float): (VQH, List[VQH#Codeword], List[VQH#Codeword]) = {
     // Step A. Increase the count
     val n = vqh.cns.getOrElse(c, 0f) + w
-    val vqh1 = patch(vqh, c, n)
+    val vqh1 = patchCount(vqh, c, n)
 
     // Step B. Add a new codeword vector
     val avgpi = 1 / vqh.k.toFloat
     val (berp, p) = Bernoulli(sigmoid(n / vqh.ntot - avgpi), vqh.rng).sample
     val (vqh2, cnews) = if (p == 1) {
-      val _vqh = patch(vqh1, c, n / 2)
+      val _vqh = patchCount(vqh1, c, n / 2)
       (add(_vqh, cnew, n / 2), cnew :: Nil)
       // TODO abruptly forget loop
     } else (vqh1, Nil)
 
     // Step C. Remove old codeword vectors
     val qtot = vqh2.cns.map { case (_, _n) => sigmoid(avgpi - _n / vqh2.ntot) }.sum
-    var (berq, cnnews, couts, ntot) =
-      (berp, HashMap.empty[VQH#Codeword, Float], List.empty[VQH#Codeword], 0f)
-    vqh2.cns.foreach {
-      case (_c, _n) =>
-        val (_berq, q) = Bernoulli(sigmoid(avgpi - _n / vqh2.ntot) / qtot, berq.rng).sample
-        berq = _berq
-        ntot = ntot + _n
-        if (q == 1) couts = _c :: couts else cnnews = cnnews.+((_c, _n))
+    val (vqh3, berq, couts) = vqh2.cns.foldLeft(vqh2, berp, List.empty[VQH#Codeword]) {
+      case ((_vqh0, _berq0, _couts0), (_c, _n)) =>
+        val (_berq1, q) = Bernoulli(sigmoid(avgpi - _n / vqh2.ntot) / qtot, _berq0.rng).sample
+        val (_vqh1, _couts1) = if (q == 1) (remove(_vqh0, _c), _c :: _couts0) else (_vqh0, _couts0)
+        (_vqh1, _berq1, _couts1)
     }
 
-    (VQH(cnnews, ntot, vqh2.k, berq.rng), cnews, couts)
+    (patchRng(vqh3, berq.rng), cnews, couts)
   }
 
   def parSearch(vqh: VQH, xp: INDArray, i: Int): Option[VQH#Codeword] = ???
