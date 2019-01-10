@@ -20,7 +20,18 @@ trait NDArrayANNOps extends ANNOps[INDArray, NDArrayANN] {
 
 }
 
+trait NDArrayANNSyntax {
+
+  implicit class NDArrayANNSyntaxImpl(_ann: NDArrayANN) extends AnnSyntaxImpl[INDArray, NDArrayANN] {
+    val ann: NDArrayANN = _ann
+    val ops: ANNOps[INDArray, NDArrayANN] = NDArrayANN
+  }
+
+}
+
 object NDArrayANN extends NDArrayANNOps {
+
+  object syntax extends NDArrayANNSyntax
 
   private case class NDArrayANNImpl(lshs: List[LSH[INDArray]],
                                     htables: List[NDArrayANN#HTable],

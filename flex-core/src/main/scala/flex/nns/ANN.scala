@@ -53,3 +53,17 @@ trait ANNLaws[V, A <: ANN[V]] { self: ANNOps[V, A] =>
   }
 
 }
+
+trait AnnSyntaxImpl[V, A <: ANN[V]] {
+  val ann: A
+  val ops: ANNOps[V, A]
+  def add(x: V): A = ops.add(ann, x)
+  def remove(x: V): A = ops.remove(ann, x)
+  def search(x: V): Option[V] = ops.search(ann, x)
+}
+
+object ANN {
+
+  object syntax extends CodewordANNSyntax with NDArrayANNSyntax with ParANNSyntax
+
+}

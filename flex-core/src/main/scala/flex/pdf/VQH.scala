@@ -3,6 +3,8 @@ package flex.pdf
 import org.nd4j.linalg.api.ndarray.INDArray
 import flex.pdf.Bernoulli.syntax._
 import flex.rand._
+import flex.nns._
+import flex.nns.ANN.syntax._
 
 import scala.collection.immutable.HashMap
 
@@ -20,31 +22,43 @@ trait VQH {
    * */
   val ntot: Float
 
-  val rng: IRng
-
   /**
    * Expected number of codeword vectors
    * */
   val k: Int
 
+  val rng: IRng
+
+  val cwAnn: CodewordANN
+
+  val parAnn: ParANN
+
 }
 
 trait VQHOps {
 
-  def add(vqh: VQH, c: VQH#Codeword, n: Float): VQH =
-    VQH(vqh.cns.+((c, n)), vqh.ntot + n, vqh.k, vqh.rng)
+  def add(vqh: VQH, x: VQH#Codeword, n: Float): VQH = {
+    val cns1 = vqh.cns.+((x, n))
+    val cwAnn1 = vqh.cwAnn.add(x)
+    val parAnn1 = vqh.parAnn.add(x)
+    VQH(cns1, vqh.ntot + n, vqh.k, vqh.rng, cwAnn1, parAnn1)
+  }
 
-  def remove(vqh: VQH, c: VQH#Codeword): VQH =
-    VQH(vqh.cns.-(c), vqh.ntot - vqh.cns.getOrElse(c, 0f), vqh.k, vqh.rng)
+  def remove(vqh: VQH, x: VQH#Codeword): VQH = {
+    val cns1 = vqh.cns.-(x)
+    val cwAnn1 = vqh.cwAnn.remove(x)
+    val parAnn1 = vqh.parAnn.remove(x)
+    VQH(cns1, vqh.ntot - vqh.cns.getOrElse(x, 0f), vqh.k, vqh.rng, cwAnn1, parAnn1)
+  }
 
-  def patchCount(vqh: VQH, c: VQH#Codeword, n: Float): VQH =
-    VQH(vqh.cns.updated(c, n), vqh.ntot - vqh.cns.getOrElse(c, 0f) + n, vqh.k, vqh.rng)
+  def patchCount(vqh: VQH, x: VQH#Codeword, n: Float): VQH =
+    VQH(vqh.cns.updated(x, n), vqh.ntot - vqh.cns.getOrElse(x, 0f) + n, vqh.k, vqh.rng, vqh.cwAnn, vqh.parAnn)
 
   def patchRng(vqh: VQH, rng: IRng): VQH =
-    VQH(vqh.cns, vqh.ntot, vqh.k, rng)
+    VQH(vqh.cns, vqh.ntot, vqh.k, rng, vqh.cwAnn, vqh.parAnn)
 
   /**
-   * Update partial input vectors with its indices.
+   * Update partial input vectors.
    * @return (Updated VQH, new codeword-vectors, out codeword-vectors)
    * */
   def parUpdate(vqh: VQH, xps: List[(INDArray, Int, Float)]): (VQH, List[VQH#Codeword], List[VQH#Codeword]) =
@@ -57,7 +71,7 @@ trait VQHOps {
     }
 
   /**
-   * Update input vectors with its indices.
+   * Update input vectors.
    * @return (Updated VQH, new codeword-vectors, out codeword-vectors)
    * */
   def expUpdate(vqh: VQH, xs: List[(VQH#Codeword, Float)]): (VQH, List[VQH#Codeword], List[VQH#Codeword]) =
@@ -70,18 +84,18 @@ trait VQHOps {
     }
 
   def singleUpdate(vqh: VQH,
-                   c: VQH#Codeword,
+                   x: VQH#Codeword,
                    cnew: => VQH#Codeword,
                    w: Float): (VQH, List[VQH#Codeword], List[VQH#Codeword]) = {
     // Step A. Increase the count
-    val n = vqh.cns.getOrElse(c, 0f) + w
-    val vqh1 = patchCount(vqh, c, n)
+    val n = vqh.cns.getOrElse(x, 0f) + w
+    val vqh1 = patchCount(vqh, x, n)
 
     // Step B. Add a new codeword vector
     val avgpi = 1 / vqh.k.toFloat
     val (berp, p) = Bernoulli(sigmoid(n / vqh.ntot - avgpi), vqh.rng).sample
     val (vqh2, cnews) = if (p == 1) {
-      val _vqh = patchCount(vqh1, c, n / 2)
+      val _vqh = patchCount(vqh1, x, n / 2)
       (add(_vqh, cnew, n / 2), cnew :: Nil)
       // TODO abruptly forget loop
     } else (vqh1, Nil)
@@ -98,16 +112,16 @@ trait VQHOps {
     (patchRng(vqh3, berq.rng), cnews, couts)
   }
 
-  def parSearch(vqh: VQH, xp: INDArray, i: Int): Option[VQH#Codeword] = ???
+  def parSearch(vqh: VQH, xp: INDArray, i: Int): Option[VQH#Codeword] = vqh.parAnn.search(xp, i)
 
-  def expSearch(vqh: VQH, x: VQH#Codeword): Option[VQH#Codeword] = ???
+  def expSearch(vqh: VQH, x: VQH#Codeword): Option[VQH#Codeword] = vqh.cwAnn.search(x)
 
   def sigmoid(x: Float): Float = 1 / (1 + math.exp(-1 * x).toFloat)
 
-  // TODO implement (Ito) diffusion
+  // TODO
   def diffusion(x: INDArray): INDArray = x
 
-  def diffusionExcept(c: VQH#Codeword, is: List[Int]): VQH#Codeword = c.zipWithIndex.map {
+  def diffusionExcept(x: VQH#Codeword, is: List[Int]): VQH#Codeword = x.zipWithIndex.map {
     case (cp, b) => if (is.contains(b)) cp else diffusion(cp)
   }
 
@@ -116,9 +130,12 @@ trait VQHOps {
 trait VQHSyntax {
 
   implicit class VQHSyntaxImpl(vqh: VQH) {
-    def parUpdate(xs: List[(INDArray, Int, Float)]): (VQH, List[VQH#Codeword], List[VQH#Codeword]) = ???
-    def expUpdate(xs: List[(VQH#Codeword, Float)]): (VQH, List[VQH#Codeword], List[VQH#Codeword]) = ???
-    def parSearch(x: INDArray, i: Int): VQH#Codeword = ???
+    def parUpdate(xps: List[(INDArray, Int, Float)]): (VQH, List[VQH#Codeword], List[VQH#Codeword]) =
+      VQH.parUpdate(vqh, xps)
+    def expUpdate(xs: List[(VQH#Codeword, Float)]): (VQH, List[VQH#Codeword], List[VQH#Codeword]) =
+      VQH.expUpdate(vqh, xs)
+    def parSearch(xp: INDArray, i: Int): Option[VQH#Codeword] = VQH.parSearch(vqh, xp, i)
+    def expSearch(x: VQH#Codeword): Option[VQH#Codeword] = VQH.expSearch(vqh, x)
   }
 
 }
@@ -127,10 +144,27 @@ object VQH extends VQHOps {
 
   object syntax extends VQHSyntax
 
-  private case class VQHImpl(cns: HashMap[VQH#Codeword, Float], ntot: Float, k: Int, rng: IRng) extends VQH
+  private case class VQHImpl(cns: HashMap[VQH#Codeword, Float],
+                             ntot: Float,
+                             k: Int,
+                             rng: IRng,
+                             cwAnn: CodewordANN,
+                             parAnn: ParANN)
+      extends VQH
 
-  def apply(cns: HashMap[VQH#Codeword, Float], ntot: Float, k: Int, rng: IRng): VQH = VQHImpl(cns, ntot, k, rng)
+  def apply(cns: HashMap[VQH#Codeword, Float],
+            ntot: Float,
+            k: Int,
+            rng: IRng,
+            cwAnn: CodewordANN,
+            parAnn: ParANN): VQH = VQHImpl(cns, ntot, k, rng, cwAnn, parAnn)
 
-  def empty(k: Int): VQH = apply(HashMap.empty[VQH#Codeword, Float], 0, k, IRng(k.hashCode))
+  def empty(dims: List[Int], k: Int): VQH = {
+    val l = math.round(math.sqrt(k.toDouble)).toInt
+    val rng1 = IRng(k.hashCode)
+    val (cwAnn, rng2) = CodewordANN.empty(l, dims, rng1)
+    val (parAnn, rng3) = ParANN.empty(l, dims, rng2)
+    apply(HashMap.empty[VQH#Codeword, Float], 0, k, rng3, cwAnn, parAnn)
+  }
 
 }

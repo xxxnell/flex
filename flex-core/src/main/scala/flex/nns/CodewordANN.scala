@@ -20,7 +20,18 @@ trait CodewordANNOps extends ANNOps[VQH#Codeword, CodewordANN] {
 
 }
 
+trait CodewordANNSyntax {
+
+  implicit class CodewordANNSyntaxImpl(_ann: CodewordANN) extends AnnSyntaxImpl[VQH#Codeword, CodewordANN] {
+    val ann: CodewordANN = _ann
+    val ops: ANNOps[VQH#Codeword, CodewordANN] = CodewordANN
+  }
+
+}
+
 object CodewordANN extends CodewordANNOps {
+
+  object syntax extends CodewordANNSyntax
 
   private case class CodewordANNImpl(lshs: List[LSH[VQH#Codeword]],
                                      htables: List[CodewordANN#HTable],

@@ -25,7 +25,7 @@ trait ComplexOps extends ModelOps {
     val (inputVqh1, cins, couts) = fiber.inputVqh.parUpdate(xs)
     val cys = cins.map(cin => (cin, fiber.op(cin)))
     val t1 = fiber.t -- couts ++ cys
-    val ys = xs.flatMap { case (x1, i, w) => t1.get(inputVqh1.parSearch(x1, i)).map(y => (y, w)) }
+    val ys = xs.flatMap { case (x1, i, w) => inputVqh1.parSearch(x1, i).flatMap(c => t1.get(c).map(y => (y, w))) }
     val (outputVqh1, _, _) = fiber.outputVqh.expUpdate(ys)
 
     Complex(inputVqh1, outputVqh1, fiber.op, t1)
