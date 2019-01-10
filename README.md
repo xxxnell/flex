@@ -54,7 +54,7 @@ First, construct an empty model using `Complex.empty`. Second, `add` the variabl
 
 ## Contributing
 
-Contributions are always welcome. Any kind of contribution, such as writing a unit test, documentation, bug fix, or implementing the algorithm of Chain in another language, is helpful. If you need some help, please contact me via [email](mailto:xxxxxnell@gmail.com) or [twitter](https://twitter.com/xxxnell).
+Contributions are always welcome. Any kind of contribution, such as writing a unit test, documentation, bug fix, or implementing the algorithm of Chain in another language, is helpful. It is also possible to make academic collaboration works. If you need some help, please contact me via [email](mailto:xxxxxnell@gmail.com) or [twitter](https://twitter.com/xxxnell).
 
 The `master` branch of this repository contains the latest stable release of Chain. In general, pull requests should be submitted from a separate `feature` branch starting from the `develop` branch. 
 
