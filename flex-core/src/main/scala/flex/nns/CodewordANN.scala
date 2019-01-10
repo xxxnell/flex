@@ -1,7 +1,9 @@
 package flex.nns
 
 import flex.pdf.VQH
-import org.nd4j.linalg.api.ndarray.INDArray
+import flex.rand._
+
+import scala.collection.immutable.{HashMap, HashSet}
 
 trait CodewordANN extends ANN[VQH#Codeword]
 
@@ -29,5 +31,19 @@ object CodewordANN extends CodewordANNOps {
             htables: List[CodewordANN#HTable],
             vtables: List[CodewordANN#VTable]): CodewordANN =
     CodewordANNImpl(lshs, htables, vtables)
+
+  /**
+   * @param l Number of LSHs
+   * @param dims Shape of <code>VQH#Codeword</code>
+   * */
+  def empty(l: Int, dims: List[Int], rng: IRng): (CodewordANN, IRng) = {
+    val w = 1.0f
+    val (lshs, rng1) = (1 to l).foldRight((List.empty[LSH[VQH#Codeword]], rng)) {
+      case (_, (_lshs, _rng1)) => LSH.codeword(dims, w, _rng1) match { case (_lsh, _rng2) => (_lsh :: _lshs, _rng2) }
+    }
+    val htables = List.fill(l)(HashMap.empty[Int, HashSet[VQH#Codeword]])
+    val vtables = List.fill(l)(HashMap.empty[VQH#Codeword, Int])
+    (apply(lshs, htables, vtables), rng1)
+  }
 
 }
