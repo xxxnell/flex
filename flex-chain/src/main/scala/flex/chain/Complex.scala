@@ -18,17 +18,17 @@ trait Complex extends Model {
 
 trait ComplexOps extends ModelOps {
 
-  def map[A](fiber: Complex, f: VQH#Codeword => VQH#Codeword): Complex =
-    Complex(fiber.inputVqh, fiber.outputVqh, fiber.op.andThen(f), fiber.t)
+  def map[A](complex: Complex, f: VQH#Codeword => VQH#Codeword): Complex =
+    Complex(complex.inputVqh, complex.outputVqh, complex.op.andThen(f), complex.t)
 
-  def update[A](fiber: Complex, xs: List[(INDArray, Int, Float)]): Complex = {
-    val (inputVqh1, cins, couts) = fiber.inputVqh.parUpdate(xs)
-    val cys = cins.map(cin => (cin, fiber.op(cin)))
-    val t1 = fiber.t -- couts ++ cys
-    val ys = xs.flatMap { case (x1, i, w) => inputVqh1.parSearch(x1, i).flatMap(c => t1.get(c).map(y => (y, w))) }
-    val (outputVqh1, _, _) = fiber.outputVqh.expUpdate(ys)
+  def update[A](complex: Complex, xps: List[(INDArray, Int, Float)]): Complex = {
+    val (inputVqh1, cins, couts) = complex.inputVqh.parUpdate(xps)
+    val cys = cins.map(cin => (cin, complex.op(cin)))
+    val t1 = complex.t -- couts ++ cys
+    val ys = xps.flatMap { case (x1, i, w) => inputVqh1.parSearch(x1, i).flatMap(c => t1.get(c).map(y => (y, w))) }
+    val (outputVqh1, _, _) = complex.outputVqh.expUpdate(ys)
 
-    Complex(inputVqh1, outputVqh1, fiber.op, t1)
+    Complex(inputVqh1, outputVqh1, complex.op, t1)
   }
 
 }

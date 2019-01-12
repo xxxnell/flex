@@ -2,7 +2,6 @@ package flex.benchmark
 
 import java.util.concurrent.TimeUnit
 
-import flex.{Sketch, SketchConf}
 import flex.benchmark.ops.SignalOps
 import flex.implicits._
 import org.openjdk.jmh.annotations._
