@@ -6,14 +6,16 @@ import org.nd4j.linalg.factory.Nd4j
 
 trait CodewordLSHOps extends LSHOps[VQH#Codeword] {
 
-  def hash(lsh: LSH[VQH#Codeword], x: VQH#Codeword): Int =
+  def hash(lsh: CodewordLSH, x: VQH#Codeword): Int =
     ((x.zip(lsh.a).map { case (_x, _a) => _a.mul(_x).getFloat(0) }.sum + lsh.b) / lsh.w).floor.round
+
+  def dim(lsh: CodewordLSH): Int = lsh.a.map(_.shape.apply(1)).sum.toInt
 
 }
 
 object CodewordLSH extends CodewordLSHOps {
 
-  private case class CodewordLSHImpl(a: VQH#Codeword, b: Float, w: Float) extends LSH[VQH#Codeword]
+  private case class CodewordLSHImpl(a: VQH#Codeword, b: Float, w: Float) extends CodewordLSH
 
   def apply(a: VQH#Codeword, b: Float, w: Float): CodewordLSH = CodewordLSHImpl(a, b, w)
 

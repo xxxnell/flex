@@ -26,12 +26,15 @@ trait LSHOps[V] {
 
   def hash(lsh: LSH[V], x: V): Int
 
+  def dim(lsh: LSH[V]): Int
+
 }
 
 trait LSHSyntax {
 
   implicit class LSHSyntaxImpl[V](lsh: LSH[V]) {
     def hash(x: V)(implicit ops: LSHOps[V]): Int = ops.hash(lsh, x)
+    def dim(implicit ops: LSHOps[V]): Int = ops.dim(lsh)
   }
 
   implicit val ndarrayLsh: LSHOps[INDArray] = NDArrayLSH

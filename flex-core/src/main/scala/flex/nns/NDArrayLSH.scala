@@ -9,6 +9,8 @@ trait NDArrayLSHOps extends LSHOps[INDArray] {
 
   def hash(lsh: LSH[INDArray], x: INDArray): Int = ((lsh.a.mul(x).getFloat(0) + lsh.b) / lsh.w).floor.round
 
+  def dim(lsh: LSH[INDArray]): Int = lsh.a.shape.apply(1).toInt
+
 }
 
 object NDArrayLSH extends NDArrayLSHOps {

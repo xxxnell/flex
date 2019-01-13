@@ -6,9 +6,9 @@ import org.nd4j.linalg.factory.Nd4j
 import org.specs2.mutable._
 import org.specs2.ScalaCheck
 
-class ANNSpec extends Specification with ScalaCheck {
+class NDArrayANNSpec extends Specification with ScalaCheck {
 
-  "ANN" should {
+  "NDArrayANN" should {
 
     "construct" in {
       val (l, dim, rng) = (10, 2, IRng(0))

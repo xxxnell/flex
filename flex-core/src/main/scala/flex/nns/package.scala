@@ -13,4 +13,6 @@ package object nns {
 
   type CodewordANN = ANN[VQH#Codeword]
 
+  object syntax extends ANNSyntax with ParANNSyntax with LSHSyntax
+
 }

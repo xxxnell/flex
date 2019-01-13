@@ -1,9 +1,8 @@
 package flex.nns
 
+import flex.nns.ANN.syntax._
 import flex.pdf.VQH
 import flex.rand._
-import flex.nns.LSH.syntax._
-import flex.nns.ANN.syntax._
 import org.nd4j.linalg.api.ndarray.INDArray
 
 trait ParANN {
@@ -24,7 +23,7 @@ trait ParANNOps extends ParANNLaws {
 
 trait ParANNLaws { self: ParANNOps =>
 
-  def add(ann: ParANN, x: VQH#Codeword)(implicit lshOps: LSHOps[INDArray]): ParANN = {
+  def add(ann: ParANN, x: VQH#Codeword): ParANN = {
     val arrAnns1 = ann.arrAnns.zip(x).map { case (arrAnn, xp) => arrAnn.add(xp) }
     val compMap1 = x.foldLeft(ann.compMap) { case (_m, xp) => _m.+(xp -> x) }
     patchCompMap(patchArrAnns(ann, arrAnns1), compMap1)
@@ -62,7 +61,7 @@ object ParANN extends ParANNOps {
   def empty(l: Int, dims: List[Int], rng: IRng): (ParANN, IRng) = {
     val (arrAnns, rng1) = dims.foldLeft((Vector.empty[NDArrayANN], rng)) {
       case ((_parAnns, _rng1), dim) =>
-        NDArrayANN.empty(l, dim, _rng1) match { case (_parAnn, _rng2) => (_parAnns.+:(_parAnn), _rng2) }
+        NDArrayANN.empty(l, dim, _rng1) match { case (_parAnn, _rng2) => (_parAnns.:+(_parAnn), _rng2) }
     }
     (apply(arrAnns, Map.empty[INDArray, VQH#Codeword]), rng1)
   }
