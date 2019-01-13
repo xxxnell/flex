@@ -15,9 +15,11 @@ trait ParANN {
 
 trait ParANNOps extends ParANNLaws {
 
-  def patchArrAnns(ann: ParANN, arrAnns: Vector[NDArrayANN]): ParANN = ???
+  def patchArrAnns(ann: ParANN, arrAnns: Vector[NDArrayANN]): ParANN =
+    ParANN(arrAnns, ann.compMap)
 
-  def patchCompMap(ann: ParANN, compose: Map[INDArray, VQH#Codeword]): ParANN = ???
+  def patchCompMap(ann: ParANN, compMap: Map[INDArray, VQH#Codeword]): ParANN =
+    ParANN(ann.arrAnns, compMap)
 
 }
 
