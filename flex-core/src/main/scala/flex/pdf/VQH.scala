@@ -130,6 +130,8 @@ trait VQHOps {
 trait VQHSyntax {
 
   implicit class VQHSyntaxImpl(vqh: VQH) {
+    def add(x: VQH#Codeword, n: Float): VQH = VQH.add(vqh, x, n)
+    def remove(x: VQH#Codeword): VQH = VQH.remove(vqh, x)
     def parUpdate(xps: List[(INDArray, Int, Float)]): (VQH, List[VQH#Codeword], List[VQH#Codeword]) =
       VQH.parUpdate(vqh, xps)
     def expUpdate(xs: List[(VQH#Codeword, Float)]): (VQH, List[VQH#Codeword], List[VQH#Codeword]) =
