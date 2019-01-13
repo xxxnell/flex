@@ -2,8 +2,8 @@ package flex.benchmark
 
 import java.util.concurrent.TimeUnit
 
-import flex.nns.NDArrayANN
-import flex.nns.NDArrayANN.syntax._
+import flex.nns._
+import flex.nns.ANN.syntax._
 import flex.rand.IRng
 import org.nd4j.linalg.api.ndarray.INDArray
 import org.nd4j.linalg.factory.Nd4j

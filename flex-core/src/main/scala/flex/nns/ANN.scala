@@ -1,6 +1,9 @@
 package flex.nns
 
 import scala.collection.immutable.{HashMap, HashSet}
+import LSH.syntax._
+import flex.pdf.VQH
+import org.nd4j.linalg.api.ndarray.INDArray
 
 trait ANN[V] {
 
@@ -16,26 +19,26 @@ trait ANN[V] {
 
 }
 
-trait ANNOps[V, A <: ANN[V]] extends ANNLaws[V, A] {
+trait ANNOps[V] extends ANNLaws[V] {
 
-  def patchHTables(ann: A, table: List[ANN[V]#HTable]): A
+  def patchHTables(ann: ANN[V], table: List[ANN[V]#HTable]): ANN[V]
 
-  def patchVTables(ann: A, table: List[ANN[V]#VTable]): A
+  def patchVTables(ann: ANN[V], table: List[ANN[V]#VTable]): ANN[V]
 
   def distance(x1: V, x2: V): Float
 
 }
 
-trait ANNLaws[V, A <: ANN[V]] { self: ANNOps[V, A] =>
+trait ANNLaws[V] { self: ANNOps[V] =>
 
-  def add(ann: A, x: V): A = {
+  def add(ann: ANN[V], x: V)(implicit lshOps: LSHOps[V]): ANN[V] = {
     val hashcodes = ann.lshs.map(lsh => lsh.hash(x))
     val htables1 = hashcodes.zip(ann.htables).map { case (h, ht) => ht.updated(h, ht.getOrElse(h, HashSet[V]()).+(x)) }
     val vtables1 = hashcodes.zip(ann.vtables).map { case (h, vt) => vt.updated(x, h) }
     patchVTables(patchHTables(ann, htables1), vtables1)
   }
 
-  def remove(ann: A, x: V): A = {
+  def remove(ann: ANN[V], x: V): ANN[V] = {
     val hashcodes = ann.vtables.map(vt => vt.get(x))
     val htables1 = hashcodes.zip(ann.htables).map {
       case (ho, ht) => ho.flatMap(h => ht.get(h).map(vs => ht.updated(h, vs.-(x)))).getOrElse(ht)
@@ -44,7 +47,7 @@ trait ANNLaws[V, A <: ANN[V]] { self: ANNOps[V, A] =>
     patchVTables(patchHTables(ann, htables1), vtables1)
   }
 
-  def search(ann: A, x: V): Option[V] = {
+  def search(ann: ANN[V], x: V): Option[V] = {
     val hashcodes = ann.vtables.map(vt => vt.get(x))
     val vectors = hashcodes.zip(ann.htables).flatMap { case (ho, ht) => ho.flatMap(h => ht.get(h)).getOrElse(Nil) }
     val ranks = vectors.groupBy(identity).mapValues(_.size).groupBy { case (_, r) => r }.mapValues(_.keySet)
@@ -54,16 +57,21 @@ trait ANNLaws[V, A <: ANN[V]] { self: ANNOps[V, A] =>
 
 }
 
-trait AnnSyntaxImpl[V, A <: ANN[V]] {
-  val ann: A
-  val ops: ANNOps[V, A]
-  def add(x: V): A = ops.add(ann, x)
-  def remove(x: V): A = ops.remove(ann, x)
-  def search(x: V): Option[V] = ops.search(ann, x)
+trait ANNSyntax {
+
+  implicit class AnnSyntaxImpl[V](ann: ANN[V]) {
+    def add(x: V)(implicit ops: ANNOps[V], lshOps: LSHOps[V]): ANN[V] = ops.add(ann, x)
+    def remove(x: V)(implicit ops: ANNOps[V]): ANN[V] = ops.remove(ann, x)
+    def search(x: V)(implicit ops: ANNOps[V]): Option[V] = ops.search(ann, x)
+  }
+
+  implicit val ndarrayOps: ANNOps[INDArray] = NDArrayANN
+  implicit val codewordOps: ANNOps[VQH#Codeword] = CodewordANN
+
 }
 
 object ANN {
 
-  object syntax extends CodewordANNSyntax with NDArrayANNSyntax with ParANNSyntax
+  object syntax extends ANNSyntax with ParANNSyntax
 
 }

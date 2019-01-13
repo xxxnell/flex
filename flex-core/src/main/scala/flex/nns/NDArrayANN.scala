@@ -1,14 +1,11 @@
 package flex.nns
 
-import flex.pdf.NormalDist
 import flex.rand.IRng
 import org.nd4j.linalg.api.ndarray.INDArray
 
 import scala.collection.immutable.{HashMap, HashSet}
 
-trait NDArrayANN extends ANN[INDArray]
-
-trait NDArrayANNOps extends ANNOps[INDArray, NDArrayANN] {
+trait NDArrayANNOps extends ANNOps[INDArray] {
 
   def patchHTables(ann: NDArrayANN, htables: List[NDArrayANN#HTable]): NDArrayANN =
     NDArrayANN(ann.lshs, htables, ann.vtables)
@@ -20,31 +17,20 @@ trait NDArrayANNOps extends ANNOps[INDArray, NDArrayANN] {
 
 }
 
-trait NDArrayANNSyntax {
-
-  implicit class NDArrayANNSyntaxImpl(_ann: NDArrayANN) extends AnnSyntaxImpl[INDArray, NDArrayANN] {
-    val ann: NDArrayANN = _ann
-    val ops: ANNOps[INDArray, NDArrayANN] = NDArrayANN
-  }
-
-}
-
 object NDArrayANN extends NDArrayANNOps {
 
-  object syntax extends NDArrayANNSyntax
-
-  private case class NDArrayANNImpl(lshs: List[LSH[INDArray]],
+  private case class NDArrayANNImpl(lshs: List[NDArrayLSH],
                                     htables: List[NDArrayANN#HTable],
                                     vtables: List[NDArrayANN#VTable])
       extends NDArrayANN
 
-  def apply(lshs: List[LSH[INDArray]], htables: List[NDArrayANN#HTable], vtables: List[NDArrayANN#VTable]): NDArrayANN =
+  def apply(lshs: List[NDArrayLSH], htables: List[NDArrayANN#HTable], vtables: List[NDArrayANN#VTable]): NDArrayANN =
     NDArrayANNImpl(lshs, htables, vtables)
 
   def empty(l: Int, dim: Int, rng: IRng): (NDArrayANN, IRng) = {
     val w = 1.0f
-    val (lshs, rng1) = (1 to l).foldRight((List.empty[LSH[INDArray]], rng)) {
-      case (_, (_lshs, _rng1)) => LSH.ndarray(dim, w, _rng1) match { case (_lsh, _rng2) => (_lsh :: _lshs, _rng2) }
+    val (lshs, rng1) = (1 to l).foldRight((List.empty[NDArrayLSH], rng)) {
+      case (_, (_lshs, _rng1)) => NDArrayLSH(dim, w, _rng1) match { case (_lsh, _rng2) => (_lsh :: _lshs, _rng2) }
     }
     val htables = List.fill(l)(HashMap.empty[Int, HashSet[INDArray]])
     val vtables = List.fill(l)(HashMap.empty[INDArray, Int])

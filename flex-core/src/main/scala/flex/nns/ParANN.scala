@@ -2,7 +2,8 @@ package flex.nns
 
 import flex.pdf.VQH
 import flex.rand._
-import flex.nns.NDArrayANN.syntax._
+import flex.nns.LSH.syntax._
+import flex.nns.ANN.syntax._
 import org.nd4j.linalg.api.ndarray.INDArray
 
 trait ParANN {
@@ -23,7 +24,7 @@ trait ParANNOps extends ParANNLaws {
 
 trait ParANNLaws { self: ParANNOps =>
 
-  def add(ann: ParANN, x: VQH#Codeword): ParANN = {
+  def add(ann: ParANN, x: VQH#Codeword)(implicit lshOps: LSHOps[INDArray]): ParANN = {
     val arrAnns1 = ann.arrAnns.zip(x).map { case (arrAnn, xp) => arrAnn.add(xp) }
     val compMap1 = x.foldLeft(ann.compMap) { case (_m, xp) => _m.+(xp -> x) }
     patchCompMap(patchArrAnns(ann, arrAnns1), compMap1)
@@ -40,7 +41,7 @@ trait ParANNLaws { self: ParANNOps =>
 
 }
 
-trait ParANNSyntax {
+trait ParANNSyntax extends LSHSyntax {
 
   implicit class ParANNSyntaxImpl(ann: ParANN) {
     def add(x: VQH#Codeword): ParANN = ParANN.add(ann, x)

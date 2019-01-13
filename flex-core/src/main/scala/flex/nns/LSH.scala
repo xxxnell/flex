@@ -14,58 +14,33 @@ import org.nd4j.linalg.factory.Nd4j
  * */
 trait LSH[V] {
 
-  def hash(x: V): Int
-
-}
-
-trait NDArrayLSH extends LSH[INDArray] {
-
-  val a: INDArray
+  val a: V
 
   val b: Float
 
   val w: Float
 
-  def hash(x: INDArray): Int = ((a.mul(x).getFloat(0) + b) / w).floor.round
+}
+
+trait LSHOps[V] {
+
+  def hash(lsh: LSH[V], x: V): Int
 
 }
 
-trait CodewordLSH extends LSH[VQH#Codeword] {
+trait LSHSyntax {
 
-  val a: VQH#Codeword
+  implicit class LSHSyntaxImpl[V](lsh: LSH[V]) {
+    def hash(x: V)(implicit ops: LSHOps[V]): Int = ops.hash(lsh, x)
+  }
 
-  val b: Float
-
-  val w: Float
-
-  def hash(x: VQH#Codeword): Int = ((x.zip(a).map { case (_x, _a) => _a.mul(_x).getFloat(0) }.sum + b) / w).floor.round
+  implicit val ndarrayLsh: LSHOps[INDArray] = NDArrayLSH
+  implicit val codewordLsh: LSHOps[VQH#Codeword] = CodewordLSH
 
 }
 
 object LSH {
 
-  private case class NDArrayLSHImpl(a: INDArray, b: Float, w: Float) extends NDArrayLSH
-
-  private case class CodewordLSHImpl(a: VQH#Codeword, b: Float, w: Float) extends CodewordLSH
-
-  def ndarray(a: INDArray, b: Float, w: Float): NDArrayLSH = NDArrayLSHImpl(a, b, w)
-
-  def codeword(a: VQH#Codeword, b: Float, w: Float): CodewordLSH = CodewordLSHImpl(a, b, w)
-
-  def ndarray(dim: Int, w: Float, rng: IRng): (NDArrayLSH, IRng) = {
-    val (normal, af) = NormalDist(0.0, 1.0, rng).samples(dim)
-    val a = Nd4j.create(af.toArray)
-    val (uniform, b) = UniformDist(w / 2, w / 2, normal.rng).sample
-    (ndarray(a, b, w), uniform.rng)
-  }
-
-  def codeword(dims: List[Int], w: Float, rng: IRng): (CodewordLSH, IRng) = {
-    val (normal, afs) = dims.foldRight[(Dist[Double], List[List[Double]])]((NormalDist(0.0, 1.0, rng), Nil)) {
-      case (dim, (_n1, _afs)) => _n1.samples(dim) match { case (_n2, _af) => (_n2, _af :: _afs) }
-    }
-    val a = afs.map(af => Nd4j.create(af.toArray))
-    val (uniform, b) = UniformDist(w / 2, w / 2, normal.rng).sample
-    (codeword(a, b, w), uniform.rng)
-  }
+  object syntax extends LSHSyntax
 
 }
