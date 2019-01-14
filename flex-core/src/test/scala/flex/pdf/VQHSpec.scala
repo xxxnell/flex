@@ -38,31 +38,39 @@ class VQHSpec extends Specification with ScalaCheck {
       "remove" in todo
 
       "parUpdate" in {
-        val (dims, k) = (List(1, 2, 3, 4, 5), 10)
-        val vqh0 = VQH.empty(dims, k)
-        val xps = (1 :: Nil).map(i => (Nd4j.randn(1, dims(i)), i, 1.0f))
-        val (vqh1, cins, couts) = vqh0.parUpdate(xps)
 
-        val cond1 = vqh1.cns.size + couts.size == xps.size
-        val cond2 = vqh1.ntot === xps.map(_._3).sum +- 0.01f
+        "first" in {
+          val (dims, k) = (List(1, 2, 3, 4, 5), 10)
+          val vqh0 = VQH.empty(dims, k)
+          val xps = (1 :: 0 :: 1 :: Nil).map(i => (Nd4j.randn(1, dims(i)), i, 1.0f))
+          val (vqh1, cins, couts) = vqh0.parUpdate(xps)
 
-        if (!cond1) ko(s"cns: ${vqh1.cns}, cins: $cins, couts: $couts")
-        else if (!cond2) ko(s"ntot: ${vqh1.ntot}")
-        else ok
+          val cond1 = vqh1.cns.size == xps.size
+          val cond2 = vqh1.ntot === xps.map(_._3).sum +- 0.01f
+
+          if (!cond1) ko(s"cns: ${vqh1.cns}, \ncins: $cins, \ncouts: $couts")
+          else if (!cond2) ko(s"ntot: ${vqh1.ntot}")
+          else ok
+        }
+
       }
 
       "expUpdate" in {
-        val (dims, k) = (List(1, 2, 3, 4, 5), 10)
-        val vqh0 = VQH.empty(dims, k)
-        val xs = (1 to 10).toList.map(_ => (dims.map(dim => Nd4j.randn(1, dim)), 1.0f))
-        val (vqh1, cins, couts) = vqh0.expUpdate(xs)
 
-        val cond1 = vqh1.cns.size + couts.size == xs.size
-        val cond2 = vqh1.ntot === xs.map(_._2).sum +- 0.01f
+        "first" in {
+          val (dims, k) = (List(1, 2, 3, 4, 5), 10)
+          val vqh0 = VQH.empty(dims, k)
+          val xs = (1 to 10).toList.map(_ => (dims.map(dim => Nd4j.randn(1, dim)), 1.0f))
+          val (vqh1, cins, couts) = vqh0.expUpdate(xs)
 
-        if (!cond1) ko(s"cns: ${vqh1.cns}, cins: $cins, couts: $couts")
-        else if (!cond2) ko(s"ntot: ${vqh1.ntot}")
-        else ok
+          val cond1 = vqh1.cns.size == xs.size
+          val cond2 = vqh1.ntot === xs.map(_._2).sum +- 0.01f
+
+          if (!cond1) ko(s"cns: ${vqh1.cns}, \ncins: $cins, \ncouts: $couts")
+          else if (!cond2) ko(s"ntot: ${vqh1.ntot}")
+          else ok
+        }
+
       }
 
       "parSearch" in {

@@ -42,6 +42,8 @@ class NDArrayANNSpec extends Specification with ScalaCheck {
           else ok
         }
 
+        "same elements" in todo
+
       }
 
       "remove" in {
