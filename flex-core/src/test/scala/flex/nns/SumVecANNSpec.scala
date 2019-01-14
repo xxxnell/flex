@@ -5,13 +5,13 @@ import org.specs2.mutable._
 import org.specs2.ScalaCheck
 import flex.nns.syntax._
 
-class CodewordANNSpec extends Specification with ScalaCheck {
+class SumVecANNSpec extends Specification with ScalaCheck {
 
   "CodewordANN" should {
 
     "construct" in {
       val (l, dims, rng) = (10, 1 :: 2 :: 3 :: Nil, IRng(0))
-      val (ann, _) = CodewordANN.empty(l, dims, rng)
+      val (ann, _) = SumVecANN.empty(l, dims, rng)
 
       val cond1a = ann.lshs.size == l
       val cond1b = ann.lshs.forall(lsh => lsh.dim == dims.sum)

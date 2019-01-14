@@ -20,14 +20,14 @@ class VQHSpec extends Specification with ScalaCheck {
       val cond1 = vqh.cns.isEmpty
       val cond2 = vqh.ntot == 0
       val cond3 = vqh.k == k
-      val cond4 = vqh.cwAnn.lshs.forall(lsh => lsh.dim == dims.sum)
-      val cond5 = vqh.parAnn.arrAnns.zip(dims).forall { case (ann, dim) => ann.lshs.forall(_.dim == dim) }
+      val cond4 = vqh.cwNns.lshs.forall(lsh => lsh.dim == dims.sum)
+      val cond5 = vqh.parCwNns.arrAnns.zip(dims).forall { case (ann, dim) => ann.lshs.forall(_.dim == dim) }
 
       if (!cond1) ko(s"cns: ${vqh.cns}")
       else if (!cond2) ko(s"ntot: ${vqh.ntot}")
       else if (!cond3) ko(s"k: ${vqh.k}")
-      else if (!cond4) ko(s"cwAnn: ${vqh.cwAnn}")
-      else if (!cond5) ko(s"parAnn: ${vqh.parAnn}")
+      else if (!cond4) ko(s"cwAnn: ${vqh.cwNns}")
+      else if (!cond5) ko(s"parAnn: ${vqh.parCwNns}")
       else ok
     }
 

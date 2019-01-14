@@ -1,6 +1,6 @@
 package flex.chain
 
-import flex.pdf.VQH
+import flex.pdf.{SumVec, VQH, Vec}
 import flex.pdf.VQH.syntax._
 import org.nd4j.linalg.api.ndarray.INDArray
 
@@ -10,18 +10,18 @@ trait Complex extends Model {
 
   val outputVqh: VQH
 
-  val op: VQH#Codeword => VQH#Codeword
+  val op: SumVec => SumVec
 
-  val t: Map[VQH#Codeword, VQH#Codeword]
+  val t: Map[SumVec, SumVec]
 
 }
 
 trait ComplexOps extends ModelOps {
 
-  def map[A](complex: Complex, f: VQH#Codeword => VQH#Codeword): Complex =
+  def map[A](complex: Complex, f: SumVec => SumVec): Complex =
     Complex(complex.inputVqh, complex.outputVqh, complex.op.andThen(f), complex.t)
 
-  def update[A](complex: Complex, xps: List[(INDArray, Int, Float)]): Complex = {
+  def update[A](complex: Complex, xps: List[(Vec, Int, Float)]): Complex = {
     val (inputVqh1, cins, couts) = complex.inputVqh.parUpdate(xps)
     val cys = cins.map(cin => (cin, complex.op(cin)))
     val t1 = complex.t -- couts ++ cys
@@ -36,7 +36,7 @@ trait ComplexOps extends ModelOps {
 trait ComplexSyntax {
 
   implicit class StreamSyntaxImpl(model: Complex) {
-    def map(f: VQH#Codeword => VQH#Codeword): Complex = Complex.map(model, f)
+    def map(f: SumVec => SumVec): Complex = Complex.map(model, f)
     def add(means: INDArray, variances: INDArray): Complex = ???
   }
 
@@ -46,15 +46,10 @@ object Complex extends ComplexOps {
 
   object syntax extends ComplexSyntax
 
-  private case class ComplexImpl[A](inputVqh: VQH,
-                                    outputVqh: VQH,
-                                    op: VQH#Codeword => VQH#Codeword,
-                                    t: Map[VQH#Codeword, VQH#Codeword])
+  private case class ComplexImpl[A](inputVqh: VQH, outputVqh: VQH, op: SumVec => SumVec, t: Map[SumVec, SumVec])
       extends Complex
 
-  def apply(inputVqh: VQH,
-            outputVqh: VQH,
-            op: VQH#Codeword => VQH#Codeword,
-            t: Map[VQH#Codeword, VQH#Codeword]): Complex = ComplexImpl(inputVqh, outputVqh, op, t)
+  def apply(inputVqh: VQH, outputVqh: VQH, op: SumVec => SumVec, t: Map[SumVec, SumVec]): Complex =
+    ComplexImpl(inputVqh, outputVqh, op, t)
 
 }

@@ -1,9 +1,9 @@
 package flex.nns
 
+import flex.nns.LSH.syntax._
+import flex.pdf.{SumVec, Vec}
+
 import scala.collection.immutable.{HashMap, HashSet}
-import LSH.syntax._
-import flex.pdf.VQH
-import org.nd4j.linalg.api.ndarray.INDArray
 
 trait ANN[V] {
 
@@ -65,8 +65,8 @@ trait ANNSyntax {
     def search(x: V)(implicit ops: ANNOps[V]): Option[V] = ops.search(ann, x)
   }
 
-  implicit val ndarrayOps: ANNOps[INDArray] = NDArrayANN
-  implicit val codewordOps: ANNOps[VQH#Codeword] = CodewordANN
+  implicit val vecOps: ANNOps[Vec] = VecANN
+  implicit val sumVecOps: ANNOps[SumVec] = SumVecANN
 
 }
 

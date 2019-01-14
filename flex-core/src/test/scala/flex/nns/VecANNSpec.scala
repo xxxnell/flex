@@ -6,13 +6,13 @@ import org.nd4j.linalg.factory.Nd4j
 import org.specs2.mutable._
 import org.specs2.ScalaCheck
 
-class NDArrayANNSpec extends Specification with ScalaCheck {
+class VecANNSpec extends Specification with ScalaCheck {
 
   "NDArrayANN" should {
 
     "construct" in {
       val (l, dim, rng) = (10, 2, IRng(0))
-      val (ann0, _) = NDArrayANN.empty(l, dim, rng)
+      val (ann0, _) = VecANN.empty(l, dim, rng)
 
       val cond1 = ann0.htables.length == l
       val cond2 = ann0.vtables.length == l
@@ -31,7 +31,7 @@ class NDArrayANNSpec extends Specification with ScalaCheck {
         "basic" in {
           val (l, dim, rng) = (10, 2, IRng(0))
           val v = Nd4j.create(Array(1.0, 1.0))
-          val (ann0, _) = NDArrayANN.empty(l, dim, rng)
+          val (ann0, _) = VecANN.empty(l, dim, rng)
           val ann1 = ann0.add(v)
 
           val cond1 = ann1.htables.forall(htable => htable.size == 1)
@@ -49,7 +49,7 @@ class NDArrayANNSpec extends Specification with ScalaCheck {
       "remove" in {
         val (l, dim, rng) = (10, 2, IRng(0))
         val v = Nd4j.create(Array(1.0, 1.0))
-        val (ann0, _) = NDArrayANN.empty(l, dim, rng)
+        val (ann0, _) = VecANN.empty(l, dim, rng)
         val ann1 = ann0.add(v)
         val ann2 = ann0.remove(v)
 
@@ -64,7 +64,7 @@ class NDArrayANNSpec extends Specification with ScalaCheck {
       "search" in {
         val (l, dim, rng) = (10, 2, IRng(0))
         val v = Nd4j.create(Array(1.0, 1.0))
-        val (ann0, _) = NDArrayANN.empty(l, dim, rng)
+        val (ann0, _) = VecANN.empty(l, dim, rng)
         val ann1 = ann0.add(v)
         val search = ann1.search(v)
 

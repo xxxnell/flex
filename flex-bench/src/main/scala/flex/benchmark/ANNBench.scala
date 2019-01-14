@@ -19,25 +19,25 @@ class ANNBench {
 
   var l: Int = 10
 
-  var ndarrAnn: NDArrayANN = _
+  var ndarrAnn: VecANN = _
 
   var v: INDArray = _
 
   @Setup
   def setup(): Unit = {
     val n = 100
-    val (ndarrAnn0, _) = NDArrayANN.empty(l, dim, IRng(0))
+    val (ndarrAnn0, _) = VecANN.empty(l, dim, IRng(0))
 
     v = Nd4j.ones(dim)
     ndarrAnn = (1 to n).foldLeft(ndarrAnn0) { case (_ann, _) => _ann.add(Nd4j.randn(1, dim)) }.add(v)
   }
 
   @Benchmark
-  def add: NDArrayANN =
+  def add: VecANN =
     ndarrAnn.add(v)
 
   @Benchmark
-  def remove: NDArrayANN =
+  def remove: VecANN =
     ndarrAnn.remove(v)
 
   @Benchmark

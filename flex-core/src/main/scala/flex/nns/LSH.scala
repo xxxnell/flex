@@ -1,9 +1,6 @@
 package flex.nns
 
 import flex.pdf._
-import flex.rand._
-import org.nd4j.linalg.api.ndarray.INDArray
-import org.nd4j.linalg.factory.Nd4j
 
 /**
  * Stable distribution LSH.
@@ -37,8 +34,8 @@ trait LSHSyntax {
     def dim(implicit ops: LSHOps[V]): Int = ops.dim(lsh)
   }
 
-  implicit val ndarrayLsh: LSHOps[INDArray] = NDArrayLSH
-  implicit val codewordLsh: LSHOps[VQH#Codeword] = CodewordLSH
+  implicit val vecLsh: LSHOps[Vec] = VecLSH
+  implicit val sumVecLsh: LSHOps[SumVec] = SumVecLSH
 
 }
 

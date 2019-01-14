@@ -1,17 +1,16 @@
 package flex
 
-import flex.pdf.VQH
-import org.nd4j.linalg.api.ndarray.INDArray
+import flex.pdf.{SumVec, Vec}
 
 package object nns {
 
-  type NDArrayLSH = LSH[INDArray]
+  type VecLSH = LSH[Vec]
 
-  type CodewordLSH = LSH[VQH#Codeword]
+  type SumVecLSH = LSH[SumVec]
 
-  type NDArrayANN = ANN[INDArray]
+  type VecANN = ANN[Vec]
 
-  type CodewordANN = ANN[VQH#Codeword]
+  type SumVecANN = ANN[SumVec]
 
   object syntax extends ANNSyntax with ParANNSyntax with LSHSyntax
 
