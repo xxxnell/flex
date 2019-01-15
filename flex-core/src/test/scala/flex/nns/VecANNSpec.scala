@@ -8,7 +8,7 @@ import org.specs2.ScalaCheck
 
 class VecANNSpec extends Specification with ScalaCheck {
 
-  "NDArrayANN" should {
+  "VecANN" should {
 
     "construct" in {
       val (l, dim, rng) = (10, 2, IRng(0))

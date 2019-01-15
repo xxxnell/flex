@@ -14,7 +14,7 @@ import org.openjdk.jmh.annotations._
 @State(Scope.Thread)
 class ANNBench {
 
-  @Param(Array("1024"))
+  @Param(Array("1024", "131072"))
   var dim: Int = _
 
   var l: Int = 10

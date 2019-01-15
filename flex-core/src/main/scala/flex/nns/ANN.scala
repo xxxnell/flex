@@ -47,13 +47,17 @@ trait ANNLaws[V] { self: ANNOps[V] =>
     patchVTables(patchHTables(ann, htables1), vtables1)
   }
 
-  def search(ann: ANN[V], x: V): Option[V] = {
-    val hashcodes = ann.vtables.map(vt => vt.get(x))
-    val vectors = hashcodes.zip(ann.htables).flatMap { case (ho, ht) => ho.flatMap(h => ht.get(h)).getOrElse(Nil) }
-    val ranks = vectors.groupBy(identity).mapValues(_.size).groupBy { case (_, r) => r }.mapValues(_.keySet)
+  def search(ann: ANN[V], x: V)(implicit lshOps: LSHOps[V]): Option[V] = {
+    val hashcodes = ann.lshs.map(lsh => lsh.hash(x))
+    val vectors = hashcodes.zip(ann.htables).flatMap { case (h, htable) => htable.getOrElse(h, Nil) }
+    val counts = vectors.groupBy(identity).mapValues(_.size)
+    val ranks = counts.groupBy { case (_, r) => r }.mapValues(_.keySet)
     val neighbors = ranks.toSeq.sortWith { case ((rank1, _), (rank2, _)) => rank1 > rank2 }.headOption.map(_._2)
     neighbors.flatMap(ns => ns.map(n => (n, distance(x, n))).toSeq.sortBy(_._2).headOption.map(_._1))
   }
+
+  def isEmpty(ann: ANN[_]): Boolean =
+    ann.htables.exists(htable => htable.isEmpty) || ann.vtables.exists(vtable => vtable.isEmpty)
 
 }
 
@@ -62,7 +66,8 @@ trait ANNSyntax {
   implicit class AnnSyntaxImpl[V](ann: ANN[V]) {
     def add(x: V)(implicit ops: ANNOps[V], lshOps: LSHOps[V]): ANN[V] = ops.add(ann, x)
     def remove(x: V)(implicit ops: ANNOps[V]): ANN[V] = ops.remove(ann, x)
-    def search(x: V)(implicit ops: ANNOps[V]): Option[V] = ops.search(ann, x)
+    def search(x: V)(implicit ops: ANNOps[V], lshOps: LSHOps[V]): Option[V] = ops.search(ann, x)
+    def isEmpty(implicit ops: ANNOps[V]): Boolean = ops.isEmpty(ann)
   }
 
   implicit val vecOps: ANNOps[Vec] = VecANN
