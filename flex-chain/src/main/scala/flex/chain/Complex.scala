@@ -1,6 +1,7 @@
 package flex.chain
 
-import flex.pdf.{SumVec, VQH, Vec}
+import flex.pdf.VQH
+import flex.vec._
 import flex.pdf.VQH.syntax._
 import org.nd4j.linalg.api.ndarray.INDArray
 

@@ -1,7 +1,7 @@
 package flex.nns
 
 import flex.nns.LSH.syntax._
-import flex.pdf.{SumVec, Vec}
+import flex.vec._
 
 import scala.collection.immutable.{HashMap, HashSet}
 

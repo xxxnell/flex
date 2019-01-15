@@ -4,7 +4,7 @@ import flex.rand.IRng
 import org.specs2.mutable._
 import org.specs2.ScalaCheck
 import flex.nns.syntax._
-import org.nd4j.linalg.factory.Nd4j
+import flex.vec._
 
 class SumVecANNSpec extends Specification with ScalaCheck {
 
@@ -30,7 +30,7 @@ class SumVecANNSpec extends Specification with ScalaCheck {
       "add" in {
         val (l, dims, rng, n) = (5, 1 :: 2 :: 3 :: Nil, IRng(0), 100)
         val (ann0, _) = SumVecANN.empty(l, dims, rng)
-        val xs = (1 to n).toList.map(_ => dims.map(dim => Nd4j.randn(1, dim)))
+        val xs = (1 to n).toList.map(i => SumVec.std(dims, IRng(i))._1)
         val ann1 = xs.foldLeft(ann0) { case (_ann, x) => _ann.add(x) }
 
         val cond1 = ann1.vtables.forall(vtable => vtable.size == xs.size)
@@ -42,7 +42,7 @@ class SumVecANNSpec extends Specification with ScalaCheck {
       "remove" in {
         val (l, dims, rng, n) = (5, 1 :: 2 :: 3 :: Nil, IRng(0), 100)
         val (ann0, _) = SumVecANN.empty(l, dims, rng)
-        val xs = (1 to n).toList.map(_ => dims.map(dim => Nd4j.randn(1, dim)))
+        val xs = (1 to n).toList.map(i => SumVec.std(dims, IRng(i))._1)
         val ann1 = xs.foldLeft(ann0) { case (_ann, x) => _ann.add(x) }
         val ann2 = xs.foldLeft(ann1) { case (_ann, x) => _ann.remove(x) }
 
@@ -56,10 +56,10 @@ class SumVecANNSpec extends Specification with ScalaCheck {
       "search" in {
 
         "basic" in {
-          val (l, dims, rng, n) = (5, 1 :: 2 :: 3 :: Nil, IRng(0), 100)
-          val (ann0, _) = SumVecANN.empty(l, dims, rng)
-          val xs = (1 to n).toList.map(_ => dims.map(dim => Nd4j.randn(1, dim)))
-          val query = dims.map(dim => Nd4j.randn(1, dim))
+          val (l, dims, rng0, n) = (5, 1 :: 2 :: 3 :: Nil, IRng(0), 100)
+          val (ann0, rng1) = SumVecANN.empty(l, dims, rng0)
+          val xs = (1 to n).toList.map(i => SumVec.std(dims, IRng(i))._1)
+          val (query, _) = SumVec.std(dims, rng1)
           val ann1 = xs.foldLeft(ann0) { case (_ann, x) => _ann.add(x) }
           val search = ann1.search(query)
 

@@ -1,7 +1,7 @@
 package flex.nns
 
-import flex.pdf.Vec
 import flex.rand.IRng
+import flex.vec._
 
 import scala.collection.immutable.{HashMap, HashSet}
 

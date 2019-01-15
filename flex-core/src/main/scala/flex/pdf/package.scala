@@ -22,10 +22,6 @@ package object pdf {
 
   type Structures = NonEmptyList[Histogram[Double]]
 
-  type Vec = INDArray
-
-  type SumVec = List[Vec]
-
   implicit def autocast[A](sketch: Sketch[A]): SimpleSketch[A] = SimpleSketch.sketch2SimpleSketch(sketch)
 
 }

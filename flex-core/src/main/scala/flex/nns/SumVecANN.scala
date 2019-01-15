@@ -1,6 +1,6 @@
 package flex.nns
 
-import flex.pdf.SumVec
+import flex.vec._
 import flex.rand._
 
 import scala.collection.immutable.{HashMap, HashSet}

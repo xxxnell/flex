@@ -4,10 +4,10 @@ import org.specs2.mutable._
 import org.specs2.ScalaCheck
 import flex.nns.LSH.syntax._
 import flex.pdf.VQH.syntax._
-import org.nd4j.linalg.factory.Nd4j
 import org.scalactic._
 import TripleEquals._
 import flex.rand.IRng
+import flex.vec._
 import org.scalactic.Tolerance._
 
 class VQHSpec extends Specification with ScalaCheck {
@@ -37,7 +37,7 @@ class VQHSpec extends Specification with ScalaCheck {
       "add" in {
         val (dims, k) = (List(1, 2, 3, 4, 5), 10)
         val vqh0 = VQH.empty(dims, k)
-        val xs = (1 to 10).toList.map(_ => (dims.map(dim => Nd4j.randn(1, dim)), 1.0f))
+        val xs = (1 to 10).toList.map(i => (SumVec.std(dims, IRng(i))._1, 1.0f))
         val vqh1 = xs.foldLeft(vqh0) { case (_vqh, (x, w)) => _vqh.add(x, w) }
 
         val cond1 = vqh1.size == xs.size
@@ -51,9 +51,9 @@ class VQHSpec extends Specification with ScalaCheck {
       "remove" in {
         val (dims, k) = (List(1, 2, 3, 4, 5), 10)
         val vqh0 = VQH.empty(dims, k)
-        val xs = (1 to 10).toList.map(_ => (dims.map(dim => Nd4j.randn(1, dim)), 1.0f))
+        val xs = (1 to 10).toList.map(i => (SumVec.std(dims, IRng(0))._1, 1.0f))
         val vqh1 = xs.foldLeft(vqh0) { case (_vqh, (x, w)) => _vqh.add(x, w) }
-        val vqh2 = xs.foldLeft(vqh1) { case (_vqh, (x, w)) => _vqh.remove(x) }
+        val vqh2 = xs.foldLeft(vqh1) { case (_vqh, (x, _)) => _vqh.remove(x) }
 
         val expected = xs.size - xs.size
         val cond1 = vqh2.size == expected
@@ -65,29 +65,37 @@ class VQHSpec extends Specification with ScalaCheck {
       "parUpdate" in {
 
         "first" in {
-          val (dims, k, n, rng) = (List(1, 2, 3, 4, 5), 20, 3, IRng(0))
+          val (dims, k, n, rng0) = (List(1, 2, 3, 4, 5), 20, 3, IRng(0))
           val vqh0 = VQH.empty(dims, k)
-          val (is, _) = (1 to n).toList.foldLeft((List.empty[Int], rng)) {
-            case ((_is, _rng), _) => ((_rng.next._2 * dims.size).floor.toInt :: _is, _rng.next._1)
+          val (irngs, _) = (1 to n).toList.foldLeft((List.empty[(Int, IRng)], rng0)) {
+            case ((_is, _rng1), _) =>
+              val (_rng2, i) = _rng1.next
+              (((i * dims.size).floor.toInt, _rng2) :: _is, _rng2)
           }
-          val xps = is.map(i => (Nd4j.randn(1, dims(i)), i, 1.0f))
+          val xps = irngs.map { case (i, rng) => (Vec.std(dims(i), rng)._1, i, 1.0f) }
           val (vqh1, cins, couts) = vqh0.parUpdate(xps)
 
           val cond1 = vqh1.cns.size == xps.size
           val cond2 = vqh1.ntot === xps.map(_._3).sum +- 0.01f
+          val cond3 = vqh1.parCwNns.arrAnns.zip(dims).forall {
+            case (ann, dim) => ann.vtables.forall(vt => vt.keySet.forall(v => v.dim == dim))
+          }
 
           if (!cond1) ko(s"cns: ${vqh1.cns}, \ncins: $cins, \ncouts: $couts")
           else if (!cond2) ko(s"ntot: ${vqh1.ntot}")
+          else if (!cond3) ko(s"arbitrary vectors: ${vqh1.parCwNns.arrAnns.map(ann => ann.vtables.head.keySet)}")
           else ok
         }
 
         "k" in {
-          val (dims, k, n, rng) = (List(1, 2, 3, 4, 5), 20, 300, IRng(0))
+          val (dims, k, n, rng0) = (List(1, 2, 3, 4, 5), 20, 300, IRng(0))
           val vqh0 = VQH.empty(dims, k)
-          val (is, _) = (1 to n).toList.foldLeft((List.empty[Int], rng)) {
-            case ((_is, _rng), _) => ((_rng.next._2 * dims.size).floor.toInt :: _is, _rng.next._1)
+          val (irngs, _) = (1 to n).toList.foldLeft((List.empty[(Int, IRng)], rng0)) {
+            case ((_is, _rng1), _) =>
+              val (_rng2, i) = _rng1.next
+              (((i * dims.size).floor.toInt, _rng2) :: _is, _rng2)
           }
-          val xps = is.map(i => (Nd4j.randn(1, dims(i)), i, 1.0f))
+          val xps = irngs.map { case (i, rng) => (Vec.std(dims(i), rng)._1, i, 1.0f) }
           val vqh1 = xps.foldLeft(vqh0) { case (_vqh, (x, i, w)) => _vqh.parUpdate((x, i, w) :: Nil)._1 }
 
           val cond1 = vqh1.size === k +- (k * 0.3).round.toInt
@@ -103,7 +111,7 @@ class VQHSpec extends Specification with ScalaCheck {
         "first" in {
           val (dims, k) = (List(1, 2, 3, 4, 5), 20)
           val vqh0 = VQH.empty(dims, k)
-          val xs = (1 to 10).toList.map(_ => (dims.map(dim => Nd4j.randn(1, dim)), 1.0f))
+          val xs = (1 to 10).toList.map(i => (SumVec.std(dims, IRng(i))._1, 1.0f))
           val (vqh1, cins, couts) = vqh0.expUpdate(xs)
 
           val cond1 = vqh1.cns.size == xs.size
@@ -117,7 +125,7 @@ class VQHSpec extends Specification with ScalaCheck {
         "k" in {
           val (dims, k, n) = (List(1, 2, 3, 4, 5), 20, 300)
           val vqh0 = VQH.empty(dims, k)
-          val xs = (1 to n).toList.map(_ => (dims.map(dim => Nd4j.randn(1, dim)), 1.0f))
+          val xs = (1 to n).toList.map(i => (SumVec.std(dims, IRng(i))._1, 1.0f))
           val vqh1 = xs.foldLeft(vqh0) { case (_vqh, (x, w)) => _vqh.expUpdate((x, w) :: Nil)._1 }
 
           val cond1 = vqh1.size === k +- (k * 0.3).round.toInt
@@ -134,7 +142,7 @@ class VQHSpec extends Specification with ScalaCheck {
           val (dims, k) = (List(1, 2, 3, 4, 5), 10)
           val vqh0 = VQH.empty(dims, k)
           val i = 0
-          val xp = Nd4j.randn(1, dims.apply(i))
+          val (xp, _) = Vec.std(dims(i), IRng(0))
           val res = vqh0.parSearch(xp, i)
 
           val cond1 = res.isEmpty
@@ -147,7 +155,7 @@ class VQHSpec extends Specification with ScalaCheck {
           val (dims, k) = (List(1, 2, 3, 4, 5), 10)
           val vqh0 = VQH.empty(dims, k)
           val i = 0
-          val x = dims.map(dim => Nd4j.randn(1, dim))
+          val (x, _) = SumVec.std(dims, IRng(0))
           val vqh1 = vqh0.add(x, 1.0f)
           val res = vqh1.parSearch(x.apply(i), i)
 
@@ -164,7 +172,7 @@ class VQHSpec extends Specification with ScalaCheck {
         "empty" in {
           val (dims, k) = (List(1, 2, 3, 4, 5), 10)
           val vqh0 = VQH.empty(dims, k)
-          val x = dims.map(dim => Nd4j.randn(1, dim))
+          val (x, _) = SumVec.std(dims, IRng(0))
           val res = vqh0.expSearch(x)
 
           val cond1 = res.isEmpty
@@ -176,7 +184,7 @@ class VQHSpec extends Specification with ScalaCheck {
         "basic" in {
           val (dims, k) = (List(1, 2, 3, 4, 5), 10)
           val vqh0 = VQH.empty(dims, k)
-          val x = dims.map(dim => Nd4j.randn(1, dim))
+          val (x, _) = SumVec.std(dims, IRng(0))
           val vqh1 = vqh0.add(x, 1.0f)
           val res = vqh1.expSearch(x)
 

@@ -1,6 +1,6 @@
 package flex.nns
 
-import flex.pdf._
+import flex.vec._
 
 /**
  * Stable distribution LSH.

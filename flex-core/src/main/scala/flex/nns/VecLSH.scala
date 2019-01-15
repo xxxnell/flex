@@ -1,8 +1,8 @@
 package flex.nns
 
-import flex.pdf.{NormalDist, UniformDist, Vec}
+import flex.pdf.UniformDist
 import flex.rand.IRng
-import org.nd4j.linalg.factory.Nd4j
+import flex.vec._
 
 trait VecLSHOps extends LSHOps[Vec] {
 
@@ -19,9 +19,8 @@ object VecLSH extends VecLSHOps {
   def apply(a: Vec, b: Float, w: Float): VecLSH = VecLSHImpl(a, b, w)
 
   def apply(dim: Int, w: Float, rng: IRng): (VecLSH, IRng) = {
-    val (normal, af) = NormalDist(0.0, 1.0, rng).samples(dim)
-    val a = Nd4j.create(af.toArray)
-    val (uniform, b) = UniformDist(w / 2, w / 2, normal.rng).sample
+    val (a, rng1) = Vec.std(dim, rng)
+    val (uniform, b) = UniformDist(w / 2, w / 2, rng1).sample
     (apply(a, b, w), uniform.rng)
   }
 

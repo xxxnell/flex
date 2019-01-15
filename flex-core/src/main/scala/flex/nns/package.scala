@@ -1,6 +1,6 @@
 package flex
 
-import flex.pdf.{SumVec, Vec}
+import flex.vec.{SumVec, Vec}
 
 package object nns {
 

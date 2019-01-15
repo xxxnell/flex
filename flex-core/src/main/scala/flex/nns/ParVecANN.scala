@@ -1,7 +1,7 @@
 package flex.nns
 
 import flex.nns.ANN.syntax._
-import flex.pdf.{SumVec, VQH, Vec}
+import flex.vec._
 import flex.rand._
 
 trait ParVecANN {

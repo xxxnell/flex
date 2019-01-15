@@ -1,10 +1,10 @@
 package flex.pdf
 
+import flex.nns.ANN.syntax._
+import flex.nns._
 import flex.pdf.Bernoulli.syntax._
 import flex.rand._
-import flex.nns._
-import flex.nns.ANN.syntax._
-import org.nd4j.linalg.factory.Nd4j
+import flex.vec._
 
 import scala.collection.immutable.HashMap
 
@@ -178,7 +178,7 @@ object VQH extends VQHOps {
 
   def empty(dims: List[Int], k: Int): VQH = {
     val l = math.round(math.sqrt(k.toDouble)).toInt
-    val init = dims.map(dim => Nd4j.zeros(1l, dim))
+    val init = SumVec.zeros(dims)
     val rng1 = IRng(k.hashCode)
     val (cwAnn, rng2) = SumVecANN.empty(l, dims, rng1)
     val (parAnn, rng3) = ParVecANN.empty(l, dims, rng2)

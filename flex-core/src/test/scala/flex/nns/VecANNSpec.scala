@@ -2,6 +2,7 @@ package flex.nns
 
 import flex.rand._
 import flex.nns.ANN.syntax._
+import flex.vec.Vec
 import org.nd4j.linalg.factory.Nd4j
 import org.specs2.mutable._
 import org.specs2.ScalaCheck
@@ -30,7 +31,7 @@ class VecANNSpec extends Specification with ScalaCheck {
 
         "basic" in {
           val (l, dim, rng) = (10, 2, IRng(0))
-          val v = Nd4j.create(Array(1.0, 1.0))
+          val v = Vec(1.0, 1.0)
           val (ann0, _) = VecANN.empty(l, dim, rng)
           val ann1 = ann0.add(v)
 
@@ -63,7 +64,7 @@ class VecANNSpec extends Specification with ScalaCheck {
 
       "search" in {
         val (l, dim, rng) = (10, 2, IRng(0))
-        val v = Nd4j.create(Array(1.0, 1.0))
+        val v = Vec(1.0, 1.0)
         val (ann0, _) = VecANN.empty(l, dim, rng)
         val ann1 = ann0.add(v)
         val search = ann1.search(v)
