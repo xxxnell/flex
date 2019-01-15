@@ -114,7 +114,7 @@ trait VQHOps {
     val qtot = vqh2.cns.map { case (_, _n) => sigmoid(avgpi - _n / vqh2.ntot) }.sum
     val (vqh3, berq, couts) = vqh2.cns.foldLeft(vqh2, berp, List.empty[SumVec]) {
       case ((_vqh0, _berq0, _couts0), (_c, _n)) =>
-        val (_berq1, q) = Bernoulli(sigmoid(avgpi - _n / vqh2.ntot) / qtot, _berq0.rng).sample
+        val (_berq1, q) = Bernoulli(sigmoid(avgpi - _n / vqh2.ntot) * avgpi, _berq0.rng).sample
         val (_vqh1, _couts1) = if (q == 1) (remove(_vqh0, _c), _c :: _couts0) else (_vqh0, _couts0)
         (_vqh1, _berq1, _couts1)
     }
@@ -126,12 +126,14 @@ trait VQHOps {
 
   def expSearch(vqh: VQH, x: SumVec): Option[SumVec] = vqh.cwNns.search(x)
 
-  def sigmoid(x: Float): Float = 1 / (1 + math.exp(-1 * x).toFloat)
+  def size(vqh: VQH): Int = vqh.cns.size
+
+  private def sigmoid(x: Float): Float = 1 / (1 + math.exp(-1 * x).toFloat)
 
   // TODO
-  def diffusion(x: Vec): Vec = x
+  private def diffusion(x: Vec): Vec = x
 
-  def diffusionExcept(x: SumVec, is: List[Int]): SumVec = x.zipWithIndex.map {
+  private def diffusionExcept(x: SumVec, is: List[Int]): SumVec = x.zipWithIndex.map {
     case (cp, b) => if (is.contains(b)) cp else diffusion(cp)
   }
 
@@ -148,6 +150,7 @@ trait VQHSyntax {
       VQH.expUpdate(vqh, xs)
     def parSearch(xp: Vec, i: Int): Option[SumVec] = VQH.parSearch(vqh, xp, i)
     def expSearch(x: SumVec): Option[SumVec] = VQH.expSearch(vqh, x)
+    def size: Int = VQH.size(vqh)
   }
 
 }
