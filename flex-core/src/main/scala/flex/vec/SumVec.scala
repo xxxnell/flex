@@ -28,6 +28,13 @@ object SumVec extends SumVecOps {
       (vec :: _sumVec, rng2)
   }
 
+  def std(dims: List[Int], rng: IRng, n: Int): (List[SumVec], IRng) =
+    (1 to n).foldRight((List.empty[SumVec], rng)) {
+      case (i, (sumvecs, _rng1)) =>
+        val (sumvec, _rng2) = std(dims, _rng1)
+        (sumvec :: sumvecs, _rng2)
+    }
+
   def zeros(dims: List[Int]): SumVec = dims.map(dim => Vec.zeros(dim))
 
 }

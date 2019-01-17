@@ -148,6 +148,8 @@ trait VQHSyntax {
       VQH.parUpdate(vqh, xps)
     def expUpdate(xs: List[(SumVec, Float)]): (VQH, List[SumVec], List[SumVec]) =
       VQH.expUpdate(vqh, xs)
+    def expUpdateTrace(xs: List[(SumVec, Float)]): List[VQH] =
+      xs.foldLeft(Vector(vqh)) { case (vqhs, x) => vqhs.:+(VQH.expUpdate(vqhs.last, x :: Nil)._1) }.toList
     def parSearch(xp: Vec, i: Int): Option[SumVec] = VQH.parSearch(vqh, xp, i)
     def expSearch(x: SumVec): Option[SumVec] = VQH.expSearch(vqh, x)
     def size: Int = VQH.size(vqh)
