@@ -13,7 +13,7 @@ object FlexBuilds {
 
   val defaultSettings = Seq(
     resolvers ++= typesafeRepo,
-    Test / fork := true,
+    fork := true,
     run / javaOptions ++= Seq(
       "-Xms8G",
       "-Xmx8G",

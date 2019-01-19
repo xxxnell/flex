@@ -24,20 +24,22 @@ object Tasks {
 
   lazy val experiment = inputKey[Unit]("Execute experiments")
 
-  def experimentTaskSetting(project: Project) = experiment := {
-    val mains = (discoveredMainClasses in (project, Compile)).value
-    val r = (runner in run).value
-    val classpath: Seq[File] = (fullClasspath in (project, Compile)).value.files
-    val logger = streams.value.log
+  def experimentTaskSetting(project: Project) =
+    experiment := Def.inputTaskDyn {
+      val mains = (discoveredMainClasses in (project, Compile)).value
+      val r = (runner in run).value
+      val classpath: Seq[File] = (fullClasspath in (project, Compile)).value.files
+      val logger = streams.value.log
 
-    val args: Seq[String] = spaceDelimited("<arg>").parsed
-    val targets = if (args.nonEmpty) {
-      args
-        .map(arg => mains.filter(main => arg.r.findFirstIn(main).nonEmpty))
-        .foldLeft(Seq.empty[String])((acc, targets) => acc ++ targets)
-    } else mains.filter(main => main.startsWith("flex.experiment"))
+      val args: Seq[String] = spaceDelimited("<arg>").parsed
+      val targets = if (args.nonEmpty) {
+        args
+          .map(arg => mains.filter(main => arg.r.findFirstIn(main).nonEmpty))
+          .foldLeft(Seq.empty[String])((acc, targets) => acc ++ targets)
+      } else mains.filter(main => main.startsWith("flex.experiment"))
 
-    targets.foreach(main => r.run(main, classpath, Seq(), logger))
-  }
+      // TODO Experiment task with no args should execute all targets
+      Def.taskDyn { (runMain in Compile in project).toTask(" " + targets.head) }
+    }.evaluated
 
 }
