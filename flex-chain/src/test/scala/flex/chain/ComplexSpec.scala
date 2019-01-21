@@ -1,12 +1,16 @@
 package flex.chain
 
 import flex.chain.Complex.syntax._
+import flex.nns.syntax._
 import flex.pdf.VQH.syntax._
 import flex.rand.IRng
 import flex.vec.Vec
-import org.scalactic.Tolerance._
 import org.specs2.ScalaCheck
 import org.specs2.mutable._
+import org.scalactic.Tolerance._
+import org.scalactic.TripleEquals._
+import org.scalactic.StringNormalizations._
+import org.scalactic.Explicitly._
 
 class ComplexSpec extends Specification with ScalaCheck {
 
@@ -38,11 +42,13 @@ class ComplexSpec extends Specification with ScalaCheck {
         val complex0 = Complex.empty(kin, kout)
         val complex1 = complex0.addStd(dims)
 
-        val cond1 = complex1.vqhin.dims == dims
-        val cond2 = complex1.vqhout.dims == dims
+        val cond1a = complex1.vqhin.dims == dims
+        val cond1b = complex1.vqhin.parnns.dims == dims
+        val cond2a = complex1.vqhout.dims == dims
+        val cond2b = complex1.vqhout.parnns.dims == dims
 
-        if (!cond1) ko(s"complex.vqhin: ${complex1.vqhin}, expected dim: $dims")
-        else if (!cond2) ko(s"complex.vqhout: ${complex1.vqhout}, expected dim: $dims")
+        if (!(cond1a && cond1b)) ko(s"complex.vqhin: ${complex1.vqhin}, expected dim: $dims")
+        else if (!(cond2a && cond2b)) ko(s"complex.vqhout: ${complex1.vqhout}, expected dim: $dims")
         else ok
       }
 
@@ -70,12 +76,12 @@ class ComplexSpec extends Specification with ScalaCheck {
         val complex2 = complex1.map { case _ :: tail => tail }
         val complex3 = complex2.update(xs)
 
-        val cond1 = complex3.vqhin.ntot === 1.0 +- 0.01
-        val cond2 = complex3.vqhout.ntot === 1.0 +- 0.01
+        val cond1 = complex3.vqhin.ntot === 1.0f +- 0.1f
+        val cond2 = complex3.vqhout.ntot === 1.0f +- 0.01f
         val cond3 = complex3.t.size == 1
 
-        if (!cond1) ko(s"complex.vqhin: ${complex2.vqhin}")
-        else if (!cond2) ko(s"complex.vqhout: ${complex2.vqhout}")
+        if (!cond1) ko(s"complex.vqhin: ${complex3.vqhin}, expected ntot: 1.0")
+        else if (!cond2) ko(s"complex.vqhout: ${complex3.vqhout}, expected ntot: 1.0")
         else if (!cond3) ko(s"complex.t: ${complex3.t}")
         else ok
       }

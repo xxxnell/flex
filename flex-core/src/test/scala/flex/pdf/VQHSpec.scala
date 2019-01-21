@@ -1,14 +1,15 @@
 package flex.pdf
 
-import org.specs2.mutable._
-import org.specs2.ScalaCheck
-import flex.nns.LSH.syntax._
+import flex.nns.syntax._
 import flex.pdf.VQH.syntax._
-import org.scalactic._
-import TripleEquals._
-import flex.rand.IRng
+import flex.rand._
 import flex.vec._
 import org.scalactic.Tolerance._
+import org.scalactic.TripleEquals._
+import org.scalactic.StringNormalizations._
+import org.scalactic.Explicitly._
+import org.specs2.ScalaCheck
+import org.specs2.mutable._
 
 class VQHSpec extends Specification with ScalaCheck {
 
@@ -21,14 +22,15 @@ class VQHSpec extends Specification with ScalaCheck {
       val cond1 = vqh.cwns.isEmpty
       val cond2 = vqh.ntot == 0
       val cond3 = vqh.k == k
-      val cond4 = vqh.cwNns.lshs.forall(lsh => lsh.dim == dims.sum)
-      val cond5 = vqh.parCwNns.arrAnns.zip(dims).forall { case (ann, dim) => ann.lshs.forall(_.dim == dim) }
+      val cond4a = vqh.nns.lshs.forall(lsh => lsh.dim == dims.sum)
+      val cond4b = vqh.nns.l != 0
+      val cond5 = vqh.parnns.arrAnns.zip(dims).forall { case (ann, dim) => ann.lshs.forall(_.dim == dim) }
 
       if (!cond1) ko(s"cns: ${vqh.cwns}")
       else if (!cond2) ko(s"ntot: ${vqh.ntot}")
       else if (!cond3) ko(s"k: ${vqh.k}")
-      else if (!cond4) ko(s"cwAnn: ${vqh.cwNns}")
-      else if (!cond5) ko(s"parAnn: ${vqh.parCwNns}")
+      else if (!(cond4a && cond4b)) ko(s"cwAnn: ${vqh.nns}")
+      else if (!cond5) ko(s"parAnn: ${vqh.parnns}")
       else ok
     }
 
@@ -62,12 +64,29 @@ class VQHSpec extends Specification with ScalaCheck {
         else ok
       }
 
+      "addDim" in {
+        val (dims0, k) = (List(1, 2, 3, 4, 5), 10)
+        val n = 6
+        val dims1 = dims0.:+(n)
+        val vqh0 = VQH.empty(dims0, k)
+        val vqh1 = vqh0.addDim(List.fill(n)(NormalDist(0.0, 1.0)))
+
+        val cond1 = vqh1.dims == dims1
+        val cond2 = vqh1.nns.dims == dims1
+        val cond3 = vqh1.parnns.dims == dims1
+
+        if (!cond1) ko(s"vqh.dims: ${vqh1.dims}, expected: $dims1")
+        if (!cond2) ko(s"vqh.nns.dims: ${vqh1.nns.dims}, expected: $dims1")
+        if (!cond3) ko(s"vqh.parnns.dims: ${vqh1.parnns.dims}, expected: $dims1")
+        else ok
+      }
+
       "parUpdate" in {
 
         "first" in {
           val (dims, k, n, rng0) = (List(1, 2, 3, 4, 5), 20, 3, IRng(0))
           val vqh0 = VQH.empty(dims, k)
-          val (irngs, _) = (1 to n).toList.foldLeft((List.empty[(Int, IRng)], rng0)) {
+          val (irngs, _) = (0 until n).toList.foldLeft((List.empty[(Int, IRng)], rng0)) {
             case ((_is, _rng1), _) =>
               val (_rng2, i) = _rng1.next
               (((i * dims.size).floor.toInt, _rng2) :: _is, _rng2)
@@ -77,13 +96,13 @@ class VQHSpec extends Specification with ScalaCheck {
 
           val cond1 = vqh1.cwns.size == xps.size
           val cond2 = vqh1.ntot === xps.map(_._3).sum +- 0.01f
-          val cond3 = vqh1.parCwNns.arrAnns.zip(dims).forall {
+          val cond3 = vqh1.parnns.arrAnns.zip(dims).forall {
             case (ann, dim) => ann.vtables.forall(vt => vt.keySet.forall(v => v.dim == dim))
           }
 
           if (!cond1) ko(s"cns: ${vqh1.cwns}, \ncins: $cins, \ncouts: $couts")
           else if (!cond2) ko(s"ntot: ${vqh1.ntot}")
-          else if (!cond3) ko(s"arbitrary vectors: ${vqh1.parCwNns.arrAnns.map(ann => ann.vtables.head.keySet)}")
+          else if (!cond3) ko(s"arbitrary vectors: ${vqh1.parnns.arrAnns.map(ann => ann.vtables.head.keySet)}")
           else ok
         }
 

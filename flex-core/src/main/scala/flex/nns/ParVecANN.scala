@@ -40,6 +40,8 @@ trait ParANNLaws { self: ParANNOps =>
   def search(ann: ParVecANN, xp: Vec, i: Int): Option[SumVec] =
     ann.arrAnns.apply(i).search(xp).flatMap(sp => ann.compMap.get(sp))
 
+  def dims(ann: ParVecANN): List[Int] = ann.arrAnns.map(_.dim).toList
+
 }
 
 trait ParANNSyntax extends LSHSyntax {
@@ -49,6 +51,7 @@ trait ParANNSyntax extends LSHSyntax {
     def adds(xs: List[SumVec]): ParVecANN = ParVecANN.add(ann, xs)
     def remove(x: SumVec): ParVecANN = ParVecANN.remove(ann, x)
     def search(xp: Vec, i: Int): Option[SumVec] = ParVecANN.search(ann, xp, i)
+    def dims: List[Int] = ParVecANN.dims(ann)
   }
 
 }

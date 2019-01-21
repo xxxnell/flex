@@ -22,8 +22,18 @@ trait ComplexOps extends ModelOps with ComplexLaws {
 
   def patchKout(complex: Complex, kout: Int): Complex = ???
 
-  def map[A](complex: Complex, f: SumVec => SumVec): Complex =
-    Complex(complex.vqhin, complex.vqhout, complex.op.andThen(f), complex.t)
+  def renewVqhout(complex: Complex): Complex = {
+    val dims = complex.op(complex.vqhin.latest).dims
+    val vqhout1 = VQH.empty(dims, complex.vqhout.k)
+    val t1 = Map.empty[SumVec, SumVec]
+
+    Complex(complex.vqhin, vqhout1, complex.op, t1)
+  }
+
+  def map[A](complex: Complex, f: SumVec => SumVec): Complex = {
+    val f1 = complex.op.andThen(f)
+    renewVqhout(Complex(complex.vqhin, complex.vqhout, f1, complex.t))
+  }
 
   def update[A](complex: Complex, xps: List[(Vec, Int, Float)]): Complex = {
     val (inputVqh1, cins, couts) = complex.vqhin.parUpdate(xps)
@@ -40,11 +50,7 @@ trait ComplexOps extends ModelOps with ComplexLaws {
    * */
   def addVar(complex: Complex, priors: List[Dist[Double]]): Complex = {
     val vqhin1 = complex.vqhin.addDim(priors)
-    val dims = complex.op(vqhin1.latest).dims
-    val vqhout1 = VQH.empty(dims, complex.vqhout.k)
-    val t1 = Map.empty[SumVec, SumVec]
-
-    Complex(vqhin1, vqhout1, complex.op, t1)
+    renewVqhout(Complex(vqhin1, complex.vqhout, complex.op, complex.t))
   }
 
 }

@@ -60,6 +60,10 @@ trait ANNLaws[V] { self: ANNOps[V] =>
   def isEmpty(ann: ANN[_]): Boolean =
     ann.htables.exists(htable => htable.isEmpty) || ann.vtables.exists(vtable => vtable.isEmpty)
 
+  def l(ann: ANN[_]): Int = ann.lshs.size
+
+  def dim(ann: ANN[V])(implicit ops: LSHOps[V]): Int = ann.lshs.headOption.map(_.dim).getOrElse(0)
+
 }
 
 trait ANNSyntax {
@@ -70,6 +74,8 @@ trait ANNSyntax {
     def remove(x: V)(implicit ops: ANNOps[V]): ANN[V] = ops.remove(ann, x)
     def search(x: V)(implicit ops: ANNOps[V], lshOps: LSHOps[V]): Option[V] = ops.search(ann, x)
     def isEmpty(implicit ops: ANNOps[V]): Boolean = ops.isEmpty(ann)
+    def l(implicit ops: ANNOps[V]): Int = ops.l(ann)
+    def dim(implicit ops: ANNOps[V], lshOps: LSHOps[V]): Int = ops.dim(ann)
   }
 
   implicit val vecOps: ANNOps[Vec] = VecANN

@@ -36,17 +36,21 @@ trait VQH {
   /**
    * NNS index for codeword vectors.
    * */
-  val cwNns: SumVecANN
+  val nns: SumVecANN
 
   /**
    * NNS index for partial codeword vectors.
    * */
-  val parCwNns: ParVecANN
+  val parnns: ParVecANN
 
   override def toString: String = {
-    val dims = VQH.dims(this)
-    val dimsStr = if (dims.isEmpty) "0" else dims.mkString("+")
-    s"VQH(k: $k, ntot: $ntot, dim: $dimsStr, size: ${VQH.size(this)})"
+    def dimsStr(dims: List[Int]): String = if (dims.isEmpty) "0" else dims.mkString("+")
+    val vqhDims = VQH.dims(this)
+    val parNnsDims = parnns.dims
+
+    s"VQH(k: $k, ntot: $ntot, " +
+      s"dim: ${dimsStr(vqhDims)}, size: ${VQH.size(this)}, " +
+      s"nns.dim: ${nns.dim}, parnns.dim: ${dimsStr(parNnsDims)})"
   }
 
 }
@@ -56,23 +60,24 @@ trait VQHOps {
   def patchCount(vqh: VQH, x: SumVec, n: Float): VQH = {
     val cwns1 = vqh.cwns.updated(x, n)
     val ntot1 = vqh.ntot - vqh.cwns.getOrElse(x, 0f) + n
-    VQH(cwns1, vqh.latest, ntot1, vqh.k, vqh.rng, vqh.cwNns, vqh.parCwNns)
+    VQH(cwns1, vqh.latest, ntot1, vqh.k, vqh.rng, vqh.nns, vqh.parnns)
   }
 
   def patchRng(vqh: VQH, rng: IRng): VQH =
-    VQH(vqh.cwns, vqh.latest, vqh.ntot, vqh.k, rng, vqh.cwNns, vqh.parCwNns)
+    VQH(vqh.cwns, vqh.latest, vqh.ntot, vqh.k, rng, vqh.nns, vqh.parnns)
 
   def patchK(vqh: VQH, k: Int): VQH =
-    VQH(vqh.cwns, vqh.latest, vqh.ntot, k, vqh.rng, vqh.cwNns, vqh.parCwNns)
+    VQH(vqh.cwns, vqh.latest, vqh.ntot, k, vqh.rng, vqh.nns, vqh.parnns)
 
   def renewNns(vqh: VQH): VQH = {
     val cws = vqh.cwns.keySet.toList
-    val l = vqh.cwNns.lshs.size
-    val dims = cws.headOption.map(cw => cw.dims).getOrElse(vqh.cwNns.dims)
+    val l = vqh.nns.lshs.size
+    val dims = vqh.latest.dims
     val (cwNns1, rng1) = SumVecANN.empty(l, dims, vqh.rng)
     val cwNns2 = cwNns1.adds(cws)
     val (parCwNns1, rng2) = ParVecANN.empty(l, dims, rng1)
     val parCwNns2 = parCwNns1.adds(cws)
+
     VQH(vqh.cwns, vqh.latest, vqh.ntot, vqh.k, rng2, cwNns2, parCwNns2)
   }
 
@@ -81,8 +86,8 @@ trait VQHOps {
    * */
   def addCw(vqh: VQH, x: SumVec, n: Float): VQH = {
     val cwns1 = vqh.cwns.+((x, n))
-    val cwAnn1 = vqh.cwNns.add(x)
-    val parAnn1 = vqh.parCwNns.add(x)
+    val cwAnn1 = vqh.nns.add(x)
+    val parAnn1 = vqh.parnns.add(x)
     VQH(cwns1, x, vqh.ntot + n, vqh.k, vqh.rng, cwAnn1, parAnn1)
   }
 
@@ -91,8 +96,8 @@ trait VQHOps {
    * */
   def removeCw(vqh: VQH, x: SumVec): VQH = {
     val cwns1 = vqh.cwns.-(x)
-    val cwAnn1 = vqh.cwNns.remove(x)
-    val parAnn1 = vqh.parCwNns.remove(x)
+    val cwAnn1 = vqh.nns.remove(x)
+    val parAnn1 = vqh.parnns.remove(x)
     VQH(cwns1, vqh.latest, vqh.ntot - vqh.cwns.getOrElse(x, 0f), vqh.k, vqh.rng, cwAnn1, parAnn1)
   }
 
@@ -113,11 +118,11 @@ trait VQHOps {
     val cwns1 = zipped.map { case ((cw, n), add) => (cw.:+(add), n) }
 
     // latest
-    val latest1rng1 = zipped.find(_._1._1 == vqh.latest).map { case ((cw, n), add) => (cw.:+(add), rng1) }
+    val latest1rng1 = zipped.find(_._1._1 == vqh.latest).map { case ((cw, _), add) => (cw.:+(add), rng1) }
     lazy val (latss, rng2) = samples(priors, rng1)
     val (latest2, rng3) = latest1rng1.getOrElse((vqh.latest.:+(Vec(latss)), rng2))
 
-    renewNns(VQH(cwns1, latest2, vqh.ntot, vqh.k, rng3, vqh.cwNns, vqh.parCwNns))
+    renewNns(VQH(cwns1, latest2, vqh.ntot, vqh.k, rng3, vqh.nns, vqh.parnns))
   }
 
   /**
@@ -173,9 +178,9 @@ trait VQHOps {
     (patchRng(vqh3, berq.rng), cnews, couts)
   }
 
-  def parSearch(vqh: VQH, xp: Vec, i: Int): Option[SumVec] = vqh.parCwNns.search(xp, i)
+  def parSearch(vqh: VQH, xp: Vec, i: Int): Option[SumVec] = vqh.parnns.search(xp, i)
 
-  def expSearch(vqh: VQH, x: SumVec): Option[SumVec] = vqh.cwNns.search(x)
+  def expSearch(vqh: VQH, x: SumVec): Option[SumVec] = vqh.nns.search(x)
 
   def size(vqh: VQH): Int = vqh.cwns.size
 
@@ -222,8 +227,8 @@ object VQH extends VQHOps {
                              ntot: Float,
                              k: Int,
                              rng: IRng,
-                             cwNns: SumVecANN,
-                             parCwNns: ParVecANN)
+                             nns: SumVecANN,
+                             parnns: ParVecANN)
       extends VQH
 
   def apply(cwns: HashMap[SumVec, Float],
