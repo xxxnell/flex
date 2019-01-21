@@ -43,6 +43,12 @@ trait VQH {
    * */
   val parCwNns: ParVecANN
 
+  override def toString: String = {
+    val dims = VQH.dims(this)
+    val dimsStr = if (dims.isEmpty) "0" else dims.mkString("+")
+    s"VQH(k: $k, ntot: $ntot, dim: $dimsStr, size: ${VQH.size(this)})"
+  }
+
 }
 
 trait VQHOps {
@@ -173,6 +179,10 @@ trait VQHOps {
 
   def size(vqh: VQH): Int = vqh.cwns.size
 
+  def dim(vqh: VQH): Int = vqh.latest.dim
+
+  def dims(vqh: VQH): List[Int] = vqh.latest.dims
+
   // TODO
   private def diffusion(x: Vec): Vec = x
 
@@ -197,6 +207,8 @@ trait VQHSyntax {
     def parSearch(xp: Vec, i: Int): Option[SumVec] = VQH.parSearch(vqh, xp, i)
     def expSearch(x: SumVec): Option[SumVec] = VQH.expSearch(vqh, x)
     def size: Int = VQH.size(vqh)
+    def dim: Int = VQH.dim(vqh)
+    def dims: List[Int] = VQH.dims(vqh)
   }
 
 }

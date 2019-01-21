@@ -11,7 +11,7 @@ lazy val root = project
   .settings(Releases.publishSettings)
   .settings(Releases.noPublishSettings)
   .settings(Tasks.benchTaskSettings(flexBench))
-  .aggregate(flexCore, flexBench, flexDocs)
+  .aggregate(flexCore, flexChain, flexBench, flexDocs)
 
 lazy val flexCore = flexModule("flex-core")
   .settings(moduleName := "flex", name := "flex core")

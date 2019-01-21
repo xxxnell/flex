@@ -1,9 +1,8 @@
 package flex.chain
 
-import flex.pdf.{Dist, VQH}
-import flex.vec._
 import flex.pdf.VQH.syntax._
-import org.nd4j.linalg.api.ndarray.INDArray
+import flex.pdf._
+import flex.vec._
 
 trait Complex extends Model {
 
@@ -17,7 +16,7 @@ trait Complex extends Model {
 
 }
 
-trait ComplexOps extends ModelOps {
+trait ComplexOps extends ModelOps with ComplexLaws {
 
   def patchKin(complex: Complex, kin: Int): Complex = ???
 
@@ -44,7 +43,17 @@ trait ComplexOps extends ModelOps {
     val dims = complex.op(vqhin1.latest).dims
     val vqhout1 = VQH.empty(dims, complex.vqhout.k)
     val t1 = Map.empty[SumVec, SumVec]
+
     Complex(vqhin1, vqhout1, complex.op, t1)
+  }
+
+}
+
+trait ComplexLaws { self: ComplexOps =>
+
+  def addStd(complex: Complex, dims: List[Int]): Complex = {
+    val priorss = dims.map(dim => List.fill(dim)(NormalDist(0.0, 1.0)))
+    priorss.foldLeft(complex) { case (_complex, priors) => addVar(_complex, priors) }
   }
 
 }
@@ -54,8 +63,9 @@ trait ComplexSyntax {
   implicit class StreamSyntaxImpl(complex: Complex) {
     def map(f: SumVec => SumVec): Complex = Complex.map(complex, f)
     def addVar(priors: List[Dist[Double]]): Complex = Complex.addVar(complex, priors)
-    def add(mvs: List[(Double, Double)]): Complex = ???
-    def addStd(dims: List[Int]): Complex = ???
+    def addStd(dims: List[Int]): Complex = Complex.addStd(complex, dims)
+    def update(xps: List[(Vec, Int, Float)]): Complex = Complex.update(complex, xps)
+    def update(xs: Vec*): Complex = Complex.update(complex, xs.toList.map(v => (v, 0, 1.0f)))
   }
 
 }
