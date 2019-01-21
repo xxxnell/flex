@@ -187,6 +187,7 @@ trait VQHSyntax {
   implicit class VQHSyntaxImpl(vqh: VQH) {
     def add(x: SumVec, n: Float): VQH = VQH.addCw(vqh, x, n)
     def remove(x: SumVec): VQH = VQH.removeCw(vqh, x)
+    def addDim(priors: List[Dist[Double]]): VQH = VQH.addDim(vqh, priors)
     def parUpdate(xps: List[(Vec, Int, Float)]): (VQH, List[SumVec], List[SumVec]) =
       VQH.parUpdate(vqh, xps)
     def expUpdate(xs: List[(SumVec, Float)]): (VQH, List[SumVec], List[SumVec]) =
