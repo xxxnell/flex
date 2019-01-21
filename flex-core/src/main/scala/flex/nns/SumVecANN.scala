@@ -16,9 +16,21 @@ trait SumVecANNOps extends ANNOps[SumVec] {
   def distance(x1: SumVec, x2: SumVec): Float =
     math.sqrt(x1.zip(x2).map { case (_x1, _x2) => math.pow(_x1.distance2(_x2), 2) }.sum).toFloat
 
+  def dims(ann: SumVecANN): List[Int] = ann.lshs.headOption.map(lsh => lsh.a.dims).getOrElse(Nil)
+
+}
+
+trait SumVecANNSyntax {
+
+  implicit class SumVecANNSyntaxImpl(ann: SumVecANN) {
+    def dims: List[Int] = SumVecANN.dims(ann)
+  }
+
 }
 
 object SumVecANN extends SumVecANNOps {
+
+  object syntax extends SumVecANNSyntax
 
   private case class SumVecANNImpl(lshs: List[SumVecLSH],
                                    htables: List[SumVecANN#HTable],

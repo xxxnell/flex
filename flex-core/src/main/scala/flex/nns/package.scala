@@ -12,6 +12,6 @@ package object nns {
 
   type SumVecANN = ANN[SumVec]
 
-  object syntax extends ANNSyntax with ParANNSyntax with LSHSyntax
+  object syntax extends ANNSyntax with ParANNSyntax with SumVecANNSyntax with LSHSyntax
 
 }

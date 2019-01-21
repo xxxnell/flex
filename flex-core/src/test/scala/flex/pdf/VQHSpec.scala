@@ -18,13 +18,13 @@ class VQHSpec extends Specification with ScalaCheck {
       val (dims, k) = (List(1, 2, 3, 4, 5), 10)
       val vqh = VQH.empty(dims, k)
 
-      val cond1 = vqh.cns.isEmpty
+      val cond1 = vqh.cwns.isEmpty
       val cond2 = vqh.ntot == 0
       val cond3 = vqh.k == k
       val cond4 = vqh.cwNns.lshs.forall(lsh => lsh.dim == dims.sum)
       val cond5 = vqh.parCwNns.arrAnns.zip(dims).forall { case (ann, dim) => ann.lshs.forall(_.dim == dim) }
 
-      if (!cond1) ko(s"cns: ${vqh.cns}")
+      if (!cond1) ko(s"cns: ${vqh.cwns}")
       else if (!cond2) ko(s"ntot: ${vqh.ntot}")
       else if (!cond3) ko(s"k: ${vqh.k}")
       else if (!cond4) ko(s"cwAnn: ${vqh.cwNns}")
@@ -75,13 +75,13 @@ class VQHSpec extends Specification with ScalaCheck {
           val xps = irngs.map { case (i, rng) => (Vec.std(dims(i), rng)._1, i, 1.0f) }
           val (vqh1, cins, couts) = vqh0.parUpdate(xps)
 
-          val cond1 = vqh1.cns.size == xps.size
+          val cond1 = vqh1.cwns.size == xps.size
           val cond2 = vqh1.ntot === xps.map(_._3).sum +- 0.01f
           val cond3 = vqh1.parCwNns.arrAnns.zip(dims).forall {
             case (ann, dim) => ann.vtables.forall(vt => vt.keySet.forall(v => v.dim == dim))
           }
 
-          if (!cond1) ko(s"cns: ${vqh1.cns}, \ncins: $cins, \ncouts: $couts")
+          if (!cond1) ko(s"cns: ${vqh1.cwns}, \ncins: $cins, \ncouts: $couts")
           else if (!cond2) ko(s"ntot: ${vqh1.ntot}")
           else if (!cond3) ko(s"arbitrary vectors: ${vqh1.parCwNns.arrAnns.map(ann => ann.vtables.head.keySet)}")
           else ok
@@ -114,10 +114,10 @@ class VQHSpec extends Specification with ScalaCheck {
           val xs = (1 to 10).toList.map(i => (SumVec.std(dims, IRng(i))._1, 1.0f))
           val (vqh1, cins, couts) = vqh0.expUpdate(xs)
 
-          val cond1 = vqh1.cns.size == xs.size
+          val cond1 = vqh1.cwns.size == xs.size
           val cond2 = vqh1.ntot === xs.map(_._2).sum +- 0.01f
 
-          if (!cond1) ko(s"cns: ${vqh1.cns}, \ncins: $cins, \ncouts: $couts")
+          if (!cond1) ko(s"cns: ${vqh1.cwns}, \ncins: $cins, \ncouts: $couts")
           else if (!cond2) ko(s"ntot: ${vqh1.ntot}")
           else ok
         }

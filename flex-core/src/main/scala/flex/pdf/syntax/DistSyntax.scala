@@ -2,10 +2,10 @@ package flex.pdf.syntax
 
 import flex.conf.pdf._
 import flex.measure.Measure
+import flex.pdf.Dist
 import flex.pdf.arithmetic.CombinationDist
-import flex.pdf.monad.{DistBind, DistFunctor}
-import flex.pdf.{Dist, SamplingDist, Sketch}
 import flex.plot.PointPlot
+import flex.rand._
 
 import scala.language.higherKinds
 
@@ -16,6 +16,7 @@ trait DistSyntax extends DistPropSyntax with DistArthmeticSyntax
 trait DistPropSyntax {
 
   implicit class DistPropSyntaxImpl[A](dist: Dist[A]) {
+    def modifyRng(frng: IRng => IRng): Dist[A] = Dist.modifyRng(dist, frng)
     def probability(from: A, to: A): Double = Dist.probability(dist, from, to)
     def pdf(a: A): Double = Dist.pdf(dist, a)
     def cdf(a: A): Double = Dist.cdf(dist, a)

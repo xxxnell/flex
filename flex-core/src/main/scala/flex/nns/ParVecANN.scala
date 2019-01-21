@@ -24,10 +24,11 @@ trait ParANNOps extends ParANNLaws {
 
 trait ParANNLaws { self: ParANNOps =>
 
-  def add(ann: ParVecANN, x: SumVec): ParVecANN = {
-    val arrAnns1 = ann.arrAnns.zip(x).map { case (arrAnn, xp) => arrAnn.add(xp) }
-    val compMap1 = x.foldLeft(ann.compMap) { case (_m, xp) => _m.+(xp -> x) }
-    patchCompMap(patchArrAnns(ann, arrAnns1), compMap1)
+  def add(ann: ParVecANN, xs: List[SumVec]): ParVecANN = xs.foldLeft(ann) {
+    case (_ann, x) =>
+      val arrAnns1 = _ann.arrAnns.zip(x).map { case (arrAnn, xp) => arrAnn.add(xp) }
+      val compMap1 = x.foldLeft(_ann.compMap) { case (_m, xp) => _m.+(xp -> x) }
+      patchCompMap(patchArrAnns(_ann, arrAnns1), compMap1)
   }
 
   def remove(ann: ParVecANN, x: SumVec): ParVecANN = {
@@ -44,7 +45,8 @@ trait ParANNLaws { self: ParANNOps =>
 trait ParANNSyntax extends LSHSyntax {
 
   implicit class ParANNSyntaxImpl(ann: ParVecANN) {
-    def add(x: SumVec): ParVecANN = ParVecANN.add(ann, x)
+    def add(x: SumVec): ParVecANN = ParVecANN.add(ann, x :: Nil)
+    def adds(xs: List[SumVec]): ParVecANN = ParVecANN.add(ann, xs)
     def remove(x: SumVec): ParVecANN = ParVecANN.remove(ann, x)
     def search(xp: Vec, i: Int): Option[SumVec] = ParVecANN.search(ann, xp, i)
   }

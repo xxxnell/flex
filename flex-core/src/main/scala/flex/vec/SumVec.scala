@@ -1,16 +1,20 @@
 package flex.vec
 
+import flex.pdf.Dist
 import flex.rand._
 
 trait SumVecOps {
 
-  def dim(v: SumVec): Int = v.map(_v => _v.dim).sum
+  def dims(v: SumVec): List[Int] = v.map(_v => _v.dim)
+
+  def dim(v: SumVec): Int = dims(v).sum
 
 }
 
 trait SumVecSyntax {
 
   implicit class SumVecSyntaxImpl(v: SumVec) {
+    def dims: List[Int] = SumVec.dims(v)
     def dim: Int = SumVec.dim(v)
   }
 

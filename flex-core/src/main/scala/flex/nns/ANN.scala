@@ -31,26 +31,27 @@ trait ANNOps[V] extends ANNLaws[V] {
 
 trait ANNLaws[V] { self: ANNOps[V] =>
 
-  def add(ann: ANN[V], x: V)(implicit lshOps: LSHOps[V]): ANN[V] = {
-    val hashcodes = ann.lshs.map(lsh => lsh.hash(x))
-    val htables1 = hashcodes.zip(ann.htables).map { case (h, ht) => ht.updated(h, ht.getOrElse(h, HashSet[V]()).+(x)) }
-    val vtables1 = hashcodes.zip(ann.vtables).map { case (h, vt) => vt.updated(x, h) }
-    patchVTables(patchHTables(ann, htables1), vtables1)
+  def add(ann: ANN[V], xs: List[V])(implicit lshOps: LSHOps[V]): ANN[V] = xs.foldLeft(ann) {
+    case (_ann, x) =>
+      val hcs = _ann.lshs.map(lsh => lsh.hash(x))
+      val hts1 = hcs.zip(_ann.htables).map { case (h, ht) => ht.updated(h, ht.getOrElse(h, HashSet.empty[V]).+(x)) }
+      val vts1 = hcs.zip(_ann.vtables).map { case (h, vt) => vt.updated(x, h) }
+      patchVTables(patchHTables(_ann, hts1), vts1)
   }
 
   def remove(ann: ANN[V], x: V): ANN[V] = {
-    val hashcodes = ann.vtables.map(vt => vt.get(x))
-    val htables1 = hashcodes.zip(ann.htables).map {
+    val hcs = ann.vtables.map(vt => vt.get(x))
+    val hts1 = hcs.zip(ann.htables).map {
       case (ho, ht) => ho.flatMap(h => ht.get(h).map(vs => ht.updated(h, vs.-(x)))).getOrElse(ht)
     }
-    val vtables1 = ann.vtables.map(vt => vt.-(x))
-    patchVTables(patchHTables(ann, htables1), vtables1)
+    val vts1 = ann.vtables.map(vt => vt.-(x))
+    patchVTables(patchHTables(ann, hts1), vts1)
   }
 
   def search(ann: ANN[V], x: V)(implicit lshOps: LSHOps[V]): Option[V] = {
-    val hashcodes = ann.lshs.map(lsh => lsh.hash(x))
-    val vectors = hashcodes.zip(ann.htables).flatMap { case (h, htable) => htable.getOrElse(h, Nil) }
-    val counts = vectors.groupBy(identity).mapValues(_.size)
+    val hcs = ann.lshs.map(lsh => lsh.hash(x))
+    val vecs = hcs.zip(ann.htables).flatMap { case (h, ht) => ht.getOrElse(h, Nil) }
+    val counts = vecs.groupBy(identity).mapValues(_.size)
     val ranks = counts.groupBy { case (_, r) => r }.mapValues(_.keySet)
     val neighbors = ranks.toSeq.sortWith { case ((rank1, _), (rank2, _)) => rank1 > rank2 }.headOption.map(_._2)
     neighbors.flatMap(ns => ns.map(n => (n, distance(x, n))).toSeq.sortBy(_._2).headOption.map(_._1))
@@ -64,7 +65,8 @@ trait ANNLaws[V] { self: ANNOps[V] =>
 trait ANNSyntax {
 
   implicit class AnnSyntaxImpl[V](ann: ANN[V]) {
-    def add(x: V)(implicit ops: ANNOps[V], lshOps: LSHOps[V]): ANN[V] = ops.add(ann, x)
+    def add(x: V)(implicit ops: ANNOps[V], lshOps: LSHOps[V]): ANN[V] = ops.add(ann, x :: Nil)
+    def adds(xs: List[V])(implicit ops: ANNOps[V], lshOps: LSHOps[V]): ANN[V] = ops.add(ann, xs)
     def remove(x: V)(implicit ops: ANNOps[V]): ANN[V] = ops.remove(ann, x)
     def search(x: V)(implicit ops: ANNOps[V], lshOps: LSHOps[V]): Option[V] = ops.search(ann, x)
     def isEmpty(implicit ops: ANNOps[V]): Boolean = ops.isEmpty(ann)
