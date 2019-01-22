@@ -6,6 +6,7 @@ import flex.pdf.syntax._
 import flex.pdf.Bernoulli.syntax._
 import flex.rand._
 import flex.vec._
+import cats.implicits._
 
 import scala.collection.immutable.HashMap
 
@@ -88,6 +89,7 @@ trait VQHOps {
     val cwns1 = vqh.cwns.+((x, n))
     val cwAnn1 = vqh.nns.add(x)
     val parAnn1 = vqh.parnns.add(x)
+
     VQH(cwns1, x, vqh.ntot + n, vqh.k, vqh.rng, cwAnn1, parAnn1)
   }
 
@@ -98,19 +100,16 @@ trait VQHOps {
     val cwns1 = vqh.cwns.-(x)
     val cwAnn1 = vqh.nns.remove(x)
     val parAnn1 = vqh.parnns.remove(x)
+
     VQH(cwns1, vqh.latest, vqh.ntot - vqh.cwns.getOrElse(x, 0f), vqh.k, vqh.rng, cwAnn1, parAnn1)
   }
 
   def addDim(vqh: VQH, priors: List[Dist[Double]]): VQH = {
     def samples(ps: List[Dist[Double]], rng: IRng): (List[Double], IRng) = ps.foldRight((List.empty[Double], rng)) {
-      case (p1, (ss, _rng)) =>
-        val (p2, s) = p1.modifyRng(_ => _rng).sample
-        (s :: ss, p2.rng)
+      case (p1, (ss, _rng)) => p1.modifyRng(_ => _rng).sample.swap.bimap(_ :: ss, _.rng)
     }
     val (adds, rng1) = (0 until vqh.cwns.size).foldRight((List.empty[Vec], vqh.rng)) {
-      case (_, (vecs, _rng0)) =>
-        val (ss, _rng1) = samples(priors, _rng0)
-        (Vec(ss) :: vecs, _rng1)
+      case (_, (vecs, _rng0)) => samples(priors, _rng0).leftMap(Vec(_) :: vecs)
     }
     val zipped = vqh.cwns.zip(adds)
 

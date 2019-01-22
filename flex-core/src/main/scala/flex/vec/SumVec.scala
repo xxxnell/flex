@@ -1,7 +1,7 @@
 package flex.vec
 
-import flex.pdf.Dist
 import flex.rand._
+import cats.implicits._
 
 trait SumVecOps {
 
@@ -26,18 +26,11 @@ object SumVec extends SumVecOps {
 
   def apply(ass: List[List[Double]]): SumVec = ass.map(as => Vec(as))
 
-  def std(dims: List[Int], rng: IRng): (SumVec, IRng) = dims.foldRight((List.empty[Vec], rng)) {
-    case (dim, (_sumVec, rng1)) =>
-      val (vec, rng2) = Vec.std(dim, rng1)
-      (vec :: _sumVec, rng2)
-  }
+  def std(dims: List[Int], rng: IRng): (SumVec, IRng) =
+    dims.foldRight((List.empty[Vec], rng)) { case (dim, (sv, _rng)) => Vec.std(dim, _rng).leftMap(_ :: sv) }
 
   def std(dims: List[Int], rng: IRng, n: Int): (List[SumVec], IRng) =
-    (1 to n).foldRight((List.empty[SumVec], rng)) {
-      case (i, (sumvecs, _rng1)) =>
-        val (sumvec, _rng2) = std(dims, _rng1)
-        (sumvec :: sumvecs, _rng2)
-    }
+    (0 until n).foldRight((List.empty[SumVec], rng)) { case (_, (svs, _rng)) => std(dims, _rng).leftMap(_ :: svs) }
 
   def zeros(dims: List[Int]): SumVec = dims.map(dim => Vec.zeros(dim))
 

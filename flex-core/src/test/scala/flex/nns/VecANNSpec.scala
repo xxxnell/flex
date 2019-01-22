@@ -1,11 +1,10 @@
 package flex.nns
 
-import flex.rand._
 import flex.nns.ANN.syntax._
+import flex.rand._
 import flex.vec.Vec
-import org.nd4j.linalg.factory.Nd4j
-import org.specs2.mutable._
 import org.specs2.ScalaCheck
+import org.specs2.mutable._
 
 class VecANNSpec extends Specification with ScalaCheck {
 
@@ -48,11 +47,11 @@ class VecANNSpec extends Specification with ScalaCheck {
       }
 
       "remove" in {
-        val (l, dim, rng) = (10, 2, IRng(0))
-        val v = Nd4j.create(Array(1.0, 1.0))
-        val (ann0, _) = VecANN.empty(l, dim, rng)
+        val (l, dim, rng0) = (10, 2, IRng(0))
+        val (v, rng1) = Vec.std(2, rng0)
+        val (ann0, _) = VecANN.empty(l, dim, rng1)
         val ann1 = ann0.add(v)
-        val ann2 = ann0.remove(v)
+        val ann2 = ann1.remove(v)
 
         val cond1 = ann2.htables.forall(htable => htable.isEmpty)
         val cond2 = ann2.vtables.forall(vtable => vtable.isEmpty)

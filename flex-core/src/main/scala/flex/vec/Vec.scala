@@ -1,5 +1,6 @@
 package flex.vec
 
+import cats.implicits._
 import flex.pdf._
 import flex.rand._
 import org.nd4j.linalg.factory.Nd4j
@@ -29,11 +30,16 @@ object Vec extends VecOps {
   /**
    * Random vector from standard normal distribution
    * */
-  def std(dim: Int, rng: IRng): (Vec, IRng) = {
-    val (normal1, samples) = NormalDist(0.0, 1.0, rng).samples(dim)
-    (Vec(samples), normal1.rng)
-  }
+  def std(dim: Int, rng: IRng): (Vec, IRng) = NormalDist(0.0, 1.0, rng).samples(dim).swap.bimap(Vec(_), _.rng)
+
+  /**
+   * Random vector from standard normal distribution
+   * */
+  def std(dim: Int, rng: IRng, n: Int): (List[Vec], IRng) =
+    (0 until n).foldRight((List.empty[Vec], rng)) { case (_, (vs, _rng0)) => std(dim, _rng0).leftMap(_ :: vs) }
 
   def zeros(dim: Int): Vec = Nd4j.zeros(1l, dim)
+
+  def ones(dim: Int): Vec = Nd4j.ones(1l, dim)
 
 }
