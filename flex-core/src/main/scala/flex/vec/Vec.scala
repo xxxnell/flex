@@ -23,9 +23,9 @@ object Vec extends VecOps {
 
   object syntax extends VecSyntax
 
-  def apply(as: Double*): Vec = apply(as.toList)
+  def apply(as: List[Double]): Vec = Nd4j.create(as.toArray, Array(as.length, 1))
 
-  def apply(as: List[Double]): Vec = Nd4j.create(as.toArray)
+  def apply(as: Double*): Vec = apply(as.toList)
 
   /**
    * Random vector from standard normal distribution
@@ -38,8 +38,8 @@ object Vec extends VecOps {
   def std(dim: Int, rng: IRng, n: Int): (List[Vec], IRng) =
     (0 until n).foldRight((List.empty[Vec], rng)) { case (_, (vs, _rng0)) => std(dim, _rng0).leftMap(_ :: vs) }
 
-  def zeros(dim: Int): Vec = Nd4j.zeros(1l, dim)
+  def zeros(dim: Int): Vec = Nd4j.zeros(dim, 1l)
 
-  def ones(dim: Int): Vec = Nd4j.ones(1l, dim)
+  def ones(dim: Int): Vec = Nd4j.ones(dim, 1l)
 
 }
