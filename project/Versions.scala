@@ -6,7 +6,7 @@ object Versions {
 
   val cats = "1.1.0"
 
-  val monix = "2.3.3"
+  val monix = "3.0.0-RC2"
 
   val scalactic = "3.0.3"
 

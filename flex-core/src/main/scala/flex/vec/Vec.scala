@@ -4,17 +4,21 @@ import cats.implicits._
 import flex.pdf._
 import flex.rand._
 import org.nd4j.linalg.factory.Nd4j
+import scala.reflect.runtime.universe._
 
 trait VecOps {
 
-  def dim(vec: Vec): Int = vec.shape.foldLeft(1) { case (acc, d) => acc * d.toInt }
+  def dim(v: Vec): Int = v.shape.foldLeft(1) { case (acc, d) => acc * d.toInt }
+
+  def csv(v: Vec): String = v.data().asDouble().mkString(",")
 
 }
 
 trait VecSyntax {
 
-  implicit class VecSyntaxImpl(vec: Vec) {
-    def dim: Int = Vec.dim(vec)
+  implicit class VecSyntaxImpl(v: Vec) {
+    def dim: Int = Vec.dim(v)
+    def csv: String = Vec.csv(v)
   }
 
 }
@@ -23,9 +27,19 @@ object Vec extends VecOps {
 
   object syntax extends VecSyntax
 
-  def apply(as: List[Double]): Vec = Nd4j.create(as.toArray, Array(as.length, 1))
+  def apply[A: TypeTag](as: List[A]): Vec = typeOf[A] match {
+    case t if t =:= typeOf[Int] => int(as.asInstanceOf[List[Int]])
+    case t if t =:= typeOf[Float] => float(as.asInstanceOf[List[Float]])
+    case t if t =:= typeOf[Double] => double(as.asInstanceOf[List[Double]])
+  }
 
-  def apply(as: Double*): Vec = apply(as.toList)
+  def apply[A: TypeTag](as: A*): Vec = apply(as.toList)
+
+  def int(as: List[Int]): Vec = Nd4j.create(as.map(a => a.toFloat).toArray, Array(as.length, 1))
+
+  def float(as: List[Float]): Vec = Nd4j.create(as.toArray, Array(as.length, 1))
+
+  def double(as: List[Double]): Vec = Nd4j.create(as.toArray, Array(as.length, 1))
 
   /**
    * Random vector from standard normal distribution

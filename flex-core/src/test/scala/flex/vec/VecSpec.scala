@@ -11,8 +11,18 @@ class VecSpec extends Specification with ScalaCheck {
     "construct" in {
 
       "apply" in {
-        val as = 1.0 :: 2.0 :: 3.0 :: Nil
+        val as = List.range(0, 784)
         val v = Vec(as)
+
+        val cond1 = v.dim == as.size
+
+        if (!cond1) ko(s"dim(v): ${v.dim}, expected: ${as.size}")
+        else ok
+      }
+
+      "int" in {
+        val as = List.range(0, 784)
+        val v = Vec.int(as)
 
         val cond1 = v.dim == as.size
 

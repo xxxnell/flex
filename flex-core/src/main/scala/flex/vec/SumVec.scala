@@ -5,17 +5,20 @@ import cats.implicits._
 
 trait SumVecOps {
 
-  def dims(v: SumVec): List[Int] = v.map(_v => _v.dim)
+  def dims(sv: SumVec): List[Int] = sv.map(_v => _v.dim)
 
-  def dim(v: SumVec): Int = dims(v).sum
+  def dim(sv: SumVec): Int = dims(sv).sum
+
+  def csv(sv: SumVec): String = sv.map(v => v.csv).mkString(",")
 
 }
 
 trait SumVecSyntax {
 
-  implicit class SumVecSyntaxImpl(v: SumVec) {
-    def dims: List[Int] = SumVec.dims(v)
-    def dim: Int = SumVec.dim(v)
+  implicit class SumVecSyntaxImpl(sv: SumVec) {
+    def dims: List[Int] = SumVec.dims(sv)
+    def dim: Int = SumVec.dim(sv)
+    def csv: String = SumVec.csv(sv)
   }
 
 }
@@ -23,6 +26,8 @@ trait SumVecSyntax {
 object SumVec extends SumVecOps {
 
   object syntax extends SumVecSyntax
+
+  def apply(vs: Vec*): SumVec = vs.toList
 
   def apply(ass: List[List[Double]]): SumVec = ass.map(as => Vec(as))
 

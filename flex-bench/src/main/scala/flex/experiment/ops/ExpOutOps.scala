@@ -1,6 +1,7 @@
 package flex.experiment.ops
 
 import java.io.{File, FileOutputStream}
+import java.nio.file.Paths
 
 import flex.plot.RangePlot
 
@@ -8,7 +9,7 @@ import scala.util.Try
 
 object ExpOutOps {
 
-  val defaultPath = "flex-bench/experiments"
+  val defaultPath: String = (Paths.get(".").toString :: "experiments" :: Nil).mkString(File.separator)
 
   // syntax
 

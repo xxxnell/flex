@@ -10,8 +10,9 @@ object Dependencies {
   )
 
   val monixs = Seq(
-    "io.monix" %% "monix" % Versions.monix
-  )
+    "io.monix" %% "monix",
+    "io.monix" %% "monix-execution"
+  ).map(_ % Versions.monix)
 
   val tics = Seq(
     "org.scalactic" %% "scalactic" % Versions.scalactic

@@ -247,4 +247,6 @@ object VQH extends VQHOps {
     apply(HashMap.empty[SumVec, Float], init, 0, k, rng3, cwAnn, parAnn)
   }
 
+  def empty(dim: Int, k: Int): VQH = empty(dim :: Nil, k)
+
 }
