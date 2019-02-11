@@ -70,8 +70,11 @@ trait ComplexSyntax {
     def map(f: SumVec => SumVec): Complex = Complex.map(complex, f)
     def addVar(priors: List[Dist[Double]]): Complex = Complex.addVar(complex, priors)
     def addStd(dims: List[Int]): Complex = Complex.addStd(complex, dims)
+    def addStd(dims: Int*): Complex = Complex.addStd(complex, dims.toList)
     def update(xps: List[(Vec, Int, Float)]): Complex = Complex.update(complex, xps)
     def update(xs: Vec*): Complex = Complex.update(complex, xs.toList.map(v => (v, 0, 1.0f)))
+    def train(dataset: Dataset): Complex = ???
+    def evaluate(dataset: Dataset): Float = ???
   }
 
 }
