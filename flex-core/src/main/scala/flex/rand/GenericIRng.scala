@@ -1,6 +1,8 @@
 package flex.rand
 
-import cats.data.State
+import cats._
+import cats.data._
+import cats.implicits._
 
 import scala.util.Random
 import scala.util.hashing.byteswap64
@@ -17,6 +19,12 @@ trait IRngOps extends RngOps[Seed, Out, GenericIRng] {
     (IRng.bare(seed2), rand)
   }
 
+  def next(rng: IRng): (IRng, Out) = nextS.run(rng).value
+
+  def nextInt(rng: IRng, b: Int): (IRng, Int) = next(rng).map(out => floor(out.toFloat * b))
+
+  private def floor(a: Float): Int = if (a - math.round(a) > 0) math.round(a) else math.round(a) - 1
+
 }
 
 trait IRngSyntax {
@@ -28,7 +36,8 @@ trait IRngSyntax {
   type IRng = GenericIRng[Seed, Out]
 
   implicit class IRngSyntaxImpl(rng: IRng) {
-    def next: (IRng, Out) = IRng.nextS.run(rng).value
+    def next: (IRng, Out) = IRng.next(rng)
+    def nextInt(b: Int): (IRng, Int) = IRng.nextInt(rng, b)
   }
 
 }
