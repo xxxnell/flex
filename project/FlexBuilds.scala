@@ -12,6 +12,7 @@ object FlexBuilds {
   )
 
   val defaultSettings = Seq(
+    scalacOptions += "-Ypartial-unification",
     resolvers ++= typesafeRepo,
     fork := true,
     run / javaOptions ++= Seq(
