@@ -21,6 +21,13 @@ trait IRngOps extends RngOps[Seed, Out, GenericIRng] {
 
   def next(rng: IRng): (IRng, Out) = nextS.run(rng).value
 
+  def nexts(rng: IRng, n: Int): (List[IRng], List[Out]) =
+    (0 until n)
+      .foldRight((rng :: Nil, List.empty[Out])) {
+        case (_, (rngs, rnds)) => next(rngs.head).bimap(rng1 => rng1 :: rngs, rnd1 => rnd1 :: rnds)
+      }
+      .bimap(rngs => rngs.reverse.tail, rnds => rnds.reverse)
+
   def nextInt(rng: IRng, b: Int): (IRng, Int) = next(rng).map(out => floor(out.toFloat * b))
 
   private def floor(a: Float): Int = if (a - math.round(a) > 0) math.round(a) else math.round(a) - 1
@@ -37,6 +44,7 @@ trait IRngSyntax {
 
   implicit class IRngSyntaxImpl(rng: IRng) {
     def next: (IRng, Out) = IRng.next(rng)
+    def nexts(n: Int): (List[IRng], List[Out]) = IRng.nexts(rng, n)
     def nextInt(b: Int): (IRng, Int) = IRng.nextInt(rng, b)
   }
 

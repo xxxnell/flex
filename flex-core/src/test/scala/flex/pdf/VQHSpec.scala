@@ -1,15 +1,18 @@
 package flex.pdf
 
+import flex.RandomSet.syntax._
 import flex.nns.syntax._
 import flex.pdf.VQH.syntax._
 import flex.rand._
 import flex.vec._
-import org.scalactic.Tolerance._
-import org.scalactic.TripleEquals._
-import org.scalactic.StringNormalizations._
-import org.scalactic.Explicitly._
+
 import org.specs2.ScalaCheck
 import org.specs2.mutable._
+
+import org.scalactic.Tolerance._
+import org.scalactic.Explicitly._
+import org.scalactic.TripleEquals._
+import org.scalactic.StringNormalizations._
 
 class VQHSpec extends Specification with ScalaCheck {
 
@@ -19,18 +22,20 @@ class VQHSpec extends Specification with ScalaCheck {
       val (dims, k) = (List(1, 2, 3, 4, 5), 10)
       val vqh = VQH.empty(dims, k)
 
-      val cond1 = vqh.cwns.isEmpty
-      val cond2 = vqh.ntot == 0
-      val cond3 = vqh.k == k
-      val cond4a = vqh.nns.lshs.forall(lsh => lsh.dim == dims.sum)
-      val cond4b = vqh.nns.l != 0
-      val cond5 = vqh.parnns.arrAnns.zip(dims).forall { case (ann, dim) => ann.lshs.forall(_.dim == dim) }
+      val cond1 = vqh.cws.isEmpty
+      val cond2 = vqh.ns.isEmpty
+      val cond3 = vqh.ntot == 0
+      val cond4 = vqh.k == k
+      val cond5a = vqh.nns.lshs.forall(lsh => lsh.dim == dims.sum)
+      val cond5b = vqh.nns.l != 0
+      val cond6 = vqh.parnns.arrAnns.zip(dims).forall { case (ann, dim) => ann.lshs.forall(_.dim == dim) }
 
-      if (!cond1) ko(s"cns: ${vqh.cwns}")
-      else if (!cond2) ko(s"ntot: ${vqh.ntot}")
-      else if (!cond3) ko(s"k: ${vqh.k}")
-      else if (!(cond4a && cond4b)) ko(s"cwAnn: ${vqh.nns}")
-      else if (!cond5) ko(s"parAnn: ${vqh.parnns}")
+      if (!cond1) ko(s"cws: ${vqh.cws}")
+      else if (!cond2) ko(s"cns: ${vqh.ns}")
+      else if (!cond3) ko(s"ntot: ${vqh.ntot}")
+      else if (!cond4) ko(s"k: ${vqh.k}")
+      else if (!(cond5a && cond5b)) ko(s"cwAnn: ${vqh.nns}")
+      else if (!cond6) ko(s"parAnn: ${vqh.parnns}")
       else ok
     }
 
@@ -43,10 +48,10 @@ class VQHSpec extends Specification with ScalaCheck {
         val vqh1 = xs.foldLeft(vqh0) { case (_vqh, (x, w)) => _vqh.add(x, w) }
 
         val cond1 = vqh1.size == xs.size
-        val cond2 = vqh1.latest == xs.last._1
+        val cond2 = vqh1.last == xs.last._1
 
         if (!cond1) ko(s"vqh.size: ${vqh1.size}, xs.size: ${xs.size}")
-        else if (!cond2) ko(s"vqh1.latest: ${vqh1.latest}")
+        else if (!cond2) ko(s"vqh1.latest: ${vqh1.last}")
         else ok
       }
 
@@ -84,43 +89,49 @@ class VQHSpec extends Specification with ScalaCheck {
       "parUpdate" in {
 
         "first" in {
-          val (dims, k, n, rng0) = (List(1, 2, 3, 4, 5), 20, 3, IRng(0))
-          val vqh0 = VQH.empty(dims, k)
-          val (irngs, _) = (0 until n).toList.foldLeft((List.empty[(Int, IRng)], rng0)) {
-            case ((_is, _rng1), _) =>
-              val (_rng2, i) = _rng1.next
-              (((i * dims.size).floor.toInt, _rng2) :: _is, _rng2)
-          }
-          val xps = irngs.map { case (i, rng) => (Vec.std(dims(i), rng)._1, i, 1.0f) }
-          val (vqh1, cins, couts) = vqh0.parUpdate(xps)
+//          val (dims, k, n, rng0) = (List(1, 2, 3, 4, 5), 20, 3, IRng(0))
+//          val vqh0 = VQH.empty(dims, k)
+//          val (irngs, _) = (0 until n).toList.foldLeft((List.empty[(Int, IRng)], rng0)) {
+//            case ((_is, _rng1), _) =>
+//              val (_rng2, i) = _rng1.next
+//              (((i * dims.size).floor.toInt, _rng2) :: _is, _rng2)
+//          }
+//          val xps = irngs.map { case (i, rng) => (Vec.std(dims(i), rng)._1, i, 1.0f) }
+//          val (vqh1, cins, couts) = vqh0.parUpdate(xps, ???)
+//
+//          val cond1 = vqh1.cws.size == xps.size
+//          val cond2 = vqh1.ns.size == xps.size
+//          val cond3 = vqh1.ntot === xps.map(_._3).sum +- 0.01f
+//          val cond4 = vqh1.parnns.arrAnns.zip(dims).forall {
+//            case (ann, dim) => ann.vtables.forall(vt => vt.keySet.forall(v => v.dim == dim))
+//          }
+//
+//          if (!cond1) ko(s"cws: ${vqh1.cws}, \ncins: $cins, \ncouts: $couts")
+//          else if (!cond2) ko(s"cns: ${vqh1.ns}, \ncins: $cins, \ncouts: $couts")
+//          else if (!cond3) ko(s"ntot: ${vqh1.ntot}")
+//          else if (!cond4) ko(s"arbitrary vectors: ${vqh1.parnns.arrAnns.map(ann => ann.vtables.head.keySet)}")
+//          else ok
 
-          val cond1 = vqh1.cwns.size == xps.size
-          val cond2 = vqh1.ntot === xps.map(_._3).sum +- 0.01f
-          val cond3 = vqh1.parnns.arrAnns.zip(dims).forall {
-            case (ann, dim) => ann.vtables.forall(vt => vt.keySet.forall(v => v.dim == dim))
-          }
-
-          if (!cond1) ko(s"cns: ${vqh1.cwns}, \ncins: $cins, \ncouts: $couts")
-          else if (!cond2) ko(s"ntot: ${vqh1.ntot}")
-          else if (!cond3) ko(s"arbitrary vectors: ${vqh1.parnns.arrAnns.map(ann => ann.vtables.head.keySet)}")
-          else ok
+          todo
         }
 
         "k" in {
-          val (dims, k, n, rng0) = (List(1, 2, 3, 4, 5), 20, 300, IRng(0))
-          val vqh0 = VQH.empty(dims, k)
-          val (irngs, _) = (1 to n).toList.foldLeft((List.empty[(Int, IRng)], rng0)) {
-            case ((_is, _rng1), _) =>
-              val (_rng2, i) = _rng1.next
-              (((i * dims.size).floor.toInt, _rng2) :: _is, _rng2)
-          }
-          val xps = irngs.map { case (i, rng) => (Vec.std(dims(i), rng)._1, i, 1.0f) }
-          val vqh1 = xps.foldLeft(vqh0) { case (_vqh, (x, i, w)) => _vqh.parUpdate((x, i, w) :: Nil)._1 }
+//          val (dims, k, n, rng0) = (List(1, 2, 3, 4, 5), 20, 300, IRng(0))
+//          val vqh0 = VQH.empty(dims, k)
+//          val (irngs, _) = (1 to n).toList.foldLeft((List.empty[(Int, IRng)], rng0)) {
+//            case ((_is, _rng1), _) =>
+//              val (_rng2, i) = _rng1.next
+//              (((i * dims.size).floor.toInt, _rng2) :: _is, _rng2)
+//          }
+//          val xps = irngs.map { case (i, rng) => (Vec.std(dims(i), rng)._1, i, 1.0f) }
+//          val vqh1 = xps.foldLeft(vqh0) { case (_vqh, (x, i, w)) => _vqh.parUpdate((x, i, w) :: Nil, ???)._1 }
+//
+//          val cond1 = vqh1.size === k +- (k * 0.3).round.toInt
+//
+//          if (!cond1) ko(s"vqh.size: ${vqh1.size}, expected: ${vqh1.k}")
+//          else ok(s"vqh.size: ${vqh1.size}, expected: ${vqh1.k}")
 
-          val cond1 = vqh1.size === k +- (k * 0.3).round.toInt
-
-          if (!cond1) ko(s"vqh.size: ${vqh1.size}, expected: ${vqh1.k}")
-          else ok(s"vqh.size: ${vqh1.size}, expected: ${vqh1.k}")
+          todo
         }
 
       }
@@ -133,15 +144,19 @@ class VQHSpec extends Specification with ScalaCheck {
           val xs = (1 to 10).toList.map(i => (SumVec.std(dims, IRng(i))._1, 1.0f))
           val (vqh1, cins, couts) = vqh0.expUpdate(xs)
 
-          val cond1 = vqh1.cwns.size == xs.size
-          val cond2 = vqh1.ntot === xs.map(_._2).sum +- 0.01f
+          println(s"${vqh1.ntot} ?= ${xs.map(_._2).sum}")
 
-          if (!cond1) ko(s"cns: ${vqh1.cwns}, \ncins: $cins, \ncouts: $couts")
-          else if (!cond2) ko(s"ntot: ${vqh1.ntot}")
+          val cond1 = vqh1.cws.size == xs.size
+          val cond2 = vqh1.ns.size == xs.size
+          val cond3 = vqh1.ntot === xs.map(_._2).sum +- 0.01f
+
+          if (!cond1) ko(s"ns: ${vqh1.cws}, \ncins: $cins, \ncouts: $couts")
+          else if (!cond2) ko(s"ns: ${vqh1.ns}, \ncins: $cins, \ncouts: $couts")
+          else if (!cond3) ko(s"ntot: ${vqh1.ntot}")
           else ok
         }
 
-        "k" in {
+        "vqh size should be similar to k" in {
           val (dims, k, n) = (List(1, 2, 3, 4, 5), 20, 300)
           val vqh0 = VQH.empty(dims, k)
           val xs = (1 to n).toList.map(i => (SumVec.std(dims, IRng(i))._1, 1.0f))
