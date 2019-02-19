@@ -2,8 +2,8 @@ import microsites._
 
 enablePlugins(MicrositesPlugin)
 
-micrositeName := "flex"
-micrositeDescription := "Fast and lightweight probability tools for a dataset and a data stream"
+micrositeName := "Flex"
+micrositeDescription := "Probabilistic deep learning library"
 micrositeAuthor := "flex contributors"
 micrositeFooterText := None
 micrositeBaseUrl := "flex"

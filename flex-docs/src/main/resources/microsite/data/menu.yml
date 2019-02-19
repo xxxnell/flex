@@ -6,13 +6,31 @@ options:
     url: docs/
     menu_type: docs
 
-  - title: Numeric Distributions
-    url: docs/numericdistributions.html
+  - title: Core
+    url: docs/core.html
     menu_type: docs
+    menu_section: core
 
-  - title: Sketch
-    url: docs/sketch.html
+    nested_options:
+
+    - title: Numeric Distributions
+      url: docs/core/numericdistributions.html
+      menu_section: core
+
+    - title: Sketch
+      url: docs/core/sketch.html
+      menu_section: core
+
+  - title: Chain
+    url: docs/chain.html
     menu_type: docs
+    menu_section: chain
+
+    nested_options:
+
+    - title: Model
+      url: docs/chain/model.html
+      menu_section: chain
 
   # Experiment Menu
 
@@ -34,9 +52,11 @@ options:
     menu_section: accuracy
 
     nested_options:
+
      - title: Stationary Case
        url: experiments/accuracyonstat.html
        menu_section: accuracy
+
      - title: Non-stationary Case
        url: experiments/accuracyonnonstat.html
        menu_section: accuracy
