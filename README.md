@@ -6,12 +6,13 @@
 [![Latest version](https://index.scala-lang.org/xxxnell/flex/flex/latest.svg)](https://index.scala-lang.org/xxxnell/flex/flex)
 
 
-Chain is a probabilistic deep learning library for data streams. Today, neural networks have been widely used for solving problems in many areas. However, classical neural networks have some limitations when you want to include uncertainties in the model. For example, suppose that input data and training data contain a lot of noise. If you need to detect whether the data contains false-positive or false-negative, the model should represent how reliable the input and the output are. To deal with this issue, probabilistic deep learning, also known as the Bayesian neural network, can be used. It is a way to treat both input and output as a probability distribution and it is one of the best approaches to represent uncertainties. However, the Bayesian neural network is so computationally slow that it cannot be readily applied to the real-world problems. Chain is fast enough to make it possible to apply the Bayesian neural network to the real-world problems. It has the following features:
+Chain is a probabilistic deep learning library for data streams. It has the following features:
 
-* Feedforward propagation
-* Fast and lightweight probability tools for a dataset and a data stream
-	* Pre-defined numeric probabilities (e.g. normal distribution, log-normal distribution)
-	* Density estimation for high-dimensional datasets and data streams
+* **Fast**. Chain provides probabilistic deep learning that is fast enough to solve the real-world problems.
+* **Typesafe and Functional**. Types and pure functions make the code easy to understand and maintain.
+*  **Easy**. You can program with a minimal knowledge of probability theory.
+
+Today, neural networks have been widely used for solving problems in many areas. However, classical neural networks have some limitations when you want to include uncertainties in the model. For example, suppose that input data and training data contain a lot of noise. If you need to detect whether the data contains false-positive or false-negative, the model should represent how reliable the input and the output are. To deal with this issue, probabilistic deep learning, also known as the Bayesian neural network, can be used. It is a way to treat both input and output as a probability distribution and it is one of the best approaches to represent uncertainties. However, the Bayesian neural network is so computationally slow that it cannot be readily applied to the real-world problems. Chain is fast enough to make it possible to apply the Bayesian neural network to the real-world problems. 
 
 
 ## Getting Started
@@ -38,18 +39,18 @@ import flex.chain.implicits._
 We will use 3 hiddel layers with 10 neurons each.
 
 ``` scala
-val (d0, l1, l2, l3) = (784, 10, 10, 1)
-val model = Complex.empty
-  .add(Nd4j.zeros(d0), Nd4j.ones(d0))
-  .add(Nd4j.zeros(d0 * l1), Nd4j.ones(d0 * l1))
-  .add(Nd4j.zeros(l1 * l2), Nd4j.ones(l1 * l2))
-  .add(Nd4j.zeros(l2 * l3), Nd4j.ones(l2 * l3))
-  .map { case x1 :: z1 :: rem => x1.mmul(z1.reshape(d0, l1)).tanh :: rem }
-  .map { case h1 :: z2 :: rem => h1.mmul(z2.reshape(l1, l2)).tanh :: rem }
-  .map { case h2 :: z3 :: rem => h2.mmul(z3.reshape(l2, l3)) :: rem }
+val (kin, kout) = (20, 10)
+val (l0, l1, l2, l3) = (784, 10, 10, 1)
+val (k0, k1, k2, k3) = (20, 20, 20, 20)
+val model0 = Complex
+  .empty(kin, kout)
+  .addStd(l0 -> k0, l0 * l1 -> k1, l1 * l2 -> k2, l2 * l3 -> k3)
+  .map { case x1 :: z1 :: rem => z1.reshape(l1, l0).mmul(x1).tanh :: rem }
+  .map { case h1 :: z2 :: rem => z2.reshape(l2, l1).mmul(h1).tanh :: rem }
+  .map { case h2 :: z3 :: rem => z3.reshape(l3, l2).mmul(h2) :: rem }
 ```
 
-First, construct an empty model using `Complex.empty`. Second, `add` the variables to be used for this neural network. Here, a prior probabilities of these variables are normal distributions with a mean of zero and a variance of one. Third, define a transformation of each layers using `map` operation. In this example, `tanh` was used as the activator.
+First, construct an empty model using `Complex.empty`. Second, `add` the variables to be used for this neural network. Here, a prior probabilities of these variables are standard normal distributions with a mean of zero and a variance of one. Third, define a transformation of each layers using `map` operation. In this example, `tanh` was used as the activator.
 
 
 ## Contributing
