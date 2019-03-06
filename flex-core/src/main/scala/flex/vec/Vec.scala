@@ -46,6 +46,10 @@ object Vec extends VecOps {
    * */
   def std(dim: Int, rng: IRng): (Vec, IRng) = NormalDist(0.0, 1.0, rng).samples(dim).swap.bimap(Vec(_), _.rng)
 
+  def stds(dim: Int, rng: IRng, n: Int): (List[Vec], IRng) = (0 until n).foldRight((List.empty[Vec], rng)) {
+    case (_, (vs, _rng)) => std(dim, _rng).leftMap(v => v :: vs)
+  }
+
   /**
    * Random vector from standard normal distribution
    * */

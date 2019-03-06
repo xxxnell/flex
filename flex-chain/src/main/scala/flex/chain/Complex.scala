@@ -38,34 +38,29 @@ trait ComplexOps extends ModelOps with ComplexLaws {
     renewOut(Complex(complex.in, complex.pools, complex.out, f1, complex.t))
   }
 
-  def update[A](complex: Complex, xps: List[(Vec, Int, Float)]): Complex = {
-    val (xs, pools1) = complete(xps, complex.pools)
-    val pools2 = updatePools(pools1, xps)
-    val (in1, cins, couts) = complex.in.expUpdate(xs)
+  def update[A](complex: Complex, xpn: (Vec, Int, Float)): Complex = {
+    val (x, i, n) = xpn
+    val pools1 = complex.pools.zipWithIndex.map {
+      case (p, j) => if (i == j) p.expUpdate((SumVec(x), n) :: Nil)._1 else p
+    }
+    val (xs, _, pools2) = complete(xpn, pools1)
+    val (in1, cins, couts) = complex.in.parUpdate(xpn :: Nil, { case (_: Vec, _: Int, _: SumVec) => xs })
     val cys = cins.map(cin => (cin, complex.op(cin)))
     val t1 = complex.t -- couts ++ cys
-    val ys = xps.flatMap { case (x1, i, w) => in1.parSearch(x1, i).flatMap(c => t1.get(c).map(y => (y, w))) }
-    val (out1, _, _) = complex.out.expUpdate(ys)
+    val yn = in1.parSearch(x, i).flatMap(c => t1.get(c).map(y => (y, n)))
+    val (out1, _, _) = complex.out.expUpdate(yn.toList)
 
     Complex(in1, pools2, out1, complex.op, t1)
   }
 
-  private def complete(xps: List[(Vec, Int, Float)], pools: List[VQH]): (List[(SumVec, Float)], List[VQH]) = {
-    val (xs, pj) = xps.foldRight((List.empty[(SumVec, Float)], pools.zipWithIndex)) {
-      case ((xp, i, n), (xs0, pj0)) =>
-        val (pj1, xx) = pj0.map { case (p0, j) => if (i == j) ((p0, j), SumVec(xp)) else p0.rand.leftMap((_, j)) }.unzip
-        ((xx.map(_.head), n) :: xs0, pj1)
-    }
-    (xs, pj.unzip._1)
+  private def complete(xp: (Vec, Int, Float), pools: List[VQH]): (SumVec, Float, List[VQH]) = {
+    val (x, i, n) = xp
+    val (pools1, xs) = pools.zipWithIndex.map { case (p, j) => if (i != j) p.rand.map(_.head) else (p, x) }.unzip
+    (xs, n, pools1)
   }
 
-  private def updatePools(pools: List[VQH], xps: List[(Vec, Int, Float)]): List[VQH] = {
-    val pjs = xps.foldLeft(pools.zipWithIndex) {
-      case (pjs0, (v, i, n)) =>
-        pjs0.map { case (p, j) => (if (i == j) p.expUpdate((SumVec(v), n) :: Nil)._1 else p, j) }
-    }
-    pjs.unzip._1
-  }
+  def updates[A](complex: Complex, xpns: List[(Vec, Int, Float)]): Complex =
+    xpns.foldLeft(complex) { case (_complex, xpn) => update(_complex, xpn) }
 
   /**
    * Add independent variables to input space with prior distributions.
@@ -94,8 +89,8 @@ trait ComplexSyntax {
     def addVar(priors: List[Dist[Double]], k: Int): Complex = Complex.addVar(complex, priors, k)
     def addStd(dimKs: List[(Int, Int)]): Complex = Complex.addStd(complex, dimKs)
     def addStd(dimKs: (Int, Int)*): Complex = Complex.addStd(complex, dimKs.toList)
-    def update(xps: List[(Vec, Int, Float)]): Complex = Complex.update(complex, xps)
-    def update(xs: Vec*): Complex = Complex.update(complex, xs.toList.map(v => (v, 0, 1.0f)))
+    def updates(xps: List[(Vec, Int, Float)]): Complex = Complex.updates(complex, xps)
+    def update(xs: Vec*): Complex = Complex.updates(complex, xs.toList.map(v => (v, 0, 1.0f)))
     def train(trainingset: Dataset): Complex = ???
     def evaluate(testset: Dataset): Float = ???
   }
