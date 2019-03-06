@@ -85,7 +85,7 @@ trait VQHOps extends VQHLaws {
 
   def addCw(vqh: VQH, x: SumVec, n: Float): VQH = {
     val n1 = vqh.ns.getOrElse(x, 0f) + n
-    val ns1 = if (n1 > 0) vqh.ns.updated(x, n1) else ???
+    val ns1 = if (n1 >= 0) vqh.ns.updated(x, n1) else ???
     val ntot1 = vqh.ntot + n
     val (cws1, latest1, nns1, parnns1) =
       if (!vqh.cws.contains(x)) (vqh.cws.+(x), x, vqh.nns.add(x), vqh.parnns.add(x))
@@ -219,6 +219,8 @@ trait VQHSyntax {
 
 object VQH extends VQHOps {
 
+  val base: Double = 10.0
+
   object syntax extends VQHSyntax
 
   private case class VQHImpl(cws: RandomSet[SumVec],
@@ -241,7 +243,7 @@ object VQH extends VQHOps {
             parCwNns: ParVecANN): VQH = VQHImpl(cws, ns, latest, ntot, k, rng, cwNns, parCwNns)
 
   def empty(dims: List[Int], k: Int): VQH = {
-    val l = math.round(math.sqrt(k.toDouble)).toInt
+    val l = math.round(math.log(k.toDouble) / math.log(base)).toInt + 1
     val init = SumVec.zeros(dims)
     val rng1 = IRng(k.hashCode)
     val (cwAnn, rng2) = SumVecANN.empty(l, dims, rng1)
