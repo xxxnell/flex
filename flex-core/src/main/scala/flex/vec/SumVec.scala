@@ -34,7 +34,7 @@ object SumVec extends SumVecOps {
   def std(dims: List[Int], rng: IRng): (SumVec, IRng) =
     dims.foldRight((List.empty[Vec], rng)) { case (dim, (sv, _rng)) => Vec.std(dim, _rng).leftMap(_ :: sv) }
 
-  def std(dims: List[Int], rng: IRng, n: Int): (List[SumVec], IRng) =
+  def stds(dims: List[Int], rng: IRng, n: Int): (List[SumVec], IRng) =
     (0 until n).foldRight((List.empty[SumVec], rng)) { case (_, (svs, _rng)) => std(dims, _rng).leftMap(_ :: svs) }
 
   def zeros(dims: List[Int]): SumVec = dims.map(dim => Vec.zeros(dim))

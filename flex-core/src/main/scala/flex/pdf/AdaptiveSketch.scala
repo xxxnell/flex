@@ -1,13 +1,13 @@
 package flex.pdf
 
 import cats.implicits._
-import flex.Memo
-import flex.Memo.syntax._
+import flex.util.Memo.syntax._
 import flex.conf.pdf.AdaptiveSketchConf
 import flex.measure.Measure
 import flex.pdf.Buffer.syntax._
 import flex.plot.CountPlot
 import flex.rand.IRng
+import flex.util.Memo
 
 import scala.language.higherKinds
 

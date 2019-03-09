@@ -1,4 +1,4 @@
-package flex
+package flex.util
 
 import cats.implicits._
 import flex.rand._

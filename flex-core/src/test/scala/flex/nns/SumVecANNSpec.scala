@@ -5,10 +5,14 @@ import org.specs2.mutable._
 import org.specs2.ScalaCheck
 import flex.nns.syntax._
 import flex.vec._
+import flex.util.IdentityHashMap
+import flex.util.IdentityHashMap.syntax._
+import flex.util.IdentityHashSet
+import flex.util.IdentityHashSet.syntax._
 
 class SumVecANNSpec extends Specification with ScalaCheck {
 
-  "CodewordANN" should {
+  "SumVecANN" should {
 
     "construct" in {
       val (l, dims, rng) = (5, 1 :: 2 :: 3 :: Nil, IRng(0))
@@ -35,7 +39,7 @@ class SumVecANNSpec extends Specification with ScalaCheck {
 
         val cond1 = ann1.vtables.forall(vtable => vtable.size == xs.size)
 
-        if (!cond1) ko(s"ann1.vtables.size: ${ann1.vtables.size}, expected: ${xs.size}")
+        if (!cond1) ko(s"ann1.vtables.size: ${ann1.vtables.map(_.size)}, expected: ${xs.size}")
         else ok
       }
 

@@ -1,9 +1,8 @@
 package flex.nns
 
 import flex.rand.IRng
+import flex.util.{IdentityHashMap, IdentityHashSet}
 import flex.vec._
-
-import scala.collection.immutable.{HashMap, HashSet}
 
 trait VecANNOps extends ANNOps[Vec] {
 
@@ -30,8 +29,8 @@ object VecANN extends VecANNOps {
     val (lshs, rng1) = (1 to l).foldRight((List.empty[VecLSH], rng)) {
       case (_, (_lshs, _rng1)) => VecLSH(dim, w, _rng1) match { case (_lsh, _rng2) => (_lsh :: _lshs, _rng2) }
     }
-    val htables = List.fill(l)(HashMap.empty[Int, HashSet[Vec]])
-    val vtables = List.fill(l)(HashMap.empty[Vec, Int])
+    val htables = List.fill(l)(IdentityHashMap.empty[Int, IdentityHashSet[Vec]])
+    val vtables = List.fill(l)(IdentityHashMap.empty[Vec, Int])
     (apply(lshs, htables, vtables), rng1)
   }
 

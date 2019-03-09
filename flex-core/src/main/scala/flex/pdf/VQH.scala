@@ -6,9 +6,9 @@ import flex.pdf.syntax._
 import flex.pdf.Bernoulli.syntax._
 import flex.rand._
 import flex.vec._
+import flex.util.RandomSet
+import flex.util.RandomSet.syntax._
 import cats.implicits._
-import flex.RandomSet
-import flex.RandomSet.syntax._
 
 import scala.collection.immutable.HashMap
 

@@ -1,4 +1,4 @@
-package flex
+package flex.util
 
 import scala.collection.mutable
 

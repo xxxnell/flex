@@ -1,8 +1,8 @@
-package flex
+package flex.util
 
-import flex.Memo.syntax._
-import org.specs2.mutable._
+import flex.util.Memo.syntax._
 import org.specs2.ScalaCheck
+import org.specs2.mutable._
 
 class MemoSpec extends Specification with ScalaCheck {
 
@@ -11,7 +11,7 @@ class MemoSpec extends Specification with ScalaCheck {
     "get" in {
       val memo = Memo.empty[Int, Int](10)
       val res = memo.get(1, i => i + 1)
-      if(res == 2) ok else ko
+      if (res == 2) ok else ko
     }
 
     "multiple get for one key" in {
@@ -21,7 +21,7 @@ class MemoSpec extends Specification with ScalaCheck {
       val cond1 = memo.queue.size == 1
       val cond2 = memo.table.size == 1
 
-      if(!cond1) ko else if(!cond2) ko else ok
+      if (!cond1) ko else if (!cond2) ko else ok
     }
 
     "multiple get for multiple key" in {
@@ -32,8 +32,8 @@ class MemoSpec extends Specification with ScalaCheck {
       val cond1 = memo.queue.size <= size
       val cond2 = memo.table.size <= size
 
-      if(!cond1) ko(s"queue size: ${memo.queue.size}")
-      else if(!cond2) ko(s"table size: ${memo.table.size}")
+      if (!cond1) ko(s"queue size: ${memo.queue.size}")
+      else if (!cond2) ko(s"table size: ${memo.table.size}")
       else ok
     }
 

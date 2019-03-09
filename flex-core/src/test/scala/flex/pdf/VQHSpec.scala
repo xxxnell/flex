@@ -1,6 +1,6 @@
 package flex.pdf
 
-import flex.RandomSet.syntax._
+import flex.util.RandomSet.syntax._
 import flex.nns.syntax._
 import flex.pdf.VQH.syntax._
 import flex.rand._

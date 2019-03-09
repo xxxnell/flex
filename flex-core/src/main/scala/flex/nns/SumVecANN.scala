@@ -2,6 +2,7 @@ package flex.nns
 
 import flex.vec._
 import flex.rand._
+import flex.util.{IdentityHashMap, IdentityHashSet}
 
 import scala.collection.immutable.{HashMap, HashSet}
 
@@ -49,8 +50,8 @@ object SumVecANN extends SumVecANNOps {
     val (lshs, rng1) = (1 to l).foldRight((List.empty[LSH[SumVec]], rng)) {
       case (_, (_lshs, _rng1)) => SumVecLSH(dims, w, _rng1) match { case (_lsh, _rng2) => (_lsh :: _lshs, _rng2) }
     }
-    val htables = List.fill(l)(HashMap.empty[Int, HashSet[SumVec]])
-    val vtables = List.fill(l)(HashMap.empty[SumVec, Int])
+    val htables = List.fill(l)(IdentityHashMap.empty[Int, IdentityHashSet[SumVec]])
+    val vtables = List.fill(l)(IdentityHashMap.empty[SumVec, Int])
     (apply(lshs, htables, vtables), rng1)
   }
 

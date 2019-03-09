@@ -5,6 +5,10 @@ import flex.rand._
 import flex.vec.Vec
 import org.specs2.ScalaCheck
 import org.specs2.mutable._
+import flex.util.IdentityHashMap
+import flex.util.IdentityHashMap.syntax._
+import flex.util.IdentityHashSet
+import flex.util.IdentityHashSet.syntax._
 
 class VecANNSpec extends Specification with ScalaCheck {
 

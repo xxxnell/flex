@@ -1,7 +1,7 @@
-package flex
+package flex.util
 
-import flex.RandomSet.syntax._
 import flex.rand.IRng
+import flex.util.RandomSet.syntax._
 import org.specs2.ScalaCheck
 import org.specs2.mutable._
 

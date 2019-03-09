@@ -7,7 +7,7 @@ import org.specs2.ScalaCheck
 
 class ParVecANNSpec extends Specification with ScalaCheck {
 
-  "ParANN" should {
+  "ParVecANN" should {
 
     "construct" in {
       val (l, dims, rng) = (10, 1 :: 2 :: 3 :: Nil, IRng(0))

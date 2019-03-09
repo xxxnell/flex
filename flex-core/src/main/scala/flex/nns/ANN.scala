@@ -1,15 +1,18 @@
 package flex.nns
 
 import flex.nns.LSH.syntax._
-import flex.vec._
+import flex.util.IdentityHashMap
+import flex.util.IdentityHashMap.syntax._
+import flex.util.IdentityHashSet
+import flex.util.IdentityHashSet.syntax._
 
-import scala.collection.immutable.{HashMap, HashSet}
+import flex.vec._
 
 trait ANN[V] {
 
-  type HTable = HashMap[Int, HashSet[V]]
+  type HTable = IdentityHashMap[Int, IdentityHashSet[V]]
 
-  type VTable = HashMap[V, Int]
+  type VTable = IdentityHashMap[V, Int]
 
   val lshs: List[LSH[V]]
 
@@ -34,7 +37,10 @@ trait ANNLaws[V] { self: ANNOps[V] =>
   def add(ann: ANN[V], xs: List[V])(implicit lshOps: LSHOps[V]): ANN[V] = xs.foldLeft(ann) {
     case (_ann, x) =>
       val hcs = _ann.lshs.map(lsh => lsh.hash(x))
-      val hts1 = hcs.zip(_ann.htables).map { case (h, ht) => ht.updated(h, ht.getOrElse(h, HashSet.empty[V]).+(x)) }
+      val hts1 = hcs.zip(_ann.htables).map {
+        case (h, ht) =>
+          ht.updated(h, ht.getOrElse(h, IdentityHashSet.empty[V]).+(x))
+      }
       val vts1 = hcs.zip(_ann.vtables).map { case (h, vt) => vt.updated(x, h) }
       patchVTables(patchHTables(_ann, hts1), vts1)
   }
@@ -49,12 +55,18 @@ trait ANNLaws[V] { self: ANNOps[V] =>
   }
 
   def search(ann: ANN[V], x: V)(implicit lshOps: LSHOps[V]): Option[V] = {
-    val hcs = ann.lshs.map(lsh => lsh.hash(x))
-    val vecs = hcs.zip(ann.htables).flatMap { case (h, ht) => ht.getOrElse(h, Nil) }
-    val counts = vecs.groupBy(identity).mapValues(_.size)
-    val ranks = counts.groupBy { case (_, r) => r }.mapValues(_.keySet)
-    val neighbors = ranks.toSeq.sortWith { case ((rank1, _), (rank2, _)) => rank1 > rank2 }.headOption.map(_._2)
-    neighbors.flatMap(ns => ns.map(n => (n, distance(x, n))).toSeq.sortBy(_._2).headOption.map(_._1))
+    val hashs = ann.lshs.map(lsh => lsh.hash(x))
+    val vecs = hashs.zip(ann.htables).flatMap { case (h, ht) => ht.getOrElse(h, IdentityHashSet.empty[V]).toList }
+    val neighbors = frequentest(vecs)
+    neighbors.map(n => (n, distance(x, n))).sortBy(_._2).headOption.map(_._1)
+  }
+
+  def frequentest[A](as: List[A]): List[A] = {
+    val ranks = as
+      .foldRight(IdentityHashMap.empty[A, Int]) { case (a, _ranks) => _ranks.updated(a, _ranks.getOrElse(a, 0) + 1) }
+      .toMap
+    val (_, maxRank) = ranks.maxBy(_._2)
+    ranks.filter { case (_, rank) => rank >= maxRank }.keys.toList
   }
 
   def isEmpty(ann: ANN[_]): Boolean =

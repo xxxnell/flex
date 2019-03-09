@@ -13,7 +13,7 @@ object MultivariateNormalExp {
 
     val (dims, k, rng) = (2 :: Nil, 20, IRng(0))
     val vqh0 = VQH.empty(dims, k)
-    val (sumvecs, _) = SumVec.std(dims, rng, n)
+    val (sumvecs, _) = SumVec.stds(dims, rng, n)
     val vqhTr = vqh0 :: vqh0.expUpdateTrace(sumvecs.map((_, 1.0f)))
     val idxVqh = vqhTr.zipWithIndex.map(_.swap)
 
