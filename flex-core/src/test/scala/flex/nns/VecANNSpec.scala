@@ -18,13 +18,13 @@ class VecANNSpec extends Specification with ScalaCheck {
       val (l, dim, rng) = (10, 2, IRng(0))
       val (ann0, _) = VecANN.empty(l, dim, rng)
 
-      val cond1 = ann0.htables.length == l
-      val cond2 = ann0.vtables.length == l
-      val cond3 = ann0.lshs.length == l
+      val cond1 = ann0.htables.size == l
+      val cond2 = ann0.vtables.size == l
+      val cond3 = ann0.lsh.size == l
 
       if (!cond1) ko(s"HTable: ${ann0.htables}")
       else if (!cond2) ko(s"VTables: ${ann0.vtables}")
-      else if (!cond3) ko(s"LSH: ${ann0.lshs}")
+      else if (!cond3) ko(s"LSH: ${ann0.lsh}")
       else ok
     }
 

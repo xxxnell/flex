@@ -7,22 +7,29 @@ import cats.implicits._
 
 trait VecLSHOps extends LSHOps[Vec] {
 
-  def hash(lsh: LSH[Vec], x: Vec): Int = ((lsh.a.mul(x).getFloat(0) + lsh.b) / lsh.w).floor.round
+  def hashs(lsh: LSH[Vec], x: Vec): List[Int] =
+    lsh.a.mmul(x).add(lsh.b).div(lsh.w).toFloatVector.toList.map(_.floor.round)
 
-  def dim(lsh: LSH[Vec]): Int = lsh.a.dim
+  def shape(lsh: LSH[Vec]): (Int, Int) = {
+    val dims = lsh.a.shape.toList
+    (dims.head.toInt, dims.tail.head.toInt)
+  }
 
 }
 
 object VecLSH extends VecLSHOps {
 
-  private case class VecLSHImpl(a: Vec, b: Float, w: Float) extends LSH[Vec]
+  private case class VecLSHImpl(a: Vec, b: Vec, w: Vec) extends LSH[Vec]
 
-  def apply(a: Vec, b: Float, w: Float): VecLSH = VecLSHImpl(a, b, w)
+  def apply(a: Vec, b: Vec, w: Vec): VecLSH = VecLSHImpl(a, b, w)
 
-  def apply(dim: Int, w: Float, rng: IRng): (VecLSH, IRng) = {
-    val (a, rng1) = Vec.std(dim, rng).leftMap(_.reshape(dim, 1))
-    val (uniform, b) = UniformDist(w / 2, w / 2, rng1).sample
-    (apply(a, b, w), uniform.rng)
+  def apply(dim: Int, w: List[Float], rng: IRng): (VecLSH, IRng) = {
+    val l = w.size
+    val (a, rng1) = Vec.std(dim * l, rng).leftMap(_.reshape(l, dim))
+    val (b, rng2) = w.foldRight((List.empty[Float], rng1)) {
+      case (_w, (_b, _rng)) => UniformDist.apply(_w / 2, _w / 2, _rng).sample.swap.bimap(s => s :: _b, d => d.rng)
+    }
+    (apply(a, Vec(b), Vec(w)), rng2)
   }
 
 }

@@ -18,12 +18,12 @@ class SumVecANNSpec extends Specification with ScalaCheck {
       val (l, dims, rng) = (5, 1 :: 2 :: 3 :: Nil, IRng(0))
       val (ann, _) = SumVecANN.empty(l, dims, rng)
 
-      val cond1a = ann.lshs.size == l
-      val cond1b = ann.lshs.forall(lsh => lsh.dim == dims.sum)
+      val cond1a = ann.lsh.size == l
+      val cond1b = ann.lsh.dim == dims.sum
       val cond2 = ann.htables.size == l
       val cond3 = ann.vtables.size == l
 
-      if (!(cond1a && cond1b)) ko(s"lshs: ${ann.lshs}")
+      if (!(cond1a && cond1b)) ko(s"lshs: ${ann.lsh}")
       else if (!cond2) ko(s"htables: ${ann.htables}")
       else if (!cond3) ko(s"vtables: ${ann.vtables}")
       else ok

@@ -13,25 +13,31 @@ trait LSH[V] {
 
   val a: V
 
-  val b: Float
+  val b: Vec
 
-  val w: Float
+  val w: Vec
 
 }
 
 trait LSHOps[V] {
 
-  def hash(lsh: LSH[V], x: V): Int
+  def hashs(lsh: LSH[V], x: V): List[Int]
 
-  def dim(lsh: LSH[V]): Int
+  def shape(lsh: LSH[V]): (Int, Int)
+
+  def dim(lsh: LSH[V]): Int = shape(lsh)._2
+
+  def size(lsh: LSH[V]): Int = shape(lsh)._1
 
 }
 
 trait LSHSyntax {
 
   implicit class LSHSyntaxImpl[V](lsh: LSH[V]) {
-    def hash(x: V)(implicit ops: LSHOps[V]): Int = ops.hash(lsh, x)
+    def hashs(x: V)(implicit ops: LSHOps[V]): List[Int] = ops.hashs(lsh, x)
+    def shape(implicit ops: LSHOps[V]): (Int, Int) = ops.shape(lsh)
     def dim(implicit ops: LSHOps[V]): Int = ops.dim(lsh)
+    def size(implicit ops: LSHOps[V]): Int = ops.size(lsh)
   }
 
   implicit val vecLsh: LSHOps[Vec] = VecLSH

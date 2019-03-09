@@ -3,26 +3,36 @@ package flex.nns
 import flex.pdf.UniformDist
 import flex.rand._
 import flex.vec._
+import cats.implicits._
 
 trait SumVecLSHOps extends LSHOps[SumVec] {
 
-  def hash(lsh: SumVecLSH, x: SumVec): Int =
-    ((x.zip(lsh.a).map { case (_x, _a) => _a.mul(_x).getFloat(0) }.sum + lsh.b) / lsh.w).floor.round
+  def hashs(lsh: SumVecLSH, x: SumVec): List[Int] = {
+    val m = lsh.a.zip(x).map { case (ap, xp) => ap.mmul(xp) }.foldLeft(Vec.zeros(size(lsh))) {
+      case (acc, _m) => acc.add(_m)
+    }
+    m.add(lsh.b).div(lsh.w).toFloatVector.toList.map(_.floor.round)
+  }
 
-  def dim(lsh: SumVecLSH): Int = lsh.a.map(_.dim).sum
+  def shape(lsh: SumVecLSH): (Int, Int) = (lsh.a.head.shape.head.toInt, lsh.a.map(_a => _a.shape.tail.head).sum.toInt)
 
 }
 
 object SumVecLSH extends SumVecLSHOps {
 
-  private case class CodewordLSHImpl(a: SumVec, b: Float, w: Float) extends SumVecLSH
+  private case class CodewordLSHImpl(a: SumVec, b: Vec, w: Vec) extends SumVecLSH
 
-  def apply(a: SumVec, b: Float, w: Float): SumVecLSH = CodewordLSHImpl(a, b, w)
+  def apply(a: SumVec, b: Vec, w: Vec): SumVecLSH = CodewordLSHImpl(a, b, w)
 
-  def apply(dims: List[Int], w: Float, rng: IRng): (SumVecLSH, IRng) = {
-    val (a, rng1) = SumVec.std(dims, rng)
-    val (uniform, b) = UniformDist(w / 2, w / 2, rng1).sample
-    (apply(a, b, w), uniform.rng)
+  def apply(dims: List[Int], w: List[Float], rng: IRng): (SumVecLSH, IRng) = {
+    val l = w.size
+    val (a, rng1) = dims.foldRight((SumVec.empty, rng)) {
+      case (dim, (_a, _rng)) => Vec.std(dim * l, _rng).leftMap(_.reshape(l, dim) :: _a)
+    }
+    val (b, rng2) = w.foldRight((List.empty[Float], rng1)) {
+      case (_w, (_b, _rng)) => UniformDist.apply(_w / 2, _w / 2, _rng).sample.swap.bimap(s => s :: _b, d => d.rng)
+    }
+    (apply(a, Vec(b), Vec(w)), rng2)
   }
 
 }

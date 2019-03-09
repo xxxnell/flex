@@ -73,7 +73,7 @@ trait VQHOps extends VQHLaws {
 
   def renewNns(vqh: VQH): VQH = {
     val cws = vqh.cws.toList
-    val l = vqh.nns.lshs.size
+    val l = vqh.nns.lsh.size
     val dims = vqh.last.dims
     val (cwNns1, rng1) = SumVecANN.empty(l, dims, vqh.rng)
     val cwNns2 = cwNns1.adds(cws)

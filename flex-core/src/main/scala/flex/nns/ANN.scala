@@ -14,7 +14,7 @@ trait ANN[V] {
 
   type VTable = IdentityHashMap[V, Int]
 
-  val lshs: List[LSH[V]]
+  val lsh: LSH[V]
 
   val htables: List[ANN[V]#HTable]
 
@@ -36,26 +36,26 @@ trait ANNLaws[V] { self: ANNOps[V] =>
 
   def add(ann: ANN[V], xs: List[V])(implicit lshOps: LSHOps[V]): ANN[V] = xs.foldLeft(ann) {
     case (_ann, x) =>
-      val hcs = _ann.lshs.map(lsh => lsh.hash(x))
-      val hts1 = hcs.zip(_ann.htables).map {
+      val hashs = _ann.lsh.hashs(x)
+      val hts1 = hashs.zip(_ann.htables).map {
         case (h, ht) =>
           ht.updated(h, ht.getOrElse(h, IdentityHashSet.empty[V]).+(x))
       }
-      val vts1 = hcs.zip(_ann.vtables).map { case (h, vt) => vt.updated(x, h) }
+      val vts1 = hashs.zip(_ann.vtables).map { case (h, vt) => vt.updated(x, h) }
       patchVTables(patchHTables(_ann, hts1), vts1)
   }
 
   def remove(ann: ANN[V], x: V): ANN[V] = {
-    val hcs = ann.vtables.map(vt => vt.get(x))
-    val hts1 = hcs.zip(ann.htables).map {
-      case (ho, ht) => ho.flatMap(h => ht.get(h).map(vs => ht.updated(h, vs.-(x)))).getOrElse(ht)
+    val hashs = ann.vtables.map(vtable => vtable.get(x))
+    val vtables1 = ann.vtables.map(vtable => vtable.-(x))
+    val htables1 = hashs.zip(ann.htables).map {
+      case (hasho, htable) => hasho.fold(htable)(hash => htable.-(hash))
     }
-    val vts1 = ann.vtables.map(vt => vt.-(x))
-    patchVTables(patchHTables(ann, hts1), vts1)
+    patchVTables(patchHTables(ann, htables1), vtables1)
   }
 
   def search(ann: ANN[V], x: V)(implicit lshOps: LSHOps[V]): Option[V] = {
-    val hashs = ann.lshs.map(lsh => lsh.hash(x))
+    val hashs = ann.lsh.hashs(x)
     val vecs = hashs.zip(ann.htables).flatMap { case (h, ht) => ht.getOrElse(h, IdentityHashSet.empty[V]).toList }
     val neighbors = frequentest(vecs)
     neighbors.map(n => (n, distance(x, n))).sortBy(_._2).headOption.map(_._1)
@@ -64,17 +64,17 @@ trait ANNLaws[V] { self: ANNOps[V] =>
   def frequentest[A](as: List[A]): List[A] = {
     val ranks = as
       .foldRight(IdentityHashMap.empty[A, Int]) { case (a, _ranks) => _ranks.updated(a, _ranks.getOrElse(a, 0) + 1) }
-      .toMap
+      .inner
     val (_, maxRank) = ranks.maxBy(_._2)
-    ranks.filter { case (_, rank) => rank >= maxRank }.keys.toList
+    ranks.filter { case (_, rank) => rank >= maxRank }.keys.toList.map(_.a)
   }
 
   def isEmpty(ann: ANN[_]): Boolean =
     ann.htables.exists(htable => htable.isEmpty) || ann.vtables.exists(vtable => vtable.isEmpty)
 
-  def l(ann: ANN[_]): Int = ann.lshs.size
+  def l(ann: ANN[V])(implicit ops: LSHOps[V]): Int = ann.lsh.shape._1
 
-  def dim(ann: ANN[V])(implicit ops: LSHOps[V]): Int = ann.lshs.headOption.map(_.dim).getOrElse(0)
+  def dim(ann: ANN[V])(implicit ops: LSHOps[V]): Int = ann.lsh.shape._2
 
 }
 
@@ -86,7 +86,7 @@ trait ANNSyntax {
     def remove(x: V)(implicit ops: ANNOps[V]): ANN[V] = ops.remove(ann, x)
     def search(x: V)(implicit ops: ANNOps[V], lshOps: LSHOps[V]): Option[V] = ops.search(ann, x)
     def isEmpty(implicit ops: ANNOps[V]): Boolean = ops.isEmpty(ann)
-    def l(implicit ops: ANNOps[V]): Int = ops.l(ann)
+    def l(implicit ops: ANNOps[V], lshOps: LSHOps[V]): Int = ops.l(ann)
     def dim(implicit ops: ANNOps[V], lshOps: LSHOps[V]): Int = ops.dim(ann)
   }
 
