@@ -63,7 +63,7 @@ trait VQH {
 
 }
 
-trait VQHOps extends VQHLaws {
+trait VQHOps extends VQHLaws { self =>
 
   def patchRng(vqh: VQH, rng: IRng): VQH =
     VQH(vqh.cws.patchRng(rng), vqh.ns, vqh.last, vqh.ntot, vqh.k, rng, vqh.nns, vqh.parnns)
@@ -71,9 +71,14 @@ trait VQHOps extends VQHLaws {
   def patchK(vqh: VQH, k: Int): VQH =
     VQH(vqh.cws, vqh.ns, vqh.last, vqh.ntot, k, vqh.rng, vqh.nns, vqh.parnns)
 
+  def l(k: Int): Int = {
+    val base: Double = 10.0
+    math.round(math.log(k.toDouble) / math.log(base)).toInt + 1
+  }
+
   def renewNns(vqh: VQH): VQH = {
     val cws = vqh.cws.toList
-    val l = vqh.nns.lsh.size
+    val l = self.l(vqh.k)
     val dims = vqh.last.dims
     val (cwNns1, rng1) = SumVecANN.empty(l, dims, vqh.rng)
     val cwNns2 = cwNns1.adds(cws)
@@ -193,6 +198,10 @@ trait VQHLaws { self: VQHOps =>
 
   def rand(vqh: VQH): (VQH, SumVec) = vqh.cws.rand.bimap(cws => patchRng(vqh, cws.rng), sv => sv.getOrElse(vqh.last))
 
+  def addStd(vqh: VQH, dims: List[Int]): VQH = dims.foldLeft(vqh) {
+    case (_vqh, dim) => addDim(_vqh, List.fill(dim)(NormalDist.std))
+  }
+
 }
 
 trait VQHSyntax {
@@ -213,13 +222,12 @@ trait VQHSyntax {
     def parSearch(xp: Vec, i: Int): Option[SumVec] = VQH.parSearch(vqh, xp, i)
     def expSearch(x: SumVec): Option[SumVec] = VQH.expSearch(vqh, x)
     def rand: (VQH, SumVec) = VQH.rand(vqh)
+    def addStd(dims: List[Int]): VQH = VQH.addStd(vqh, dims)
   }
 
 }
 
-object VQH extends VQHOps {
-
-  val base: Double = 10.0
+object VQH extends VQHOps { self =>
 
   object syntax extends VQHSyntax
 
@@ -243,7 +251,7 @@ object VQH extends VQHOps {
             parCwNns: ParVecANN): VQH = VQHImpl(cws, ns, latest, ntot, k, rng, cwNns, parCwNns)
 
   def empty(dims: List[Int], k: Int): VQH = {
-    val l = math.round(math.log(k.toDouble) / math.log(base)).toInt + 1
+    val l = self.l(k)
     val init = SumVec.zeros(dims)
     val rng1 = IRng(k.hashCode)
     val (cwAnn, rng2) = SumVecANN.empty(l, dims, rng1)

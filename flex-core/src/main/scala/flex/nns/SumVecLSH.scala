@@ -5,6 +5,8 @@ import flex.rand._
 import flex.vec._
 import cats.implicits._
 
+import scala.util.Try
+
 trait SumVecLSHOps extends LSHOps[SumVec] {
 
   def hashs(lsh: SumVecLSH, x: SumVec): List[Int] = {
@@ -14,7 +16,12 @@ trait SumVecLSHOps extends LSHOps[SumVec] {
     m.add(lsh.b).div(lsh.w).toFloatVector.toList.map(_.floor.round)
   }
 
-  def shape(lsh: SumVecLSH): (Int, Int) = (lsh.a.head.shape.head.toInt, lsh.a.map(_a => _a.shape.tail.head).sum.toInt)
+  def shape(lsh: SumVecLSH): (Int, Int) = {
+    val l = lsh.a.headOption.flatMap(head => head.shape.headOption).getOrElse(0L).toInt
+    val dim = lsh.a.map(_a => Try(_a.shape.apply(1)).getOrElse(0L)).sum.toInt
+
+    (l, dim)
+  }
 
 }
 

@@ -5,14 +5,18 @@ import flex.rand.IRng
 import flex.vec._
 import cats.implicits._
 
+import scala.util.Try
+
 trait VecLSHOps extends LSHOps[Vec] {
 
   def hashs(lsh: LSH[Vec], x: Vec): List[Int] =
     lsh.a.mmul(x).add(lsh.b).div(lsh.w).toFloatVector.toList.map(_.floor.round)
 
   def shape(lsh: LSH[Vec]): (Int, Int) = {
-    val dims = lsh.a.shape.toList
-    (dims.head.toInt, dims.tail.head.toInt)
+    val l = lsh.a.shape.headOption.getOrElse(0L).toInt
+    val dim = Try(lsh.a.shape.apply(1)).getOrElse(0L).toInt
+
+    (l, dim)
   }
 
 }

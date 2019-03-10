@@ -76,7 +76,7 @@ trait ComplexOps extends ModelOps with ComplexLaws {
 trait ComplexLaws { self: ComplexOps =>
 
   def addStd(complex: Complex, dimKs: List[(Int, Int)]): Complex = {
-    val priorsKs = dimKs.map { case (dim, k) => (List.fill(dim)(NormalDist(0.0, 1.0)), k) }
+    val priorsKs = dimKs.map { case (dim, k) => (List.fill(dim)(NormalDist.std), k) }
     priorsKs.foldLeft(complex) { case (_complex, (priors, k)) => addVar(_complex, priors, k) }
   }
 

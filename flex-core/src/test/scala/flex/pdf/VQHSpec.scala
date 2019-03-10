@@ -19,24 +19,69 @@ class VQHSpec extends Specification with ScalaCheck {
   "VQH" should {
 
     "construct" in {
-      val (dims, k) = (List(1, 2, 3, 4, 5), 10)
-      val vqh = VQH.empty(dims, k)
 
-      val cond1 = vqh.cws.isEmpty
-      val cond2 = vqh.ns.isEmpty
-      val cond3 = vqh.ntot == 0
-      val cond4 = vqh.k == k
-      val cond5a = vqh.nns.lsh.dim == dims.sum
-      val cond5b = vqh.nns.l != 0
-      val cond6 = vqh.parnns.arrAnns.zip(dims).forall { case (ann, dim) => ann.lsh.dim == dim }
+      "basic" in {
+        val (dims, k) = (List(1, 2, 3, 4, 5), 10)
+        val vqh = VQH.empty(dims, k)
 
-      if (!cond1) ko(s"cws: ${vqh.cws}")
-      else if (!cond2) ko(s"cns: ${vqh.ns}")
-      else if (!cond3) ko(s"ntot: ${vqh.ntot}")
-      else if (!cond4) ko(s"k: ${vqh.k}")
-      else if (!(cond5a && cond5b)) ko(s"cwAnn: ${vqh.nns}")
-      else if (!cond6) ko(s"parAnn: ${vqh.parnns}")
-      else ok
+        val cond1 = vqh.cws.isEmpty
+        val cond2 = vqh.ns.isEmpty
+        val cond3 = vqh.ntot == 0
+        val cond4 = vqh.k == k
+        val cond5a = vqh.nns.lsh.dim == dims.sum
+        val cond5b = vqh.nns.size > 0
+        val cond6 = vqh.parnns.arrAnns.zip(dims).forall { case (ann, dim) => ann.lsh.dim == dim }
+
+        if (!cond1) ko(s"cws: ${vqh.cws}")
+        else if (!cond2) ko(s"cns: ${vqh.ns}")
+        else if (!cond3) ko(s"ntot: ${vqh.ntot}")
+        else if (!cond4) ko(s"k: ${vqh.k}")
+        else if (!(cond5a && cond5b)) ko(s"cwAnn: ${vqh.nns}")
+        else if (!cond6) ko(s"parAnn: ${vqh.parnns}")
+        else ok
+      }
+
+      "empty with dims=Nil" in {
+        val (dims, k) = (List.empty[Int], 10)
+        val vqh = VQH.empty(dims, k)
+
+        val cond1 = vqh.cws.isEmpty
+        val cond2 = vqh.ns.isEmpty
+        val cond3 = vqh.ntot == 0
+        val cond4 = vqh.k == k
+        val cond5 = vqh.nns.lsh.dim == dims.sum
+        val cond6 = vqh.parnns.arrAnns.isEmpty
+
+        if (!cond1) ko(s"cws: ${vqh.cws}")
+        else if (!cond2) ko(s"cns: ${vqh.ns}")
+        else if (!cond3) ko(s"ntot: ${vqh.ntot}")
+        else if (!cond4) ko(s"k: ${vqh.k}")
+        else if (!cond5) ko(s"cwAnn: ${vqh.nns}")
+        else if (!cond6) ko(s"parAnn: ${vqh.parnns}")
+        else ok
+      }
+
+      "addDim" in {
+        val (dims0, dims1, k) = (List.empty[Int], List(1, 2, 3, 4, 5), 10)
+        val vqh = VQH.empty(dims0, k).addStd(dims1)
+
+        val cond1 = vqh.cws.isEmpty
+        val cond2 = vqh.ns.isEmpty
+        val cond3 = vqh.ntot == 0
+        val cond4 = vqh.k == k
+        val cond5a = vqh.nns.lsh.dim == dims1.sum
+        val cond5b = vqh.nns.size > 0
+        val cond6 = vqh.parnns.arrAnns.zip(dims1).forall { case (ann, dim) => ann.lsh.dim == dim }
+
+        if (!cond1) ko(s"cws: ${vqh.cws}")
+        else if (!cond2) ko(s"cns: ${vqh.ns}")
+        else if (!cond3) ko(s"ntot: ${vqh.ntot}")
+        else if (!cond4) ko(s"k: ${vqh.k}")
+        else if (!(cond5a && cond5b)) ko(s"cwAnn: ${vqh.nns}")
+        else if (!cond6) ko(s"parAnn: ${vqh.parnns}")
+        else ok
+      }
+
     }
 
     "ops" in {
@@ -160,7 +205,9 @@ class VQHSpec extends Specification with ScalaCheck {
           val (dims, k, n) = (List(1, 2, 3, 4, 5), 20, 300)
           val vqh0 = VQH.empty(dims, k)
           val xs = (1 to n).toList.map(i => (SumVec.std(dims, IRng(i))._1, 1.0f))
-          val vqh1 = xs.foldLeft(vqh0) { case (_vqh, (x, w)) => _vqh.expUpdate((x, w) :: Nil)._1 }
+          val vqh1 = xs.foldLeft(vqh0) {
+            case (_vqh, (x, w)) => _vqh.expUpdate((x, w) :: Nil)._1
+          }
 
           val cond1 = vqh1.size === k +- (k * 0.3).round.toInt
 

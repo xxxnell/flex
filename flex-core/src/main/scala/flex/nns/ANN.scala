@@ -65,14 +65,14 @@ trait ANNLaws[V] { self: ANNOps[V] =>
     val ranks = as
       .foldRight(IdentityHashMap.empty[A, Int]) { case (a, _ranks) => _ranks.updated(a, _ranks.getOrElse(a, 0) + 1) }
       .inner
-    val (_, maxRank) = ranks.maxBy(_._2)
+    lazy val (_, maxRank) = ranks.maxBy(_._2)
     ranks.filter { case (_, rank) => rank >= maxRank }.keys.toList.map(_.a)
   }
 
   def isEmpty(ann: ANN[_]): Boolean =
     ann.htables.exists(htable => htable.isEmpty) || ann.vtables.exists(vtable => vtable.isEmpty)
 
-  def l(ann: ANN[V])(implicit ops: LSHOps[V]): Int = ann.lsh.shape._1
+  def size(ann: ANN[V])(implicit ops: LSHOps[V]): Int = ann.lsh.shape._1
 
   def dim(ann: ANN[V])(implicit ops: LSHOps[V]): Int = ann.lsh.shape._2
 
@@ -86,7 +86,7 @@ trait ANNSyntax {
     def remove(x: V)(implicit ops: ANNOps[V]): ANN[V] = ops.remove(ann, x)
     def search(x: V)(implicit ops: ANNOps[V], lshOps: LSHOps[V]): Option[V] = ops.search(ann, x)
     def isEmpty(implicit ops: ANNOps[V]): Boolean = ops.isEmpty(ann)
-    def l(implicit ops: ANNOps[V], lshOps: LSHOps[V]): Int = ops.l(ann)
+    def size(implicit ops: ANNOps[V], lshOps: LSHOps[V]): Int = ops.size(ann)
     def dim(implicit ops: ANNOps[V], lshOps: LSHOps[V]): Int = ops.dim(ann)
   }
 

@@ -4,6 +4,8 @@ import flex.vec._
 import flex.rand._
 import flex.util.{IdentityHashMap, IdentityHashSet}
 
+import scala.util.Try
+
 trait SumVecANNOps extends ANNOps[SumVec] {
 
   def patchHTables(ann: SumVecANN, htables: List[SumVecANN#HTable]): SumVecANN =
@@ -15,7 +17,7 @@ trait SumVecANNOps extends ANNOps[SumVec] {
   def distance(x1: SumVec, x2: SumVec): Float =
     math.sqrt(x1.zip(x2).map { case (_x1, _x2) => math.pow(_x1.distance2(_x2), 2) }.sum).toFloat
 
-  def dims(ann: SumVecANN): List[Int] = ???
+  def dims(ann: SumVecANN): List[Int] = ann.lsh.a.map(_a => Try(_a.shape.apply(1)).getOrElse(0L).toInt)
 
 }
 
