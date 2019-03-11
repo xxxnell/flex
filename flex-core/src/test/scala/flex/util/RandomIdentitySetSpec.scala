@@ -1,16 +1,17 @@
 package flex.util
 
 import flex.rand.IRng
-import flex.util.RandomSet.syntax._
+import flex.util.RandomIdentitySet.syntax._
+import flex.util.IdentityHashMap.syntax._
 import org.specs2.ScalaCheck
 import org.specs2.mutable._
 
-class RandomSetSpec extends Specification with ScalaCheck {
+class RandomIdentitySetSpec extends Specification with ScalaCheck {
 
-  "RandomSet" should {
+  "RandomIdentitySet" should {
 
     "construct" in {
-      val as = RandomSet.empty[Int](IRng(0))
+      val as = RandomIdentitySet.empty[Int](IRng(0))
 
       val cond1 = as.as.isEmpty
       val cond2 = as.is.isEmpty
@@ -23,7 +24,7 @@ class RandomSetSpec extends Specification with ScalaCheck {
     "add" in {
 
       "basic" in {
-        val as0 = RandomSet.empty[Int](IRng(0))
+        val as0 = RandomIdentitySet.empty[Int](IRng(0))
         val as1 = as0.add(1)
 
         val cond1 = as1.as.size == 1
@@ -35,7 +36,7 @@ class RandomSetSpec extends Specification with ScalaCheck {
       }
 
       "duplicated" in {
-        val as0 = RandomSet.empty[Int](IRng(0))
+        val as0 = RandomIdentitySet.empty[Int](IRng(0))
         val as1 = as0.add(1)
         val as2 = as1.add(1)
 
@@ -48,7 +49,7 @@ class RandomSetSpec extends Specification with ScalaCheck {
       }
 
       "a few" in {
-        val as0 = RandomSet.empty[Int](IRng(0))
+        val as0 = RandomIdentitySet.empty[Int](IRng(0))
         val dats = (1 to 10).toList
         val as1 = dats.foldLeft(as0) { case (_as, dat) => _as.add(dat) }
 
@@ -65,7 +66,7 @@ class RandomSetSpec extends Specification with ScalaCheck {
     "remove" in {
 
       "empty" in {
-        val as0 = RandomSet.empty[Int](IRng(0))
+        val as0 = RandomIdentitySet.empty[Int](IRng(0))
         val a = 1
         val as1 = as0.remove(a)
 
@@ -78,7 +79,7 @@ class RandomSetSpec extends Specification with ScalaCheck {
       }
 
       "1" in {
-        val as0 = RandomSet.empty[Int](IRng(0))
+        val as0 = RandomIdentitySet.empty[Int](IRng(0))
         val a = 1
         val as1 = as0.add(a)
         val as2 = as1.remove(a)
@@ -92,7 +93,7 @@ class RandomSetSpec extends Specification with ScalaCheck {
       }
 
       "2" in {
-        val as0 = RandomSet.empty[Int](IRng(0))
+        val as0 = RandomIdentitySet.empty[Int](IRng(0))
         val (a1, a2) = (1, 2)
         val as1 = as0.add(a1).add(a2)
         val as2 = as1.remove(a1)
@@ -113,7 +114,7 @@ class RandomSetSpec extends Specification with ScalaCheck {
     "rand" in {
 
       "single" in {
-        val as0 = RandomSet.empty[Int](IRng(0))
+        val as0 = RandomIdentitySet.empty[Int](IRng(0))
         val a = 1
         val as1 = as0.add(a)
         val (as2, rnd1) = as1.rand
@@ -130,7 +131,7 @@ class RandomSetSpec extends Specification with ScalaCheck {
       }
 
       "empty" in {
-        val as0 = RandomSet.empty[Int](IRng(0))
+        val as0 = RandomIdentitySet.empty[Int](IRng(0))
         val (_, rnd1) = as0.rand
 
         val cond1 = rnd1.isEmpty

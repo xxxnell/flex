@@ -36,10 +36,9 @@ trait ANNLaws[V] { self: ANNOps[V] =>
 
   def add(ann: ANN[V], xs: List[V])(implicit lshOps: LSHOps[V]): ANN[V] = xs.foldLeft(ann) {
     case (_ann, x) =>
-      val hashs = _ann.lsh.hashs(x)
+      val hashs = _ann.lsh.hash(x)
       val hts1 = hashs.zip(_ann.htables).map {
-        case (h, ht) =>
-          ht.updated(h, ht.getOrElse(h, IdentityHashSet.empty[V]).+(x))
+        case (h, ht) => ht.updated(h, ht.getOrElse(h, IdentityHashSet.empty[V]).+(x))
       }
       val vts1 = hashs.zip(_ann.vtables).map { case (h, vt) => vt.updated(x, h) }
       patchVTables(patchHTables(_ann, hts1), vts1)
@@ -55,10 +54,11 @@ trait ANNLaws[V] { self: ANNOps[V] =>
   }
 
   def search(ann: ANN[V], x: V)(implicit lshOps: LSHOps[V]): Option[V] = {
-    val hashs = ann.lsh.hashs(x)
+    val hashs = ann.lsh.hash(x)
     val vecs = hashs.zip(ann.htables).flatMap { case (h, ht) => ht.getOrElse(h, IdentityHashSet.empty[V]).toList }
     val neighbors = frequentest(vecs)
-    neighbors.map(n => (n, distance(x, n))).sortBy(_._2).headOption.map(_._1)
+    if (neighbors.size > 2) neighbors.map(n => (n, distance(x, n))).sortBy(_._2).headOption.map(_._1)
+    else neighbors.headOption
   }
 
   def frequentest[A](as: List[A]): List[A] = {

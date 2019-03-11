@@ -19,11 +19,27 @@ trait LSH[V] {
 
 }
 
-trait LSHOps[V] {
+trait LSHOps[V] extends LSHLaws[V] {
 
-  def hashs(lsh: LSH[V], x: V): List[Int]
+  /**
+   * a * x
+   * */
+  def mul(lsh: LSH[V], x: V): Vec
 
   def shape(lsh: LSH[V]): (Int, Int)
+
+}
+
+trait LSHLaws[V] { self: LSHOps[V] =>
+
+  def hashf(lsh: LSH[V], x: V): Vec = mul(lsh, x).add(lsh.b).div(lsh.w)
+
+  def hashList(lsh: LSH[V], x: V): List[Int] = {
+    val hashf = self.hashf(lsh, x)
+    (0 until size(lsh)).toList.map(i => hashf.getFloat(i.toLong).floor.round)
+  }
+
+  def hashVec(lsh: LSH[V], x: V): Vec = self.hashf(lsh, x).floor.round
 
   def dim(lsh: LSH[V]): Int = shape(lsh)._2
 
@@ -34,7 +50,7 @@ trait LSHOps[V] {
 trait LSHSyntax {
 
   implicit class LSHSyntaxImpl[V](lsh: LSH[V]) {
-    def hashs(x: V)(implicit ops: LSHOps[V]): List[Int] = ops.hashs(lsh, x)
+    def hash(x: V)(implicit ops: LSHOps[V]): List[Int] = ops.hashList(lsh, x)
     def shape(implicit ops: LSHOps[V]): (Int, Int) = ops.shape(lsh)
     def dim(implicit ops: LSHOps[V]): Int = ops.dim(lsh)
     def size(implicit ops: LSHOps[V]): Int = ops.size(lsh)

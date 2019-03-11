@@ -2,6 +2,7 @@ package flex.nns
 
 import flex.rand.IRng
 import flex.nns.syntax._
+import flex.util.IdentityHashMap.syntax._
 import org.specs2.mutable._
 import org.specs2.ScalaCheck
 

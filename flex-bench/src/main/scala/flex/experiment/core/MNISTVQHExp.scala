@@ -4,6 +4,7 @@ import flex.experiment.ops.ExpOutOps
 import flex.pdf.VQH
 import flex.pdf.VQH.syntax._
 import flex.vec._
+import flex.util.IdentityHashMap.syntax._
 import monix.execution.Scheduler.Implicits.global
 
 import scala.concurrent.duration._
@@ -21,7 +22,7 @@ object MNISTVQHExp {
 
     val instrs = ins.map(in => in.csv).mkString("\n")
     val vqhstrs = vqhs.zipWithIndex.map {
-      case (vqh, i) => (i, vqh.ns.map { case (sv, n) => sv.csv + "," + n / vqh.ntot }.mkString("\n"))
+      case (vqh, i) => (i, vqh.ns.toMap.map { case (sv, n) => sv.csv + "," + n / vqh.ntot }.mkString("\n"))
     }
 
     ExpOutOps.clear(expName)

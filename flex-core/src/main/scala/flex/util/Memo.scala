@@ -2,6 +2,9 @@ package flex.util
 
 import scala.collection.mutable
 
+/**
+ * NOTE: `Memo` is mutable object.
+ * */
 trait Memo[K, V] {
 
   val size: Int

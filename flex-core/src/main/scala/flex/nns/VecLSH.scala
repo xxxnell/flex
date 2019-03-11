@@ -9,8 +9,7 @@ import scala.util.Try
 
 trait VecLSHOps extends LSHOps[Vec] {
 
-  def hashs(lsh: LSH[Vec], x: Vec): List[Int] =
-    lsh.a.mmul(x).add(lsh.b).div(lsh.w).toFloatVector.toList.map(_.floor.round)
+  def mul(lsh: LSH[Vec], x: Vec): Vec = lsh.a.mmul(x)
 
   def shape(lsh: LSH[Vec]): (Int, Int) = {
     val l = lsh.a.shape.headOption.getOrElse(0L).toInt

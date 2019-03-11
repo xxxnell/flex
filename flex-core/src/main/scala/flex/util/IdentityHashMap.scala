@@ -29,6 +29,11 @@ trait IdentityHashMapOps {
 
   def toMap[K, V](map: IdentityHashMap[K, V]): Map[K, V] = map.inner.map { case (ek, v) => (ek.a, v) }
 
+  def contains[K, V](map: IdentityHashMap[K, V], k: K): Boolean = map.inner.contains(EqAdapter(k))
+
+  def map[K1, V1, K2, V2](map: IdentityHashMap[K1, V1], f: (K1, V1) => (K2, V2)): IdentityHashMap[K2, V2] =
+    IdentityHashMap(map.inner.map { case (ek, v) => f(ek.a, v).leftMap(k => EqAdapter(k)) })
+
 }
 
 trait IdentityHashMapSyntax {
@@ -44,6 +49,8 @@ trait IdentityHashMapSyntax {
     def size: Int = IdentityHashMap.size(map)
     def isEmpty: Boolean = IdentityHashMap.isEmpty(map)
     def toMap: Map[K, V] = IdentityHashMap.toMap(map)
+    def contains(k: K): Boolean = IdentityHashMap.contains(map, k)
+    def map[K2, V2](f: (K, V) => (K2, V2)): IdentityHashMap[K2, V2] = IdentityHashMap.map(map, f)
   }
 
 }

@@ -6,8 +6,9 @@ import flex.pdf.syntax._
 import flex.pdf.Bernoulli.syntax._
 import flex.rand._
 import flex.vec._
-import flex.util.RandomSet
-import flex.util.RandomSet.syntax._
+import flex.util.{IdentityHashMap, RandomIdentitySet}
+import flex.util.RandomIdentitySet.syntax._
+import flex.util.IdentityHashMap.syntax._
 import cats.implicits._
 
 import scala.collection.immutable.HashMap
@@ -17,12 +18,12 @@ trait VQH {
   /**
    * Codeword vectors.
    * */
-  val cws: RandomSet[SumVec]
+  val cws: RandomIdentitySet[SumVec]
 
   /**
    * Counts w.r.t. codeword vectors.
    * */
-  val ns: Map[SumVec, Float]
+  val ns: IdentityHashMap[SumVec, Float]
 
   /**
    * Last changed codeword vector.
@@ -114,7 +115,7 @@ trait VQHOps extends VQHLaws { self =>
     }
     val tf = vqh.cws.toList.zip(adds).map { case (cw, add) => cw -> cw.:+(add) }.toMap
 
-    val cws1 = RandomSet(vqh.cws.rng, vqh.cws.toList.map(cw => tf(cw)))
+    val cws1 = RandomIdentitySet(vqh.cws.rng, vqh.cws.toList.map(cw => tf(cw)))
     val ns1 = vqh.ns.map { case (cw, n) => (tf(cw), n) }
     val (latest1, rng2) = tf.get(vqh.last).fold(randVec(priors, rng1).leftMap(vec => vqh.last.:+(vec)))((_, rng1))
 
@@ -182,7 +183,7 @@ trait VQHLaws { self: VQHOps =>
     } else (vqh1, Nil)
 
     // Step C. Remove old codeword vectors
-    val (vqh3, rng2, couts) = vqh2.ns.foldLeft(vqh2, rng1, List.empty[SumVec]) {
+    val (vqh3, rng2, couts) = vqh2.ns.toMap.foldLeft(vqh2, rng1, List.empty[SumVec]) {
       case ((_vqh0, _rng0, _couts0), (_c, _n)) =>
         val (_rng1, q) = Bernoulli(sigmoid(avgpi - _n / vqh2.ntot) * avgpi, _rng0).sample.leftMap(_.rng)
         val (_vqh1, _couts1) = if (q == 1) (removeCw(_vqh0, _c), _c :: _couts0) else (_vqh0, _couts0)
@@ -231,8 +232,8 @@ object VQH extends VQHOps { self =>
 
   object syntax extends VQHSyntax
 
-  private case class VQHImpl(cws: RandomSet[SumVec],
-                             ns: Map[SumVec, Float],
+  private case class VQHImpl(cws: RandomIdentitySet[SumVec],
+                             ns: IdentityHashMap[SumVec, Float],
                              last: SumVec,
                              ntot: Float,
                              k: Int,
@@ -241,8 +242,8 @@ object VQH extends VQHOps { self =>
                              parnns: ParVecANN)
       extends VQH
 
-  def apply(cws: RandomSet[SumVec],
-            ns: Map[SumVec, Float],
+  def apply(cws: RandomIdentitySet[SumVec],
+            ns: IdentityHashMap[SumVec, Float],
             latest: SumVec,
             ntot: Float,
             k: Int,
@@ -257,7 +258,7 @@ object VQH extends VQHOps { self =>
     val (cwAnn, rng2) = SumVecANN.empty(l, dims, rng1)
     val (parAnn, rng3) = ParVecANN.empty(l, dims, rng2)
 
-    apply(RandomSet.empty[SumVec](rng3), HashMap.empty[SumVec, Float], init, 0, k, rng3, cwAnn, parAnn)
+    apply(RandomIdentitySet.empty[SumVec](rng3), IdentityHashMap.empty[SumVec, Float], init, 0, k, rng3, cwAnn, parAnn)
   }
 
   def empty(dim: Int, k: Int): VQH = empty(dim :: Nil, k)

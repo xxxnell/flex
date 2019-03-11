@@ -3,12 +3,14 @@ package flex.nns
 import flex.nns.ANN.syntax._
 import flex.vec._
 import flex.rand._
+import flex.util.IdentityHashMap
+import flex.util.IdentityHashMap.syntax._
 
 trait ParVecANN {
 
   val arrAnns: Vector[VecANN]
 
-  val compMap: Map[Vec, SumVec]
+  val compMap: IdentityHashMap[Vec, SumVec]
 
 }
 
@@ -17,7 +19,7 @@ trait ParANNOps extends ParANNLaws {
   def patchArrAnns(ann: ParVecANN, arrAnns: Vector[VecANN]): ParVecANN =
     ParVecANN(arrAnns, ann.compMap)
 
-  def patchCompMap(ann: ParVecANN, compMap: Map[Vec, SumVec]): ParVecANN =
+  def patchCompMap(ann: ParVecANN, compMap: IdentityHashMap[Vec, SumVec]): ParVecANN =
     ParVecANN(ann.arrAnns, compMap)
 
 }
@@ -60,9 +62,9 @@ object ParVecANN extends ParANNOps {
 
   object syntax extends ParANNSyntax
 
-  private case class ParVecANNImpl(arrAnns: Vector[VecANN], compMap: Map[Vec, SumVec]) extends ParVecANN
+  private case class ParVecANNImpl(arrAnns: Vector[VecANN], compMap: IdentityHashMap[Vec, SumVec]) extends ParVecANN
 
-  def apply(arrAnns: Vector[VecANN], compMap: Map[Vec, SumVec]): ParVecANN =
+  def apply(arrAnns: Vector[VecANN], compMap: IdentityHashMap[Vec, SumVec]): ParVecANN =
     ParVecANNImpl(arrAnns, compMap)
 
   def empty(l: Int, dims: List[Int], rng: IRng): (ParVecANN, IRng) = {
@@ -70,7 +72,7 @@ object ParVecANN extends ParANNOps {
       case ((_parAnns, _rng1), dim) =>
         VecANN.empty(l, dim, _rng1) match { case (_parAnn, _rng2) => (_parAnns.:+(_parAnn), _rng2) }
     }
-    (apply(arrAnns, Map.empty[Vec, SumVec]), rng1)
+    (apply(arrAnns, IdentityHashMap.empty[Vec, SumVec]), rng1)
   }
 
 }

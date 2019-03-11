@@ -9,12 +9,10 @@ import scala.util.Try
 
 trait SumVecLSHOps extends LSHOps[SumVec] {
 
-  def hashs(lsh: SumVecLSH, x: SumVec): List[Int] = {
-    val m = lsh.a.zip(x).map { case (ap, xp) => ap.mmul(xp) }.foldLeft(Vec.zeros(size(lsh))) {
+  def mul(lsh: SumVecLSH, x: SumVec): Vec =
+    lsh.a.zip(x).map { case (ap, xp) => ap.mmul(xp) }.foldLeft(Vec.zeros(size(lsh))) {
       case (acc, _m) => acc.add(_m)
     }
-    m.add(lsh.b).div(lsh.w).toFloatVector.toList.map(_.floor.round)
-  }
 
   def shape(lsh: SumVecLSH): (Int, Int) = {
     val l = lsh.a.headOption.flatMap(head => head.shape.headOption).getOrElse(0L).toInt
