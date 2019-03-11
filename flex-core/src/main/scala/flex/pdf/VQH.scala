@@ -1,17 +1,15 @@
 package flex.pdf
 
+import cats.implicits._
 import flex.nns._
 import flex.nns.syntax._
-import flex.pdf.syntax._
 import flex.pdf.Bernoulli.syntax._
+import flex.pdf.syntax._
 import flex.rand._
-import flex.vec._
-import flex.util.{IdentityHashMap, RandomIdentitySet}
-import flex.util.RandomIdentitySet.syntax._
 import flex.util.IdentityHashMap.syntax._
-import cats.implicits._
-
-import scala.collection.immutable.HashMap
+import flex.util.RandomIdentitySet.syntax._
+import flex.util.{IdentityHashMap, RandomIdentitySet}
+import flex.vec._
 
 trait VQH {
 

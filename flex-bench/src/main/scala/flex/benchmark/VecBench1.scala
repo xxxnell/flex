@@ -11,7 +11,7 @@ import org.openjdk.jmh.annotations._
 @BenchmarkMode(Array(Mode.AverageTime))
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @State(Scope.Thread)
-class ArrayBench1 {
+class VecBench1 {
 
   // parameters
 
@@ -24,12 +24,20 @@ class ArrayBench1 {
 
   var xt: INDArray = _
 
+  var a1: INDArray = _
+
+  var a100: INDArray = _
+
   val scalar: INDArray = Nd4j.ones(1)
 
   @Setup
   def setup(): Unit = {
+    val (h1, h2) = (1, 100)
+
     x = Nd4j.ones(dim)
     xt = x.transpose()
+    a1 = Nd4j.ones(dim * h1).reshape(h1, dim)
+    a100 = Nd4j.ones(dim * h2).reshape(h2, dim)
 
 //    NativeOpsHolder.getInstance.getDeviceNativeOps.setElementThreshold(16384)
 //    NativeOpsHolder.getInstance.getDeviceNativeOps.setTADThreshold(64)
@@ -40,8 +48,20 @@ class ArrayBench1 {
     x.add(1)
 
   @Benchmark
-  def mul: INDArray =
-    x.mul(xt)
+  def mmul1: INDArray =
+    a1.mmul(xt)
+
+  @Benchmark
+  def mmul1Get: Double =
+    a1.mmul(xt).getDouble(0L)
+
+  @Benchmark
+  def mmul100: INDArray =
+    a100.mmul(xt)
+
+  @Benchmark
+  def mmul100Get: Double =
+    a100.mmul(xt).getDouble(0L)
 
   @Benchmark
   def getLast: INDArray =
@@ -51,6 +71,22 @@ class ArrayBench1 {
   def concat: INDArray =
     Nd4j.concat(1, x, scalar)
 
-  def reshape: INDArray = ???
+  @Benchmark
+  def equals: Boolean = x.equals(x)
+
+  @Benchmark
+  def eq: Boolean = x.eq(x)
+
+  @Benchmark
+  def vstack: INDArray = Nd4j.vstack(xt, xt)
+
+  @Benchmark
+  def get: Double = x.getDouble((dim / 2).toLong)
+
+  @Benchmark
+  def amin: Number = x.aminNumber()
+
+  @Benchmark
+  def dup: INDArray = x.dup()
 
 }

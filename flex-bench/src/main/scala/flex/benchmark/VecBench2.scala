@@ -11,7 +11,7 @@ import org.openjdk.jmh.annotations._
 @BenchmarkMode(Array(Mode.AverageTime))
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @State(Scope.Thread)
-class ArrayBench2 {
+class VecBench2 {
 
   // parameters
 
