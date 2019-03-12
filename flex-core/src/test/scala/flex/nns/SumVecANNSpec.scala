@@ -15,8 +15,8 @@ class SumVecANNSpec extends Specification with ScalaCheck {
   "SumVecANN" should {
 
     "construct" in {
-      val (l, dims, rng) = (5, 1 :: 2 :: 3 :: Nil, IRng(0))
-      val (ann, _) = SumVecANN.empty(l, dims, rng)
+      val (l, dims, cache, rng) = (5, 1 :: 2 :: 3 :: Nil, 10, IRng(0))
+      val (ann, _) = SumVecANN.empty(l, dims, cache, rng)
 
       val cond1a = ann.lsh.size == l
       val cond1b = ann.lsh.dim == dims.sum
@@ -32,8 +32,8 @@ class SumVecANNSpec extends Specification with ScalaCheck {
     "ops" in {
 
       "add" in {
-        val (l, dims, rng, n) = (5, 1 :: 2 :: 3 :: Nil, IRng(0), 100)
-        val (ann0, _) = SumVecANN.empty(l, dims, rng)
+        val (l, dims, cache, rng, n) = (5, 1 :: 2 :: 3 :: Nil, 10, IRng(0), 100)
+        val (ann0, _) = SumVecANN.empty(l, dims, cache, rng)
         val xs = (1 to n).toList.map(i => SumVec.std(dims, IRng(i))._1)
         val ann1 = xs.foldLeft(ann0) { case (_ann, x) => _ann.add(x) }
 
@@ -44,8 +44,8 @@ class SumVecANNSpec extends Specification with ScalaCheck {
       }
 
       "remove" in {
-        val (l, dims, rng, n) = (5, 1 :: 2 :: 3 :: Nil, IRng(0), 100)
-        val (ann0, _) = SumVecANN.empty(l, dims, rng)
+        val (l, dims, cache, rng, n) = (5, 1 :: 2 :: 3 :: Nil, 10, IRng(0), 100)
+        val (ann0, _) = SumVecANN.empty(l, dims, cache, rng)
         val xs = (1 to n).toList.map(i => SumVec.std(dims, IRng(i))._1)
         val ann1 = xs.foldLeft(ann0) { case (_ann, x) => _ann.add(x) }
         val ann2 = xs.foldLeft(ann1) { case (_ann, x) => _ann.remove(x) }
@@ -60,8 +60,8 @@ class SumVecANNSpec extends Specification with ScalaCheck {
       "search" in {
 
         "basic" in {
-          val (l, dims, rng0, n) = (5, 1 :: 2 :: 3 :: Nil, IRng(0), 100)
-          val (ann0, rng1) = SumVecANN.empty(l, dims, rng0)
+          val (l, dims, cache, rng0, n) = (5, 1 :: 2 :: 3 :: Nil, 10, IRng(0), 100)
+          val (ann0, rng1) = SumVecANN.empty(l, dims, cache, rng0)
           val xs = (1 to n).toList.map(i => SumVec.std(dims, IRng(i))._1)
           val (query, _) = SumVec.std(dims, rng1)
           val ann1 = xs.foldLeft(ann0) { case (_ann, x) => _ann.add(x) }

@@ -33,19 +33,20 @@ object SumVecANN extends SumVecANNOps {
 
   object syntax extends SumVecANNSyntax
 
-  private case class SumVecANNImpl(lsh: SumVecLSH, htables: List[SumVecANN#HTable], vtables: List[SumVecANN#VTable])
+  private case class SumVecANNImpl(lsh: LSH[SumVec], htables: List[SumVecANN#HTable], vtables: List[SumVecANN#VTable])
       extends SumVecANN
 
-  def apply(lsh: SumVecLSH, htables: List[SumVecANN#HTable], vtables: List[SumVecANN#VTable]): SumVecANN =
+  def apply(lsh: LSH[SumVec], htables: List[SumVecANN#HTable], vtables: List[SumVecANN#VTable]): SumVecANN =
     SumVecANNImpl(lsh, htables, vtables)
 
   /**
    * @param l Number of LSHs
    * @param dims Shape of <code>VQH#Codeword</code>
    * */
-  def empty(l: Int, dims: List[Int], rng: IRng): (SumVecANN, IRng) = {
+  def empty(l: Int, dims: List[Int], cache: Int, rng: IRng): (SumVecANN, IRng) = {
     val w = List.fill(l)(1.0f)
-    val (lsh, rng1) = SumVecLSH(dims, w, rng)
+    val memoSize = cache * dims.size
+    val (lsh, rng1) = SumVecLSH(dims, w, memoSize, rng)
     val htables = List.fill(l)(IdentityHashMap.empty[Int, IdentityHashSet[SumVec]])
     val vtables = List.fill(l)(IdentityHashMap.empty[SumVec, Int])
     (apply(lsh, htables, vtables), rng1)

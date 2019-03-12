@@ -1,6 +1,6 @@
 package flex.nns
 
-import flex.vec._
+import flex.util.Memo.syntax._
 
 /**
  * Stable distribution LSH.
@@ -13,56 +13,33 @@ trait LSH[V] {
 
   val a: V
 
-  val b: Vec
+  val b: List[Float]
 
-  val w: Vec
+  val w: List[Float]
 
-}
+  val memo: LSHMemo
 
-trait LSHOps[V] extends LSHLaws[V] {
+  // ops
 
   /**
    * a * x
    * */
-  def mul(lsh: LSH[V], x: V): Vec
+  def mul(x: V): List[Float]
 
-  def shape(lsh: LSH[V]): (Int, Int)
+  def shape: (Int, Int)
 
-}
+  // laws
 
-trait LSHLaws[V] { self: LSHOps[V] =>
-
-  def hashf(lsh: LSH[V], x: V): Vec = mul(lsh, x).add(lsh.b).div(lsh.w)
-
-  def hashList(lsh: LSH[V], x: V): List[Int] = {
-    val hashf = self.hashf(lsh, x)
-    (0 until size(lsh)).toList.map(i => hashf.getFloat(i.toLong).floor.round)
+  def hash(x: V): List[Int] = (mul(x), b, w).zipped.map {
+    case (_ax, _b, _w) => ((_ax + _b) / _w).floor.round
   }
 
-  def hashVec(lsh: LSH[V], x: V): Vec = self.hashf(lsh, x).floor.round
+  def dim: Int = shape._2
 
-  def dim(lsh: LSH[V]): Int = shape(lsh)._2
+  def size: Int = shape._1
 
-  def size(lsh: LSH[V]): Int = shape(lsh)._1
-
-}
-
-trait LSHSyntax {
-
-  implicit class LSHSyntaxImpl[V](lsh: LSH[V]) {
-    def hash(x: V)(implicit ops: LSHOps[V]): List[Int] = ops.hashList(lsh, x)
-    def shape(implicit ops: LSHOps[V]): (Int, Int) = ops.shape(lsh)
-    def dim(implicit ops: LSHOps[V]): Int = ops.dim(lsh)
-    def size(implicit ops: LSHOps[V]): Int = ops.size(lsh)
-  }
-
-  implicit val vecLsh: LSHOps[Vec] = VecLSH
-  implicit val sumVecLsh: LSHOps[SumVec] = SumVecLSH
+  def clear: Unit = memo.clear
 
 }
 
-object LSH {
-
-  object syntax extends LSHSyntax
-
-}
+object LSH

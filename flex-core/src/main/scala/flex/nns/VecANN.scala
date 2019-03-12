@@ -18,14 +18,16 @@ trait VecANNOps extends ANNOps[Vec] {
 
 object VecANN extends VecANNOps {
 
-  private case class VecANNImpl(lsh: VecLSH, htables: List[VecANN#HTable], vtables: List[VecANN#VTable]) extends VecANN
+  private case class VecANNImpl(lsh: LSH[Vec], htables: List[VecANN#HTable], vtables: List[VecANN#VTable])
+      extends VecANN
 
-  def apply(lsh: VecLSH, htables: List[VecANN#HTable], vtables: List[VecANN#VTable]): VecANN =
+  def apply(lsh: LSH[Vec], htables: List[VecANN#HTable], vtables: List[VecANN#VTable]): VecANN =
     VecANNImpl(lsh, htables, vtables)
 
-  def empty(l: Int, dim: Int, rng: IRng): (VecANN, IRng) = {
+  def empty(l: Int, dim: Int, cache: Int, rng: IRng): (VecANN, IRng) = {
     val w = List.fill(l)(1.0f)
-    val (lsh, rng1) = VecLSH(dim, w, rng)
+    val memoSize = cache
+    val (lsh, rng1) = VecLSH(dim, w, memoSize, rng)
     val htables = List.fill(l)(IdentityHashMap.empty[Int, IdentityHashSet[Vec]])
     val vtables = List.fill(l)(IdentityHashMap.empty[Vec, Int])
     (apply(lsh, htables, vtables), rng1)

@@ -15,24 +15,32 @@ trait Memo[K, V] {
 
   val table: mutable.WeakHashMap[K, V]
 
+  override def toString: String = table.toString()
+
 }
 
 trait MemoOps {
 
-  def get[K, V](memo: Memo[K, V], k: K, f: K => V): V =
+  def get[K, V](memo: Memo[K, V], k: K, v: => V): V =
     memo.table.get(k) match {
       case Some(value) => value
       case None =>
-        val value = f(k)
-        put(memo, k, value)
-        value
+        lazy val _v = v
+        put(memo, k, _v)
+        _v
     }
 
   def put[K, V](memo: Memo[K, V], k: K, v: V): Unit = {
     memo.queue += k
     memo.table += ((k, v))
+    if (memo.full) memo.table.remove(memo.queue.dequeue())
     if (!memo.full && memo.queue.size >= memo.size) memo.full = true
-    if (memo.full && memo.queue.nonEmpty) memo.table.remove(memo.queue.dequeue())
+  }
+
+  def clear(memo: Memo[_, _]): Unit = {
+    memo.queue.clear()
+    memo.table.clear()
+    memo.full = false
   }
 
 }
@@ -40,7 +48,8 @@ trait MemoOps {
 trait MemoSyntax {
 
   implicit class MemoSyntaxImpl[K, V](memo: Memo[K, V]) {
-    def get(k: K, f: K => V): V = Memo.get(memo, k, f)
+    def get(k: K, v: => V): V = Memo.get(memo, k, v)
+    def clear: Unit = Memo.clear(memo)
   }
 
 }

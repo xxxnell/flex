@@ -11,8 +11,8 @@ class ParVecANNSpec extends Specification with ScalaCheck {
   "ParVecANN" should {
 
     "construct" in {
-      val (l, dims, rng) = (10, 1 :: 2 :: 3 :: Nil, IRng(0))
-      val (ann, _) = ParVecANN.empty(l, dims, rng)
+      val (l, dims, cache, rng) = (10, 1 :: 2 :: 3 :: Nil, 10, IRng(0))
+      val (ann, _) = ParVecANN.empty(l, dims, cache, rng)
 
       val cond1 = ann.arrAnns.zip(dims).forall { case (_ann, dim) => _ann.lsh.dim == dim }
       val cond2 = ann.compMap.isEmpty

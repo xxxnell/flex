@@ -16,7 +16,7 @@ class VecANNSpec extends Specification with ScalaCheck {
 
     "construct" in {
       val (l, dim, rng) = (10, 2, IRng(0))
-      val (ann0, _) = VecANN.empty(l, dim, rng)
+      val (ann0, _) = VecANN.empty(l, dim, 10, rng)
 
       val cond1 = ann0.htables.size == l
       val cond2 = ann0.vtables.size == l
@@ -35,7 +35,7 @@ class VecANNSpec extends Specification with ScalaCheck {
         "basic" in {
           val (l, dim, rng) = (10, 2, IRng(0))
           val v = Vec(1.0, 1.0)
-          val (ann0, _) = VecANN.empty(l, dim, rng)
+          val (ann0, _) = VecANN.empty(l, dim, 10, rng)
           val ann1 = ann0.add(v)
 
           val cond1 = ann1.htables.forall(htable => htable.size == 1)
@@ -53,7 +53,7 @@ class VecANNSpec extends Specification with ScalaCheck {
       "remove" in {
         val (l, dim, rng0) = (10, 2, IRng(0))
         val (v, rng1) = Vec.std(2, rng0)
-        val (ann0, _) = VecANN.empty(l, dim, rng1)
+        val (ann0, _) = VecANN.empty(l, dim, 10, rng1)
         val ann1 = ann0.add(v)
         val ann2 = ann1.remove(v)
 
@@ -68,7 +68,7 @@ class VecANNSpec extends Specification with ScalaCheck {
       "search" in {
         val (l, dim, rng) = (10, 2, IRng(0))
         val v = Vec(1.0, 1.0)
-        val (ann0, _) = VecANN.empty(l, dim, rng)
+        val (ann0, _) = VecANN.empty(l, dim, 10, rng)
         val ann1 = ann0.add(v)
         val search = ann1.search(v)
 

@@ -75,13 +75,15 @@ trait VQHOps extends VQHLaws { self =>
     math.round(math.log(k.toDouble) / math.log(base)).toInt + 1
   }
 
+  def cache(k: Int): Int = k * 2
+
   def renewNns(vqh: VQH): VQH = {
     val cws = vqh.cws.toList
     val l = self.l(vqh.k)
     val dims = vqh.last.dims
-    val (cwNns1, rng1) = SumVecANN.empty(l, dims, vqh.rng)
+    val (cwNns1, rng1) = SumVecANN.empty(l, dims, cache(vqh.k), vqh.rng)
     val cwNns2 = cwNns1.adds(cws)
-    val (parCwNns1, rng2) = ParVecANN.empty(l, dims, rng1)
+    val (parCwNns1, rng2) = ParVecANN.empty(l, dims, cache(vqh.k), rng1)
     val parCwNns2 = parCwNns1.adds(cws)
 
     patchRng(VQH(vqh.cws, vqh.ns, vqh.last, vqh.ntot, vqh.k, vqh.rng, cwNns2, parCwNns2), rng2)
@@ -253,8 +255,8 @@ object VQH extends VQHOps { self =>
     val l = self.l(k)
     val init = SumVec.zeros(dims)
     val rng1 = IRng(k.hashCode)
-    val (cwAnn, rng2) = SumVecANN.empty(l, dims, rng1)
-    val (parAnn, rng3) = ParVecANN.empty(l, dims, rng2)
+    val (cwAnn, rng2) = SumVecANN.empty(l, dims, cache(k), rng1)
+    val (parAnn, rng3) = ParVecANN.empty(l, dims, cache(k), rng2)
 
     apply(RandomIdentitySet.empty[SumVec](rng3), IdentityHashMap.empty[SumVec, Float], init, 0, k, rng3, cwAnn, parAnn)
   }

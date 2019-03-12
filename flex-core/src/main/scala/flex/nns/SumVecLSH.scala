@@ -1,35 +1,45 @@
 package flex.nns
 
+import cats.implicits._
 import flex.pdf.UniformDist
 import flex.rand._
+import flex.util.{EqAdapter, Memo}
 import flex.vec._
-import cats.implicits._
+import flex.util.Memo.syntax._
 
 import scala.util.Try
 
-trait SumVecLSHOps extends LSHOps[SumVec] {
+trait SumVecLSH extends LSH[SumVec] {
 
-  def mul(lsh: SumVecLSH, x: SumVec): Vec =
-    lsh.a.zip(x).map { case (ap, xp) => ap.mmul(xp) }.foldLeft(Vec.zeros(size(lsh))) {
-      case (acc, _m) => acc.add(_m)
-    }
+  // ops
 
-  def shape(lsh: SumVecLSH): (Int, Int) = {
-    val l = lsh.a.headOption.flatMap(head => head.shape.headOption).getOrElse(0L).toInt
-    val dim = lsh.a.map(_a => Try(_a.shape.apply(1)).getOrElse(0L)).sum.toInt
+  def muli(x: SumVec, i: Int): List[Float] = {
+    val xp = x.apply(i)
+    memo.get((EqAdapter(xp), i), this.a.apply(i).mmul(xp).toFloatVector.toList)
+  }
+
+  def mul(x: SumVec): List[Float] = x.indices.foldLeft(List.fill(size)(0.0f)) {
+    case (cum, i) => cum.zip(muli(x, i)).map { case (a1, a2) => a1 + a2 }
+  }
+
+  def shape: (Int, Int) = {
+    val l = a.headOption.flatMap(head => head.shape.headOption).getOrElse(0L).toInt
+    val dim = a.map(_a => Try(_a.shape.apply(1)).getOrElse(0L)).sum.toInt
 
     (l, dim)
   }
 
+  def toVecLSH(i: Int): VecLSH = VecLSH(a.apply(i), b, w, i, memo)
+
 }
 
-object SumVecLSH extends SumVecLSHOps {
+object SumVecLSH {
 
-  private case class CodewordLSHImpl(a: SumVec, b: Vec, w: Vec) extends SumVecLSH
+  private case class SumVecLSHImpl(a: SumVec, b: List[Float], w: List[Float], memo: LSHMemo) extends SumVecLSH
 
-  def apply(a: SumVec, b: Vec, w: Vec): SumVecLSH = CodewordLSHImpl(a, b, w)
+  def apply(a: SumVec, b: List[Float], w: List[Float], memo: LSHMemo): SumVecLSH = SumVecLSHImpl(a, b, w, memo)
 
-  def apply(dims: List[Int], w: List[Float], rng: IRng): (SumVecLSH, IRng) = {
+  def apply(dims: List[Int], w: List[Float], memoSize: Int, rng: IRng): (SumVecLSH, IRng) = {
     val l = w.size
     val (a, rng1) = dims.foldRight((SumVec.empty, rng)) {
       case (dim, (_a, _rng)) => Vec.std(dim * l, _rng).leftMap(_.reshape(l, dim) :: _a)
@@ -37,7 +47,8 @@ object SumVecLSH extends SumVecLSHOps {
     val (b, rng2) = w.foldRight((List.empty[Float], rng1)) {
       case (_w, (_b, _rng)) => UniformDist.apply(_w / 2, _w / 2, _rng).sample.swap.bimap(s => s :: _b, d => d.rng)
     }
-    (apply(a, Vec(b), Vec(w)), rng2)
+    val memo = Memo.empty[(EqAdapter[Vec], Int), List[Float]](memoSize)
+    (apply(a, b, w, memo), rng2)
   }
 
 }

@@ -46,7 +46,7 @@ trait ParANNLaws { self: ParANNOps =>
 
 }
 
-trait ParANNSyntax extends LSHSyntax {
+trait ParANNSyntax {
 
   implicit class ParANNSyntaxImpl(ann: ParVecANN) {
     def add(x: SumVec): ParVecANN = ParVecANN.add(ann, x :: Nil)
@@ -67,10 +67,10 @@ object ParVecANN extends ParANNOps {
   def apply(arrAnns: Vector[VecANN], compMap: IdentityHashMap[Vec, SumVec]): ParVecANN =
     ParVecANNImpl(arrAnns, compMap)
 
-  def empty(l: Int, dims: List[Int], rng: IRng): (ParVecANN, IRng) = {
+  def empty(l: Int, dims: List[Int], cache: Int, rng: IRng): (ParVecANN, IRng) = {
     val (arrAnns, rng1) = dims.foldLeft((Vector.empty[VecANN], rng)) {
       case ((_parAnns, _rng1), dim) =>
-        VecANN.empty(l, dim, _rng1) match { case (_parAnn, _rng2) => (_parAnns.:+(_parAnn), _rng2) }
+        VecANN.empty(l, dim, cache, _rng1) match { case (_parAnn, _rng2) => (_parAnns.:+(_parAnn), _rng2) }
     }
     (apply(arrAnns, IdentityHashMap.empty[Vec, SumVec]), rng1)
   }

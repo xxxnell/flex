@@ -29,6 +29,9 @@ class ANNBench {
   @Param(Array("10", "100"))
   var n: Int = _
 
+  @Param(Array("0"))
+  var cache: Int = _
+
   var ann: VecANN = _
 
   var x: Vec = _
@@ -57,7 +60,7 @@ class ANNBench {
   @Setup
   def setup(): Unit = {
     val rng0 = IRng(0)
-    val (ann0, rng1) = VecANN.empty(l, dim, rng0)
+    val (ann0, rng1) = VecANN.empty(l, dim, cache, rng0)
     val (prepvs, _) = Vec.std(dim, rng1, n)
 
     x = Vec.ones(dim)

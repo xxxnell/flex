@@ -40,8 +40,8 @@ trait AdaptiveSketchOps[S[_] <: AdaptiveSketch[_]] extends SketchPrimPropOps[S] 
 
   def queueCorrection(sketch: S[_]): Double = {
     lazy val corr = queueCorrectionMemo.get(
-      sketch.conf,
-      conf => {
+      sketch.conf, {
+        val conf = sketch.conf
         val cmapNo = conf.cmap.no
         val decayFactor = conf.decayFactor
         val effNo = if (cmapNo > 1) cmapNo - 1 else cmapNo

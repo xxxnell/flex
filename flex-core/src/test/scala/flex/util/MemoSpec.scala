@@ -10,13 +10,13 @@ class MemoSpec extends Specification with ScalaCheck {
 
     "get" in {
       val memo = Memo.empty[Int, Int](10)
-      val res = memo.get(1, i => i + 1)
+      val res = memo.get(1, 2)
       if (res == 2) ok else ko
     }
 
     "multiple get for one key" in {
       val memo = Memo.empty[Int, Int](10)
-      (0 to 100).foreach(_ => memo.get(1, i => i + 1))
+      (0 to 100).foreach(_ => memo.get(1, 1))
 
       val cond1 = memo.queue.size == 1
       val cond2 = memo.table.size == 1
@@ -27,7 +27,7 @@ class MemoSpec extends Specification with ScalaCheck {
     "multiple get for multiple key" in {
       val size = 10
       val memo = Memo.empty[Int, Int](size)
-      (0 to 10000000).foreach(i => memo.get(i, j => j + 1))
+      (0 to 10000000).foreach(i => memo.get(i, 1))
 
       val cond1 = memo.queue.size <= size
       val cond2 = memo.table.size <= size
