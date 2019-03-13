@@ -4,7 +4,6 @@ import flex.util.IdentityHashMap
 import flex.util.IdentityHashMap.syntax._
 import flex.util.IdentityHashSet
 import flex.util.IdentityHashSet.syntax._
-import flex.vec._
 
 import scala.language.higherKinds
 
@@ -72,6 +71,10 @@ trait ANNLaws[V, A <: ANN[V]] { self: ANNOps[V, A] =>
 
   def dim(ann: ANN[_]): Int = ann.lsh.shape._2
 
+  def vs(ann: A): List[V] = ann.vtables.headOption.map(vtable => vtable.inner.keySet.toList.map(_.a)).getOrElse(Nil)
+
+  def clear(ann: A): Unit = ann.lsh.clear
+
 }
 
 trait ANNSyntax extends VecANNSyntax with SumVecANNSyntax
@@ -86,6 +89,8 @@ trait ANNSyntaxImpl[V, A <: ANN[V]] {
   def isEmpty: Boolean = ops.isEmpty(ann)
   def size: Int = ops.size(ann)
   def dim: Int = ops.dim(ann)
+  def vs: List[V] = ops.vs(ann)
+  def clear: Unit = ops.clear(ann)
 }
 
 object ANN {

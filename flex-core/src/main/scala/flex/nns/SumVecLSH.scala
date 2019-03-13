@@ -24,14 +24,18 @@ trait SumVecLSHOps { lsh: SumVecLSH =>
     case (cum, i) => cum.zip(muli(x, i)).map { case (a1, a2) => a1 + a2 }
   }
 
+  def dims: List[Int] = a.map(_a => Try(_a.shape.apply(1)).getOrElse(0L).toInt)
+
   def shape: (Int, Int) = {
     val l = a.headOption.flatMap(head => head.shape.headOption).getOrElse(0L).toInt
-    val dim = a.map(_a => Try(_a.shape.apply(1)).getOrElse(0L)).sum.toInt
+    val dim = dims.sum
 
     (l, dim)
   }
 
-  def toVecLSH(i: Int): VecLSH = VecLSH(a.apply(i), b, w, i, memo)
+  def get(i: Int): VecLSH = VecLSH(a.apply(i), b, w, i, memo)
+
+  def unzip: List[VecLSH] = dims.indices.toList.map(i => get(i))
 
 }
 

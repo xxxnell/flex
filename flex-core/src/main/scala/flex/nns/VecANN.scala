@@ -47,4 +47,16 @@ object VecANN extends VecANNOps {
     (apply(lsh, htables, vtables), rng1)
   }
 
+  def fromSumVecANN(svann: SumVecANN): List[VecANN] = {
+    val anns0 = svann.lsh.unzip.map { lsh =>
+      val l = lsh.size
+      val htables = List.fill(l)(IdentityHashMap.empty[Int, IdentityHashSet[Vec]])
+      val vtables = List.fill(l)(IdentityHashMap.empty[Vec, Int])
+      apply(lsh, htables, vtables)
+    }
+    SumVecANN.vs(svann).foldLeft(anns0) {
+      case (anns, sv) => anns.zip(sv).map { case (ann, v) => add(ann, v :: Nil) }
+    }
+  }
+
 }

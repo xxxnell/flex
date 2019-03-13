@@ -71,6 +71,12 @@ trait ComplexOps extends ModelOps with ComplexLaws {
     renewOut(Complex(in1, pools1, complex.out, complex.op, complex.t))
   }
 
+  def clear(complex: Complex): Unit = {
+    complex.in.clear
+    complex.pools.foreach(_.clear)
+    complex.out.clear
+  }
+
 }
 
 trait ComplexLaws { self: ComplexOps =>
@@ -93,6 +99,7 @@ trait ComplexSyntax {
     def update(xs: Vec*): Complex = Complex.updates(complex, xs.toList.map(v => (v, 0, 1.0f)))
     def train(trainingset: Dataset): Complex = ???
     def evaluate(testset: Dataset): Float = ???
+    def clear: Unit = Complex.clear(complex)
   }
 
 }

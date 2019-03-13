@@ -22,6 +22,8 @@ trait ParANNOps extends ParANNLaws {
   def patchCompMap(ann: ParVecANN, compMap: IdentityHashMap[Vec, SumVec]): ParVecANN =
     ParVecANN(ann.arrAnns, compMap)
 
+  def clear(ann: ParVecANN): Unit = ann.arrAnns.map(_.clear)
+
 }
 
 trait ParANNLaws { self: ParANNOps =>
@@ -49,11 +51,13 @@ trait ParANNLaws { self: ParANNOps =>
 trait ParANNSyntax {
 
   implicit class ParANNSyntaxImpl(ann: ParVecANN) {
+    def patchArrAnns(arrAnns: Vector[VecANN]): ParVecANN = ParVecANN.patchArrAnns(ann, arrAnns)
     def add(x: SumVec): ParVecANN = ParVecANN.add(ann, x :: Nil)
     def adds(xs: List[SumVec]): ParVecANN = ParVecANN.add(ann, xs)
     def remove(x: SumVec): ParVecANN = ParVecANN.remove(ann, x)
     def search(xp: Vec, i: Int): Option[SumVec] = ParVecANN.search(ann, xp, i)
     def dims: List[Int] = ParVecANN.dims(ann)
+    def clear: Unit = ParVecANN.clear(ann)
   }
 
 }
@@ -72,7 +76,15 @@ object ParVecANN extends ParANNOps {
       case ((_parAnns, _rng1), dim) =>
         VecANN.empty(l, dim, cache, _rng1) match { case (_parAnn, _rng2) => (_parAnns.:+(_parAnn), _rng2) }
     }
+
     (apply(arrAnns, IdentityHashMap.empty[Vec, SumVec]), rng1)
+  }
+
+  def fromSumVecANN(ann: SumVecANN): ParVecANN = {
+    val arrAnns = VecANN.fromSumVecANN(ann).toVector
+    val compMap = IdentityHashMap(SumVecANN.vs(ann).flatMap(sv => sv.map(v => (v, sv))): _*)
+
+    apply(arrAnns, compMap)
   }
 
 }

@@ -82,11 +82,11 @@ trait VQHOps extends VQHLaws { self =>
     val l = self.l(vqh.k)
     val dims = vqh.last.dims
     val (cwNns1, rng1) = SumVecANN.empty(l, dims, cache(vqh.k), vqh.rng)
+    val parCwNns1 = ParVecANN.fromSumVecANN(cwNns1)
     val cwNns2 = cwNns1.adds(cws)
-    val (parCwNns1, rng2) = ParVecANN.empty(l, dims, cache(vqh.k), rng1)
     val parCwNns2 = parCwNns1.adds(cws)
 
-    patchRng(VQH(vqh.cws, vqh.ns, vqh.last, vqh.ntot, vqh.k, vqh.rng, cwNns2, parCwNns2), rng2)
+    patchRng(VQH(vqh.cws, vqh.ns, vqh.last, vqh.ntot, vqh.k, vqh.rng, cwNns2, parCwNns2), rng1)
   }
 
   def addCw(vqh: VQH, x: SumVec, n: Float): VQH = {
@@ -128,6 +128,11 @@ trait VQHOps extends VQHLaws { self =>
         case (p1, (ss, _rng)) => p1.modifyRng(_ => _rng).sample.swap.bimap(_ :: ss, _.rng)
       }
       .leftMap(rnds => Vec(rnds))
+
+  def clear(vqh: VQH): Unit = {
+    vqh.nns.clear
+    vqh.parnns.clear
+  }
 
 }
 
@@ -224,6 +229,7 @@ trait VQHSyntax {
     def expSearch(x: SumVec): Option[SumVec] = VQH.expSearch(vqh, x)
     def rand: (VQH, SumVec) = VQH.rand(vqh)
     def addStd(dims: List[Int]): VQH = VQH.addStd(vqh, dims)
+    def clear: Unit = VQH.clear(vqh)
   }
 
 }

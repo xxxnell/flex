@@ -53,30 +53,43 @@ class ComplexBench1 {
   }
 
   @Benchmark
-  def update1: Complex =
+  def update1: Complex = {
+    complex.clear
     complex.update(input)
+  }
 
   @Benchmark
-  def update1000: Complex =
+  def update1000: Complex = {
+    complex.clear
     complex.update(inputs: _*)
+  }
 
   @Benchmark
-  def poolUpdate: (VQH, List[SumVec], List[SumVec]) =
+  def poolUpdate: (VQH, List[SumVec], List[SumVec]) = {
+    complex.clear
     complex.pools.head.expUpdate((SumVec(input), 1.0f) :: Nil)
+  }
 
   @Benchmark
-  def inUpdate: (VQH, List[SumVec], List[SumVec]) =
+  def inUpdate: (VQH, List[SumVec], List[SumVec]) = {
+    complex.clear
     complex.in.parUpdate((input, 0, 1.0f) :: Nil, { case (_, _, a) => a })
+  }
 
   @Benchmark
-  def op: SumVec = nn(complex.in.last)
+  def op: Float =
+    nn(complex.in.last).headOption.map(_.getFloat(0L)).getOrElse(0.0f)
 
   @Benchmark
-  def inSearch: Option[SumVec] =
+  def inSearch: Option[SumVec] = {
+    complex.clear
     complex.in.parSearch(input, 0)
+  }
 
   @Benchmark
-  def outUpdate: (VQH, List[SumVec], List[SumVec]) =
+  def outUpdate: (VQH, List[SumVec], List[SumVec]) = {
+    complex.clear
     complex.out.parUpdate((output, 0, 1.0f) :: Nil, { case (_, _, a) => a })
+  }
 
 }
