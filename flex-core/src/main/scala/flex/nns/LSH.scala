@@ -9,7 +9,7 @@ import flex.util.Memo.syntax._
  * @see https://en.wikipedia.org/wiki/Locality-sensitive_hashing#Stable_distributions
  * @see http://mlwiki.org/index.php/Euclidean_LSH
  * */
-trait LSH[V] {
+trait LSH[V] extends LSHOps[V] {
 
   val a: V
 
@@ -19,7 +19,9 @@ trait LSH[V] {
 
   val memo: LSHMemo
 
-  // ops
+}
+
+trait LSHOps[V] { lsh: LSH[V] =>
 
   /**
    * a * x

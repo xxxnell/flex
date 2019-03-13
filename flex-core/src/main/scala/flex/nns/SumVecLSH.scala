@@ -9,7 +9,9 @@ import flex.util.Memo.syntax._
 
 import scala.util.Try
 
-trait SumVecLSH extends LSH[SumVec] {
+trait SumVecLSH extends LSH[SumVec] with SumVecLSHOps
+
+trait SumVecLSHOps { lsh: SumVecLSH =>
 
   // ops
 

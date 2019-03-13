@@ -9,11 +9,13 @@ import flex.vec._
 
 import scala.util.Try
 
-trait VecLSH extends LSH[Vec] {
+trait VecLSH extends LSH[Vec] with VecLSHOps {
 
   val index: Int
 
-  // ops
+}
+
+trait VecLSHOps { lsh: VecLSH =>
 
   def mul(x: Vec): List[Float] =
     memo.get((EqAdapter(x), index), a.mmul(x).toFloatVector.toList)
