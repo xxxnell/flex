@@ -4,24 +4,38 @@ import flex.rand.IRng
 import flex.util.{IdentityHashMap, IdentityHashSet}
 import flex.vec._
 
-trait VecANNOps extends ANNOps[Vec] {
+trait VecANN extends ANN[Vec] {
 
-  def patchHTables(ann: VecANN, htables: List[VecANN#HTable]): VecANN =
+  val lsh: VecLSH
+
+}
+
+trait VecANNOps extends ANNOps[Vec, VecANN] {
+
+  def patchHTables(ann: VecANN, htables: List[HTable[Vec]]): VecANN =
     VecANN(ann.lsh, htables, ann.vtables)
 
-  def patchVTables(ann: VecANN, vtables: List[VecANN#VTable]): VecANN =
+  def patchVTables(ann: VecANN, vtables: List[VTable[Vec]]): VecANN =
     VecANN(ann.lsh, ann.htables, vtables)
 
   def distance(x1: Vec, x2: Vec): Float = x1.distance2(x2).toFloat
 
 }
 
+trait VecANNSyntax {
+
+  implicit class VecANNSyntaxImpl(_ann: VecANN) extends ANNSyntaxImpl[Vec, VecANN] {
+    val ops: VecANNOps = VecANN
+    val ann: VecANN = _ann
+  }
+
+}
+
 object VecANN extends VecANNOps {
 
-  private case class VecANNImpl(lsh: LSH[Vec], htables: List[VecANN#HTable], vtables: List[VecANN#VTable])
-      extends VecANN
+  private case class VecANNImpl(lsh: VecLSH, htables: List[HTable[Vec]], vtables: List[VTable[Vec]]) extends VecANN
 
-  def apply(lsh: LSH[Vec], htables: List[VecANN#HTable], vtables: List[VecANN#VTable]): VecANN =
+  def apply(lsh: VecLSH, htables: List[HTable[Vec]], vtables: List[VTable[Vec]]): VecANN =
     VecANNImpl(lsh, htables, vtables)
 
   def empty(l: Int, dim: Int, cache: Int, rng: IRng): (VecANN, IRng) = {

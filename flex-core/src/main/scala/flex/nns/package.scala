@@ -1,15 +1,15 @@
 package flex
 
-import flex.util.{EqAdapter, Memo}
+import flex.util.{EqAdapter, IdentityHashMap, IdentityHashSet, Memo}
 import flex.vec.{SumVec, Vec}
 
 package object nns {
 
   type LSHMemo = Memo[(EqAdapter[Vec], Int), List[Float]]
 
-  type VecANN = ANN[Vec]
+  type HTable[V] = IdentityHashMap[Int, IdentityHashSet[V]]
 
-  type SumVecANN = ANN[SumVec]
+  type VTable[V] = IdentityHashMap[V, Int]
 
   object syntax extends ANNSyntax with ParANNSyntax with SumVecANNSyntax
 

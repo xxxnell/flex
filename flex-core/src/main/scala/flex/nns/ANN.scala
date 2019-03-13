@@ -4,36 +4,33 @@ import flex.util.IdentityHashMap
 import flex.util.IdentityHashMap.syntax._
 import flex.util.IdentityHashSet
 import flex.util.IdentityHashSet.syntax._
-
 import flex.vec._
+
+import scala.language.higherKinds
 
 trait ANN[V] {
 
-  type HTable = IdentityHashMap[Int, IdentityHashSet[V]]
-
-  type VTable = IdentityHashMap[V, Int]
-
   val lsh: LSH[V]
 
-  val htables: List[ANN[V]#HTable]
+  val htables: List[HTable[V]]
 
-  val vtables: List[ANN[V]#VTable]
+  val vtables: List[VTable[V]]
 
 }
 
-trait ANNOps[V] extends ANNLaws[V] {
+trait ANNOps[V, A <: ANN[V]] extends ANNLaws[V, A] {
 
-  def patchHTables(ann: ANN[V], table: List[ANN[V]#HTable]): ANN[V]
+  def patchHTables(ann: A, table: List[HTable[V]]): A
 
-  def patchVTables(ann: ANN[V], table: List[ANN[V]#VTable]): ANN[V]
+  def patchVTables(ann: A, table: List[VTable[V]]): A
 
   def distance(x1: V, x2: V): Float
 
 }
 
-trait ANNLaws[V] { self: ANNOps[V] =>
+trait ANNLaws[V, A <: ANN[V]] { self: ANNOps[V, A] =>
 
-  def add(ann: ANN[V], xs: List[V]): ANN[V] = xs.foldLeft(ann) {
+  def add(ann: A, xs: List[V]): A = xs.foldLeft(ann) {
     case (_ann, x) =>
       val hashs = _ann.lsh.hash(x)
       val hts1 = hashs.zip(_ann.htables).map {
@@ -43,7 +40,7 @@ trait ANNLaws[V] { self: ANNOps[V] =>
       patchVTables(patchHTables(_ann, hts1), vts1)
   }
 
-  def remove(ann: ANN[V], x: V): ANN[V] = {
+  def remove(ann: A, x: V): A = {
     val hashs = ann.vtables.map(vtable => vtable.get(x))
     val vtables1 = ann.vtables.map(vtable => vtable.-(x))
     val htables1 = hashs.zip(ann.htables).map {
@@ -52,7 +49,7 @@ trait ANNLaws[V] { self: ANNOps[V] =>
     patchVTables(patchHTables(ann, htables1), vtables1)
   }
 
-  def search(ann: ANN[V], x: V): Option[V] = {
+  def search(ann: A, x: V): Option[V] = {
     val hashs = ann.lsh.hash(x)
     val vecs = hashs.zip(ann.htables).flatMap { case (h, ht) => ht.getOrElse(h, IdentityHashSet.empty[V]).toList }
     val neighbors = frequentest(vecs)
@@ -60,9 +57,9 @@ trait ANNLaws[V] { self: ANNOps[V] =>
     else neighbors.headOption
   }
 
-  def frequentest[A](as: List[A]): List[A] = {
-    val ranks = as
-      .foldRight(IdentityHashMap.empty[A, Int]) { case (_a, _ranks) => _ranks.updated(_a, _ranks.getOrElse(_a, 0) + 1) }
+  def frequentest[X](xs: List[X]): List[X] = {
+    val ranks = xs
+      .foldRight(IdentityHashMap.empty[X, Int]) { case (x, _ranks) => _ranks.updated(x, _ranks.getOrElse(x, 0) + 1) }
       .inner
     lazy val (_, maxRank) = ranks.maxBy(_._2)
     ranks.filter { case (_, rank) => rank >= maxRank }.keys.toList.map(_.a)
@@ -71,27 +68,24 @@ trait ANNLaws[V] { self: ANNOps[V] =>
   def isEmpty(ann: ANN[_]): Boolean =
     ann.htables.exists(htable => htable.isEmpty) || ann.vtables.exists(vtable => vtable.isEmpty)
 
-  def size(ann: ANN[V]): Int = ann.lsh.shape._1
+  def size(ann: ANN[_]): Int = ann.lsh.shape._1
 
-  def dim(ann: ANN[V]): Int = ann.lsh.shape._2
+  def dim(ann: ANN[_]): Int = ann.lsh.shape._2
 
 }
 
-trait ANNSyntax {
+trait ANNSyntax extends VecANNSyntax with SumVecANNSyntax
 
-  implicit class AnnSyntaxImpl[V](ann: ANN[V]) {
-    def add(x: V)(implicit ops: ANNOps[V]): ANN[V] = ops.add(ann, x :: Nil)
-    def adds(xs: List[V])(implicit ops: ANNOps[V]): ANN[V] = ops.add(ann, xs)
-    def remove(x: V)(implicit ops: ANNOps[V]): ANN[V] = ops.remove(ann, x)
-    def search(x: V)(implicit ops: ANNOps[V]): Option[V] = ops.search(ann, x)
-    def isEmpty(implicit ops: ANNOps[V]): Boolean = ops.isEmpty(ann)
-    def size(implicit ops: ANNOps[V]): Int = ops.size(ann)
-    def dim(implicit ops: ANNOps[V]): Int = ops.dim(ann)
-  }
-
-  implicit val vecOps: ANNOps[Vec] = VecANN
-  implicit val sumVecOps: ANNOps[SumVec] = SumVecANN
-
+trait ANNSyntaxImpl[V, A <: ANN[V]] {
+  val ops: ANNOps[V, A]
+  val ann: A
+  def add(x: V): A = ops.add(ann, x :: Nil)
+  def adds(xs: List[V]): A = ops.add(ann, xs)
+  def remove(x: V): A = ops.remove(ann, x)
+  def search(x: V): Option[V] = ops.search(ann, x)
+  def isEmpty: Boolean = ops.isEmpty(ann)
+  def size: Int = ops.size(ann)
+  def dim: Int = ops.dim(ann)
 }
 
 object ANN {

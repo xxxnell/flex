@@ -6,12 +6,18 @@ import flex.util.{IdentityHashMap, IdentityHashSet}
 
 import scala.util.Try
 
-trait SumVecANNOps extends ANNOps[SumVec] {
+trait SumVecANN extends ANN[SumVec] {
 
-  def patchHTables(ann: SumVecANN, htables: List[SumVecANN#HTable]): SumVecANN =
+  val lsh: SumVecLSH
+
+}
+
+trait SumVecANNOps extends ANNOps[SumVec, SumVecANN] {
+
+  def patchHTables(ann: SumVecANN, htables: List[HTable[SumVec]]): SumVecANN =
     SumVecANN(ann.lsh, htables, ann.vtables)
 
-  def patchVTables(ann: SumVecANN, vtables: List[SumVecANN#VTable]): SumVecANN =
+  def patchVTables(ann: SumVecANN, vtables: List[VTable[SumVec]]): SumVecANN =
     SumVecANN(ann.lsh, ann.htables, vtables)
 
   def distance(x1: SumVec, x2: SumVec): Float =
@@ -23,7 +29,9 @@ trait SumVecANNOps extends ANNOps[SumVec] {
 
 trait SumVecANNSyntax {
 
-  implicit class SumVecANNSyntaxImpl(ann: SumVecANN) {
+  implicit class SumVecANNSyntaxImpl(_ann: SumVecANN) extends ANNSyntaxImpl[SumVec, SumVecANN] {
+    val ops: SumVecANNOps = SumVecANN
+    val ann: SumVecANN = _ann
     def dims: List[Int] = SumVecANN.dims(ann)
   }
 
@@ -33,10 +41,10 @@ object SumVecANN extends SumVecANNOps {
 
   object syntax extends SumVecANNSyntax
 
-  private case class SumVecANNImpl(lsh: LSH[SumVec], htables: List[SumVecANN#HTable], vtables: List[SumVecANN#VTable])
+  private case class SumVecANNImpl(lsh: SumVecLSH, htables: List[HTable[SumVec]], vtables: List[VTable[SumVec]])
       extends SumVecANN
 
-  def apply(lsh: LSH[SumVec], htables: List[SumVecANN#HTable], vtables: List[SumVecANN#VTable]): SumVecANN =
+  def apply(lsh: SumVecLSH, htables: List[HTable[SumVec]], vtables: List[VTable[SumVec]]): SumVecANN =
     SumVecANNImpl(lsh, htables, vtables)
 
   /**
