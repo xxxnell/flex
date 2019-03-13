@@ -15,7 +15,7 @@ class VecBench1 {
 
   // parameters
 
-  @Param(Array("1", "2", "8734", "921600"))
+  @Param(Array("1", "921600"))
   var dim: Int = _
 
   // variables
@@ -62,6 +62,24 @@ class VecBench1 {
   @Benchmark
   def mmul100Get: Double =
     a100.mmul(xt).getDouble(0L)
+
+  @Benchmark
+  def mmul100GetGet: Double = {
+    val b = a100.mmul(xt)
+    b.getDouble(0L) + b.getDouble(1L)
+  }
+
+  @Benchmark
+  def mmul100GetMmul: Double = {
+    val b = a100.mmul(xt)
+    val v1 = b.getDouble(0L)
+    val v2 = b.add(1.0).getDouble(0L)
+    v1 + v2
+  }
+
+  @Benchmark
+  def mmul100Add: INDArray =
+    a100.mmul(xt).add(1.0)
 
   @Benchmark
   def getLast: INDArray =
