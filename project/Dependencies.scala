@@ -43,8 +43,8 @@ object Dependencies {
   )
 
   val nd4j = Seq(
-    "org.nd4j" % "nd4j-native-platform" % Versions.nd4j
-//    "org.nd4j" % "nd4j-cuda-9.2-platform" % Versions.nd4j
+//    "org.nd4j" % "nd4j-native-platform" % Versions.nd4j
+    "org.nd4j" % "nd4j-cuda-9.0-platform" % Versions.nd4j
   )
 
   // project dependencies
