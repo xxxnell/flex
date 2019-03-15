@@ -37,20 +37,33 @@ class VQHBench {
   }
 
   @Benchmark
-  def parUpdate: (VQH, List[SumVec], List[SumVec]) =
+  def parUpdate: (VQH, List[SumVec], List[SumVec]) = {
+    vqh.clear
     vqh.parUpdate((input.head, 0, 0f) :: Nil, { case (_, _, sv) => sv })
+  }
 
   @Benchmark
-  def expUpdate: (VQH, List[SumVec], List[SumVec]) =
+  def expUpdate: (VQH, List[SumVec], List[SumVec]) = {
+    vqh.clear
     vqh.expUpdate((input, 0f) :: Nil)
+  }
 
   @Benchmark
-  def parSearch: Option[SumVec] = vqh.parSearch(input.head, 0)
+  def parSearch: Option[SumVec] = {
+    vqh.clear
+    vqh.parSearch(input.head, 0)
+  }
 
   @Benchmark
-  def expSearch: Option[SumVec] = vqh.expSearch(input)
+  def expSearch: Option[SumVec] = {
+    vqh.clear
+    vqh.expSearch(input)
+  }
 
   @Benchmark
-  def singleUpdate: (VQH, List[SumVec], List[SumVec]) = VQH.singleUpdate(vqh, input, input, 1.0f)
+  def singleUpdate: (VQH, List[SumVec], List[SumVec]) = {
+    vqh.clear
+    VQH.singleUpdate(vqh, input, input, 1.0f)
+  }
 
 }

@@ -3,6 +3,8 @@ package flex.nns
 import flex.vec._
 import flex.rand._
 import flex.util.{IdentityHashMap, IdentityHashSet}
+import flex.util.IdentityHashMap.syntax._
+import flex.util.IdentityHashSet.syntax._
 
 import scala.util.Try
 
@@ -25,6 +27,8 @@ trait SumVecANNOps extends ANNOps[SumVec, SumVecANN] {
 
   def dims(ann: SumVecANN): List[Int] = ann.lsh.a.map(_a => Try(_a.shape.apply(1)).getOrElse(0L).toInt)
 
+  def unzip(ann: SumVecANN): List[VecANN] = VecANN.fromSumVecANN(ann)
+
 }
 
 trait SumVecANNSyntax {
@@ -33,6 +37,7 @@ trait SumVecANNSyntax {
     val ops: SumVecANNOps = SumVecANN
     val ann: SumVecANN = _ann
     def dims: List[Int] = SumVecANN.dims(ann)
+    def unzip: List[VecANN] = SumVecANN.unzip(ann)
   }
 
 }
@@ -55,9 +60,18 @@ object SumVecANN extends SumVecANNOps {
     val w = List.fill(l)(1.0f)
     val memoSize = cache * dims.size
     val (lsh, rng1) = SumVecLSH(dims, w, memoSize, rng)
-    val htables = List.fill(l)(IdentityHashMap.empty[Int, IdentityHashSet[SumVec]])
-    val vtables = List.fill(l)(IdentityHashMap.empty[SumVec, Int])
+    val htables = List.fill(l)(HTable.empty[SumVec])
+    val vtables = List.fill(l)(VTable.empty[SumVec])
+
     (apply(lsh, htables, vtables), rng1)
+  }
+
+  def fromVecANN(vann: VecANN): SumVecANN = {
+    val lsh = SumVecLSH.fromVecLSH(vann.lsh)
+    val htables = vann.htables.map(htable => htable.map { case (hash, vs) => (hash, vs.map(v => SumVec(v))) })
+    val vtables = vann.vtables.map(vtable => vtable.map { case (v, hash) => (SumVec(v), hash) })
+
+    apply(lsh, htables, vtables)
   }
 
 }

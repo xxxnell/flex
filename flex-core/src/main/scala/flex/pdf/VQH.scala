@@ -115,23 +115,40 @@ trait VQHOps extends VQHLaws { self =>
     }
     val tf = vqh.cws.toList.zip(adds).map { case (cw, add) => cw -> cw.:+(add) }.toMap
 
-    val cws1 = RandomIdentitySet(vqh.cws.rng, vqh.cws.toList.map(cw => tf(cw)))
+    val cws1 = RandomIdentitySet(vqh.cws.toList.map(cw => tf(cw)), vqh.cws.rng)
     val ns1 = vqh.ns.map { case (cw, n) => (tf(cw), n) }
     val (latest1, rng2) = tf.get(vqh.last).fold(randVec(priors, rng1).leftMap(vec => vqh.last.:+(vec)))((_, rng1))
 
     renewNns(patchRng(VQH(cws1, ns1, latest1, vqh.ntot, vqh.k, vqh.rng, vqh.nns, vqh.parnns), rng2))
   }
 
-  private def randVec(priors: List[Dist[Double]], rng: IRng): (Vec, IRng) =
+  protected def randVec(priors: List[Dist[Double]], rng: IRng): (Vec, IRng) =
     priors
       .foldRight((List.empty[Double], rng)) {
         case (p1, (ss, _rng)) => p1.modifyRng(_ => _rng).sample.swap.bimap(_ :: ss, _.rng)
       }
       .leftMap(rnds => Vec(rnds))
 
-  def clear(vqh: VQH): Unit = {
-    vqh.nns.clear
-    vqh.parnns.clear
+  def unzip(vqh: VQH): List[VQH] = {
+    val h = vqh.last.size
+    val rng = vqh.rng
+    val ntot = vqh.ntot
+    val k = vqh.k
+    val cwss = vqh.cws.toList
+      .foldRight(List.fill(h)(List.empty[SumVec])) {
+        case (sv, accs) => accs.zip(sv).map { case (acc, v) => SumVec(v) :: acc }
+      }
+      .map(cws => RandomIdentitySet(cws, rng))
+    val nss = vqh.ns.toMap.foldRight(List.fill(h)(IdentityHashMap.empty[SumVec, Float])) {
+      case ((sv, n), accs) => accs.zip(sv).map { case (ns, v) => ns.add(SumVec(v) -> n) }
+    }
+    val lasts = vqh.last.map(vec => SumVec(vec))
+    val nnss = vqh.nns.unzip.map(vann => SumVecANN.fromVecANN(vann))
+    val paranns = vqh.parnns.unzip
+
+    cwss.zip(nss).zip(lasts).zip(nnss).zip(paranns).map {
+      case ((((cws, ns), last), nns), parann) => VQH(cws, ns, last, ntot, k, rng, nns, parann)
+    }
   }
 
 }
@@ -208,11 +225,17 @@ trait VQHLaws { self: VQHOps =>
     case (_vqh, dim) => addDim(_vqh, List.fill(dim)(NormalDist.std))
   }
 
+  def clear(vqh: VQH): Unit = {
+    vqh.nns.clear
+    vqh.parnns.clear
+  }
+
 }
 
 trait VQHSyntax {
 
   implicit class VQHSyntaxImpl(vqh: VQH) {
+    def patchK(k: Int): VQH = VQH.patchK(vqh, k)
     def size: Int = VQH.size(vqh)
     def dim: Int = VQH.dim(vqh)
     def dims: List[Int] = VQH.dims(vqh)
@@ -230,6 +253,7 @@ trait VQHSyntax {
     def rand: (VQH, SumVec) = VQH.rand(vqh)
     def addStd(dims: List[Int]): VQH = VQH.addStd(vqh, dims)
     def clear: Unit = VQH.clear(vqh)
+    def unzip: List[VQH] = VQH.unzip(vqh)
   }
 
 }
@@ -254,8 +278,8 @@ object VQH extends VQHOps { self =>
             ntot: Float,
             k: Int,
             rng: IRng,
-            cwNns: SumVecANN,
-            parCwNns: ParVecANN): VQH = VQHImpl(cws, ns, latest, ntot, k, rng, cwNns, parCwNns)
+            nns: SumVecANN,
+            parnns: ParVecANN): VQH = VQHImpl(cws, ns, latest, ntot, k, rng, nns, parnns)
 
   def empty(dims: List[Int], k: Int): VQH = {
     val l = self.l(k)

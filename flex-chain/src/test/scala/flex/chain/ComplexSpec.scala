@@ -42,10 +42,10 @@ class ComplexSpec extends Specification with ScalaCheck {
 
       "add" in {
         val (kin, kout) = (10, 20)
-        val dims = 1 :: 2 :: 3 :: Nil
-        val ks = Stream.continually(15)
+        val dimKs = (1 -> 15) :: (2 -> 10) :: (3 -> 5) :: Nil
+        val (dims, ks) = dimKs.unzip
         val complex0 = Complex.empty(kin, kout)
-        val complex1 = complex0.addStd(dims.zip(ks))
+        val complex1 = complex0.addStd(dimKs)
 
         val cond1a = complex1.in.dims == dims
         val cond1b = complex1.in.parnns.dims == dims

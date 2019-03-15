@@ -63,7 +63,9 @@ object IdentityHashMap extends IdentityHashMapOps {
 
   def apply[K, V](inner: HashMap[EqAdapter[K], V]): IdentityHashMap[K, V] = IdentityHashMapImpl(inner)
 
-  def apply[K, V](kv: (K, V)*): IdentityHashMap[K, V] = apply(HashMap(kv.map(_.leftMap(k => EqAdapter(k))): _*))
+  def apply[K, V](kvs: List[(K, V)]): IdentityHashMap[K, V] = apply(HashMap(kvs.map(_.leftMap(k => EqAdapter(k))): _*))
+
+  def apply[K, V](kv: (K, V)*): IdentityHashMap[K, V] = apply(kv.toList)
 
   def empty[K, V]: IdentityHashMap[K, V] = apply(HashMap.empty[EqAdapter[K], V])
 

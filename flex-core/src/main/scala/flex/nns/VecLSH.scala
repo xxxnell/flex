@@ -11,14 +11,14 @@ import scala.util.Try
 
 trait VecLSH extends LSH[Vec] with VecLSHOps {
 
-  val index: Int
+  val offset: Int
 
 }
 
 trait VecLSHOps { lsh: VecLSH =>
 
   def mul(x: Vec): List[Float] =
-    memo.get((EqAdapter(x), index), a.mmul(x).toFloatVector.toList)
+    memo.get((EqAdapter(x), offset), a.mmul(x).toFloatVector.toList)
 
   def shape: (Int, Int) = {
     val l = a.shape.headOption.getOrElse(0L).toInt
@@ -31,7 +31,7 @@ trait VecLSHOps { lsh: VecLSH =>
 
 object VecLSH {
 
-  private case class VecLSHImpl(a: Vec, b: List[Float], w: List[Float], index: Int, memo: LSHMemo) extends VecLSH
+  private case class VecLSHImpl(a: Vec, b: List[Float], w: List[Float], offset: Int, memo: LSHMemo) extends VecLSH
 
   def apply(a: Vec, b: List[Float], w: List[Float], index: Int, memo: LSHMemo): VecLSH =
     VecLSHImpl(a, b, w, index, memo)
@@ -46,6 +46,6 @@ object VecLSH {
     (apply(a, b, w, 0, memo), rng2)
   }
 
-  def fromSumVecLSH(lsh: SumVecLSH, i: Int): VecLSH = lsh.get(i)
+  def fromSumVecLSH(lsh: SumVecLSH, i: Int): VecLSH = VecLSH(lsh.a.apply(i), lsh.b, lsh.w, lsh.offset + i, lsh.memo)
 
 }

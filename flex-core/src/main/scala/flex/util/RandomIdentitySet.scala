@@ -77,7 +77,7 @@ object RandomIdentitySet extends RandomSetOps {
   def apply[A](as: Vector[A], is: IdentityHashMap[A, Int], rng: IRng): RandomIdentitySet[A] =
     RandomIdentitySetImpl(as, is, rng)
 
-  def apply[A](rng: IRng, as: List[A]): RandomIdentitySet[A] = as.foldLeft(empty[A](rng)) { case (s, a) => add(s, a) }
+  def apply[A](as: List[A], rng: IRng): RandomIdentitySet[A] = as.foldLeft(empty[A](rng)) { case (s, a) => add(s, a) }
 
   def empty[A](rng: IRng): RandomIdentitySet[A] =
     RandomIdentitySetImpl(Vector.empty[A], IdentityHashMap.empty[A, Int], rng)

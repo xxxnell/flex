@@ -2,6 +2,7 @@ package flex.vec
 
 import flex.rand._
 import cats.implicits._
+import flex.util.EqAdapter
 
 trait SumVecOps {
 
@@ -11,6 +12,8 @@ trait SumVecOps {
 
   def csv(sv: SumVec): String = sv.map(v => v.csv).mkString(",")
 
+  def eqfy(sv: SumVec): List[EqAdapter[Vec]] = sv.map(v => EqAdapter(v))
+
 }
 
 trait SumVecSyntax {
@@ -19,6 +22,7 @@ trait SumVecSyntax {
     def dims: List[Int] = SumVec.dims(sv)
     def dim: Int = SumVec.dim(sv)
     def csv: String = SumVec.csv(sv)
+    def eqfy: List[EqAdapter[Vec]] = SumVec.eqfy(sv)
   }
 
 }

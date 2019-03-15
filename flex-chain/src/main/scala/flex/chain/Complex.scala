@@ -66,8 +66,10 @@ trait ComplexOps extends ModelOps with ComplexLaws {
    * Add independent variables to input space with prior distributions.
    * */
   def addVar(complex: Complex, priors: List[Dist[Double]], k: Int): Complex = {
+    val ks = complex.pools.map(_.k).:+(k)
     val in1 = complex.in.addDim(priors)
-    val pools1 = complex.pools.:+(VQH.empty(priors.size, k))
+    val pools1 = in1.unzip.zip(ks).map { case (vqh, _k) => vqh.patchK(_k) }
+
     renewOut(Complex(in1, pools1, complex.out, complex.op, complex.t))
   }
 

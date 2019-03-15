@@ -278,6 +278,22 @@ class VQHSpec extends Specification with ScalaCheck {
 
       }
 
+      "unzip" in {
+        val (dims, k) = (List(1, 2, 3, 4, 5), 10)
+        val (xs, _) = SumVec.stds(dims, IRng(0), 100)
+        val (vqh0, _, _) = VQH.empty(dims, k).expUpdate(xs.map(x => (x, 1.0f)))
+        val vqhs = vqh0.unzip
+
+        val cond1 = vqhs.size == dims.size
+        val cond2 = vqhs.zip(dims).forall { case (vqh, dim) => vqh.dims == (dim :: Nil) }
+        val cond3 = vqhs.forall(vqh => vqh.k == vqh0.k)
+
+        if (!cond1) ko(s"vqhs.size: ${vqhs.size}, ${dims.size}")
+        else if (!cond2) ko(s"dims of vqhs: ${vqhs.map(_.dims)}, expected: $dims")
+        else if (!cond3) ko(s"vqhs: $vqhs")
+        else ok
+      }
+
     }
 
   }

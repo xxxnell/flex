@@ -24,6 +24,9 @@ trait IdentityHashSetOps {
 
   def toList[A](set: IdentityHashSet[A]): List[A] = set.inner.map(_.a).toList
 
+  def map[A, B](set: IdentityHashSet[A], f: A => B): IdentityHashSet[B] =
+    IdentityHashSet(set.inner.map(eqa => EqAdapter(f(eqa.a))))
+
 }
 
 trait IdentityHashSetSyntax {
@@ -37,6 +40,7 @@ trait IdentityHashSetSyntax {
     def size: Int = IdentityHashSet.size(set)
     def isEmpty: Boolean = IdentityHashSet.isEmpty(set)
     def toList: List[A] = IdentityHashSet.toList(set)
+    def map[B](f: A => B): IdentityHashSet[B] = IdentityHashSet.map(set, f)
   }
 
 }
@@ -48,6 +52,8 @@ object IdentityHashSet extends IdentityHashSetOps {
   private case class IdentityHashSetImpl[A](inner: HashSet[EqAdapter[A]]) extends IdentityHashSet[A]
 
   def apply[A](inner: HashSet[EqAdapter[A]]): IdentityHashSet[A] = IdentityHashSetImpl(inner)
+
+  def apply[A](as: List[A]): IdentityHashSet[A] = apply(HashSet(as.map(a => EqAdapter(a)): _*))
 
   def empty[A]: IdentityHashSet[A] = apply(HashSet.empty[EqAdapter[A]])
 

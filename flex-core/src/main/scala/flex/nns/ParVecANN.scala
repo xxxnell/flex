@@ -1,10 +1,10 @@
 package flex.nns
 
 import flex.nns.ANN.syntax._
-import flex.vec._
 import flex.rand._
 import flex.util.IdentityHashMap
 import flex.util.IdentityHashMap.syntax._
+import flex.vec._
 
 trait ParVecANN {
 
@@ -22,7 +22,7 @@ trait ParANNOps extends ParANNLaws {
   def patchCompMap(ann: ParVecANN, compMap: IdentityHashMap[Vec, SumVec]): ParVecANN =
     ParVecANN(ann.arrAnns, compMap)
 
-  def clear(ann: ParVecANN): Unit = ann.arrAnns.map(_.clear)
+  def clear(ann: ParVecANN): Unit = ann.arrAnns.foreach(_.clear)
 
 }
 
@@ -46,6 +46,19 @@ trait ParANNLaws { self: ParANNOps =>
 
   def dims(ann: ParVecANN): List[Int] = ann.arrAnns.map(_.dim).toList
 
+  def unzip(ann: ParVecANN): List[ParVecANN] = {
+    import flex.vec.SumVec.syntax._
+
+    val arrAnnss = ann.arrAnns.map(vann => Vector(vann))
+    val compMaps = ann.compMap.inner.foldRight(Vector.fill(dims(ann).size)(IdentityHashMap.empty[Vec, SumVec])) {
+      case ((eqv, sv), acc) =>
+        val i = sv.eqfy.indexOf(eqv)
+        acc.updated(i, acc(i).add(eqv.a, sv))
+    }
+
+    arrAnnss.zip(compMaps).map { case (arrAnns, compMap) => ParVecANN(arrAnns, compMap) }.toList
+  }
+
 }
 
 trait ParANNSyntax {
@@ -58,6 +71,7 @@ trait ParANNSyntax {
     def search(xp: Vec, i: Int): Option[SumVec] = ParVecANN.search(ann, xp, i)
     def dims: List[Int] = ParVecANN.dims(ann)
     def clear: Unit = ParVecANN.clear(ann)
+    def unzip: List[ParVecANN] = ParVecANN.unzip(ann)
   }
 
 }
