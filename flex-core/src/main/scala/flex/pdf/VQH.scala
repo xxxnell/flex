@@ -10,6 +10,7 @@ import flex.util.IdentityHashMap.syntax._
 import flex.util.RandomIdentitySet.syntax._
 import flex.util.{IdentityHashMap, RandomIdentitySet}
 import flex.vec._
+import org.nd4j.linalg.factory.Nd4j
 
 trait VQH {
 
@@ -109,25 +110,32 @@ trait VQHOps extends VQHLaws { self =>
     VQH(cws1, ns1, vqh.last, vqh.ntot - vqh.ns.getOrElse(x, 0f), vqh.k, vqh.rng, cwAnn1, parAnn1)
   }
 
-  def addDim(vqh: VQH, priors: List[Dist[Double]]): VQH = {
+  /**
+   * @param rand Random vector generator w.r.t a prior distribution
+   * */
+  def addDim(vqh: VQH, rand: IRng => (Vec, IRng)): VQH = {
     val (adds, rng1) = (0 until vqh.cws.size).foldRight((List.empty[Vec], vqh.rng)) {
-      case (_, (_adds, _rng0)) => randVec(priors, _rng0).leftMap(add => add :: _adds)
+      case (_, (_adds, _rng0)) => rand(_rng0).leftMap(add => add :: _adds)
     }
-    val tf = vqh.cws.toList.zip(adds).map { case (cw, add) => cw -> cw.:+(add) }.toMap
+    val tf = IdentityHashMap(vqh.cws.toList.zip(adds).map { case (cw, add) => cw -> cw.:+(add) })
 
-    val cws1 = RandomIdentitySet(vqh.cws.toList.map(cw => tf(cw)), vqh.cws.rng)
-    val ns1 = vqh.ns.map { case (cw, n) => (tf(cw), n) }
-    val (latest1, rng2) = tf.get(vqh.last).fold(randVec(priors, rng1).leftMap(vec => vqh.last.:+(vec)))((_, rng1))
+    val cws1 = RandomIdentitySet(vqh.cws.toList.flatMap(cw => tf.get(cw)), vqh.cws.rng)
+    val ns1 = vqh.ns.flatMap { case (cw, n) => tf.get(cw).map(cw1 => (cw1, n)) }
+    val (latest1, rng2) = tf.get(vqh.last).fold(rand(rng1).leftMap(vec => vqh.last.:+(vec)))((_, rng1))
 
     renewNns(patchRng(VQH(cws1, ns1, latest1, vqh.ntot, vqh.k, vqh.rng, vqh.nns, vqh.parnns), rng2))
   }
 
-  protected def randVec(priors: List[Dist[Double]], rng: IRng): (Vec, IRng) =
-    priors
-      .foldRight((List.empty[Double], rng)) {
-        case (p1, (ss, _rng)) => p1.modifyRng(_ => _rng).sample.swap.bimap(_ :: ss, _.rng)
-      }
-      .leftMap(rnds => Vec(rnds))
+  def addDimPrior(vqh: VQH, priors: List[Dist[Double]]): VQH = {
+    val rand = (rng: IRng) =>
+      priors
+        .foldRight((List.empty[Double], rng)) {
+          case (p1, (ss, _rng)) => p1.modifyRng(_ => _rng).sample.swap.bimap(_ :: ss, _.rng)
+        }
+        .leftMap(rnds => Vec(rnds))
+
+    addDim(vqh, rand)
+  }
 
   def unzip(vqh: VQH): List[VQH] = {
     val h = vqh.last.size
@@ -222,7 +230,7 @@ trait VQHLaws { self: VQHOps =>
   def rand(vqh: VQH): (VQH, SumVec) = vqh.cws.rand.bimap(cws => patchRng(vqh, cws.rng), sv => sv.getOrElse(vqh.last))
 
   def addStd(vqh: VQH, dims: List[Int]): VQH = dims.foldLeft(vqh) {
-    case (_vqh, dim) => addDim(_vqh, List.fill(dim)(NormalDist.std))
+    case (_vqh, dim) => addDim(_vqh, rng => Vec.std(dim, rng))
   }
 
   def clear(vqh: VQH): Unit = {
@@ -241,7 +249,8 @@ trait VQHSyntax {
     def dims: List[Int] = VQH.dims(vqh)
     def add(x: SumVec, n: Float): VQH = VQH.addCw(vqh, x, n)
     def remove(x: SumVec): VQH = VQH.removeCw(vqh, x)
-    def addDim(priors: List[Dist[Double]]): VQH = VQH.addDim(vqh, priors)
+    def addDim(rand: IRng => (Vec, IRng)): VQH = VQH.addDim(vqh, rand)
+    def addDim(priors: List[Dist[Double]]): VQH = VQH.addDimPrior(vqh, priors)
     def parUpdate(xps: List[(Vec, Int, Float)],
                   complete: (Vec, Int, SumVec) => SumVec): (VQH, List[SumVec], List[SumVec]) =
       VQH.parUpdate(vqh, xps, complete)
@@ -252,6 +261,7 @@ trait VQHSyntax {
     def expSearch(x: SumVec): Option[SumVec] = VQH.expSearch(vqh, x)
     def rand: (VQH, SumVec) = VQH.rand(vqh)
     def addStd(dims: List[Int]): VQH = VQH.addStd(vqh, dims)
+    def addStd(dims: Int*): VQH = VQH.addStd(vqh, dims.toList)
     def clear: Unit = VQH.clear(vqh)
     def unzip: List[VQH] = VQH.unzip(vqh)
   }

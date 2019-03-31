@@ -56,6 +56,8 @@ object IRng extends IRngOps {
 
   def apply(seed: Int): IRng = bare(seed.toLong)
 
+  def apply(seed: Long): IRng = bare(seed)
+
   def bare(seed: Seed): IRng = IRngImpl(seed)
 
 }

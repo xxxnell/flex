@@ -4,6 +4,7 @@ import flex.pdf.VQH.syntax._
 import flex.pdf._
 import flex.vec._
 import cats.implicits._
+import flex.rand.IRng
 
 trait Complex extends Model {
 
@@ -24,6 +25,12 @@ trait ComplexOps extends ModelOps with ComplexLaws {
   def patchKin(complex: Complex, kin: Int): Complex = ???
 
   def patchKout(complex: Complex, kout: Int): Complex = ???
+
+  def patchIn(complex: Complex, in: VQH, ks: List[Int]): Complex = {
+    val pools1 = in.unzip.zip(ks).map { case (vqh, k) => vqh.patchK(k) }
+
+    renewOut(Complex(in, pools1, complex.out, complex.op, complex.t))
+  }
 
   def renewOut(complex: Complex): Complex = {
     val dims = complex.op(complex.in.last).dims
@@ -62,17 +69,6 @@ trait ComplexOps extends ModelOps with ComplexLaws {
   def updates[A](complex: Complex, xpns: List[(Vec, Int, Float)]): Complex =
     xpns.foldLeft(complex) { case (_complex, xpn) => update(_complex, xpn) }
 
-  /**
-   * Add independent variables to input space with prior distributions.
-   * */
-  def addVar(complex: Complex, priors: List[Dist[Double]], k: Int): Complex = {
-    val ks = complex.pools.map(_.k).:+(k)
-    val in1 = complex.in.addDim(priors)
-    val pools1 = in1.unzip.zip(ks).map { case (vqh, _k) => vqh.patchK(_k) }
-
-    renewOut(Complex(in1, pools1, complex.out, complex.op, complex.t))
-  }
-
   def clear(complex: Complex): Unit = {
     complex.in.clear
     complex.pools.foreach(_.clear)
@@ -84,8 +80,8 @@ trait ComplexOps extends ModelOps with ComplexLaws {
 trait ComplexLaws { self: ComplexOps =>
 
   def addStd(complex: Complex, dimKs: List[(Int, Int)]): Complex = {
-    val priorsKs = dimKs.map { case (dim, k) => (List.fill(dim)(NormalDist.std), k) }
-    priorsKs.foldLeft(complex) { case (_complex, (priors, k)) => addVar(_complex, priors, k) }
+    val (dims, ks) = dimKs.unzip
+    patchIn(complex, complex.in.addStd(dims), complex.pools.map(_.k) ++ ks)
   }
 
 }
@@ -94,7 +90,6 @@ trait ComplexSyntax {
 
   implicit class StreamSyntaxImpl(complex: Complex) {
     def map(f: SumVec => SumVec): Complex = Complex.map(complex, f)
-    def addVar(priors: List[Dist[Double]], k: Int): Complex = Complex.addVar(complex, priors, k)
     def addStd(dimKs: List[(Int, Int)]): Complex = Complex.addStd(complex, dimKs)
     def addStd(dimKs: (Int, Int)*): Complex = Complex.addStd(complex, dimKs.toList)
     def updates(xps: List[(Vec, Int, Float)]): Complex = Complex.updates(complex, xps)

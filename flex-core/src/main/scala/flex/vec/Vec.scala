@@ -42,19 +42,16 @@ object Vec extends VecOps {
   def double(as: List[Double]): Vec = Nd4j.create(as.toArray, Array(as.length, 1))
 
   /**
-   * Random vector from standard normal distribution
+   * Random vector from standard normal distribution.
    * */
-  def std(dim: Int, rng: IRng): (Vec, IRng) = NormalDist(0.0, 1.0, rng).samples(dim).swap.bimap(Vec(_), _.rng)
-
-  def stds(dim: Int, rng: IRng, n: Int): (List[Vec], IRng) = (0 until n).foldRight((List.empty[Vec], rng)) {
-    case (_, (vs, _rng)) => std(dim, _rng).leftMap(v => v :: vs)
+  def std(dim: Int, rng: IRng): (Vec, IRng) = {
+    Nd4j.getRandom.setSeed(rng.seed)
+    (Nd4j.randn(Array(dim, 1)), IRng(Nd4j.getRandom.getSeed))
   }
 
-  /**
-   * Random vector from standard normal distribution
-   * */
-  def std(dim: Int, rng: IRng, n: Int): (List[Vec], IRng) =
-    (0 until n).foldRight((List.empty[Vec], rng)) { case (_, (vs, _rng0)) => std(dim, _rng0).leftMap(_ :: vs) }
+  def stds(dims: List[Int], rng: IRng): (List[Vec], IRng) = dims.foldRight((List.empty[Vec], rng)) {
+    case (dim, (vs, _rng)) => std(dim, _rng).leftMap(v => v :: vs)
+  }
 
   def zeros(dim: Int): Vec = Nd4j.zeros(dim, 1l)
 

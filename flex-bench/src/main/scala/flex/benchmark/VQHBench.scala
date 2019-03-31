@@ -66,4 +66,8 @@ class VQHBench {
     VQH.singleUpdate(vqh, input, input, 1.0f)
   }
 
+  @Benchmark
+  def addStd: VQH =
+    vqh.addStd(10000)
+
 }

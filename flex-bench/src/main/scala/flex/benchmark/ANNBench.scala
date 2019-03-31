@@ -61,7 +61,7 @@ class ANNBench {
   def setup(): Unit = {
     val rng0 = IRng(0)
     val (ann0, rng1) = VecANN.empty(l, dim, cache, rng0)
-    val (prepvs, _) = Vec.std(dim, rng1, n)
+    val (prepvs, _) = Vec.stds(List.fill(n)(dim), rng1)
 
     x = Vec.ones(dim)
     ann = prepvs.foldLeft(ann0) { case (_ann, prepv) => _ann.add(prepv) }.add(x)
