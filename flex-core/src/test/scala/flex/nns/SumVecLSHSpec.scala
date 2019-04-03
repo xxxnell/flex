@@ -10,7 +10,7 @@ class SumVecLSHSpec extends Specification with ScalaCheck {
   "SumVecLSH" should {
 
     "hash" in {
-      val (dim, depth, l, memoSize, rng0) = (1, 5, 3, 10, IRng(0))
+      val (dim, depth, l, memoSize, rng0) = (10, 5, 3, 10, IRng(0))
       val dims = List.fill(depth)(dim)
       val (lsh, rng1) = SumVecLSH(dims, List.fill(l)(1.0f), memoSize, rng0)
       val (x, _) = SumVec.std(dims, rng1)
@@ -22,7 +22,7 @@ class SumVecLSHSpec extends Specification with ScalaCheck {
     }
 
     "hash2" in {
-      val (dim, depth, l, memoSize, rng0) = (1, 10, 3, 10, IRng(0))
+      val (dim, depth, l, memoSize, rng0) = (10, 5, 3, 10, IRng(0))
       val dims = List.fill(depth)(dim)
       val w = List.fill(l)(1.0f)
       val (lsh, rng1) = SumVecLSH(dims, w, memoSize, rng0)

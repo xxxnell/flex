@@ -25,7 +25,7 @@ trait SumVecANNOps extends ANNOps[SumVec, SumVecANN] {
   def distance(x1: SumVec, x2: SumVec): Float =
     math.sqrt(x1.zip(x2).map { case (_x1, _x2) => math.pow(_x1.distance2(_x2), 2) }.sum).toFloat
 
-  def dims(ann: SumVecANN): List[Int] = ann.lsh.a.map(_a => Try(_a.shape.apply(1)).getOrElse(0L).toInt)
+  def dims(ann: SumVecANN): List[Int] = ann.lsh.dims
 
   def unzip(ann: SumVecANN): List[VecANN] = VecANN.fromSumVecANN(ann)
 

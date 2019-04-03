@@ -53,6 +53,8 @@ object Vec extends VecOps {
     case (dim, (vs, _rng)) => std(dim, _rng).leftMap(v => v :: vs)
   }
 
+  def stds(dim: Int, rng: IRng, n: Int): (List[Vec], IRng) = stds(List.fill(n)(dim), rng)
+
   def zeros(dim: Int): Vec = Nd4j.zeros(dim, 1l)
 
   def ones(dim: Int): Vec = Nd4j.ones(dim, 1l)

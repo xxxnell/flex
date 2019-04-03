@@ -3,6 +3,7 @@ package flex.vec
 import flex.rand._
 import cats.implicits._
 import flex.util.EqAdapter
+import org.nd4j.linalg.factory.Nd4j
 
 trait SumVecOps {
 
@@ -14,6 +15,8 @@ trait SumVecOps {
 
   def eqfy(sv: SumVec): List[EqAdapter[Vec]] = sv.map(v => EqAdapter(v))
 
+  def concat(sv: SumVec): Vec = Nd4j.concat(1, sv.toArray: _*)
+
 }
 
 trait SumVecSyntax {
@@ -23,6 +26,7 @@ trait SumVecSyntax {
     def dim: Int = SumVec.dim(sv)
     def csv: String = SumVec.csv(sv)
     def eqfy: List[EqAdapter[Vec]] = SumVec.eqfy(sv)
+    def concat: Vec = SumVec.concat(sv)
   }
 
 }
@@ -40,8 +44,11 @@ object SumVec extends SumVecOps {
   def std(dims: List[Int], rng: IRng): (SumVec, IRng) =
     dims.foldRight((List.empty[Vec], rng)) { case (dim, (sv, _rng)) => Vec.std(dim, _rng).leftMap(_ :: sv) }
 
-  def stds(dims: List[Int], rng: IRng, n: Int): (List[SumVec], IRng) =
-    (0 until n).foldRight((List.empty[SumVec], rng)) { case (_, (svs, _rng)) => std(dims, _rng).leftMap(_ :: svs) }
+  def stds(dimss: List[List[Int]], rng: IRng): (List[SumVec], IRng) = dimss.foldRight((List.empty[SumVec], rng)) {
+    case (dims, (svs, _rng)) => std(dims, _rng).leftMap(_ :: svs)
+  }
+
+  def stds(dims: List[Int], rng: IRng, n: Int): (List[SumVec], IRng) = stds(List.fill(n)(dims), rng)
 
   def zeros(dims: List[Int]): SumVec = dims.map(dim => Vec.zeros(dim))
 

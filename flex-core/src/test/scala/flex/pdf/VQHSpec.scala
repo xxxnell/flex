@@ -120,7 +120,7 @@ class VQHSpec extends Specification with ScalaCheck {
         val n = 6
         val dims1 = dims0.:+(n)
         val vqh0 = VQH.empty(dims0, k)
-        val vqh1 = vqh0.addDim(List.fill(n)(NormalDist(0.0, 1.0)))
+        val vqh1 = vqh0.addStd(6)
 
         val cond1 = vqh1.dims == dims1
         val cond2 = vqh1.nns.dims == dims1

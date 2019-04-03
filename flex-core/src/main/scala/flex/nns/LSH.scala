@@ -11,7 +11,7 @@ import flex.util.Memo.syntax._
  * */
 trait LSH[V] extends LSHOps[V] {
 
-  val a: V
+  val a: List[V]
 
   val b: List[Float]
 
