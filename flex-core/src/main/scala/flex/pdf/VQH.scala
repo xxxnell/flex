@@ -169,7 +169,8 @@ trait VQHLaws { self: VQHOps =>
       case ((_vqh, _cnews, _couts), (xp, a, w)) =>
         val (vqh1, cnews1, couts1) = parSearch(vqh, xp, a)
           .map(_c => singleUpdate(_vqh, _c, complete(xp, a, _c), w))
-          .getOrElse((addCw(_vqh, vqh.last, w), vqh.last :: Nil, Nil))
+          .getOrElse((addCw(_vqh, complete(xp, a, vqh.last), w), complete(xp, a, vqh.last) :: Nil, Nil))
+
         (vqh1, cnews1 ++ _cnews, couts1 ++ _couts)
     }
 

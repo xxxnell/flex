@@ -14,6 +14,8 @@ trait RandomIdentitySet[A] {
 
   val rng: IRng
 
+  override def toString: String = s"RandomIdentitySet(${as.mkString(", ")})"
+
 }
 
 trait RandomSetOps {
