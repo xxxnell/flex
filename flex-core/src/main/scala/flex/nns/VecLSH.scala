@@ -49,6 +49,7 @@ object VecLSH {
     (apply(a, b, w, 0, memo), rng2)
   }
 
-  def fromSumVecLSH(lsh: SumVecLSH, i: Int): VecLSH = VecLSH(lsh.a.apply(i), lsh.b, lsh.w, lsh.offset + i, lsh.memo)
+  def fromSumVecLSH(lsh: SumVecLSH, i: Int): VecLSH =
+    VecLSH(lsh.a.map(_a => _a.apply(i)), lsh.b, lsh.w, lsh.offset + i, lsh.memo)
 
 }
