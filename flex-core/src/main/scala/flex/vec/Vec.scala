@@ -46,11 +46,12 @@ object Vec extends VecOps {
    * */
   def std(dim: Int, rng: IRng): (Vec, IRng) = {
     Nd4j.getRandom.setSeed(rng.seed)
-    (Nd4j.randn(Array(dim, 1)), IRng(Nd4j.getRandom.getSeed))
+    (Nd4j.randn(Array(dim, 1)), rng.next._1)
   }
 
   def stds(dims: List[Int], rng: IRng): (List[Vec], IRng) = dims.foldRight((List.empty[Vec], rng)) {
-    case (dim, (vs, _rng)) => std(dim, _rng).leftMap(v => v :: vs)
+    case (dim, (vs, _rng)) =>
+      std(dim, _rng).leftMap(v => v :: vs)
   }
 
   def stds(dim: Int, rng: IRng, n: Int): (List[Vec], IRng) = stds(List.fill(n)(dim), rng)

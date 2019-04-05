@@ -1,6 +1,7 @@
 package flex.vec
 
 import flex.rand.IRng
+import org.nd4j.linalg.factory.Nd4j
 import org.specs2.mutable._
 import org.specs2.ScalaCheck
 
@@ -31,12 +32,26 @@ class VecSpec extends Specification with ScalaCheck {
       }
 
       "std" in {
-        val dim = 10
-        val (v, _) = Vec.std(dim, IRng(0))
+        val (dim, seed) = (10, 0)
+        val (v, rng1) = Vec.std(dim, IRng(seed))
 
         val cond1 = v.dim == dim
+        val cond2 = rng1.seed != seed
 
         if (!cond1) ko(s"dim(v): ${v.dim}, expected: $dim")
+        else if (!cond2) ko(s"seed doesn't change: $seed -> ${rng1.seed}")
+        else ok
+      }
+
+      "stds" in {
+        val (dims, seed) = (10 :: 20 :: 30 :: Nil, 0)
+        val (vs, rng1) = Vec.stds(dims, IRng(seed))
+
+        val cond1 = vs.zip(dims).forall { case (v, dim) => v.dim == dim }
+        val cond2 = rng1.seed != seed
+
+        if (!cond1) ko(s"dim(v): ${vs.map(v => v.dim)}, expected: $dims")
+        else if (!cond2) ko(s"seed doesn't change: $seed -> ${rng1.seed}")
         else ok
       }
 
