@@ -184,6 +184,7 @@ trait VQHLaws { self: VQHOps =>
         val (vqh1, cnews1, couts1) = expSearch(vqh, x)
           .map(c => singleUpdate(_vqh, c, x, w))
           .getOrElse((addCw(_vqh, x, w), x :: Nil, Nil))
+
         (vqh1, cnews1 ++ _newcs, couts1 ++ _couts)
     }
 
@@ -192,12 +193,12 @@ trait VQHLaws { self: VQHOps =>
     val vqh1 = addCw(vqh, c, w)
 
     // Step B. Add a new codeword vector
-    val n0 = vqh.ns.getOrElse(c, 0f)
-    val avgpi = 1 / vqh.k.toFloat
-    val (rng1, p) = Bernoulli(sigmoid((n0 + w) / vqh.ntot - avgpi), vqh.rng).sample.leftMap(_.rng)
+    val n1 = vqh1.ns.getOrElse(c, 0f)
+    val (pi, avgpi) = (n1 / vqh1.ntot, 1 / vqh1.k.toFloat)
+    val (rng1, p) = Bernoulli(sigmoid(pi - avgpi), vqh1.rng).sample.leftMap(_.rng)
     val (vqh2, cnews) = if (p == 1) {
-      val _vqh1 = addCw(vqh1, c, -1 * (n0 + w) / 2)
-      val _vqh2 = addCw(_vqh1, cnew, (n0 + w) / 2)
+      val _vqh1 = addCw(vqh1, c, -1 * n1 / 2)
+      val _vqh2 = addCw(_vqh1, cnew, n1 / 2)
       (_vqh2, cnew :: Nil)
       // TODO abruptly forget loop
     } else (vqh1, Nil)
@@ -205,7 +206,8 @@ trait VQHLaws { self: VQHOps =>
     // Step C. Remove old codeword vectors
     val (vqh3, rng2, couts) = vqh2.ns.toMap.foldLeft(vqh2, rng1, List.empty[SumVec]) {
       case ((_vqh0, _rng0, _couts0), (_c, _n)) =>
-        val (_rng1, q) = Bernoulli(sigmoid(avgpi - _n / vqh2.ntot) * avgpi, _rng0).sample.leftMap(_.rng)
+        val pi = _n / vqh2.ntot
+        val (_rng1, q) = Bernoulli(sigmoid(avgpi - pi) * avgpi, _rng0).sample.leftMap(_.rng)
         val (_vqh1, _couts1) = if (q == 1) (removeCw(_vqh0, _c), _c :: _couts0) else (_vqh0, _couts0)
         (_vqh1, _rng1, _couts1)
     }

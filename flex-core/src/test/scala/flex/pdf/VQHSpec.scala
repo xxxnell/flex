@@ -190,8 +190,6 @@ class VQHSpec extends Specification with ScalaCheck {
           val xs = (1 to 10).toList.map(i => (SumVec.std(dims, IRng(i))._1, 1.0f))
           val (vqh1, cins, couts) = vqh0.expUpdate(xs)
 
-          println(s"${vqh1.ntot} ?= ${xs.map(_._2).sum}")
-
           val cond1 = vqh1.cws.size == xs.size
           val cond2 = vqh1.ns.size == xs.size
           val cond3 = vqh1.ntot === xs.map(_._2).sum +- 0.01f
