@@ -221,7 +221,15 @@ trait VQHLaws { self: VQHOps =>
 
   def rand(vqh: VQH): (VQH, SumVec) = vqh.cws.rand.bimap(cws => patchRng(vqh, cws.rng), sv => sv.getOrElse(vqh.last))
 
-  def addStd(vqh: VQH, dims: List[Int]): VQH = addDim(vqh, rng => SumVec.std(dims, rng))
+  def addDimStd(vqh: VQH, dims: List[Int]): VQH = addDim(vqh, rng => SumVec.std(dims, rng))
+
+  def addCwNormal(vqh: VQH, params: List[List[(Float, Float)]]): VQH = {
+    val (sv, rng) = SumVec.normal(params, vqh.rng)
+    addCw(patchRng(vqh, rng), sv, 0f)
+  }
+
+  def initNormal(vqh: VQH, params: List[List[(Float, Float)]]): VQH =
+    (0 until vqh.k).foldLeft(vqh) { case (_vqh, _) => addCwNormal(_vqh, params) }
 
   def clear(vqh: VQH): Unit = {
     vqh.nns.clear
@@ -249,8 +257,9 @@ trait VQHSyntax {
     def parSearch(xp: Vec, i: Int): Option[SumVec] = VQH.parSearch(vqh, xp, i)
     def expSearch(x: SumVec): Option[SumVec] = VQH.expSearch(vqh, x)
     def rand: (VQH, SumVec) = VQH.rand(vqh)
-    def addStd(dims: List[Int]): VQH = VQH.addStd(vqh, dims)
-    def addStd(dims: Int*): VQH = VQH.addStd(vqh, dims.toList)
+    def addDimStd(dims: List[Int]): VQH = VQH.addDimStd(vqh, dims)
+    def addDimStd(dims: Int*): VQH = VQH.addDimStd(vqh, dims.toList)
+    def initNormal(params: List[List[(Float, Float)]]): VQH = VQH.initNormal(vqh, params)
     def clear: Unit = VQH.clear(vqh)
     def unzip: List[VQH] = VQH.unzip(vqh)
   }

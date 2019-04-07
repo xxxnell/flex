@@ -11,11 +11,11 @@ import flex.util.Memo.syntax._
  * */
 trait LSH[V] extends LSHOps[V] {
 
-  val a: List[V]
+  val as: List[V]
 
-  val b: List[Float]
+  val bs: List[Float]
 
-  val w: List[Float]
+  val ws: List[Float]
 
   val memo: LSHMemo
 
@@ -32,7 +32,7 @@ trait LSHOps[V] { lsh: LSH[V] =>
 
   // laws
 
-  def hash(x: V): List[Int] = (mul(x), b, w).zipped.map {
+  def hash(x: V): List[Int] = (mul(x), bs, ws).zipped.map {
     case (_ax, _b, _w) => ((_ax + _b) / _w).floor.round
   }
 

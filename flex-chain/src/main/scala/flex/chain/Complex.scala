@@ -22,14 +22,29 @@ trait Complex extends Model {
 
 trait ComplexOps extends ModelOps with ComplexLaws {
 
-  def patchKin(complex: Complex, kin: Int): Complex = ???
+  def patchKin(complex: Complex, kin: Int): Complex =
+    Complex(complex.in.patchK(kin), complex.pools, complex.out, complex.op, complex.t)
 
-  def patchKout(complex: Complex, kout: Int): Complex = ???
+  def patchKout(complex: Complex, kout: Int): Complex =
+    Complex(complex.in.patchK(kout), complex.pools, complex.out, complex.op, complex.t)
 
+  /**
+   * @param ks list of k for pools
+   * */
   def patchIn(complex: Complex, in: VQH, ks: List[Int]): Complex = {
     val pools1 = in.unzip.zip(ks).map { case (vqh, k) => vqh.patchK(k) }
 
     renewOut(Complex(in, pools1, complex.out, complex.op, complex.t))
+  }
+
+  /**
+   * @param k k for in
+   * */
+  def patchPools(complex: Complex, pools: List[VQH], k: Int): Complex = {
+    val dims = pools.flatMap(pool => pool.dims)
+    val in1 = VQH.empty(dims, k)
+
+    renewOut(Complex(in1, pools, complex.out, complex.op, complex.t))
   }
 
   def renewOut(complex: Complex): Complex = {
@@ -79,24 +94,40 @@ trait ComplexOps extends ModelOps with ComplexLaws {
 
 trait ComplexLaws { self: ComplexOps =>
 
-  def addStd(complex: Complex, dimKs: List[(Int, Int)]): Complex = {
+  def addDimStd(complex: Complex, dimKs: List[(Int, Int)]): Complex = {
     val (dims, ks) = dimKs.unzip
-    patchIn(complex, complex.in.addStd(dims), complex.pools.map(_.k) ++ ks)
+    patchIn(complex, complex.in.addDimStd(dims), complex.pools.map(_.k) ++ ks)
+  }
+
+  def initNormal(complex: Complex, paramss: List[List[(Float, Float)]]): Complex =
+    patchPools(
+      complex,
+      complex.pools.zip(paramss).map { case (pool, params) => pool.initNormal(params :: Nil) },
+      complex.in.k
+    )
+
+  def initStd(complex: Complex): Complex = {
+    val params = complex.in.dims.map(dim => List.fill(dim)((0.0f, 1.0f)))
+    initNormal(complex, params)
   }
 
 }
 
 trait ComplexSyntax {
 
-  implicit class StreamSyntaxImpl(complex: Complex) {
+  implicit class ComplexSyntaxImpl(complex: Complex) {
     def map(f: SumVec => SumVec): Complex = Complex.map(complex, f)
-    def addStd(dimKs: List[(Int, Int)]): Complex = Complex.addStd(complex, dimKs)
-    def addStd(dimKs: (Int, Int)*): Complex = Complex.addStd(complex, dimKs.toList)
+    def addDim(dimKs: List[(Int, Int)]): Complex = Complex.addDimStd(complex, dimKs)
+    def addDim(dimKs: (Int, Int)*): Complex = Complex.addDimStd(complex, dimKs.toList)
+    def addDimStd(dimKs: List[(Int, Int)]): Complex = Complex.addDimStd(complex, dimKs)
+    def addDimStd(dimKs: (Int, Int)*): Complex = Complex.addDimStd(complex, dimKs.toList)
     def updates(xps: List[(Vec, Int, Float)]): Complex = Complex.updates(complex, xps)
     def update(xs: Vec*): Complex = Complex.updates(complex, xs.toList.map(v => (v, 0, 1.0f)))
     def train(trainingset: Dataset): Complex = ???
     def evaluate(testset: Dataset): Float = ???
     def clear: Unit = Complex.clear(complex)
+    def init: Complex = Complex.initStd(complex)
+    def initNormal(params: List[List[(Float, Float)]]): Complex = Complex.initNormal(complex, params)
   }
 
 }

@@ -50,6 +50,11 @@ object SumVec extends SumVecOps {
 
   def stds(dims: List[Int], rng: IRng, n: Int): (List[SumVec], IRng) = stds(List.fill(n)(dims), rng)
 
+  def normal(paramss: List[List[(Float, Float)]], rng: IRng): (SumVec, IRng) =
+    paramss.foldRight((List.empty[Vec], rng)) {
+      case (params, (sv, _rng)) => Vec.normal(params, _rng).leftMap(v => v :: sv)
+    }
+
   def zeros(dims: List[Int]): SumVec = dims.map(dim => Vec.zeros(dim))
 
 }

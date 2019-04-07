@@ -45,7 +45,7 @@ class ComplexSpec extends Specification with ScalaCheck {
         val dimKs = (1 -> 15) :: (2 -> 10) :: (3 -> 5) :: Nil
         val (dims, ks) = dimKs.unzip
         val complex0 = Complex.empty(kin, kout)
-        val complex1 = complex0.addStd(dimKs)
+        val complex1 = complex0.addDimStd(dimKs)
 
         val cond1a = complex1.in.dims == dims
         val cond1b = complex1.in.parnns.dims == dims
@@ -65,7 +65,7 @@ class ComplexSpec extends Specification with ScalaCheck {
         val dims = 1 :: 2 :: 3 :: Nil
         val ks = Stream.continually(15)
         val complex0 = Complex.empty(kin, kout)
-        val complex1 = complex0.addStd(dims.zip(ks))
+        val complex1 = complex0.addDimStd(dims.zip(ks))
         val complex2 = complex1.map { case _ :: tail => tail }
 
         val cond1 = complex2.in.dims == dims
@@ -82,7 +82,7 @@ class ComplexSpec extends Specification with ScalaCheck {
         val ks = Stream.continually(15)
         val (xs, _) = Vec.std(dims.head, IRng(0))
         val complex0 = Complex.empty(kin, kout)
-        val complex1 = complex0.addStd(dims.zip(ks))
+        val complex1 = complex0.addDimStd(dims.zip(ks))
         val complex2 = complex1.map { case _ :: tail => tail }
         val complex3 = complex2.update(xs)
 
@@ -95,6 +95,31 @@ class ComplexSpec extends Specification with ScalaCheck {
         else if (!cond2) ko(s"complex.pools.head: ${complex3.pools.head}, expected ntot: 1.0")
         else if (!cond3) ko(s"complex.out: ${complex3.out}, expected ntot: 1.0")
         else if (!cond4) ko(s"complex.t: ${complex3.t}")
+        else ok
+      }
+
+      "initNormal" in {
+        val (kin, kout, kpool) = (10, 20, 15)
+        val (dims, ks) = (10 :: 20 :: 30 :: Nil, Stream.continually(kpool))
+        val params = dims.map(dim => List.fill(dim)((0.0f, 1.0f)))
+        val complex = Complex.empty(kin, kout).addDimStd(dims.zip(ks)).initNormal(params)
+
+        val poolSizes = complex.pools.map(pool => pool.size)
+        val cond1 = poolSizes.forall(size => size == kpool)
+
+        if (!cond1) ko(s"Size of pools: $poolSizes")
+        else ok
+      }
+
+      "init" in {
+        val (kin, kout, kpool) = (10, 20, 15)
+        val (dims, ks) = (10 :: 20 :: 30 :: Nil, Stream.continually(kpool))
+        val complex = Complex.empty(kin, kout).addDimStd(dims.zip(ks)).init
+
+        val poolSizes = complex.pools.map(pool => pool.size)
+        val cond1 = poolSizes.forall(size => size == kpool)
+
+        if (!cond1) ko(s"Size of pools: $poolSizes")
         else ok
       }
 

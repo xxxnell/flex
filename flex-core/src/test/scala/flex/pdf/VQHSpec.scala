@@ -64,7 +64,7 @@ class VQHSpec extends Specification with ScalaCheck {
 
       "addDim" in {
         val (dims0, dims1, k) = (List.empty[Int], List(1, 2, 3, 4, 5), 10)
-        val vqh = VQH.empty(dims0, k).addStd(dims1)
+        val vqh = VQH.empty(dims0, k).addDimStd(dims1)
 
         val cond1 = vqh.cws.isEmpty
         val cond2 = vqh.ns.isEmpty
@@ -120,7 +120,7 @@ class VQHSpec extends Specification with ScalaCheck {
         val n = 6
         val dims1 = dims0.:+(n)
         val vqh0 = VQH.empty(dims0, k)
-        val vqh1 = vqh0.addStd(6)
+        val vqh1 = vqh0.addDimStd(6)
 
         val cond1 = vqh1.dims == dims1
         val cond2 = vqh1.nns.dims == dims1
@@ -289,6 +289,17 @@ class VQHSpec extends Specification with ScalaCheck {
         if (!cond1) ko(s"vqhs.size: ${vqhs.size}, ${dims.size}")
         else if (!cond2) ko(s"dims of vqhs: ${vqhs.map(_.dims)}, expected: $dims")
         else if (!cond3) ko(s"vqhs: $vqhs")
+        else ok
+      }
+
+      "initNormal" in {
+        val (dims, k) = (List(10, 20, 30), 15)
+        val params = dims.map(dim => List.fill(dim)((1.0f, 1.0f)))
+        val vqh = VQH.empty(dims, k).initNormal(params)
+
+        val cond1 = vqh.size == k
+
+        if (!cond1) ko(s"Initialized VQH size: ${vqh.size}, expected: ${k}")
         else ok
       }
 
