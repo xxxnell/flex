@@ -49,8 +49,7 @@ object VecANN extends VecANNOps {
 
   def empty(l: Int, dim: Int, cache: Int, rng: IRng): (VecANN, IRng) = {
     val w = List.fill(l)(1.0f)
-    val memoSize = cache
-    val (lsh, rng1) = VecLSH(dim, w, memoSize, rng)
+    val (lsh, rng1) = VecLSH(dim, w, cache, rng)
     val htables = List.fill(l)(HTable.empty[Vec])
     val vtables = List.fill(l)(VTable.empty[Vec])
 

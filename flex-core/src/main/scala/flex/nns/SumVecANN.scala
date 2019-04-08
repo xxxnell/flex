@@ -58,8 +58,7 @@ object SumVecANN extends SumVecANNOps {
    * */
   def empty(l: Int, dims: List[Int], cache: Int, rng: IRng): (SumVecANN, IRng) = {
     val w = List.fill(l)(1.0f)
-    val memoSize = cache * dims.size
-    val (lsh, rng1) = SumVecLSH(dims, w, memoSize, rng)
+    val (lsh, rng1) = SumVecLSH(dims, w, cache, rng)
     val htables = List.fill(l)(HTable.empty[SumVec])
     val vtables = List.fill(l)(VTable.empty[SumVec])
 

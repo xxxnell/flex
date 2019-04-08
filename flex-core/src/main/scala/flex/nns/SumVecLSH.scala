@@ -21,9 +21,9 @@ trait SumVecLSHOps { lsh: SumVecLSH =>
 
   def muli(x: SumVec, i: Int): List[Float] = {
     val xp = x.apply(i)
-    val ap = as.map(a => a.apply(i))
+    val aps = as.map(a => a.apply(i))
 
-    memo.get((EqAdapter(xp), EqAdapter(ap)), ap.map(_ap => _ap.mmul(xp).getFloat(0l)))
+    aps.map(ap => memo.get((EqAdapter(xp), EqAdapter(ap)), ap.mmul(xp).getFloat(0l)))
   }
 
   def mul(x: SumVec): List[Float] = x.indices.foldLeft(List.fill(size)(0.0f)) {
@@ -52,13 +52,13 @@ object SumVecLSH {
   def apply(as: List[SumVec], bs: List[Float], ws: List[Float], memo: LSHMemo): SumVecLSH =
     SumVecLSHImpl(as, bs, ws, memo)
 
-  def apply(dims: List[Int], ws: List[Float], memoSize: Int, rng: IRng): (SumVecLSH, IRng) = {
+  def apply(dims: List[Int], ws: List[Float], cache: Int, rng: IRng): (SumVecLSH, IRng) = {
     val l = ws.size
     val (as, rng1) = SumVec.stds(dims, rng, l).leftMap(_.map(_.zip(dims).map { case (v, dim) => v.reshape(1, dim) }))
     val (bs, rng2) = ws.foldRight((List.empty[Float], rng1)) {
       case (_w, (_b, _rng)) => UniformDist.apply(_w / 2, _w / 2, _rng).sample.swap.bimap(s => s :: _b, d => d.rng)
     }
-    val memo = Memo.empty[(EqAdapter[Vec], EqAdapter[List[Vec]]), List[Float]](memoSize)
+    val memo = LSHMemo.empty(cache * dims.size * l)
 
     (apply(as, bs, ws, memo), rng2)
   }

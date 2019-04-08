@@ -18,7 +18,7 @@ trait VecLSH extends LSH[Vec] with VecLSHOps {
 trait VecLSHOps { lsh: VecLSH =>
 
   def mul(x: Vec): List[Float] =
-    memo.get((EqAdapter(x), EqAdapter(as)), as.map(a => a.mmul(x).getFloat(0l)))
+    as.map(a => memo.get((EqAdapter(x), EqAdapter(a)), a.mmul(x).getFloat(0l)))
 
   def shape: (Int, Int) = {
     val l = as.size
@@ -36,13 +36,13 @@ object VecLSH {
   def apply(as: List[Vec], bs: List[Float], ws: List[Float], memo: LSHMemo): VecLSH =
     VecLSHImpl(as, bs, ws, memo)
 
-  def apply(dim: Int, ws: List[Float], memoSize: Int, rng: IRng): (VecLSH, IRng) = {
+  def apply(dim: Int, ws: List[Float], cache: Int, rng: IRng): (VecLSH, IRng) = {
     val l = ws.size
     val (as, rng1) = Vec.stds(dim, rng, l).leftMap(_.map(_.reshape(1, dim)))
     val (bs, rng2) = ws.foldRight((List.empty[Float], rng1)) {
       case (_w, (_b, _rng)) => UniformDist.apply(_w / 2, _w / 2, _rng).sample.swap.bimap(s => s :: _b, d => d.rng)
     }
-    val memo = Memo.empty[(EqAdapter[Vec], EqAdapter[List[Vec]]), List[Float]](memoSize)
+    val memo = LSHMemo.empty(cache * l)
 
     (apply(as, bs, ws, memo), rng2)
   }
