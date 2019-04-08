@@ -99,16 +99,16 @@ trait ComplexLaws { self: ComplexOps =>
     patchIn(complex, complex.in.addDimStd(dims), complex.pools.map(_.k) ++ ks)
   }
 
-  def initNormal(complex: Complex, paramss: List[List[(Float, Float)]]): Complex =
+  def initNormal(complex: Complex, locs: List[Vec], scales: List[Vec]): Complex =
     patchPools(
       complex,
-      complex.pools.zip(paramss).map { case (pool, params) => pool.initNormal(params :: Nil) },
+      (complex.pools, locs, scales).zipped.map { case (pool, loc, scale) => pool.initNormal(loc :: Nil, scale :: Nil) },
       complex.in.k
     )
 
   def initStd(complex: Complex): Complex = {
-    val params = complex.in.dims.map(dim => List.fill(dim)((0.0f, 1.0f)))
-    initNormal(complex, params)
+    val dims = complex.in.dims
+    initNormal(complex, SumVec.zeros(dims), SumVec.ones(dims))
   }
 
 }
@@ -127,7 +127,7 @@ trait ComplexSyntax {
     def evaluate(testset: Dataset): Float = ???
     def clear: Unit = Complex.clear(complex)
     def init: Complex = Complex.initStd(complex)
-    def initNormal(params: List[List[(Float, Float)]]): Complex = Complex.initNormal(complex, params)
+    def initNormal(locs: List[Vec], scales: List[Vec]): Complex = Complex.initNormal(complex, locs, scales)
   }
 
 }

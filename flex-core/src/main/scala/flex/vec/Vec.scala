@@ -56,10 +56,8 @@ object Vec extends VecOps {
 
   def stds(dim: Int, rng: IRng, n: Int): (List[Vec], IRng) = stds(List.fill(n)(dim), rng)
 
-  def normal(params: List[(Float, Float)], rng: IRng): (Vec, IRng) = {
-    val (loc, scale) = params.unzip.bimap(locl => Vec(locl), scalel => Vec(scalel))
-    std(params.size, rng).leftMap(vec => scale.mul(vec).add(loc))
-  }
+  def normal(loc: Vec, scale: Vec, rng: IRng): (Vec, IRng) =
+    std(loc.dim, rng).leftMap(vec => scale.mul(vec).add(loc))
 
   def zeros(dim: Int): Vec = Nd4j.zeros(dim, 1l)
 

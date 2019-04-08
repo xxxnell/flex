@@ -17,16 +17,16 @@ object FlexBuilds {
     fork := true,
     run / javaOptions ++= Seq(
       "-Xms8G",
-      "-Xmx8G",
-      "-Dorg.bytedeco.javacpp.maxbytes=8G",
-      "-Dorg.bytedeco.javacpp.maxphysicalbytes=10G",
+      "-Xmx10G",
+      "-Dorg.bytedeco.javacpp.maxbytes=20G",
+      "-Dorg.bytedeco.javacpp.maxphysicalbytes=20G",
       "-Dorg.bytedeco.javacpp.openblas.load=mkl_rt"
     ),
     Test / javaOptions ++= Seq(
       "-Xms8G",
-      "-Xmx8G",
-      "-Dorg.bytedeco.javacpp.maxbytes=8G",
-      "-Dorg.bytedeco.javacpp.maxphysicalbytes=10G",
+      "-Xmx10G",
+      "-Dorg.bytedeco.javacpp.maxbytes=20G",
+      "-Dorg.bytedeco.javacpp.maxphysicalbytes=20G",
       "-Dorg.bytedeco.javacpp.openblas.load=mkl_rt"
     )
   )

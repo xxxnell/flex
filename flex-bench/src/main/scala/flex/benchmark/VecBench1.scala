@@ -2,6 +2,8 @@ package flex.benchmark
 
 import java.util.concurrent.TimeUnit
 
+import flex.rand.IRng
+import flex.vec.Vec
 import org.nd4j.linalg.api.ndarray.INDArray
 import org.nd4j.linalg.factory.Nd4j
 import org.nd4j.linalg.indexing.NDArrayIndex
@@ -15,8 +17,8 @@ class VecBench1 {
 
   // parameters
 
-  @Param(Array("1", "921600"))
-  var dim: Int = _
+  @Param(Array("247678", "2476788", "24767882"))
+  var dim: Long = _
 
   // variables
 
@@ -26,22 +28,25 @@ class VecBench1 {
 
   var a1: INDArray = _
 
-  var a100: INDArray = _
+  var aN: INDArray = _
 
   val scalar: INDArray = Nd4j.ones(1)
 
   @Setup
   def setup(): Unit = {
-    val (h1, h2) = (1, 100)
+    val (h1, h2) = (1, 5)
 
     x = Nd4j.ones(dim)
     xt = x.transpose()
-    a1 = Nd4j.ones(dim * h1).reshape(h1, dim)
-    a100 = Nd4j.ones(dim * h2).reshape(h2, dim)
-
-//    NativeOpsHolder.getInstance.getDeviceNativeOps.setElementThreshold(16384)
-//    NativeOpsHolder.getInstance.getDeviceNativeOps.setTADThreshold(64)
+    a1 = Nd4j.ones(h1 * dim).reshape(h1, dim)
+    aN = Nd4j.ones(h2 * dim).reshape(h2, dim)
   }
+
+  @Benchmark
+  def std: Vec = Vec.std(dim.toInt, IRng(0))._1
+
+  @Benchmark
+  def normal: Vec = Vec.normal(Vec.zeros(dim.toInt), Vec.ones(dim.toInt), IRng(0))._1
 
   @Benchmark
   def add: INDArray =
@@ -56,22 +61,22 @@ class VecBench1 {
     a1.mmul(xt).getDouble(0L)
 
   @Benchmark
-  def mmul100: INDArray =
-    a100.mmul(xt)
+  def mmulN: INDArray =
+    aN.mmul(xt)
 
   @Benchmark
-  def mmul100Get: Double =
-    a100.mmul(xt).getDouble(0L)
+  def mmulNGet: Double =
+    aN.mmul(xt).getDouble(0L)
 
   @Benchmark
   def mmul100GetGet: Double = {
-    val b = a100.mmul(xt)
+    val b = aN.mmul(xt)
     b.getDouble(0L) + b.getDouble(1L)
   }
 
   @Benchmark
   def mmul100GetMmul: Double = {
-    val b = a100.mmul(xt)
+    val b = aN.mmul(xt)
     val v1 = b.getDouble(0L)
     val v2 = b.add(1.0).getDouble(0L)
     v1 + v2
@@ -79,7 +84,7 @@ class VecBench1 {
 
   @Benchmark
   def mmul100Add: INDArray =
-    a100.mmul(xt).add(1.0)
+    aN.mmul(xt).add(1.0)
 
   @Benchmark
   def getLast: INDArray =

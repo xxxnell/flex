@@ -4,7 +4,7 @@ import flex.chain.Complex.syntax._
 import flex.nns.syntax._
 import flex.pdf.VQH.syntax._
 import flex.rand.IRng
-import flex.vec.Vec
+import flex.vec.{SumVec, Vec}
 import org.specs2.ScalaCheck
 import org.specs2.mutable._
 import org.scalactic.Tolerance._
@@ -101,8 +101,8 @@ class ComplexSpec extends Specification with ScalaCheck {
       "initNormal" in {
         val (kin, kout, kpool) = (10, 20, 15)
         val (dims, ks) = (10 :: 20 :: 30 :: Nil, Stream.continually(kpool))
-        val params = dims.map(dim => List.fill(dim)((0.0f, 1.0f)))
-        val complex = Complex.empty(kin, kout).addDimStd(dims.zip(ks)).initNormal(params)
+        val (locs, scales) = (SumVec.zeros(dims), SumVec.ones(dims))
+        val complex = Complex.empty(kin, kout).addDimStd(dims.zip(ks)).initNormal(locs, scales)
 
         val poolSizes = complex.pools.map(pool => pool.size)
         val cond1 = poolSizes.forall(size => size == kpool)

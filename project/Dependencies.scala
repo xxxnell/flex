@@ -43,15 +43,19 @@ object Dependencies {
   )
 
   val nd4j = Seq(
-//    "org.nd4j" % "nd4j-native-platform" % Versions.nd4j
-    "org.nd4j" % "nd4j-cuda-9.0-platform" % Versions.nd4j
+//    "org.nd4j" % "nd4j-native-platform" % Versions.dl4j
+    "org.nd4j" % "nd4j-cuda-9.0-platform" % Versions.dl4j
+  )
+
+  val dl4j = Seq(
+    "org.deeplearning4j" % "deeplearning4j-core" % Versions.dl4j
   )
 
   // project dependencies
 
   val core = libraryDependencies ++= (cats ++ monixs ++ specs ++ tics ++ math ++ nd4j)
 
-  val chain = libraryDependencies ++= (cats ++ monixs ++ specs ++ tics ++ math)
+  val chain = libraryDependencies ++= (cats ++ monixs ++ specs ++ tics ++ math ++ nd4j ++ dl4j)
 
   val bench = libraryDependencies ++= (specs ++ tics ++ datetime ++ jol ++ csv)
 

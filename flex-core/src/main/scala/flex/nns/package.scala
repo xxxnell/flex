@@ -5,7 +5,11 @@ import flex.vec.{SumVec, Vec}
 
 package object nns {
 
-  type LSHMemo = Memo[(EqAdapter[Vec], EqAdapter[List[Vec]]), List[Float]]
+  type LSHMemo = Memo[(EqAdapter[Vec], EqAdapter[Vec]), Float]
+
+  object LSHMemo {
+    def empty(size: Int): LSHMemo = Memo.empty[(EqAdapter[Vec], EqAdapter[Vec]), Float](size)
+  }
 
   type HTable[V] = Map[Int, IdentityHashSet[V]]
 

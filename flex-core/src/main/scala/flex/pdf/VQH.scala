@@ -223,13 +223,13 @@ trait VQHLaws { self: VQHOps =>
 
   def addDimStd(vqh: VQH, dims: List[Int]): VQH = addDim(vqh, rng => SumVec.std(dims, rng))
 
-  def addCwNormal(vqh: VQH, params: List[List[(Float, Float)]]): VQH = {
-    val (sv, rng) = SumVec.normal(params, vqh.rng)
-    addCw(patchRng(vqh, rng), sv, 0f)
+  def addCwNormal(vqh: VQH, locs: List[Vec], scales: List[Vec]): VQH = {
+    val (sv, rng1) = SumVec.normal(locs, scales, vqh.rng)
+    addCw(patchRng(vqh, rng1), sv, 0f)
   }
 
-  def initNormal(vqh: VQH, params: List[List[(Float, Float)]]): VQH =
-    (0 until vqh.k).foldLeft(vqh) { case (_vqh, _) => addCwNormal(_vqh, params) }
+  def initNormal(vqh: VQH, locs: List[Vec], scales: List[Vec]): VQH =
+    (0 until vqh.k).foldLeft(vqh) { case (_vqh, _) => addCwNormal(_vqh, locs, scales) }
 
   def clear(vqh: VQH): Unit = {
     vqh.nns.clear
@@ -259,7 +259,7 @@ trait VQHSyntax {
     def rand: (VQH, SumVec) = VQH.rand(vqh)
     def addDimStd(dims: List[Int]): VQH = VQH.addDimStd(vqh, dims)
     def addDimStd(dims: Int*): VQH = VQH.addDimStd(vqh, dims.toList)
-    def initNormal(params: List[List[(Float, Float)]]): VQH = VQH.initNormal(vqh, params)
+    def initNormal(locs: List[Vec], scales: List[Vec]): VQH = VQH.initNormal(vqh, locs, scales)
     def clear: Unit = VQH.clear(vqh)
     def unzip: List[VQH] = VQH.unzip(vqh)
   }

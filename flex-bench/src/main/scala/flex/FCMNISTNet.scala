@@ -1,4 +1,4 @@
-package flex.benchmark.complex
+package flex
 
 import flex.chain.Complex
 import flex.chain.Complex.syntax._
@@ -24,7 +24,8 @@ object FCMNISTNet {
   def complex: Complex =
     Complex
       .empty(kin, kout)
-      .addStd(l0 -> k0, l0 * l1 -> k1, l1 * l2 -> k2, l2 * l3 -> k3)
+      .addDim(l0 -> k0, l0 * l1 -> k1, l1 * l2 -> k2, l2 * l3 -> k3)
       .map(v0 => nn(v0))
+      .init
 
 }

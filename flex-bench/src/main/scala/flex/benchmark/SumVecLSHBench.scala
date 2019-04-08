@@ -12,13 +12,13 @@ import org.openjdk.jmh.annotations._
 @State(Scope.Thread)
 class SumVecLSHBench {
 
-  @Param(Array("1"))
+  @Param(Array("1000", "1000000", "100000000"))
   var dim: Int = _
 
-  @Param(Array("10"))
+  @Param(Array("1"))
   var depth: Int = _
 
-  @Param(Array("3"))
+  @Param(Array("1", "3"))
   var l: Int = _
 
   @Param(Array("10"))

@@ -294,12 +294,12 @@ class VQHSpec extends Specification with ScalaCheck {
 
       "initNormal" in {
         val (dims, k) = (List(10, 20, 30), 15)
-        val params = dims.map(dim => List.fill(dim)((1.0f, 1.0f)))
-        val vqh = VQH.empty(dims, k).initNormal(params)
+        val (locs, scales) = (SumVec.zeros(dims), SumVec.ones(dims))
+        val vqh = VQH.empty(dims, k).initNormal(locs, scales)
 
         val cond1 = vqh.size == k
 
-        if (!cond1) ko(s"Initialized VQH size: ${vqh.size}, expected: ${k}")
+        if (!cond1) ko(s"Initialized VQH size: ${vqh.size}, expected: $k")
         else ok
       }
 

@@ -68,6 +68,6 @@ class VQHBench {
 
   @Benchmark
   def addStd: VQH =
-    vqh.addStd(10000)
+    vqh.addDimStd(10000)
 
 }

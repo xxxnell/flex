@@ -1,8 +1,8 @@
-package flex.benchmark
+package flex.benchmark.complex
 
 import java.util.concurrent.TimeUnit
 
-import flex.benchmark.complex.FCMNISTNet
+import flex.FCMNISTNet
 import flex.chain.Complex
 import flex.chain.Complex.syntax._
 import flex.pdf.VQH
@@ -14,7 +14,7 @@ import org.openjdk.jmh.annotations._
 @BenchmarkMode(Array(Mode.AverageTime))
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @State(Scope.Thread)
-class ComplexBench1 {
+class FCMNISTNetBench {
 
   var complex: Complex = _
 
@@ -27,8 +27,8 @@ class ComplexBench1 {
   @Setup
   def setup(): Unit = {
     complex = FCMNISTNet.complex
-    input = Vec.ones(complex.in.dims.head)
     inputs = Vec.stds(List.fill(1000)(complex.in.dims.head), IRng(0))._1
+    input = inputs.head
     output = Vec.ones(complex.out.dims.head)
   }
 
