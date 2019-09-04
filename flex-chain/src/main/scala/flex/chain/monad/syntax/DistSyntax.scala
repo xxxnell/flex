@@ -16,11 +16,12 @@ trait DistSyntax extends DistSyntax1 {
                                                                                  conf: C): D[B] =
       functor.map(dist, f, measureB, conf)
     def flatMap[B, D1[_] <: Dist[_], D2[_] <: SamplingDist[_], C <: SamplingDistConfB[D2[_]]](f: A => D1[B])(
-        implicit
-        aux: DistBindAux[D1, D2],
-        bind: DistBind[Dist, D1, D2, C],
-        measureB: Measure[B],
-        conf: C): aux.Out[B] =
+      implicit
+      aux: DistBindAux[D1, D2],
+      bind: DistBind[Dist, D1, D2, C],
+      measureB: Measure[B],
+      conf: C
+    ): aux.Out[B] =
       bind.bind(dist, f, measureB, conf)
   }
 

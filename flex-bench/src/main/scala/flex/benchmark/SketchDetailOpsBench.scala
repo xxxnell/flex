@@ -48,8 +48,7 @@ class SketchDetailOpsBench { self =>
       bufferSize = bufferSize,
       thresholdPeriod = bufferSize,
       decayFactor = decayFactor,
-      rebuildThreshold = rebuildThreshold
-    )
+      rebuildThreshold = rebuildThreshold)
     val (_, samples) = NumericDist.normal(0.0, 1).samples(bufferSize)
     val sketch0 = Sketch.empty[Double]
 
@@ -67,8 +66,7 @@ class SketchDetailOpsBench { self =>
       cmapNo = cmapNo,
       cmapStart = Some(-10d),
       cmapEnd = Some(10d),
-      counterNo = counterNo
-    )
+      counterNo = counterNo)
 
     Sketch.empty[Double]
   }

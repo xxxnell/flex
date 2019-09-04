@@ -1,7 +1,7 @@
 package flex
 
 import flex.cmap.DividerCmap
-import flex.pdf.{AdaptiveSketch, Sketch}
+import flex.pdf.{ AdaptiveSketch, Sketch }
 import org.openjdk.jol.info.GraphLayout._
 
 object Profiler {

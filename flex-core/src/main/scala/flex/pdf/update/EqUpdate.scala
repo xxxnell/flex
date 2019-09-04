@@ -14,12 +14,13 @@ import scala.language.higherKinds
 
 object EqUpdate {
 
-  def updateCmap[A](cdfSampling: PointPlot,
-                    ps: List[(Prim, Count)],
-                    mixingRatio: Double,
-                    window: Double,
-                    icdfSampling: (Double => A) => List[A],
-                    measure: Measure[A]): Cmap = {
+  def updateCmap[A](
+      cdfSampling: PointPlot,
+      ps: List[(Prim, Count)],
+      mixingRatio: Double,
+      window: Double,
+      icdfSampling: (Double => A) => List[A],
+      measure: Measure[A]): Cmap = {
     val mergedCum =
       if (ps.isEmpty) cdfSampling
       else if (cdfSampling.isEmpty) PointPlot.normalizedCumulative(ps)

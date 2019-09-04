@@ -1,10 +1,10 @@
 package flex.pdf
 
 import flex.cmap.Cmap
-import flex.conf.pdf.{DataBinningDistConf, SketchConf}
+import flex.conf.pdf.{ DataBinningDistConf, SketchConf }
 import flex.hcounter.HCounter
 import flex.measure.Measure
-import flex.plot.{DensityPlot, PointPlot}
+import flex.plot.{ DensityPlot, PointPlot }
 import flex.range.RangeP
 import flex.rand.IRng
 
@@ -28,37 +28,31 @@ trait HistogramOps[H[_] <: Histogram[_]] extends DataBinningDistOps[H] with Hist
 trait HistogramLaws[H[_] <: Histogram[_]] { self: HistogramOps[H] =>
 
   def update[A](hist: H[A], as: List[(A, Count)]): H[A] =
-    modifyCounter(
-      hist,
-      counter => {
-        val measure = hist.measure.asInstanceOf[Measure[A]]
-        val zs = as.map { case (a, count) => (hist.cmap.apply(measure.to(a)), count) }
-        counter.updates(zs)
-      }
-    )
+    modifyCounter(hist, counter => {
+      val measure = hist.measure.asInstanceOf[Measure[A]]
+      val zs = as.map { case (a, count) => (hist.cmap.apply(measure.to(a)), count) }
+      counter.updates(zs)
+    })
 
   def scanUpdate[A](hist: H[A], as: List[(A, Count)]): H[A] =
-    modifyCounter(
-      hist,
-      counter => {
-        val measure = hist.measure.asInstanceOf[Measure[A]]
-        val ps = as.map { case (a, count) => (measure.to(a), count) }.toArray
-        val bins = hist.cmap.binsArr
+    modifyCounter(hist, counter => {
+      val measure = hist.measure.asInstanceOf[Measure[A]]
+      val ps = as.map { case (a, count) => (measure.to(a), count) }.toArray
+      val bins = hist.cmap.binsArr
 
-        var i = 0
-        var j = 0
-        var _counter = counter
-        while (i < bins.length && j < ps.length) {
-          val range = bins.apply(i)
-          while (j < ps.length && range.contains(ps.apply(j)._1)) {
-            _counter = _counter.update(i, ps.apply(j)._2)
-            j += 1
-          }
-          i += 1
+      var i = 0
+      var j = 0
+      var _counter = counter
+      while (i < bins.length && j < ps.length) {
+        val range = bins.apply(i)
+        while (j < ps.length && range.contains(ps.apply(j)._1)) {
+          _counter = _counter.update(i, ps.apply(j)._2)
+          j += 1
         }
-        _counter
+        i += 1
       }
-    )
+      _counter
+    })
 
   def count[A](hist: H[A], start: A, end: A): Count = {
     val measure = hist.measure.asInstanceOf[Measure[A]]
@@ -125,11 +119,12 @@ trait HistogramLaws[H[_] <: Histogram[_]] { self: HistogramOps[H] =>
 
 object Histogram extends HistogramOps[Histogram] {
 
-  private case class HistogramImpl[A](measure: Measure[A],
-                                      rng: IRng,
-                                      conf: DataBinningDistConf,
-                                      cmap: Cmap,
-                                      counter: HCounter)
+  private case class HistogramImpl[A](
+      measure: Measure[A],
+      rng: IRng,
+      conf: DataBinningDistConf,
+      cmap: Cmap,
+      counter: HCounter)
       extends Histogram[A]
 
   def bare[A](measure: Measure[A], rng: IRng, conf: DataBinningDistConf, cmap: Cmap, counter: HCounter): Histogram[A] =

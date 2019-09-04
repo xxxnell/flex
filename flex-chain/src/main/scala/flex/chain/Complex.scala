@@ -100,11 +100,9 @@ trait ComplexLaws { self: ComplexOps =>
   }
 
   def initNormal(complex: Complex, locs: List[Vec], scales: List[Vec]): Complex =
-    patchPools(
-      complex,
-      (complex.pools, locs, scales).zipped.map { case (pool, loc, scale) => pool.initNormal(loc :: Nil, scale :: Nil) },
-      complex.in.k
-    )
+    patchPools(complex, (complex.pools, locs, scales).zipped.map {
+      case (pool, loc, scale) => pool.initNormal(loc :: Nil, scale :: Nil)
+    }, complex.in.k)
 
   def initStd(complex: Complex): Complex = {
     val dims = complex.in.dims

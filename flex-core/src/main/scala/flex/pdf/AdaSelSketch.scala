@@ -3,7 +3,7 @@ package flex.pdf
 import flex.conf.pdf.AdaSelSketchConf
 import flex.measure.Measure
 import flex.pdf.Buffer.syntax._
-import flex.pdf.diagnose.{CDFDiagnose, KLDDiagnose, KSDiagnose}
+import flex.pdf.diagnose.{ CDFDiagnose, KLDDiagnose, KSDiagnose }
 import flex.plot.PointPlot
 import flex.rand.IRng
 import flex.pdf.syntax._
@@ -36,41 +36,45 @@ trait AdaSelSketchOps[S[_] <: AdaSelSketch[_]] extends AdaptiveSketchOps[S] with
 
 object AdaSelSketch extends AdaSelSketchOps[AdaSelSketch] {
 
-  private case class AdaSelSketchImpl[A](measure: Measure[A],
-                                         rng: IRng,
-                                         conf: AdaSelSketchConf,
-                                         structures: Structures,
-                                         buffer: Buffer[A],
-                                         thresholds: Stream[Count],
-                                         count: Count)
+  private case class AdaSelSketchImpl[A](
+      measure: Measure[A],
+      rng: IRng,
+      conf: AdaSelSketchConf,
+      structures: Structures,
+      buffer: Buffer[A],
+      thresholds: Stream[Count],
+      count: Count)
       extends AdaSelSketch[A]
 
-  def bare[A](measure: Measure[A],
-              rng: IRng,
-              conf: AdaSelSketchConf,
-              structures: Structures,
-              buffer: Buffer[A],
-              thresholds: Stream[Count],
-              count: Count): AdaSelSketch[A] =
+  def bare[A](
+      measure: Measure[A],
+      rng: IRng,
+      conf: AdaSelSketchConf,
+      structures: Structures,
+      buffer: Buffer[A],
+      thresholds: Stream[Count],
+      count: Count): AdaSelSketch[A] =
     AdaSelSketchImpl(measure, rng, conf, structures, buffer, thresholds, count)
 
   def empty[A](implicit measure: Measure[A], conf: AdaSelSketchConf): AdaSelSketch[A] =
-    bare(measure,
-         IRng(-1),
-         conf,
-         structures(conf),
-         Buffer.empty[A],
-         periodicThresholds(conf.startThreshold, conf.thresholdPeriod),
-         0)
+    bare(
+      measure,
+      IRng(-1),
+      conf,
+      structures(conf),
+      Buffer.empty[A],
+      periodicThresholds(conf.startThreshold, conf.thresholdPeriod),
+      0)
 
   def concat[A](as: List[(A, Count)])(implicit measure: Measure[A], conf: AdaSelSketchConf): AdaSelSketch[A] = {
-    val emptySketch = bare(measure,
-                           IRng(-1),
-                           conf,
-                           concatStructures(as, measure, conf),
-                           Buffer.empty[A],
-                           periodicThresholds(conf.startThreshold, conf.thresholdPeriod),
-                           0)
+    val emptySketch = bare(
+      measure,
+      IRng(-1),
+      conf,
+      concatStructures(as, measure, conf),
+      Buffer.empty[A],
+      periodicThresholds(conf.startThreshold, conf.thresholdPeriod),
+      0)
 
     narrowUpdate(emptySketch, as)
   }

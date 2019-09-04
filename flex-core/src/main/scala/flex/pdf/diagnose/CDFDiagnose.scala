@@ -22,9 +22,10 @@ trait CDFDiagnose {
    * Exists loop for intersaction of cdf1 and cdf2
    * @param f (x1, x2, cum11, cum12, cum21, cum22)
    * */
-  protected def cdfExistsItc(cdf1: PointPlot,
-                             cdf2: PointPlot,
-                             f: ((Double, Double, Double, Double, Double, Double)) => Boolean): Boolean = {
+  protected def cdfExistsItc(
+      cdf1: PointPlot,
+      cdf2: PointPlot,
+      f: ((Double, Double, Double, Double, Double, Double)) => Boolean): Boolean = {
     val records = cdf1.records
     var i = 1
     var (x1, cum11) = records.apply(0)
@@ -48,9 +49,10 @@ trait CDFDiagnose {
    * Exists loop for union of cdf1 and cdf2
    * @param f (x1, x2, cum11, cum12, cum21, cum22)
    * */
-  protected def cdfExistsUni(cdf1: PointPlot,
-                             cdf2: PointPlot,
-                             f: ((Double, Double, Double, Double, Double, Double)) => Boolean): Boolean =
+  protected def cdfExistsUni(
+      cdf1: PointPlot,
+      cdf2: PointPlot,
+      f: ((Double, Double, Double, Double, Double, Double)) => Boolean): Boolean =
     cdfExistsItc(cdf2, cdf1, f) // TODO
 
 }

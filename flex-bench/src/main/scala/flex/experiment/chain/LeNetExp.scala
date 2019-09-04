@@ -19,18 +19,15 @@ object LeNetExp {
 
     println(
       s"LeNet initialization " +
-        s"\n\tElapsed time: ${initTime / 1000000} ms" +
-        s"\n\tParams number: ${LeNet.mln.numParams()}"
-    )
+      s"\n\tElapsed time: ${initTime / 1000000} ms" +
+      s"\n\tParams number: ${LeNet.mln.numParams()}")
     println(
       s"LeNet(cnn):" +
-        s"\n\tElapsed time: ${cnnTime / 1000000} ms (${flex.fmt(cnnTime.toDouble / 1000000 / n)} ms/data)"
-    )
+      s"\n\tElapsed time: ${cnnTime / 1000000} ms (${flex.fmt(cnnTime.toDouble / 1000000 / n)} ms/data)")
     println(
       s"LeNet(bnn):" +
-        s"\n\tresult: ${bnn.out}, " +
-        s"\n\tElapsed time: ${bnnTime / 1000000} ms (${flex.fmt(bnnTime.toDouble / 1000000 / n)} ms/data)"
-    )
+      s"\n\tresult: ${bnn.out}, " +
+      s"\n\tElapsed time: ${bnnTime / 1000000} ms (${flex.fmt(bnnTime.toDouble / 1000000 / n)} ms/data)")
   }
 
 }

@@ -2,7 +2,7 @@ package flex.nns
 
 import flex.vec._
 import flex.rand._
-import flex.util.{IdentityHashMap, IdentityHashSet}
+import flex.util.{ IdentityHashMap, IdentityHashSet }
 import flex.util.IdentityHashMap.syntax._
 import flex.util.IdentityHashSet.syntax._
 

@@ -1,6 +1,6 @@
 package flex.experiment.ops
 
-import java.io.{File, FileOutputStream}
+import java.io.{ File, FileOutputStream }
 import java.nio.file.Paths
 
 import flex.plot.RangePlot

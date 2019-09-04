@@ -37,19 +37,22 @@ object NumericDist extends NumericDistOps[NumericDist] {
   def normal[A](mean: A, variance: Double)(implicit measure: Measure[A], conf: SmoothDistConf): NormalDist[A] =
     NormalDist(mean, variance)
 
-  def normal[A](mean: A, variance: Double, rng: IRng)(implicit measure: Measure[A],
-                                                      conf: SmoothDistConf): NormalDist[A] =
+  def normal[A](mean: A, variance: Double, rng: IRng)(
+      implicit measure: Measure[A],
+      conf: SmoothDistConf): NormalDist[A] =
     NormalDist(mean, variance, rng)
 
-  def normal[A](mean: A, variance: Double, seed: Int)(implicit measure: Measure[A],
-                                                      conf: SmoothDistConf): NormalDist[A] =
+  def normal[A](mean: A, variance: Double, seed: Int)(
+      implicit measure: Measure[A],
+      conf: SmoothDistConf): NormalDist[A] =
     NormalDist(mean, variance, IRng(seed))
 
   def logNormal[A](scale: A, shape: Double)(implicit measure: Measure[A], conf: SmoothDistConf): LogNormalDist[A] =
     LogNormalDist(scale, shape)
 
-  def logNormal[A](scale: A, shape: Double, rng: IRng)(implicit measure: Measure[A],
-                                                       conf: SmoothDistConf): LogNormalDist[A] =
+  def logNormal[A](scale: A, shape: Double, rng: IRng)(
+      implicit measure: Measure[A],
+      conf: SmoothDistConf): LogNormalDist[A] =
     LogNormalDist(scale, shape, rng)
 
   def pareto[A](scale: A, shape: Double)(implicit measure: Measure[A], conf: SmoothDistConf): ParetoDist[A] =
@@ -61,8 +64,9 @@ object NumericDist extends NumericDistOps[NumericDist] {
   def uniform[A](scale: A, width: Double)(implicit measure: Measure[A], conf: SmoothDistConf): UniformDist[A] =
     UniformDist(scale, width)
 
-  def uniform[A](scale: A, width: Double, rng: IRng)(implicit measure: Measure[A],
-                                                     conf: SmoothDistConf): UniformDist[A] =
+  def uniform[A](scale: A, width: Double, rng: IRng)(
+      implicit measure: Measure[A],
+      conf: SmoothDistConf): UniformDist[A] =
     UniformDist(scale, width, rng)
 
   // pipelining

@@ -1,8 +1,8 @@
 package flex.chain.monad
 
-import flex.conf.pdf.{SamplingDistConf, SamplingDistConfB, SketchConf}
+import flex.conf.pdf.{ SamplingDistConf, SamplingDistConfB, SketchConf }
 import flex.measure.Measure
-import flex.pdf.{Dist, SamplingDist, Sketch}
+import flex.pdf.{ Dist, SamplingDist, Sketch }
 
 import scala.language.higherKinds
 

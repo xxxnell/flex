@@ -13,9 +13,7 @@ object EqualizeIcdfSampling extends IcdfSampling[EqualizeIcdfSamplingConf] {
     val corr = conf.boundaryRatio
     val unit = 1.0 / (size.toDouble - 2 + 2 * corr)
 
-    (1 until size).toList
-      .map(i => unit * corr + unit * (i - 1))
-      .map(p => icdf(p))
+    (1 until size).toList.map(i => unit * corr + unit * (i - 1)).map(p => icdf(p))
   }
 
 }

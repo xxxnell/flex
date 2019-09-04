@@ -7,8 +7,8 @@ import flex.hcounter.HCounter
 import flex.implicits._
 import flex.pdf.Buffer.syntax._
 import flex.pdf.update.EqUpdate
-import flex.pdf.{AdaptiveSketch, Count, Histogram, Sketch}
-import flex.{NumericDist, SketchConf}
+import flex.pdf.{ AdaptiveSketch, Count, Histogram, Sketch }
+import flex.{ NumericDist, SketchConf }
 import org.openjdk.jmh.annotations._
 
 @BenchmarkMode(Array(Mode.AverageTime))
@@ -44,8 +44,7 @@ class DeepUpdateBench { self =>
       bufferSize = bufferSize,
       cmapSize = cmapSize,
       cmapNo = cmapNo,
-      counterNo = counterNo
-    )
+      counterNo = counterNo)
     val (_, samples) = NumericDist.normal(0.0, 1).samples(bufferSize + 1)
     val sketch0 = Sketch.empty[Double]
 

@@ -35,11 +35,12 @@ object LeNet {
       .layer(2, CNN.conv5x5("cnn2", 100, Array[Int](5, 5), Array[Int](1, 1), 0))
       .layer(3, CNN.maxPool("maxool2", Array[Int](2, 2)))
       .layer(4, new DenseLayer.Builder().nOut(500).build)
-      .layer(5,
-             new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
-               .nOut(labelNo)
-               .activation(Activation.SOFTMAX)
-               .build)
+      .layer(
+        5,
+        new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
+          .nOut(labelNo)
+          .activation(Activation.SOFTMAX)
+          .build)
       .backprop(true)
       .pretrain(false)
       .setInputType(InputType.convolutional(height, width, channel))
@@ -58,10 +59,6 @@ object LeNet {
   }
 
   def complex: Complex =
-    Complex
-      .empty(kin, kout)
-      .addDim((channel * height * width) -> k0, mln.numParams.toInt -> k1)
-      .map(nn)
-      .init
+    Complex.empty(kin, kout).addDim((channel * height * width) -> k0, mln.numParams.toInt -> k1).map(nn).init
 
 }

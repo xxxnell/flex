@@ -1,11 +1,11 @@
 package flex.plot
 
 import flex._
-import flex.pdf.{Count, Prim}
+import flex.pdf.{ Count, Prim }
 import flex.range.RangeP
 import cats.data.NonEmptyList
 
-import scala.collection.immutable.{TreeMap, TreeSet}
+import scala.collection.immutable.{ TreeMap, TreeSet }
 import scala.collection.mutable.ArrayBuffer
 import scala.language.postfixOps
 
@@ -37,19 +37,16 @@ trait PointPlotOps[P <: PointPlot] extends PlotOps[P] with PointPlotLaws[P] {
 trait PointPlotLaws[P <: PointPlot] { self: PointPlotOps[P] =>
 
   def map(plot: P, f: (Double, Double) => (Double, Double)): P =
-    modifyRecords(
-      plot,
-      records0 => {
-        var i = 0
-        val records1 = Array.ofDim[(Double, Double)](records0.length)
-        while (i < records0.length) {
-          val (x, y) = records0.apply(i)
-          records1.update(i, f(x, y))
-          i += 1
-        }
-        records1
+    modifyRecords(plot, records0 => {
+      var i = 0
+      val records1 = Array.ofDim[(Double, Double)](records0.length)
+      while (i < records0.length) {
+        val (x, y) = records0.apply(i)
+        records1.update(i, f(x, y))
+        i += 1
       }
-    )
+      records1
+    })
 
   def interpolation(plot: P, x: Double): Double = {
     val records = plot.records
@@ -91,9 +88,9 @@ trait PointPlotLaws[P <: PointPlot] { self: PointPlotOps[P] =>
         Some((records.apply(i + j - 2), records.apply(i + j - 1)))
       } else None
 
-    refsForShift(1)
-      .orElse(refsForShift(0))
-      .flatMap { case (ref1, ref2) => if (ref1._1 <= x && ref2._1 >= x) Fitting(ref1 :: ref2 :: Nil, x) else None }
+    refsForShift(1).orElse(refsForShift(0)).flatMap {
+      case (ref1, ref2) => if (ref1._1 <= x && ref2._1 >= x) Fitting(ref1 :: ref2 :: Nil, x) else None
+    }
   }
 
   def add(plots: NonEmptyList[(Double, P)]): P =
@@ -137,63 +134,53 @@ trait PointPlotLaws[P <: PointPlot] { self: PointPlotOps[P] =>
         }
 
         records1
-      }
-    )
+      })
 
   def inverse(plot: P): P =
-    modifyRecords(
-      plot,
-      (records0: Array[(Double, Double)]) => {
-        var i = 0
-        val records1 = Array.ofDim[(Double, Double)](records0.length)
-        while (i < records0.length) {
-          val (x, y) = records0(i)
-          records1.update(i, (y, x))
-          i += 1
-        }
-        records1
+    modifyRecords(plot, (records0: Array[(Double, Double)]) => {
+      var i = 0
+      val records1 = Array.ofDim[(Double, Double)](records0.length)
+      while (i < records0.length) {
+        val (x, y) = records0(i)
+        records1.update(i, (y, x))
+        i += 1
       }
-    )
+      records1
+    })
 
   def normalizedCumulative(plot: P): P =
-    modifyRecords(
-      plot,
-      (records0: Array[(Double, Double)]) => {
-        var (i, cum) = (0, 0.0)
-        var (x1, y1) = (Double.NaN, Double.NaN)
-        val sum = integralAll(plot)
-        val length = records0.length
-        val records1 = Array.ofDim[(Double, Double)](length)
-        while (i < records0.length) {
-          val (x2, y2) = records0(i)
-          cum += (if (!x1.isNaN && !y1.isNaN) areaPoint(x1, y1, x2, y2) else 0.0) / sum
-          records1.update(i, (x2, cum))
-          x1 = x2
-          y1 = y2
-          i += 1
-        }
-        records1
+    modifyRecords(plot, (records0: Array[(Double, Double)]) => {
+      var (i, cum) = (0, 0.0)
+      var (x1, y1) = (Double.NaN, Double.NaN)
+      val sum = integralAll(plot)
+      val length = records0.length
+      val records1 = Array.ofDim[(Double, Double)](length)
+      while (i < records0.length) {
+        val (x2, y2) = records0(i)
+        cum += (if (!x1.isNaN && !y1.isNaN) areaPoint(x1, y1, x2, y2) else 0.0) / sum
+        records1.update(i, (x2, cum))
+        x1 = x2
+        y1 = y2
+        i += 1
       }
-    )
+      records1
+    })
 
   def inverseNormalizedCumulative(plot: P): P =
     inverse(normalizedCumulative(plot))
 
   def changeRate(plot: P): P =
-    modifyRecords(
-      plot,
-      records0 => {
-        var i = 0
-        val records1 = new ArrayBuffer[(Double, Double)]
-        while (i < records0.length) {
-          lazy val (x0, y0) = records0.apply(i - 1)
-          lazy val (x1, y1) = records0.apply(i)
-          if (i > 0 && x0 != x1) records1.append((x0 / 2 + x1 / 2, (y1 - y0) / (x1 - x0)))
-          i += 1
-        }
-        records1.toArray
+    modifyRecords(plot, records0 => {
+      var i = 0
+      val records1 = new ArrayBuffer[(Double, Double)]
+      while (i < records0.length) {
+        lazy val (x0, y0) = records0.apply(i - 1)
+        lazy val (x1, y1) = records0.apply(i)
+        if (i > 0 && x0 != x1) records1.append((x0 / 2 + x1 / 2, (y1 - y0) / (x1 - x0)))
+        i += 1
       }
-    )
+      records1.toArray
+    })
 
   def integralAll(plot: P): Double = {
     val records = plot.records

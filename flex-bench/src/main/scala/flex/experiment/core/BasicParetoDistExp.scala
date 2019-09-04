@@ -9,10 +9,7 @@ object BasicParetoDistExp {
     val expName1 = "basic-pareto"
     val dataNo = 1000
 
-    implicit val conf: SketchConf = SketchConf(
-      cmapStart = Some(-10),
-      cmapEnd = Some(10)
-    )
+    implicit val conf: SketchConf = SketchConf(cmapStart = Some(-10), cmapEnd = Some(10))
     val sketch0 = Sketch.empty[Double]
     val underlying = NumericDist.pareto(1d, 1d)
     val (_, datas) = underlying.samples(dataNo)

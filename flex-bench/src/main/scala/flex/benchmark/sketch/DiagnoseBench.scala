@@ -5,10 +5,10 @@ import java.util.concurrent.TimeUnit
 import flex.conf.pdf.CustomAdaSelSketchConf
 import flex.implicits._
 import flex.measure.Measure
-import flex.pdf.{AdaptiveSketch, Count, Histogram, Prim, SelectiveSketch}
+import flex.pdf.{ AdaptiveSketch, Count, Histogram, Prim, SelectiveSketch }
 import flex.plot.PointPlot
 import flex.pdf.Buffer.syntax._
-import flex.pdf.diagnose.{CDFDiagnose, EDDiagnose, KLDDiagnose, KSDiagnose}
+import flex.pdf.diagnose.{ CDFDiagnose, EDDiagnose, KLDDiagnose, KSDiagnose }
 import org.openjdk.jmh.annotations._
 
 @BenchmarkMode(Array(Mode.AverageTime))
@@ -46,8 +46,7 @@ class DiagnoseBench { self =>
       bufferSize = bufferSizeL,
       cmapSize = cmapSizeL,
       cmapNo = cmapNoL,
-      counterNo = counterNoL
-    )
+      counterNo = counterNoL)
     val (_, samples) = NumericDist.normal(0.0, 1).samples(bufferSizeL + 1)
     val sketch0 = Sketch.empty[Double]
 

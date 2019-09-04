@@ -2,7 +2,7 @@ package flex.pdf.monad
 
 import flex.conf.pdf.SketchConf
 import flex.conf.pdf.SketchConfB
-import flex.pdf.{Dist, Sketch}
+import flex.pdf.{ Dist, Sketch }
 
 import scala.language.higherKinds
 

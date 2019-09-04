@@ -3,7 +3,7 @@ package flex.util
 import scala.collection.immutable.HashMap
 import cats.implicits._
 
-import scala.collection.{GenTraversableOnce, TraversableLike}
+import scala.collection.{ GenTraversableOnce, TraversableLike }
 
 trait IdentityHashMap[K, V] {
 
@@ -36,8 +36,9 @@ trait IdentityHashMapOps {
   def map[K1, V1, K2, V2](map: IdentityHashMap[K1, V1], f: (K1, V1) => (K2, V2)): IdentityHashMap[K2, V2] =
     IdentityHashMap(map.inner.map { case (ek, v) => f(ek.a, v).leftMap(k => EqAdapter(k)) })
 
-  def flatMap[K1, V1, K2, V2](map: IdentityHashMap[K1, V1],
-                              f: (K1, V1) => Traversable[(K2, V2)]): IdentityHashMap[K2, V2] =
+  def flatMap[K1, V1, K2, V2](
+      map: IdentityHashMap[K1, V1],
+      f: (K1, V1) => Traversable[(K2, V2)]): IdentityHashMap[K2, V2] =
     IdentityHashMap(map.inner.flatMap { case (ek, v) => f(ek.a, v).map(_.leftMap(k => EqAdapter(k))) })
 
 }

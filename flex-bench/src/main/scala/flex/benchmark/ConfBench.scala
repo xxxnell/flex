@@ -53,8 +53,7 @@ class ConfBench { self =>
       bufferSize = bufferSizeLS,
       thresholdPeriod = bufferSizeLS,
       decayFactor = decayFactorLS,
-      rebuildThreshold = rebuildThresholdLS
-    )
+      rebuildThreshold = rebuildThresholdLS)
 
     normalSignals = SignalOps.normalSignals(iterateBenchSizeLS).toArray
     incrDriftSignals = SignalOps.incrDriftSignals(iterateBenchSizeLS, 0.01).toArray

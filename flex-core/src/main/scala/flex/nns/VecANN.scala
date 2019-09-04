@@ -1,7 +1,7 @@
 package flex.nns
 
 import flex.rand.IRng
-import flex.util.{IdentityHashMap, IdentityHashSet}
+import flex.util.{ IdentityHashMap, IdentityHashSet }
 import flex.util.IdentityHashSet.syntax._
 import flex.util.IdentityHashMap.syntax._
 import flex.vec._

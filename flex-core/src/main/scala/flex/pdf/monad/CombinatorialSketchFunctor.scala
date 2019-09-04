@@ -1,6 +1,6 @@
 package flex.pdf.monad
 
-import flex.conf.pdf.{SketchConf, SmoothDistConf}
+import flex.conf.pdf.{ SketchConf, SmoothDistConf }
 import flex.measure.Measure
 import flex.pdf.Sketch
 

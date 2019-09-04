@@ -12,10 +12,7 @@ object BasicLogNormalDistExp {
     val start = 50
     val period = 100
 
-    implicit val conf: SketchConf = SketchConf(
-      cmapStart = Some(-10),
-      cmapEnd = Some(10)
-    )
+    implicit val conf: SketchConf = SketchConf(cmapStart = Some(-10), cmapEnd = Some(10))
     val sketch0 = Sketch.empty[Double]
     val underlying = NumericDist.logNormal(0.0, 1)
     val (_, datas) = underlying.samples(dataNo)

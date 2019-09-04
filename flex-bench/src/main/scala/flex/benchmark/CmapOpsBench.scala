@@ -3,7 +3,7 @@ package flex.benchmark
 import java.util.concurrent.TimeUnit
 
 import org.openjdk.jmh.annotations._
-import flex.cmap.{Cmap, UniformCmap}
+import flex.cmap.{ Cmap, UniformCmap }
 import flex.hmap.HDim
 import flex.range
 

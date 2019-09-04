@@ -1,7 +1,7 @@
 package flex
 
-import flex.util.{EqAdapter, IdentityHashMap, IdentityHashSet, Memo}
-import flex.vec.{SumVec, Vec}
+import flex.util.{ EqAdapter, IdentityHashMap, IdentityHashSet, Memo }
+import flex.vec.{ SumVec, Vec }
 
 package object nns {
 

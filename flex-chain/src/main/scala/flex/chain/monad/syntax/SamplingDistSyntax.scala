@@ -11,10 +11,12 @@ trait SamplingDistSyntax extends SamplingDistSyntax1 {
 
   implicit class SamplingDistMonadSyntaxImpl[A](dist: SamplingDist[A]) {
     def map[B, D[_] <: SamplingDist[_], C <: SamplingDistConfB[D[_]]](
-        f: A => B)(implicit functor: SamplingDistFunctor[SamplingDist, D, C], measureB: Measure[B], conf: C): D[B] =
+      f: A => B
+    )(implicit functor: SamplingDistFunctor[SamplingDist, D, C], measureB: Measure[B], conf: C): D[B] =
       functor.map(dist, f, measureB, conf)
     def flatMap[B, D1[_] <: Dist[_], D2[_] <: SamplingDist[_], C <: SamplingDistConfB[D2[_]]](
-        f: A => D1[B])(implicit bind: SamplingDistBind[SamplingDist, D1, D2, C], measureB: Measure[B], conf: C): D2[B] =
+      f: A => D1[B]
+    )(implicit bind: SamplingDistBind[SamplingDist, D1, D2, C], measureB: Measure[B], conf: C): D2[B] =
       bind.bind(dist, f, measureB, conf)
   }
 

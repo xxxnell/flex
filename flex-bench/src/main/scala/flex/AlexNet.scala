@@ -3,7 +3,7 @@ package flex
 import flex.chain.Complex
 import flex.chain.Complex.syntax._
 import flex.vec._
-import org.deeplearning4j.nn.conf.{GradientNormalization, NeuralNetConfiguration}
+import org.deeplearning4j.nn.conf.{ GradientNormalization, NeuralNetConfiguration }
 import org.deeplearning4j.nn.conf.inputs.InputType
 import org.deeplearning4j.nn.conf.layers._
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork
@@ -11,7 +11,7 @@ import org.deeplearning4j.nn.weights.WeightInit
 import org.nd4j.linalg.activations.Activation
 import org.nd4j.linalg.learning.config.Nesterovs
 import org.nd4j.linalg.lossfunctions.LossFunctions
-import org.nd4j.linalg.schedule.{ScheduleType, StepSchedule}
+import org.nd4j.linalg.schedule.{ ScheduleType, StepSchedule }
 import org.deeplearning4j.nn.conf.distribution._
 
 object AlexNet {
@@ -50,12 +50,13 @@ object AlexNet {
       .layer(9, CNN.maxPool("maxpool3", Array[Int](3, 3)))
       .layer(10, CNN.fullyConnected("ffn1", 4096, nonZeroBias, dropOut, new GaussianDistribution(0, 0.005)))
       .layer(11, CNN.fullyConnected("ffn2", 4096, nonZeroBias, dropOut, new GaussianDistribution(0, 0.005)))
-      .layer(12,
-             new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
-               .name("output")
-               .nOut(label)
-               .activation(Activation.SOFTMAX)
-               .build)
+      .layer(
+        12,
+        new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
+          .name("output")
+          .nOut(label)
+          .activation(Activation.SOFTMAX)
+          .build)
       .backprop(true)
       .pretrain(false)
       .setInputType(InputType.convolutional(height, width, channel))
@@ -74,10 +75,6 @@ object AlexNet {
   }
 
   def complex: Complex =
-    Complex
-      .empty(kin, kout)
-      .addDim((channel * height * width) -> k0, mln.numParams.toInt -> k1)
-      .map(nn)
-      .init
+    Complex.empty(kin, kout).addDim((channel * height * width) -> k0, mln.numParams.toInt -> k1).map(nn).init
 
 }

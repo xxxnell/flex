@@ -10,10 +10,7 @@ object BasicMapExp {
     val expName = "basic-map"
     val dataNo = 300
 
-    implicit val conf: SketchConf = SketchConf(
-      cmapStart = Some(-10),
-      cmapEnd = Some(10)
-    )
+    implicit val conf: SketchConf = SketchConf(cmapStart = Some(-10), cmapEnd = Some(10))
     val sketch0 = Sketch.empty[Double]
     val underlying = NumericDist.normal(0.0, 1)
     val (_, datas) = underlying.samples(dataNo)

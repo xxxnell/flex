@@ -1,9 +1,9 @@
 package flex.pdf.syntax
 
-import flex.conf.pdf.{SamplingDistConf, SamplingDistConfB, SketchConf}
+import flex.conf.pdf.{ SamplingDistConf, SamplingDistConfB, SketchConf }
 import flex.measure.Measure
-import flex.pdf.monad.{SamplingDistBind, SamplingDistFunctor}
-import flex.pdf.{Dist, SamplingDist, Sketch}
+import flex.pdf.monad.{ SamplingDistBind, SamplingDistFunctor }
+import flex.pdf.{ Dist, SamplingDist, Sketch }
 import flex.plot.PointPlot
 
 import scala.language.higherKinds

@@ -3,7 +3,7 @@ package flex.nns
 import cats.implicits._
 import flex.pdf.UniformDist
 import flex.rand.IRng
-import flex.util.{EqAdapter, Memo}
+import flex.util.{ EqAdapter, Memo }
 import flex.util.Memo.syntax._
 import flex.vec._
 

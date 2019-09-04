@@ -17,8 +17,7 @@ object BasicDeltaDistExp {
       cmapNo = 2,
       cmapStart = Some(-10d),
       cmapEnd = Some(10d),
-      counterSize = samplingNo
-    )
+      counterSize = samplingNo)
     val sketch0 = Sketch.empty[Double]
     val (_, datas) = Dist.delta(0.1).samples(dataNo)
     val sketchTraces = sketch0 :: sketch0.updateTrace(datas)

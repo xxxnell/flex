@@ -1,10 +1,10 @@
 package flex.benchmark.ops
 
-import java.io.{File, FileOutputStream}
+import java.io.{ File, FileOutputStream }
 
 import com.github.nscala_time.time.Imports._
 import org.openjdk.jmh.infra.BenchmarkParams
-import org.openjdk.jmh.results.{RunResult, Result => BenchResult}
+import org.openjdk.jmh.results.{ RunResult, Result => BenchResult }
 
 import scala.collection.JavaConverters._
 
@@ -36,16 +36,16 @@ object BenchOutOps {
 
     def records(result: RunResult): List[String] =
       metadata2Records(result.getAggregatedResult.getParams) :::
-        result2Records(result.getAggregatedResult.getPrimaryResult)
+      result2Records(result.getAggregatedResult.getPrimaryResult)
 
     def recordLabels: List[String] =
       paramLabels :::
-        resultLabels
+      resultLabels
 
     def metadata2Records(params: BenchmarkParams): List[String] =
       params.getBenchmark ::
-        metadata2Params(params).mkString(" & ") ::
-        Nil
+      metadata2Params(params).mkString(" & ") ::
+      Nil
 
     def metadata2Params(params: BenchmarkParams): Map[String, String] =
       params.getParamsKeys.asScala.toList
@@ -56,15 +56,15 @@ object BenchOutOps {
 
     def paramLabels: List[String] =
       "Benchmark" ::
-        "Parameters" ::
-        Nil
+      "Parameters" ::
+      Nil
 
     def result2Records(result: BenchResult[_]): List[String] =
       result.getScore.toString ::
-        result.getScoreError.toString ::
-        result.getScoreUnit ::
-        result.getSampleCount.toString ::
-        Nil
+      result.getScoreError.toString ::
+      result.getScoreUnit ::
+      result.getSampleCount.toString ::
+      Nil
 
     def resultLabels: List[String] = "Score" :: "Error" :: "Unit" :: "Count" :: Nil
 

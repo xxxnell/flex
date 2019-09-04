@@ -9,10 +9,7 @@ object BasicUniformDistExp {
     val expName1 = "basic-uniform"
     val dataNo = 1000
 
-    implicit val conf: SketchConf = SketchConf(
-      cmapStart = Some(-10),
-      cmapEnd = Some(10)
-    )
+    implicit val conf: SketchConf = SketchConf(cmapStart = Some(-10), cmapEnd = Some(10))
     val sketch0 = Sketch.empty[Double]
     val underlying = NumericDist.uniform(0.0, 1.0)
     val (_, datas) = underlying.samples(dataNo)

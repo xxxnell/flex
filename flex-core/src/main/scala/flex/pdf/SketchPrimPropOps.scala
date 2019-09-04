@@ -4,11 +4,11 @@ import cats.data.NonEmptyList
 import cats.implicits._
 import flex.measure.Measure
 import flex.pdf.syntax._
-import flex.pdf.update.{EqUpdate, EqualSpaceSmoothingPs, SmoothingPs}
+import flex.pdf.update.{ EqUpdate, EqualSpaceSmoothingPs, SmoothingPs }
 import flex.plot.PointPlot
 
 import scala.collection.mutable
-import scala.language.{higherKinds, postfixOps}
+import scala.language.{ higherKinds, postfixOps }
 
 /**
  * This Ops introduces the update function with primitive type as a parameter.
@@ -62,21 +62,18 @@ trait SketchPrimPropOps[S[_] <: Sketch[_]] extends SketchPrimPropLaws[S] with Sk
   private val decayRateCacheLimit: Int = 100
 
   def decayRate(decayFactor: Double, i: Int): Double =
-    decayRateCache.getOrElse(
-      (decayFactor, i), {
-        val rate = math.exp(-1 * decayFactor * i)
-        decayRateCache.put((decayFactor, i), rate)
-        if (decayRateCache.size > decayRateCacheLimit) decayRateCache = decayRateCache.takeRight(decayRateCacheLimit)
-        rate
-      }
-    )
+    decayRateCache.getOrElse((decayFactor, i), {
+      val rate = math.exp(-1 * decayFactor * i)
+      decayRateCache.put((decayFactor, i), rate)
+      if (decayRateCache.size > decayRateCacheLimit) decayRateCache = decayRateCache.takeRight(decayRateCacheLimit)
+      rate
+    })
 
   def primCountForStr(sketch: S[_], pFrom: Prim, pTo: Prim): Double = {
     val counts = sketch.structures.map { hist =>
       hist.count(pFrom, pTo)
     }
-    val decayRates = (0 until counts.size.toInt)
-      .map(i => decayRate(sketch.conf.decayFactor, i))
+    val decayRates = (0 until counts.size.toInt).map(i => decayRate(sketch.conf.decayFactor, i))
     val weightedCountSum = counts.toList.zip(decayRates).map { case (count, r) => count * r }.sum
     val normalization = decayRates.sum
 

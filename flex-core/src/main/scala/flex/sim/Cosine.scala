@@ -1,7 +1,7 @@
 package flex.sim
 
 import flex.conf.pdf.SamplingDistConf
-import flex.pdf.{Dist, PlottedDist, SamplingDist}
+import flex.pdf.{ Dist, PlottedDist, SamplingDist }
 import flex.plot.DensityPlot
 
 /**

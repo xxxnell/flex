@@ -8,9 +8,9 @@ import flex.hcounter.HCounter
 import flex.measure.Measure
 import flex.pdf.sampling.IcdfSampling
 import flex.pdf.update.EqUpdate
-import flex.plot.{DensityPlot, PointPlot}
+import flex.plot.{ DensityPlot, PointPlot }
 import flex.rand.IRng
-import flex.range.{RangeM, RangeP}
+import flex.range.{ RangeM, RangeP }
 
 import scala.collection.mutable.ArrayBuffer
 import scala.language.higherKinds
@@ -49,9 +49,8 @@ trait SketchPropOps[S[_] <: Sketch[_]] extends DataBinningDistOps[S] with Sketch
 
 trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
 
-  def modifyEffStructure[A](sketch: S[A], f: Histogram[Double] => Histogram[Double]): S[A] = modifyStructures(
-    sketch,
-    strs => {
+  def modifyEffStructure[A](sketch: S[A], f: Histogram[Double] => Histogram[Double]): S[A] =
+    modifyStructures(sketch, strs => {
       val cmapNo = sketch.conf.cmap.no
       val effNo = if (cmapNo > 1) cmapNo - 1 else cmapNo
       var i = 0
@@ -61,8 +60,7 @@ trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
           f(hist)
         } else hist
       }
-    }
-  )
+    })
 
   def flatDensity: Double = (1 / Cmap.max) * (1 / (1 - Cmap.min / Cmap.max))
 
@@ -174,8 +172,7 @@ trait SketchPropLaws[S[_] <: Sketch[_]] { self: SketchPropOps[S] =>
       1000,
       conf.dataKernelWindow,
       IcdfSampling.samplingF(measure, conf.cmap),
-      measure
-    )
+      measure)
 
     NonEmptyList.of(Histogram.forCmap(cmap)(flex.doubleMeasure, conf))
   }

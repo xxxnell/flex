@@ -9,7 +9,7 @@ import flex.chain.Complex.syntax._
 import flex.pdf.VQH
 import flex.pdf.VQH.syntax._
 import flex.rand.IRng
-import flex.vec.{SumVec, Vec}
+import flex.vec.{ SumVec, Vec }
 import org.openjdk.jmh.annotations._
 
 @BenchmarkMode(Array(Mode.AverageTime))

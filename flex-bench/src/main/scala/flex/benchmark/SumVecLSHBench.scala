@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit
 
 import flex.nns._
 import flex.rand.IRng
-import flex.vec.{SumVec, Vec}
+import flex.vec.{ SumVec, Vec }
 import org.openjdk.jmh.annotations._
 
 @BenchmarkMode(Array(Mode.AverageTime))

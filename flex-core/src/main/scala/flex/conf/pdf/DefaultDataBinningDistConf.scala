@@ -1,6 +1,6 @@
 package flex.conf.pdf
 
-import flex.conf.cmap.{CmapConf, UniformEqualizeCmapConf}
+import flex.conf.cmap.{ CmapConf, UniformEqualizeCmapConf }
 import flex.conf.counter.CounterConf
 
 trait DefaultDataBinningDistConf extends DataBinningDistConf {

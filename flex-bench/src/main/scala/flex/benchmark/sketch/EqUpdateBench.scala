@@ -5,11 +5,11 @@ import java.util.concurrent.TimeUnit
 import flex.cmap.Cmap
 import flex.implicits._
 import flex.measure.Measure
-import flex.measure.syntax.{-∞, ∞}
-import flex.pdf.{AdaptiveSketch, Count}
+import flex.measure.syntax.{ -∞, ∞ }
+import flex.pdf.{ AdaptiveSketch, Count }
 import flex.pdf.sampling.IcdfSampling
 import flex.pdf.update.EqUpdate
-import flex.plot.{DensityPlot, PointPlot}
+import flex.plot.{ DensityPlot, PointPlot }
 import flex.range.RangeM
 import org.openjdk.jmh.annotations._
 
@@ -46,8 +46,7 @@ class EqUpdateBench { self =>
       bufferSize = bufferSize,
       cmapSize = cmapSize,
       cmapNo = cmapNo,
-      counterNo = counterNo
-    )
+      counterNo = counterNo)
     val (_, samples) = NumericDist.normal(0.0, 1).samples(bufferSize + 1)
     val sketch0 = Sketch.empty[Double]
 

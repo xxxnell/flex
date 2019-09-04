@@ -1,6 +1,6 @@
 package flex.experiment.core
 
-import flex.conf.pdf.{CustomDataBinningDistConf, DataBinningDistConf}
+import flex.conf.pdf.{ CustomDataBinningDistConf, DataBinningDistConf }
 import flex.experiment.ops.ExpOutOps
 import flex.implicits._
 import flex.pdf.Histogram
@@ -18,10 +18,8 @@ object HistogramLognormalDistExp { self =>
     val start = 0.0
     val end = underlying.icdf(0.95)
 
-    implicit val histoConf: DataBinningDistConf = CustomDataBinningDistConf(
-      cmapStart = Some(start),
-      cmapEnd = Some(end)
-    )
+    implicit val histoConf: DataBinningDistConf =
+      CustomDataBinningDistConf(cmapStart = Some(start), cmapEnd = Some(end))
     val emptyHisto = Histogram.empty[Double]
 
     // update datas

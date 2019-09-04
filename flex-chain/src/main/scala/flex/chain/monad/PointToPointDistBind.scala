@@ -2,7 +2,7 @@ package flex.chain.monad
 
 import flex.conf.pdf.SamplingDistConf
 import flex.measure.Measure
-import flex.pdf.{Dist, PlottedDist, SamplingDist}
+import flex.pdf.{ Dist, PlottedDist, SamplingDist }
 
 object PointToPointDistBind extends DistBind[Dist, Dist, SamplingDist, SamplingDistConf] {
 

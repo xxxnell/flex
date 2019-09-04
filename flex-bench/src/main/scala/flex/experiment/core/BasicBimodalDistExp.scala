@@ -10,10 +10,7 @@ object BasicBimodalDistExp {
     val dataNo = 1000
 
     val sketch0 = {
-      implicit val conf: SketchConf = SketchConf(
-        cmapStart = Some(-10d),
-        cmapEnd = Some(10)
-      )
+      implicit val conf: SketchConf = SketchConf(cmapStart = Some(-10d), cmapEnd = Some(10))
       Sketch.empty[Double]
     }
     val underlying = (0.5, NumericDist.normal(-2.0, 1)) + (0.5, NumericDist.normal(2.0, 1))

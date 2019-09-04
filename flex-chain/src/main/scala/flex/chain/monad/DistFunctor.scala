@@ -3,7 +3,7 @@ package flex.chain.monad
 import flex.conf.pdf._
 import flex.conf.pdf.SamplingDistConfB
 import flex.measure.Measure
-import flex.pdf.{Dist, SamplingDist, Sketch}
+import flex.pdf.{ Dist, SamplingDist, Sketch }
 
 import scala.language.higherKinds
 

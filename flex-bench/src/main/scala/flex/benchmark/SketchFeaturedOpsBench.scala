@@ -46,8 +46,7 @@ class SketchFeaturedOpsBench { self =>
       bufferSize = bufferSizeL,
       thresholdPeriod = bufferSizeL,
       decayFactor = decayFactorL,
-      rebuildThreshold = rebuildThresholdL
-    )
+      rebuildThreshold = rebuildThresholdL)
     val (_, samples) = NumericDist.normal(0.0, 1).samples(bufferSizeL)
     val sketch0 = Sketch.empty[Double]
 

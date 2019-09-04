@@ -24,41 +24,45 @@ trait AdaPerSketchOps[S[_] <: AdaPerSketch[_]] extends AdaptiveSketchOps[S] with
 
 object AdaPerSketch extends AdaPerSketchOps[AdaPerSketch] {
 
-  private case class AdaPerSketchImpl[A](measure: Measure[A],
-                                         rng: IRng,
-                                         conf: AdaPerSketchConf,
-                                         structures: Structures,
-                                         buffer: Buffer[A],
-                                         thresholds: Stream[Count],
-                                         count: Count)
+  private case class AdaPerSketchImpl[A](
+      measure: Measure[A],
+      rng: IRng,
+      conf: AdaPerSketchConf,
+      structures: Structures,
+      buffer: Buffer[A],
+      thresholds: Stream[Count],
+      count: Count)
       extends AdaPerSketch[A]
 
-  def bare[A](measure: Measure[A],
-              rng: IRng,
-              conf: AdaPerSketchConf,
-              structures: Structures,
-              buffer: Buffer[A],
-              thresholds: Stream[Count],
-              count: Count): AdaPerSketch[A] =
+  def bare[A](
+      measure: Measure[A],
+      rng: IRng,
+      conf: AdaPerSketchConf,
+      structures: Structures,
+      buffer: Buffer[A],
+      thresholds: Stream[Count],
+      count: Count): AdaPerSketch[A] =
     AdaPerSketchImpl(measure, rng, conf, structures, buffer, thresholds, count)
 
   def empty[A](implicit measure: Measure[A], conf: AdaPerSketchConf): AdaPerSketch[A] =
-    bare(measure,
-         IRng(-1),
-         conf,
-         structures(conf),
-         Buffer.empty[A],
-         periodicThresholds(conf.startThreshold, conf.thresholdPeriod),
-         0)
+    bare(
+      measure,
+      IRng(-1),
+      conf,
+      structures(conf),
+      Buffer.empty[A],
+      periodicThresholds(conf.startThreshold, conf.thresholdPeriod),
+      0)
 
   def concat[A](as: List[(A, Count)])(implicit measure: Measure[A], conf: AdaPerSketchConf): AdaPerSketch[A] = {
-    val emptySketch = bare(measure,
-                           IRng(-1),
-                           conf,
-                           concatStructures(as, measure, conf),
-                           Buffer.empty[A],
-                           periodicThresholds(conf.startThreshold, conf.thresholdPeriod),
-                           0)
+    val emptySketch = bare(
+      measure,
+      IRng(-1),
+      conf,
+      concatStructures(as, measure, conf),
+      Buffer.empty[A],
+      periodicThresholds(conf.startThreshold, conf.thresholdPeriod),
+      0)
 
     narrowUpdate(emptySketch, as)
   }

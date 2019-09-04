@@ -1,7 +1,7 @@
 package flex.conf
 
 import flex.SketchConf
-import flex.conf.pdf.{DefaultDataBinningDistConf, SmoothDistConf}
+import flex.conf.pdf.{ DefaultDataBinningDistConf, SmoothDistConf }
 
 trait ConfPkgSyntax extends ConfPkgSyntax1
 

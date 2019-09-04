@@ -28,25 +28,26 @@ trait Params {
         bufferSize = bufferSize,
         thresholdPeriod = bufferSize,
         decayFactor = decayFactor,
-        rebuildThreshold = rebuildThreshold
-      )
+        rebuildThreshold = rebuildThreshold)
 
 }
 
 object Params {
 
-  private case class ParamImpl(cmapSizes: List[Int],
-                               cmapNos: List[Int],
-                               bufferSizes: List[Int],
-                               decayFactors: List[Double],
-                               rebuildThresholds: List[Double])
+  private case class ParamImpl(
+      cmapSizes: List[Int],
+      cmapNos: List[Int],
+      bufferSizes: List[Int],
+      decayFactors: List[Double],
+      rebuildThresholds: List[Double])
       extends Params
 
-  def apply(cmapSizes: List[Int],
-            cmapNos: List[Int],
-            bufferSizes: List[Int],
-            decayFactors: List[Double],
-            rebuildThresholds: List[Double]): Params =
+  def apply(
+      cmapSizes: List[Int],
+      cmapNos: List[Int],
+      bufferSizes: List[Int],
+      decayFactors: List[Double],
+      rebuildThresholds: List[Double]): Params =
     ParamImpl(cmapSizes, cmapNos, bufferSizes, decayFactors, rebuildThresholds)
 
   def default: Params =
@@ -54,11 +55,12 @@ object Params {
 
   def reducedBy(i: Int): Params = {
     def reduce[A](as: List[A], i: Int): List[A] = as.sliding(i, i).toList.flatMap(ps => ps.headOption)
-    apply(reduce(defaultCmapSizes, i),
-          reduce(defaultCmapNos, i),
-          reduce(defaultBufferSizes, i),
-          reduce(defaultDecayFactors, i),
-          reduce(defaultRebuildThresholds, i))
+    apply(
+      reduce(defaultCmapSizes, i),
+      reduce(defaultCmapNos, i),
+      reduce(defaultBufferSizes, i),
+      reduce(defaultDecayFactors, i),
+      reduce(defaultRebuildThresholds, i))
   }
 
   val defaultCmapSizes: List[Int] = (10 :: 25 :: 40 :: 55 :: 100 :: Nil).distinct.sorted

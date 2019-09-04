@@ -1,6 +1,6 @@
 package flex.pdf
 
-import flex.conf.pdf.{AdaSelSketchConf, SelectiveSketchConf}
+import flex.conf.pdf.{ AdaSelSketchConf, SelectiveSketchConf }
 import flex.measure.Measure
 import flex.rand.IRng
 

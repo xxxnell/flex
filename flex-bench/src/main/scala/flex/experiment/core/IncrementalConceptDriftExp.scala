@@ -22,10 +22,7 @@ object IncrementalConceptDriftExp {
     def underlying(idx: Int): NumericDist[Double] = NumericDist.normal(center(idx), 1.0, idx)
     val datas: List[Double] = (0 to dataNo).toList.map(idx => underlying(idx).sample._2)
 
-    implicit val conf: SketchConf = SketchConf(
-      cmapStart = Some(-20.0),
-      cmapEnd = Some(20.0)
-    )
+    implicit val conf: SketchConf = SketchConf(cmapStart = Some(-20.0), cmapEnd = Some(20.0))
     val sketch0 = Sketch.empty[Double]
     val sketchTraces = sketch0 :: sketch0.updateTrace(datas)
     val idxSketches = sketchTraces.indices.zip(sketchTraces).toList.filter { case (idx, _) => idx % 10 == 0 }
@@ -49,9 +46,10 @@ object IncrementalConceptDriftExp {
     ExpOutOps.writeStr(expName, "euclidean", idxEuc.map { case (idx, euc) => s"$idx, $euc" }.mkString("\n"))
     ExpOutOps.writeStr(expName, "ed", idxED.map { case (idx, ed) => s"$idx, $ed" }.mkString("\n"))
     ExpOutOps.writeStr(expName, "ed2", idxED2.map { case (idx, ed) => s"$idx, $ed" }.mkString("\n"))
-    ExpOutOps.writeStr(expName,
-                       "median",
-                       idxMedian.map { case (idx, sktMed) => s"$idx, ${center(idx)}, $sktMed" }.mkString("\n"))
+    ExpOutOps.writeStr(
+      expName,
+      "median",
+      idxMedian.map { case (idx, sktMed) => s"$idx, ${center(idx)}, $sktMed" }.mkString("\n"))
 
     // console print
     val avgSize = 10
@@ -61,10 +59,10 @@ object IncrementalConceptDriftExp {
     val mem = flex.Profiler.serializedMem(idxSketches.last._2)
 
     val str = s"Similarity for incremental concept-drifted data stream with velocity $velocity: \n" +
-      s" KLD: $avgKld \n" +
-      s" Cosine: $avgCos \n" +
-      s" Euclidean: $avgEuc \n" +
-      s" Memory usage (byte): $mem"
+    s" KLD: $avgKld \n" +
+    s" Cosine: $avgCos \n" +
+    s" Euclidean: $avgEuc \n" +
+    s" Memory usage (byte): $mem"
     println(str)
   }
 

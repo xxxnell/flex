@@ -4,8 +4,8 @@ import java.util.concurrent.TimeUnit
 
 import flex.implicits._
 import flex.pdf.Buffer.syntax._
-import flex.pdf.{AdaptiveSketch, Buffer, Count}
-import flex.{NumericDist, Sketch, SketchConf}
+import flex.pdf.{ AdaptiveSketch, Buffer, Count }
+import flex.{ NumericDist, Sketch, SketchConf }
 import org.openjdk.jmh.annotations._
 
 @BenchmarkMode(Array(Mode.AverageTime))
@@ -41,8 +41,7 @@ class NarrowUpdateBench { self =>
       bufferSize = bufferSize,
       cmapSize = cmapSize,
       cmapNo = cmapNo,
-      counterNo = counterNo
-    )
+      counterNo = counterNo)
     val (_, samples) = NumericDist.normal(0.0, 1).samples(bufferSize + 1)
     val sketch0 = Sketch.empty[Double]
 
@@ -71,7 +70,8 @@ class NarrowUpdateBench { self =>
 
   @Benchmark
   def modifyBuffer: AdaptiveSketch[Count] =
-    AdaptiveSketch
-      .modifyBuffer(sketch.asInstanceOf[AdaptiveSketch[Double]], (buffer0: Buffer[Double]) => buffer0 :+ (2.0, 1.0))
+    AdaptiveSketch.modifyBuffer(
+      sketch.asInstanceOf[AdaptiveSketch[Double]],
+      (buffer0: Buffer[Double]) => buffer0 :+ (2.0, 1.0))
 
 }

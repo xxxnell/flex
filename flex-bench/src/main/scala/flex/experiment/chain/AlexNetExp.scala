@@ -19,18 +19,15 @@ object AlexNetExp {
 
     println(
       s"AlexNet initialization " +
-        s"\n\tElapsed time: ${initTime / 1000000} ms" +
-        s"\n\tParams number: ${AlexNet.mln.numParams()}"
-    )
+      s"\n\tElapsed time: ${initTime / 1000000} ms" +
+      s"\n\tParams number: ${AlexNet.mln.numParams()}")
     println(
       s"AlexNet(cnn):" +
-        f"\n\tElapsed time: ${cnnTime / 1000000} ms (${flex.fmt(cnnTime.toDouble / 1000000 / n)} ms/data)"
-    )
+      f"\n\tElapsed time: ${cnnTime / 1000000} ms (${flex.fmt(cnnTime.toDouble / 1000000 / n)} ms/data)")
     println(
       s"AlexNet(bnn):" +
-        s"\n\tresult: ${bnn.out}, " +
-        f"\n\tElapsed time: ${bnnTime / 1000000} ms (${flex.fmt(bnnTime.toDouble / 1000000 / n)} ms/data)"
-    )
+      s"\n\tresult: ${bnn.out}, " +
+      f"\n\tElapsed time: ${bnnTime / 1000000} ms (${flex.fmt(bnnTime.toDouble / 1000000 / n)} ms/data)")
   }
 
 }

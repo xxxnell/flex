@@ -3,9 +3,9 @@ package flex.pdf.syntax
 import flex.cmap.Cmap
 import flex.conf.pdf.SketchConf
 import flex.measure.Measure
-import flex.pdf.monad.{SketchBind, SketchFunctor}
-import flex.pdf.{Count, Dist, Histogram, Sketch}
-import flex.plot.{DensityPlot, PointPlot}
+import flex.pdf.monad.{ SketchBind, SketchFunctor }
+import flex.pdf.{ Count, Dist, Histogram, Sketch }
+import flex.plot.{ DensityPlot, PointPlot }
 import flex.range.RangeM
 
 trait SketchSyntax extends SketchPropSyntax

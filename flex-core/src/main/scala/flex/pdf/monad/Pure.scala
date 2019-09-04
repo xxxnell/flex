@@ -2,7 +2,7 @@ package flex.pdf.monad
 
 import flex.conf.pdf.SmoothDistConf
 import flex.measure.Measure
-import flex.pdf.{DeltaDist, Dist}
+import flex.pdf.{ DeltaDist, Dist }
 
 object Pure {
 

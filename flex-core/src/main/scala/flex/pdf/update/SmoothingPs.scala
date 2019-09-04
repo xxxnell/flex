@@ -1,6 +1,6 @@
 package flex.pdf.update
 
-import flex.pdf.{Count, Dist, Prim}
+import flex.pdf.{ Count, Dist, Prim }
 
 trait SmoothingPs {
 

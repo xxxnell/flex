@@ -1,7 +1,7 @@
 package flex.hmap
 
 import cats.data.Kleisli
-import flex.{Epi, Mon}
+import flex.{ Epi, Mon }
 import flex.counter.CDim
 
 /**

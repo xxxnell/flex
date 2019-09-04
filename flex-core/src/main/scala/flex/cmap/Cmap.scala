@@ -1,7 +1,7 @@
 package flex.cmap
 
 import cats.data.Kleisli
-import flex.conf.cmap.{CmapConf, UniformCmapConf}
+import flex.conf.cmap.{ CmapConf, UniformCmapConf }
 import flex.hmap.HDim
 import flex.pdf._
 import flex.range.syntax._

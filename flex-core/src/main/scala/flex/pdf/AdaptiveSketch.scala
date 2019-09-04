@@ -39,19 +39,17 @@ trait AdaptiveSketchOps[S[_] <: AdaptiveSketch[_]] extends SketchPrimPropOps[S] 
   lazy val queueCorrectionMemo: Memo[AdaptiveSketchConf, Double] = Memo.empty(1)
 
   def queueCorrection(sketch: S[_]): Double = {
-    lazy val corr = queueCorrectionMemo.get(
-      sketch.conf, {
-        val conf = sketch.conf
-        val cmapNo = conf.cmap.no
-        val decayFactor = conf.decayFactor
-        val effNo = if (cmapNo > 1) cmapNo - 1 else cmapNo
+    lazy val corr = queueCorrectionMemo.get(sketch.conf, {
+      val conf = sketch.conf
+      val cmapNo = conf.cmap.no
+      val decayFactor = conf.decayFactor
+      val effNo = if (cmapNo > 1) cmapNo - 1 else cmapNo
 
-        lazy val effRates = (0 until effNo).map(i => decayRate(decayFactor, i))
-        lazy val allRates = (0 until cmapNo).map(i => decayRate(decayFactor, i))
+      lazy val effRates = (0 until effNo).map(i => decayRate(decayFactor, i))
+      lazy val allRates = (0 until cmapNo).map(i => decayRate(decayFactor, i))
 
-        effRates.sum / allRates.sum
-      }
-    )
+      effRates.sum / allRates.sum
+    })
 
     if (sketch.structures.size < sketch.conf.cmap.no) 1 else corr
   }
@@ -81,16 +79,13 @@ trait AdaptiveSketchLaws[S[_] <: AdaptiveSketch[_]] { self: AdaptiveSketchOps[S]
 
   def append[A](sketch0: S[A], as: List[(A, Count)]): (S[A], List[(A, Count)]) = {
     var rem: Buffer[A] = null
-    val sketch1 = modifyBuffer(
-      sketch0,
-      (buffer0: Buffer[A]) => {
-        val concat = buffer0 ++ as
-        val overflow = concat.size - sketch0.conf.bufferSize
-        val (_rem, buffer1) = concat.splitAt(overflow)
-        rem = _rem
-        buffer1
-      }
-    )
+    val sketch1 = modifyBuffer(sketch0, (buffer0: Buffer[A]) => {
+      val concat = buffer0 ++ as
+      val overflow = concat.size - sketch0.conf.bufferSize
+      val (_rem, buffer1) = concat.splitAt(overflow)
+      rem = _rem
+      buffer1
+    })
 
     (sketch1, rem.toList)
   }

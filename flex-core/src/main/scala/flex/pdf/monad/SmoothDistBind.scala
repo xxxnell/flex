@@ -1,7 +1,7 @@
 package flex.pdf.monad
 
 import flex.conf.pdf.SamplingDistConfB
-import flex.pdf.{Dist, SamplingDist, SmoothDist}
+import flex.pdf.{ Dist, SamplingDist, SmoothDist }
 
 import scala.language.higherKinds
 

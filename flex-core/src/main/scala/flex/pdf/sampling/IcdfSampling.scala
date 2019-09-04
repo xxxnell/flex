@@ -1,6 +1,6 @@
 package flex.pdf.sampling
 
-import flex.conf.pdf.{EqualizeIcdfSamplingConf, IcdfSamplingConf}
+import flex.conf.pdf.{ EqualizeIcdfSamplingConf, IcdfSamplingConf }
 import flex.measure.Measure
 import flex.range.RangeM
 
@@ -20,13 +20,10 @@ trait IcdfSamplingLaws[C <: IcdfSamplingConf] { self: IcdfSampling[C] =>
 
   @Deprecated
   def samplingRanges[A](icdf: Double => A, measure: Measure[A], conf: C): List[RangeM[A]] =
-    sampling(icdf, measure, conf)
-      .sliding(2)
-      .toList
-      .flatMap {
-        case q1 :: q2 :: Nil => Some(RangeM(q1, q2)(measure))
-        case _ => None
-      }
+    sampling(icdf, measure, conf).sliding(2).toList.flatMap {
+      case q1 :: q2 :: Nil => Some(RangeM(q1, q2)(measure))
+      case _ => None
+    }
 
 }
 

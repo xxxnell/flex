@@ -1,7 +1,7 @@
 package flex.pdf.update
 
 import flex.conf.pdf.SmoothDistConf
-import flex.pdf.{Count, Dist, NumericDist, PredefinedDist, Prim}
+import flex.pdf.{ Count, Dist, NumericDist, PredefinedDist, Prim }
 import flex.plot.DensityPlot
 import flex.range.RangeP
 import flex.measure.syntax._

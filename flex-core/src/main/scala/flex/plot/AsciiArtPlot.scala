@@ -23,8 +23,8 @@ object AsciiArtPlot {
     val remLength = length - 3 - rangeLength * 2
 
     range.start.toString.take(rangeLength) +
-      " ~ " +
-      range.end.toString.take(rangeLength)
+    " ~ " +
+    range.end.toString.take(rangeLength)
   }
 
   def asciiForProb(prob: Double): String =

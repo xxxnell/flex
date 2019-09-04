@@ -1,6 +1,6 @@
 package flex.chain.monad
 
-import flex.conf.pdf.{SketchConf, SketchConfB}
+import flex.conf.pdf.{ SketchConf, SketchConfB }
 import flex.pdf.Sketch
 
 import scala.language.higherKinds

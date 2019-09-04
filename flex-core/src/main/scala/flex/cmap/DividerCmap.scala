@@ -22,7 +22,7 @@ trait DividerCmap extends Cmap {
 
   override def equals(other: Any): Boolean =
     other.isInstanceOf[DividerCmap] &&
-      (divider == other.asInstanceOf[DividerCmap].divider)
+    (divider == other.asInstanceOf[DividerCmap].divider)
 
   override def toString: String = {
     def divider2Str(divider: List[Prim]): String =
@@ -56,9 +56,7 @@ trait DividerCmapOps[DC <: DividerCmap] extends CmapOps[DC] {
   def bins(cmap: DC): List[RangeP] = {
     val divider = cmap.divider
 
-    (min :: divider)
-      .zip(divider :+ max)
-      .map { case (start, end) => RangeP(start, end) }
+    (min :: divider).zip(divider :+ max).map { case (start, end) => RangeP(start, end) }
   }
 
   def binsArr(cmap: DC): Array[RangeP] = {

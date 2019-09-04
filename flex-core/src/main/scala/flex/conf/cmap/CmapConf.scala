@@ -10,11 +10,12 @@ trait CmapConf extends IcdfSamplingConf {
 
 object CmapConf {
 
-  def uniformEqualize(size: Int,
-                      no: Int,
-                      start: Option[Prim],
-                      end: Option[Prim],
-                      boundaryRatio: Double): UniformEqualizeCmapConf =
+  def uniformEqualize(
+      size: Int,
+      no: Int,
+      start: Option[Prim],
+      end: Option[Prim],
+      boundaryRatio: Double): UniformEqualizeCmapConf =
     UniformEqualizeCmapConf(size, no, start, end, boundaryRatio)
 
 }

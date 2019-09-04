@@ -2,7 +2,7 @@ package flex.hcounter
 
 import cats.data.NonEmptyList
 import flex.counter.Counter
-import flex.hmap.{HDim, Hmap}
+import flex.hmap.{ HDim, Hmap }
 import flex.pdf.Count
 
 import scala.util.hashing.byteswap32

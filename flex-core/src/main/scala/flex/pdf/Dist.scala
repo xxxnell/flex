@@ -1,6 +1,6 @@
 package flex.pdf
 
-import flex.conf.pdf.{DistConf, SmoothDistConf}
+import flex.conf.pdf.{ DistConf, SmoothDistConf }
 import flex.measure.Measure
 import flex.pdf.arithmetic.CombinationDist
 import flex.plot.PointPlot

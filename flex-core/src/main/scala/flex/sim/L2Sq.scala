@@ -1,6 +1,6 @@
 package flex.sim
 
-import flex.pdf.{Dist, SamplingDist}
+import flex.pdf.{ Dist, SamplingDist }
 
 /**
  * Squared Eucledian Distance, or Minkowski L2 Distance between two pdfs.

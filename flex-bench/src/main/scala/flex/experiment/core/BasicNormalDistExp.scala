@@ -9,11 +9,7 @@ object BasicNormalDistExp {
     val expName1 = "basic-normal"
     val dataNo = 1000
 
-    implicit val conf: SketchConf = SketchConf(
-      cmapStart = Some(-20),
-      cmapEnd = Some(20),
-      rebuildThreshold = 0.2
-    )
+    implicit val conf: SketchConf = SketchConf(cmapStart = Some(-20), cmapEnd = Some(20), rebuildThreshold = 0.2)
     val sketch0 = Sketch.empty[Double]
     val underlying = NumericDist.normal(0.0, 1)
     val (_, datas) = underlying.samples(dataNo)

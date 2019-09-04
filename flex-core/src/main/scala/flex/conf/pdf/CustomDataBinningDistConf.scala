@@ -11,21 +11,20 @@ object CustomDataBinningDistConf {
       extends CustomDataBinningDistConf
 
   def apply( // dist
-            delta: Double = DefaultAdaPerSketchConf.delta,
-            // cmap
-            cmapSize: Int = DefaultAdaSelSketchConf.cmap.size,
-            cmapNo: Int = DefaultAdaSelSketchConf.cmap.no,
-            cmapStart: Option[Double] = DefaultAdaSelSketchConf.cmap.start,
-            cmapEnd: Option[Double] = DefaultAdaSelSketchConf.cmap.end,
-            boundaryRatio: Double = DefaultAdaSelSketchConf.cmap.boundaryRatio,
-            // counter
-            counterSize: Int = DefaultAdaSelSketchConf.counter.size,
-            counterNo: Int = DefaultAdaSelSketchConf.counter.no): CustomDataBinningDistConf =
+      delta: Double = DefaultAdaPerSketchConf.delta,
+      // cmap
+      cmapSize: Int = DefaultAdaSelSketchConf.cmap.size,
+      cmapNo: Int = DefaultAdaSelSketchConf.cmap.no,
+      cmapStart: Option[Double] = DefaultAdaSelSketchConf.cmap.start,
+      cmapEnd: Option[Double] = DefaultAdaSelSketchConf.cmap.end,
+      boundaryRatio: Double = DefaultAdaSelSketchConf.cmap.boundaryRatio,
+      // counter
+      counterSize: Int = DefaultAdaSelSketchConf.counter.size,
+      counterNo: Int = DefaultAdaSelSketchConf.counter.no): CustomDataBinningDistConf =
     bare(
       delta,
       CmapConf.uniformEqualize(cmapSize, cmapNo, cmapStart, cmapEnd, boundaryRatio),
-      CounterConf(counterSize, counterNo)
-    )
+      CounterConf(counterSize, counterNo))
 
   def bare(delta: Double, cmap: CmapConf, counter: CounterConf): CustomDataBinningDistConf =
     CustomDataBinningDistConfImpl(delta, cmap, counter)

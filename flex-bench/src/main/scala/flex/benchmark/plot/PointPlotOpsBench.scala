@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit
 
 import flex._
 import flex.plot.syntax._
-import flex.plot.{CountPlot, DensityPlot, PointPlot}
+import flex.plot.{ CountPlot, DensityPlot, PointPlot }
 import flex.range.RangeP
 import org.openjdk.jmh.annotations._
 

@@ -1,9 +1,9 @@
 package flex.chain.monad
 
 import cats.data.NonEmptyList
-import flex.conf.pdf.{DistConf, SamplingDistConf, SmoothDistConf}
+import flex.conf.pdf.{ DistConf, SamplingDistConf, SmoothDistConf }
 import flex.measure.Measure
-import flex.pdf.{DeltaDist, Dist, PlottedDist, UniformDist}
+import flex.pdf.{ DeltaDist, Dist, PlottedDist, UniformDist }
 import flex.plot.PointPlot
 
 import scala.collection.mutable.ArrayBuffer
@@ -17,10 +17,11 @@ object PointToPointBind { self =>
     PlottedDist.forCdfSampling(cdf)(measureB, SamplingDistConf.forDistConf(conf))
   }
 
-  def weightCdfs[A, B](dist: Dist[A],
-                       f: A => Dist[B],
-                       measureB: Measure[B],
-                       conf: DistConf): List[(Double, PointPlot)] = {
+  def weightCdfs[A, B](
+      dist: Dist[A],
+      f: A => Dist[B],
+      measureB: Measure[B],
+      conf: DistConf): List[(Double, PointPlot)] = {
     val cum1 = dist.cdfSampling.records
     val array = new ArrayBuffer[(Double, PointPlot)]
     var i = 1

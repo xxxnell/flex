@@ -3,7 +3,7 @@ package flex.pdf.update
 import cats.data.NonEmptyList
 import flex.conf.pdf.SmoothDistConf
 import flex.pdf.arithmetic.CombinationDist
-import flex.pdf.{Count, Dist, NumericDist, Prim}
+import flex.pdf.{ Count, Dist, NumericDist, Prim }
 import flex.measure.syntax._
 import org.apache.commons.math3.special.Erf
 

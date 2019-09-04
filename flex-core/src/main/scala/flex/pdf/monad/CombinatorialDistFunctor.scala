@@ -1,8 +1,8 @@
 package flex.pdf.monad
 
-import flex.conf.pdf.{SamplingDistConf, SmoothDistConf}
+import flex.conf.pdf.{ SamplingDistConf, SmoothDistConf }
 import flex.measure.Measure
-import flex.pdf.{Dist, SamplingDist}
+import flex.pdf.{ Dist, SamplingDist }
 
 object CombinatorialDistFunctor extends DistFunctor[Dist, SamplingDist, SamplingDistConf] {
 

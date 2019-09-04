@@ -1,7 +1,7 @@
 package flex.measure
 
 import flex.pdf.Prim
-import scala.reflect.runtime.universe.{typeOf, TypeTag}
+import scala.reflect.runtime.universe.{ typeOf, TypeTag }
 
 /**
  * Measure is a bijective map between primitive type of Sketch and arbitrary

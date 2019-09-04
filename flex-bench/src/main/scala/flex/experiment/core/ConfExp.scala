@@ -4,7 +4,7 @@ import flex.conf.pdf.AdaSelSketchConf
 import flex.experiment.ops._
 import flex.implicits._
 import flex.rand.IRng
-import flex.{Params, Profiler}
+import flex.{ Params, Profiler }
 
 object ConfExp {
 
@@ -22,24 +22,24 @@ object ConfExp {
     val confHeader = "cmapSize, cmapNo, bufferSize, decayFactor, rebuildThreshold, ed, mem\n"
     val conf2Str: SketchConf => String = conf =>
       s"${conf.cmap.size}, " +
-        s"${conf.cmap.no}, " +
-        s"${conf.asInstanceOf[AdaSelSketchConf].bufferSize}, " +
-        s"${conf.decayFactor}, " +
-        s"${conf.asInstanceOf[AdaSelSketchConf].rebuildThreshold}"
+      s"${conf.cmap.no}, " +
+      s"${conf.asInstanceOf[AdaSelSketchConf].bufferSize}, " +
+      s"${conf.decayFactor}, " +
+      s"${conf.asInstanceOf[AdaSelSketchConf].rebuildThreshold}"
     val normalOut =
-      confHeader +
-        confs
-          .map { conf =>
-            s"${conf2Str(conf)}, ${normalEds.getOrElse(conf, "")}, ${mems.getOrElse(conf, "")}"
-          }
-          .mkString("\n")
+    confHeader +
+    confs
+      .map { conf =>
+        s"${conf2Str(conf)}, ${normalEds.getOrElse(conf, "")}, ${mems.getOrElse(conf, "")}"
+      }
+      .mkString("\n")
     val incrDriftOut =
-      confHeader +
-        confs
-          .map { conf =>
-            s"${conf2Str(conf)}, ${driftEds.getOrElse(conf, "")}, ${mems.getOrElse(conf, "")}"
-          }
-          .mkString("\n")
+    confHeader +
+    confs
+      .map { conf =>
+        s"${conf2Str(conf)}, ${driftEds.getOrElse(conf, "")}, ${mems.getOrElse(conf, "")}"
+      }
+      .mkString("\n")
     println("(2/2) Results are printed...")
 
     ExpOutOps.clear(expName)

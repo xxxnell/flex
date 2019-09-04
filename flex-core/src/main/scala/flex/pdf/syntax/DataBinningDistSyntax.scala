@@ -1,7 +1,7 @@
 package flex.pdf.syntax
 
 import flex.hcounter.HCounter
-import flex.pdf.{Count, DataBinningDist, DataBinningDistOps, Histogram, HistogramOps}
+import flex.pdf.{ Count, DataBinningDist, DataBinningDistOps, Histogram, HistogramOps }
 import flex.plot.DensityPlot
 
 import scala.language.higherKinds

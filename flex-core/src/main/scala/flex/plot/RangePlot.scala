@@ -5,9 +5,9 @@ import flex.pdf.Prim
 import flex.plot.syntax._
 import flex.range._
 import flex.range.syntax._
-import org.apache.commons.math3.fitting.{PolynomialCurveFitter, WeightedObservedPoints}
+import org.apache.commons.math3.fitting.{ PolynomialCurveFitter, WeightedObservedPoints }
 
-import scala.collection.immutable.{TreeMap, TreeSet}
+import scala.collection.immutable.{ TreeMap, TreeSet }
 import scala.language.postfixOps
 import scala.math._
 import scala.util.Try
@@ -68,9 +68,7 @@ trait RangePlotLaws[P <: RangePlot] { self: RangePlotOps[P] =>
     })
 
   def image(plot: P, argument: Double): Option[Double] =
-    plot.records
-      .find { case (range, value) => range.contains(argument) }
-      .map { case (range, value) => value }
+    plot.records.find { case (range, value) => range.contains(argument) }.map { case (range, value) => value }
 
   def interpolation(plot: P, x: Double): Double = {
     lazy val midInterp = for {
@@ -78,22 +76,18 @@ trait RangePlotLaws[P <: RangePlot] { self: RangePlotOps[P] =>
       fromIndexBlocks <- plot.middleIndex.from(x).headOption
       (toPoint, toBlocks) = toIndexBlocks
       (fromPoint, fromBlocks) = fromIndexBlocks
-      toP = toBlocks
-        .map { case ((x1, y1), (x2, y2)) => (x1 / 2 + x2 / 2, y1 / 2 + y2 / 2) }
-        .maxBy { case (_, y) => y }
-      fromP = fromBlocks
-        .map { case ((x1, y1), (x2, y2)) => (x1 / 2 + x2 / 2, y1 / 2 + y2 / 2) }
-        .minBy { case (_, y) => y }
+      toP = toBlocks.map { case ((x1, y1), (x2, y2)) => (x1 / 2 + x2 / 2, y1 / 2 + y2 / 2) }.maxBy { case (_, y) => y }
+      fromP = fromBlocks.map { case ((x1, y1), (x2, y2)) => (x1 / 2 + x2 / 2, y1 / 2 + y2 / 2) }.minBy {
+        case (_, y) => y
+      }
       fitting <- Fitting.dataFitting(toP :: fromP :: Nil, x)
     } yield fitting
 
-    lazy val headExt = plot.records.headOption
-      .filter { case (range, _) => range.start >= x }
-      .map { case (_, value) => value }
+    lazy val headExt =
+      plot.records.headOption.filter { case (range, _) => range.start >= x }.map { case (_, value) => value }
 
-    lazy val tailExt = plot.records.lastOption
-      .filter { case (range, _) => range.end <= x }
-      .map { case (_, value) => value }
+    lazy val tailExt =
+      plot.records.lastOption.filter { case (range, _) => range.end <= x }.map { case (_, value) => value }
 
     midInterp.orElse(headExt).orElse(tailExt).getOrElse(0)
   }
@@ -115,14 +109,11 @@ trait RangePlotLaws[P <: RangePlot] { self: RangePlotOps[P] =>
   }
 
   def planarizeRecord(record: Record, boundaries: TreeSet[Double]): List[Record] = {
-    val (_, planarized) = boundaries
-      .from(record._1.start)
-      .to(record._1.end)
-      .foldRight((record, List.empty[Record])) {
-        case (b, (rem @ (range, _), acc)) =>
-          if (range.start != b && range.end != b)
-            split(rem, b).fold((rem, acc)) { case (rec1, rec2) => (rec1, rec2 :: acc) } else (rem, acc)
-      }
+    val (_, planarized) = boundaries.from(record._1.start).to(record._1.end).foldRight((record, List.empty[Record])) {
+      case (b, (rem @ (range, _), acc)) =>
+        if (range.start != b && range.end != b)
+          split(rem, b).fold((rem, acc)) { case (rec1, rec2) => (rec1, rec2 :: acc) } else (rem, acc)
+    }
 
     if (planarized.nonEmpty) planarized else List(record)
   }
@@ -169,8 +160,7 @@ trait RangePlotLaws[P <: RangePlot] { self: RangePlotOps[P] =>
             val min = values.min
             (range, if (math.abs(max) > math.abs(min)) max else min)
         }
-      }
-    )
+      })
 
   def multiplyConstant(plot: P, mag: Double): P = modifyValue(plot, { case (_, value) => value * mag })
 
@@ -180,11 +170,9 @@ trait RangePlotLaws[P <: RangePlot] { self: RangePlotOps[P] =>
     lazy val startBoundary: Double = (for {
       idxBlocks <- plot.startIndexedBlocks.to(start).lastOption
       (_, blocks) = idxBlocks
-      ((x1, y1), (x2, y2)) = blocks
-        .groupBy { case (_, (_x2, _)) => _x2 }
-        .maxBy { case (_x2, _) => _x2 }
-        ._2
-        .maxBy { case ((_, _y1), (_, _y2)) => _y1 / 2 + _y2 / 2 }
+      ((x1, y1), (x2, y2)) = blocks.groupBy { case (_, (_x2, _)) => _x2 }.maxBy { case (_x2, _) => _x2 }._2.maxBy {
+        case ((_, _y1), (_, _y2)) => _y1 / 2 + _y2 / 2
+      }
       yi = CountPlot.disjoint((RangeP(x1), y1) :: (RangeP(x2), y2) :: Nil).interpolation(start)
     } yield if (start != x1) areaPoint(start, yi, x2, y2) else 0).sum
 
@@ -192,11 +180,9 @@ trait RangePlotLaws[P <: RangePlot] { self: RangePlotOps[P] =>
       (for {
         idxBlocks <- plot.startIndexedBlocks.to(end).lastOption
         (_, blocks) = idxBlocks
-        ((x1, y1), (x2, y2)) = blocks
-          .groupBy { case (_, (_x2, _)) => _x2 }
-          .maxBy { case (_x2, _) => _x2 }
-          ._2
-          .maxBy { case ((_, _y1), (_, _y2)) => _y1 / 2 + _y2 / 2 }
+        ((x1, y1), (x2, y2)) = blocks.groupBy { case (_, (_x2, _)) => _x2 }.maxBy { case (_x2, _) => _x2 }._2.maxBy {
+          case ((_, _y1), (_, _y2)) => _y1 / 2 + _y2 / 2
+        }
         yi = CountPlot.disjoint((RangeP(x1), y1) :: (RangeP(x2), y2) :: Nil).interpolation(end)
       } yield areaPoint(x1, y1, end, yi)).sum
     }
@@ -206,13 +192,10 @@ trait RangePlotLaws[P <: RangePlot] { self: RangePlotOps[P] =>
          val endBlock = (for {
            idxBlocks <- startIndexedBlocksFromTo.lastOption
            (_, blocks) = idxBlocks
-           block = blocks
-             .groupBy { case (_, (_x2, _)) => _x2 }
-             .maxBy { case (_x2, _) => _x2 }
-             ._2
-             .maxBy { case ((_, _y1), (_, _y2)) => _y1 / 2 + _y2 / 2 }
-         } yield areaBlock(block))
-           .getOrElse(0.0)
+           block = blocks.groupBy { case (_, (_x2, _)) => _x2 }.maxBy { case (_x2, _) => _x2 }._2.maxBy {
+             case ((_, _y1), (_, _y2)) => _y1 / 2 + _y2 / 2
+           }
+         } yield areaBlock(block)).getOrElse(0.0)
 
          Some(startIndexedBlocksFromTo.values.toList.map(blocks => areaBlocks(blocks)).sum - endBlock)
        } else None).sum
@@ -267,11 +250,9 @@ trait RangePlotLaws[P <: RangePlot] { self: RangePlotOps[P] =>
             (RangeP.point(range.start), startVal) :: (RangeP.point(range.end), endVal) :: Nil
         }
 
-        utdRecord.headOption.fold(utdRecord)(
-          utdHead => if (utdHead._1 != cumHead._1) cumHead :: utdRecord else utdRecord
-        )
-      }
-    )
+        utdRecord.headOption.fold(utdRecord)(utdHead =>
+          if (utdHead._1 != cumHead._1) cumHead :: utdRecord else utdRecord)
+      })
   }
 
   def normalizedCumulative(plot: P): P = {
@@ -283,8 +264,7 @@ trait RangePlotLaws[P <: RangePlot] { self: RangePlotOps[P] =>
   def inverseNormalizedCumulative(plot: P): P =
     unsafeModifyRecords(
       normalizedCumulative(plot),
-      (records: List[Record]) => records.map { case (range, value) => (RangeP.point(value), range.middle) }
-    )
+      (records: List[Record]) => records.map { case (range, value) => (RangeP.point(value), range.middle) })
 
 }
 

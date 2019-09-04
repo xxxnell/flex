@@ -33,13 +33,15 @@ object DensityPlot extends DensityPlotOps {
     val sum = ds.map(d => d._2).sum
     val utdWindow = if (window <= 0) 1e-100 else window
 
-    modifyRecords(DensityPlot.empty,
-                  _ =>
-                    ds.map {
-                      case (value, count) =>
-                        (RangeP(value - (utdWindow / 2), value + (utdWindow / 2)),
-                         if (sum * utdWindow > 0) count / (sum * utdWindow) else 0)
-                  })
+    modifyRecords(
+      DensityPlot.empty,
+      _ =>
+        ds.map {
+          case (value, count) =>
+            (
+              RangeP(value - (utdWindow / 2), value + (utdWindow / 2)),
+              if (sum * utdWindow > 0) count / (sum * utdWindow) else 0)
+      })
   }
 
   def disjoint(records: List[Record]): DensityPlot = modifyRecords(empty, _ => records)

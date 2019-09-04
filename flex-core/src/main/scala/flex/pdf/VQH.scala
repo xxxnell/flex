@@ -8,7 +8,7 @@ import flex.pdf.syntax._
 import flex.rand._
 import flex.util.IdentityHashMap.syntax._
 import flex.util.RandomIdentitySet.syntax._
-import flex.util.{IdentityHashMap, RandomIdentitySet}
+import flex.util.{ IdentityHashMap, RandomIdentitySet }
 import flex.vec._
 import org.nd4j.linalg.factory.Nd4j
 
@@ -57,8 +57,8 @@ trait VQH {
     val parNnsDims = parnns.dims
 
     s"VQH(k: $k, ntot: $ntot, " +
-      s"dim: ${dimsStr(vqhDims)}, size: ${VQH.size(this)}, " +
-      s"nns.dim: ${nns.dim}, parnns.dim: ${dimsStr(parNnsDims)})"
+    s"dim: ${dimsStr(vqhDims)}, size: ${VQH.size(this)}, " +
+    s"nns.dim: ${nns.dim}, parnns.dim: ${dimsStr(parNnsDims)})"
   }
 
 }
@@ -162,9 +162,10 @@ trait VQHLaws { self: VQHOps =>
    * Update partial input vectors.
    * @return (Updated VQH, new codeword-vectors, out codeword-vectors)
    * */
-  def parUpdate(vqh: VQH,
-                xps: List[(Vec, Int, Float)],
-                complete: (Vec, Int, SumVec) => SumVec): (VQH, List[SumVec], List[SumVec]) =
+  def parUpdate(
+      vqh: VQH,
+      xps: List[(Vec, Int, Float)],
+      complete: (Vec, Int, SumVec) => SumVec): (VQH, List[SumVec], List[SumVec]) =
     xps.foldLeft((vqh, List.empty[SumVec], List.empty[SumVec])) {
       case ((_vqh, _cnews, _couts), (xp, a, w)) =>
         val (vqh1, cnews1, couts1) = parSearch(vqh, xp, a)
@@ -181,9 +182,8 @@ trait VQHLaws { self: VQHOps =>
   def expUpdate(vqh: VQH, xs: List[(SumVec, Float)]): (VQH, List[SumVec], List[SumVec]) =
     xs.foldLeft((vqh, List.empty[SumVec], List.empty[SumVec])) {
       case ((_vqh, _newcs, _couts), (x, w)) =>
-        val (vqh1, cnews1, couts1) = expSearch(vqh, x)
-          .map(c => singleUpdate(_vqh, c, x, w))
-          .getOrElse((addCw(_vqh, x, w), x :: Nil, Nil))
+        val (vqh1, cnews1, couts1) =
+          expSearch(vqh, x).map(c => singleUpdate(_vqh, c, x, w)).getOrElse((addCw(_vqh, x, w), x :: Nil, Nil))
 
         (vqh1, cnews1 ++ _newcs, couts1 ++ _couts)
     }
@@ -248,8 +248,9 @@ trait VQHSyntax {
     def add(x: SumVec, n: Float): VQH = VQH.addCw(vqh, x, n)
     def remove(x: SumVec): VQH = VQH.removeCw(vqh, x)
     def addDim(rand: IRng => (SumVec, IRng)): VQH = VQH.addDim(vqh, rand)
-    def parUpdate(xps: List[(Vec, Int, Float)],
-                  complete: (Vec, Int, SumVec) => SumVec): (VQH, List[SumVec], List[SumVec]) =
+    def parUpdate(
+        xps: List[(Vec, Int, Float)],
+        complete: (Vec, Int, SumVec) => SumVec): (VQH, List[SumVec], List[SumVec]) =
       VQH.parUpdate(vqh, xps, complete)
     def expUpdate(xs: List[(SumVec, Float)]): (VQH, List[SumVec], List[SumVec]) = VQH.expUpdate(vqh, xs)
     def expUpdateTrace(xs: List[(SumVec, Float)]): List[VQH] =
@@ -270,24 +271,26 @@ object VQH extends VQHOps { self =>
 
   object syntax extends VQHSyntax
 
-  private case class VQHImpl(cws: RandomIdentitySet[SumVec],
-                             ns: IdentityHashMap[SumVec, Float],
-                             last: SumVec,
-                             ntot: Float,
-                             k: Int,
-                             rng: IRng,
-                             nns: SumVecANN,
-                             parnns: ParVecANN)
+  private case class VQHImpl(
+      cws: RandomIdentitySet[SumVec],
+      ns: IdentityHashMap[SumVec, Float],
+      last: SumVec,
+      ntot: Float,
+      k: Int,
+      rng: IRng,
+      nns: SumVecANN,
+      parnns: ParVecANN)
       extends VQH
 
-  def apply(cws: RandomIdentitySet[SumVec],
-            ns: IdentityHashMap[SumVec, Float],
-            latest: SumVec,
-            ntot: Float,
-            k: Int,
-            rng: IRng,
-            nns: SumVecANN,
-            parnns: ParVecANN): VQH = VQHImpl(cws, ns, latest, ntot, k, rng, nns, parnns)
+  def apply(
+      cws: RandomIdentitySet[SumVec],
+      ns: IdentityHashMap[SumVec, Float],
+      latest: SumVec,
+      ntot: Float,
+      k: Int,
+      rng: IRng,
+      nns: SumVecANN,
+      parnns: ParVecANN): VQH = VQHImpl(cws, ns, latest, ntot, k, rng, nns, parnns)
 
   def empty(dims: List[Int], k: Int): VQH = {
     val l = self.l(k)

@@ -6,7 +6,7 @@ import flex.range.syntax._
 import flex.measure.syntax._
 
 import scala.collection.immutable.NumericRange
-import scala.language.{higherKinds, implicitConversions, reflectiveCalls}
+import scala.language.{ higherKinds, implicitConversions, reflectiveCalls }
 
 /**
  * Range for measurable value.
@@ -44,7 +44,7 @@ trait RangeMOps[Γ, R[_] <: RangeM[_]] {
 
   def containsP(start: Prim, end: Prim, p: Prim): Boolean =
     ((start >= p) && (end <= p)) ||
-      ((start <= p) && (end >= p))
+    ((start <= p) && (end >= p))
 
   def contains[A <: Γ](range: R[A], a: A): Boolean =
     containsP(startP(range), endP(range), range.measure.asInstanceOf[Measure[A]].to(a))

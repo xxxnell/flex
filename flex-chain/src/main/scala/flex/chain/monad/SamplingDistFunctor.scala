@@ -1,6 +1,6 @@
 package flex.chain.monad
 
-import flex.conf.pdf.{SamplingDistConf, SamplingDistConfB}
+import flex.conf.pdf.{ SamplingDistConf, SamplingDistConfB }
 import flex.pdf.SamplingDist
 
 import scala.language.higherKinds

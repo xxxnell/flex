@@ -1,9 +1,9 @@
 package flex.vec
 
-import java.io.{DataInputStream, File, FileInputStream, FileOutputStream}
+import java.io.{ DataInputStream, File, FileInputStream, FileOutputStream }
 import java.net.URL
 import java.nio.channels.Channels
-import java.nio.file.{Files, Paths}
+import java.nio.file.{ Files, Paths }
 import java.util.zip.GZIPInputStream
 
 import monix.eval.Task

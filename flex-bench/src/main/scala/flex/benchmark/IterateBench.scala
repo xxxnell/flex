@@ -43,8 +43,7 @@ class IterateBench { self =>
       cmapNo = cmapNoL,
       cmapStart = Some(-3.0),
       cmapEnd = Some(3.0),
-      rebuildThreshold = rebuildThresholdL
-    )
+      rebuildThreshold = rebuildThresholdL)
 
     signals = SignalOps.normalSignals(iterateBenchSize).toArray
     sketch = Sketch.empty[Double]

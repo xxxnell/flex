@@ -2,7 +2,7 @@ package flex.pdf.syntax
 
 import flex.conf.pdf.SamplingDistConf
 import flex.measure.Measure
-import flex.pdf.{PlottedDist, SmoothDist}
+import flex.pdf.{ PlottedDist, SmoothDist }
 
 trait SmoothDistSyntax extends SmoothDistPropSyntax
 

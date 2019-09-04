@@ -1,6 +1,6 @@
 package flex.plot
 
-import org.apache.commons.math3.fitting.{PolynomialCurveFitter, WeightedObservedPoints}
+import org.apache.commons.math3.fitting.{ PolynomialCurveFitter, WeightedObservedPoints }
 
 import scala.math.BigDecimal
 import scala.util.Try
@@ -41,12 +41,7 @@ object Fitting {
     else
       try {
         Some(
-          linearFittingBigDecimal(
-            (BigDecimal(x1), BigDecimal(y1)),
-            (BigDecimal(x2), BigDecimal(y2)),
-            BigDecimal(x)
-          ).toDouble
-        )
+          linearFittingBigDecimal((BigDecimal(x1), BigDecimal(y1)), (BigDecimal(x2), BigDecimal(y2)), BigDecimal(x)).toDouble)
       } catch {
         case _: Exception => None
       }

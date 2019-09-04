@@ -2,7 +2,7 @@ package flex.benchmark.sketch
 
 import java.util.concurrent.TimeUnit
 
-import flex.pdf.{Buffer, Count}
+import flex.pdf.{ Buffer, Count }
 import flex.pdf.Buffer.syntax._
 import org.openjdk.jmh.annotations._
 

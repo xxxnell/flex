@@ -10,10 +10,7 @@ object AvgBindExp {
     val expName = "avg-bind"
     val dataNo = 300
 
-    implicit val conf: SketchConf = SketchConf(
-      cmapStart = Some(-10d),
-      cmapEnd = Some(10)
-    )
+    implicit val conf: SketchConf = SketchConf(cmapStart = Some(-10d), cmapEnd = Some(10))
     val sketchA0 = Sketch.empty[Double]
     val sketchB0 = Sketch.empty[Double]
     val sketchC0 = Sketch.empty[Double]
