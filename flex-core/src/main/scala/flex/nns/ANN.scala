@@ -52,7 +52,7 @@ trait ANNLaws[V, A <: ANN[V]] { self: ANNOps[V, A] =>
     val hashs = ann.lsh.hash(x)
     val vecs = hashs.zip(ann.htables).flatMap { case (h, ht) => ht.getOrElse(h, IdentityHashSet.empty[V]).toList }
     val neighbors = frequentest(vecs)
-    if (neighbors.size > 2) neighbors.map(n => (n, distance(x, n))).sortBy(_._2).headOption.map(_._1)
+    if (neighbors.size > 1) neighbors.map(n => (n, distance(x, n))).sortBy(_._2).headOption.map(_._1)
     else neighbors.headOption
   }
 
