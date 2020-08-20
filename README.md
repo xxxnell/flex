@@ -9,7 +9,7 @@ Flex is a probabilistic deep learning library for data streams. It has the follo
 
 * **Fast**. Flex provides probabilistic deep learning that is fast enough to solve the real-world problems.
 * **Typesafe and Functional**. Types and pure functions make the code easy to understand and maintain.
-*  **Easy**. You can program with a minimal knowledge of probability theory.
+* **Easy**. You can program with a minimal knowledge of probability theory.
 
 Today, neural networks have been widely used for solving problems in many areas. However, classical neural networks have some limitations when you want to include uncertainties in the model. For example, suppose that input data and training data contain a lot of noise. If you need to detect whether the data contains false-positive or false-negative, the model should represent how reliable the input and the output are. To deal with this issue, probabilistic deep learning, also known as the Bayesian neural network, can be used. It is a way to treat both input and output as a probability distribution and it is one of the best approaches to represent uncertainties. However, the Bayesian neural network is so computationally slow that it cannot be readily applied to the real-world problems. Flex is fast enough to make it possible to apply the Bayesian neural network to the real-world problems. 
 
