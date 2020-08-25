@@ -28,7 +28,7 @@ object AsciiArtPlot {
   }
 
   def asciiForProb(prob: Double): String =
-    prob * 100 + "%"
+    f"${prob * 100}%1.2f" * 100 + "%"
 
   def asciiProbBarForProb(prob: Double): String =
     ("*" * (prob * 100).toInt).take(150)
