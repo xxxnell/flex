@@ -17,6 +17,4 @@ object DistFunctor {
 
   def samplingDist: DistFunctor[Dist, SamplingDist, SamplingDistConf] = CombinatorialDistFunctor
 
-//  def sketch: DistFunctor[Dist, Sketch, SketchConf] = ???
-
 }
